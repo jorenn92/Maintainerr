@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import NodeCache from 'node-cache';
-import { LoggerService } from 'src/logger/logger.service';
 
 // 5 minute default TTL (in seconds)
 const DEFAULT_TTL = 300;
@@ -14,16 +13,11 @@ interface ExternalAPIOptions {
   headers?: Record<string, unknown>;
 }
 
-@Injectable()
-export class BaseApiService {
+export class ExternalApiService {
   protected axios: AxiosInstance;
   private baseUrl: string;
   private cache?: NodeCache;
-  public logger = new LoggerService();
-
-  constructor(private loggerService: LoggerService) {}
-
-  public createBaseConnection(
+  constructor(
     baseUrl: string,
     params: Record<string, unknown>,
     options: ExternalAPIOptions = {},
@@ -59,6 +53,43 @@ export class BaseApiService {
 
     return response.data;
   }
+
+  // public createBaseConnection(
+  //   baseUrl: string,
+  //   params: Record<string, unknown>,
+  //   options: ExternalAPIOptions = {},
+  // ) {
+  //   this.axios = axios.create({
+  //     baseURL: baseUrl,
+  //     params,
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       Accept: 'application/json',
+  //       ...options.headers,
+  //     },
+  //   });
+  //   this.baseUrl = baseUrl;
+  //   this.cache = options.nodeCache;
+  // }
+  // protected async get<T>(
+  //   endpoint: string,
+  //   config?: AxiosRequestConfig,
+  //   ttl?: number,
+  // ): Promise<T> {
+  //   const cacheKey = this.serializeCacheKey(endpoint, config?.params);
+  //   const cachedItem = this.cache?.get<T>(cacheKey);
+  //   if (cachedItem) {
+  //     return cachedItem;
+  //   }
+
+  //   const response = await this.axios.get<T>(endpoint, config);
+
+  //   if (this.cache) {
+  //     this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
+  //   }
+
+  //   return response.data;
+  // }
 
   protected async getRolling<T>(
     endpoint: string,

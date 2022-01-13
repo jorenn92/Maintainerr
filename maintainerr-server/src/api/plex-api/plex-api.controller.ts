@@ -15,7 +15,7 @@ import {
 import { PlexApiService } from './plex-api.service';
 import { PlexHub, PlexLibraryItem } from './interfaces/library.interfaces';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
-import { BasicResponseDto } from '../base-api/dto/basic-response.dto';
+import { BasicResponseDto } from './dto/basic-response.dto';
 
 @Controller('api/plex')
 export class PlexApiController {

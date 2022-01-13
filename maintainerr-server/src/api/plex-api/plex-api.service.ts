@@ -6,8 +6,7 @@ import {
   SettingsService,
   Library,
 } from 'src/settings/settings.service';
-import { BaseApiService } from '../base-api/base-api.service';
-import { BasicResponseDto } from '../base-api/dto/basic-response.dto';
+import { BasicResponseDto } from './dto/basic-response.dto';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
 import {
   PlexCollection,
@@ -32,10 +31,7 @@ const { getSettings } = new SettingsService();
 export class PlexApiService {
   private plexClient: NodePlexAPI;
   private machineId: string;
-  constructor(
-    private loggerService: LoggerService,
-    private baseApi: BaseApiService,
-  ) {
+  constructor(private loggerService: LoggerService) {
     this.initialize({});
     this.setMachineId();
   }
