@@ -47,6 +47,14 @@ export class PlexApiController {
   getMetadata(@Param('id') id: string) {
     return this.plexApiService.getMetadata(id);
   }
+  @Get('meta/:id/seen')
+  getSeenBy(@Param('id') id: string) {
+    return this.plexApiService.getSeenBy(id);
+  }
+  @Get('meta/:id/children')
+  getChildrenMetadata(@Param('id') id: string) {
+    return this.plexApiService.getChildrenMetadata(id);
+  }
   @Get('library/:id/recent')
   getRecentlyAdded(@Param('id', new ParseIntPipe()) id: number) {
     this.plexApiService.getRecentlyAdded(id.toString());

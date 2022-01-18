@@ -2,11 +2,6 @@ export const enum RulePossibility {
   BIGGER,
   SMALLER,
   EQUALS,
-  ADD,
-  ADDDAYS,
-  ADDWEEKS,
-  ADDMONTHS,
-  ADDYEARS,
   CONTAINS,
   BEFORE,
   AFTER,
@@ -15,8 +10,15 @@ export const enum RulePossibility {
 }
 
 export const enum RuleOperators {
-  '&&',
-  '||',
+  AND,
+  OR,
+}
+
+export const enum Application {
+  PLEX,
+  RADARR,
+  SONARR,
+  OVERSEERR,
 }
 
 export class RuleType {
@@ -37,7 +39,6 @@ export class RuleType {
   static readonly TEXT = new RuleType('2', [
     RulePossibility.EQUALS,
     RulePossibility.CONTAINS,
-    RulePossibility.ADD,
   ]);
   static readonly USER = new RuleType('3', [RulePossibility.EQUALS]);
   static readonly NUMBERGROUP = new RuleType('4', [RulePossibility.CONTAINS]);
@@ -54,71 +55,160 @@ export class RuleType {
   }
 }
 
-export interface Rule {
+export interface Property {
   id: number;
   name: string;
   type: RuleType;
 }
 
-export interface RuleGroup {
+export interface ApplicationProperties {
   id: number;
   name: string;
-  props: Rule[];
+  description?: string;
+  props: Property[];
 }
 export class RuleConstants {
-  rules: RuleGroup[] = [
+  applications: ApplicationProperties[] = [
     {
-      id: 0,
+      id: Application.PLEX,
       name: 'Plex',
       props: [
         {
           id: 0,
           name: 'addDate',
           type: RuleType.DATE,
-        } as Rule,
-        { id: 1, name: 'user', type: RuleType.USER } as Rule,
-        { id: 2, name: 'seenBy', type: RuleType.USERGROUP } as Rule,
-        { id: 3, name: 'releaseDate', type: RuleType.DATE } as Rule,
-        { id: 4, name: 'imdbScore', type: RuleType.NUMBER } as Rule,
-        { id: 5, name: 'quality', type: RuleType.TEXT } as Rule,
-        { id: 6, name: 'label', type: RuleType.TEXT } as Rule,
-        { id: 7, name: 'people', type: RuleType.TEXTGROUP } as Rule,
-        { id: 8, name: 'collections', type: RuleType.NUMBER } as Rule,
+        } as Property,
+        {
+          id: 1,
+          name: 'seenBy',
+          type: RuleType.USERGROUP,
+        } as Property,
+        {
+          id: 2,
+          name: 'releaseDate',
+          type: RuleType.TEXT,
+        } as Property,
+        {
+          id: 3,
+          name: 'rating',
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 4,
+          name: 'people',
+          type: RuleType.TEXTGROUP,
+        } as Property,
+        {
+          id: 5,
+          name: 'viewCount',
+          type: RuleType.NUMBER,
+        } as Property,
+
+        {
+          id: 6,
+          name: 'collections',
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 7,
+          name: 'lastViewedAt',
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 8,
+          name: 'fileVideoResolution',
+          type: RuleType.TEXT,
+        } as Property,
+        {
+          id: 9,
+          name: 'fileBitrate',
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 10,
+          name: 'fileVideoCodec',
+          type: RuleType.TEXT,
+        } as Property,
+        {
+          id: 11,
+          name: 'genre',
+          type: RuleType.TEXTGROUP,
+        } as Property,
       ],
     },
     {
-      id: 1,
+      id: Application.RADARR,
       name: 'Radarr',
       props: [
-        { id: 0, name: 'addDate', type: RuleType.DATE } as Rule,
-        { id: 1, name: 'fileDate', type: RuleType.DATE } as Rule,
-        { id: 2, name: 'tags', type: RuleType.TEXTGROUP } as Rule,
-        { id: 3, name: 'profile', type: RuleType.TEXT } as Rule,
-        { id: 4, name: 'size', type: RuleType.NUMBER } as Rule,
-        { id: 5, name: 'releaseDate', type: RuleType.DATE } as Rule,
+        { id: 0, name: 'addDate', type: RuleType.DATE, apiLoc: '' } as Property,
+        {
+          id: 1,
+          name: 'fileDate',
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 2,
+          name: 'tags',
+          type: RuleType.TEXTGROUP,
+        } as Property,
+        { id: 3, name: 'profile', type: RuleType.TEXT } as Property,
+        { id: 4, name: 'size', type: RuleType.NUMBER } as Property,
+        {
+          id: 5,
+          name: 'releaseDate',
+          type: RuleType.DATE,
+        } as Property,
       ],
     },
     {
-      id: 2,
+      id: Application.SONARR,
       name: 'Sonarr',
       props: [
-        { id: 0, name: 'addDate', type: RuleType.DATE } as Rule,
-        { id: 1, name: 'fileDate', type: RuleType.DATE } as Rule,
-        { id: 2, name: 'tags', type: RuleType.TEXTGROUP } as Rule,
-        { id: 3, name: 'profile', type: RuleType.TEXT } as Rule,
-        { id: 4, name: 'size', type: RuleType.NUMBER } as Rule,
-        { id: 5, name: 'releaseDate', type: RuleType.DATE } as Rule,
-        { id: 6, name: 'seasons', type: RuleType.NUMBER } as Rule,
+        { id: 0, name: 'addDate', type: RuleType.DATE, apiLoc: '' } as Property,
+        {
+          id: 1,
+          name: 'fileDate',
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 2,
+          name: 'tags',
+          type: RuleType.TEXTGROUP,
+        } as Property,
+        { id: 3, name: 'profile', type: RuleType.TEXT, apiLoc: '' } as Property,
+        { id: 4, name: 'size', type: RuleType.NUMBER, apiLoc: '' } as Property,
+        {
+          id: 5,
+          name: 'releaseDate',
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 6,
+          name: 'seasons',
+          type: RuleType.NUMBER,
+        } as Property,
       ],
     },
     {
-      id: 3,
+      id: Application.OVERSEERR,
       name: 'Overseerr',
       props: [
-        { id: 0, name: 'addUser', type: RuleType.USER } as Rule,
-        { id: 1, name: 'requestDate', type: RuleType.DATE } as Rule,
-        { id: 2, name: 'releaseDate', type: RuleType.DATE } as Rule,
-        { id: 3, name: 'approvalDate', type: RuleType.DATE } as Rule,
+        { id: 0, name: 'addUser', type: RuleType.USER, apiLoc: '' } as Property,
+        {
+          id: 1,
+          name: 'requestDate',
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 2,
+          name: 'releaseDate',
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 3,
+          name: 'approvalDate',
+          type: RuleType.DATE,
+        } as Property,
       ],
     },
   ];

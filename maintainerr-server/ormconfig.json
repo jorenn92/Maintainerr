@@ -1,0 +1,15 @@
+{
+    "type": "sqlite",
+    "database": "maintainerr.sqlite",
+    "entities": [
+        "dist/**/*.entity{.ts,.js}"
+    ],
+    "synchronize": true,
+    "migrationsTableName": "migrations",
+    "migrations": [
+        "dist/database/migrations/*.js"
+    ],
+    "cli": {
+        "migrationsDir": "src/database/migrations"
+    }
+}

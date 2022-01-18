@@ -6,9 +6,17 @@ import { ServarrApiModule } from 'src/modules/api/servarr-api/servarr-api.module
 import { RulesModule } from 'src/modules/rules/rules.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { getConnectionOptions } from 'typeorm';
 
 @Module({
   imports: [
+    TypeOrmModule.forRootAsync({
+      useFactory: async () =>
+        Object.assign(await getConnectionOptions(), {
+          autoLoadEntities: true,
+        }),
+    }),
     PlexApiModule,
     ExternalApiModule,
     MovieDbApiModule,

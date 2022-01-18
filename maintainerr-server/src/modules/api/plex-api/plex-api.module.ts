@@ -8,6 +8,6 @@ import { LoggerModule } from 'src/logger/logger.module';
   imports: [SettingsModule, LoggerModule],
   controllers: [PlexApiController],
   providers: [PlexApiService],
-  exports: [],
+  exports: [PlexApiService],
 })
 export class PlexApiModule {}

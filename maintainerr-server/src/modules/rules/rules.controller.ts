@@ -1,16 +1,32 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { RulesDto } from './dtos/rules.dto';
+import { RuleExecutorService } from './rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
 
 @Controller('api/rules')
 export class RulesController {
-  constructor(private readonly rulesService: RulesService) {}
+  constructor(
+    private readonly rulesService: RulesService,
+    private readonly ruleExecutorService: RuleExecutorService,
+  ) {}
+  @Get('/constants')
+  getRuleConstants() {
+    return this.rulesService.getRuleConstants;
+  }
+  @Get('/:id')
+  getRules(@Param('id') id: string) {
+    return this.rulesService.getRules(id);
+  }
   @Get()
-  getRules() {
-    return this.rulesService.getRules;
+  getRuleGroups() {
+    return this.rulesService.getRuleGroups(false);
+  }
+  @Post('/execute')
+  executeRules() {
+    this.ruleExecutorService.executeAllRules();
   }
   @Post()
-  setRules(@Body() body: RulesDto): ReturnStatus {
-    return this.rulesService.setRules(body);
+  async setRules(@Body() body: RulesDto): Promise<ReturnStatus> {
+    return await this.rulesService.setRules(body);
   }
 }

@@ -17,7 +17,7 @@ export interface PlexMetadata {
   viewedLeafCount: number;
   addedAt: number;
   updatedAt: number;
-  Media: Media[];
+  media: Media[];
 }
 
 export interface Media {
@@ -35,7 +35,6 @@ export interface Media {
   videoFrameRate: string;
   videoProfile: string;
 }
-
 export interface PlexMetadataResponse {
   MediaContainer: {
     Metadata: PlexMetadata[];
