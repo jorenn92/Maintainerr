@@ -11,9 +11,18 @@ import { ValueGetterService } from './getter/getter.service';
 import { RadarrGetterService } from './getter/radarr-getter.service';
 import { SonarrGetterService } from './getter/sonarr-getter.service';
 import { OverseerrGetterService } from './getter/overseerr-getter.service';
+import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
+import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
+import { TmdbApiModule } from '../api/tmdb-api/tmdb.module';
 
 @Module({
-  imports: [PlexApiModule, TypeOrmModule.forFeature([Rules, RuleGroup])],
+  imports: [
+    PlexApiModule,
+    ServarrApiModule,
+    TypeOrmModule.forFeature([Rules, RuleGroup]),
+    OverseerrApiModule,
+    TmdbApiModule,
+  ],
   providers: [
     RulesService,
     RuleExecutorService,

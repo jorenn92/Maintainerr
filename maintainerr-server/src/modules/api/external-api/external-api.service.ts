@@ -44,7 +44,6 @@ export class ExternalApiService {
     if (cachedItem) {
       return cachedItem;
     }
-
     const response = await this.axios.get<T>(endpoint, config);
 
     if (this.cache) {
@@ -54,42 +53,13 @@ export class ExternalApiService {
     return response.data;
   }
 
-  // public createBaseConnection(
-  //   baseUrl: string,
-  //   params: Record<string, unknown>,
-  //   options: ExternalAPIOptions = {},
-  // ) {
-  //   this.axios = axios.create({
-  //     baseURL: baseUrl,
-  //     params,
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       Accept: 'application/json',
-  //       ...options.headers,
-  //     },
-  //   });
-  //   this.baseUrl = baseUrl;
-  //   this.cache = options.nodeCache;
-  // }
-  // protected async get<T>(
-  //   endpoint: string,
-  //   config?: AxiosRequestConfig,
-  //   ttl?: number,
-  // ): Promise<T> {
-  //   const cacheKey = this.serializeCacheKey(endpoint, config?.params);
-  //   const cachedItem = this.cache?.get<T>(cacheKey);
-  //   if (cachedItem) {
-  //     return cachedItem;
-  //   }
-
-  //   const response = await this.axios.get<T>(endpoint, config);
-
-  //   if (this.cache) {
-  //     this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
-  //   }
-
-  //   return response.data;
-  // }
+  protected async delete<T>(
+    endpoint: string,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
+    const response = await this.axios.delete<T>(endpoint, config);
+    return response.data;
+  }
 
   protected async getRolling<T>(
     endpoint: string,

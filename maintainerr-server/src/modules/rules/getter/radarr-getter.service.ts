@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PlexLibraryItem } from 'src/modules/api/plex-api/interfaces/library.interfaces';
-import { PlexApiService } from 'src/modules/api/plex-api/plex-api.service';
+import { RadarrApi } from 'src/modules/api/servarr-api/helpers/radarr.helper';
+import { ServarrService } from 'src/modules/api/servarr-api/servarr.service';
 import {
   Application,
   Property,
@@ -9,64 +10,70 @@ import {
 
 @Injectable()
 export class RadarrGetterService {
+  api: RadarrApi;
   plexProperties: Property[];
-  constructor(private readonly plexApi: PlexApiService) {
+  constructor(private readonly servarrService: ServarrService) {
+    this.api = servarrService.RadarrApi;
     const ruleConstanst = new RuleConstants();
     this.plexProperties = ruleConstanst.applications.find(
-      (el) => el.id === Application.PLEX,
+      (el) => el.id === Application.RADARR,
     ).props;
   }
 
-  get(id: number, libItem: PlexLibraryItem) {
+  async get(id: number, libItem: PlexLibraryItem) {
     const prop = this.plexProperties.find((el) => el.id === id);
+    const movieResponse = await this.servarrService.RadarrApi.getMovieByTmdbId(
+      +libItem.ratingKey,
+    );
     switch (prop.name) {
       case 'addDate': {
-        return new Date(libItem.addedAt);
+        return movieResponse.added ? new Date(movieResponse.added) : null;
       }
-      case 'seenBy': {
-        return this.plexApi
-          .getSeenBy(libItem.ratingKey)
-          .then((seenby) => {
-            return seenby.map((el) => el.accountID);
-          })
-          .catch((_err) => {
-            return null;
-          });
-      }
-      case 'releaseDate': {
-        return new Date(libItem.originallyAvailableAt);
-      }
-      case 'rating': {
-        return +libItem.rating;
-      }
-      case 'people': {
-        return libItem.role ? libItem.role.map((el) => el.tag) : null;
-      }
-      case 'viewCount': {
-        return +libItem.viewCount;
-      }
-      case 'collections': {
-        return +0; // TODO
-      }
-      case 'lastViewedAt': {
-        return new Date(libItem.lastViewedAt);
-      }
-      case 'fileVideoResolution': {
-        return libItem.Media[0].videoResolution
-          ? libItem.Media[0].videoResolution
+      case 'fileDate': {
+        return movieResponse.movieFile[0].dateAdded
+          ? new Date(movieResponse.movieFile[0].dateAdded)
           : null;
       }
-      case 'fileBitrate': {
-        return libItem.Media[0].bitrate ? libItem.Media[0].bitrate : null;
+      case 'fileQuality': {
+        return movieResponse.movieFile[0].quality.quality.resolution
+          ? new Date(movieResponse.movieFile[0].quality.quality.resolution)
+          : null;
       }
-      case 'fileVideoCodec': {
-        return libItem.Media[0].videoCodec ? libItem.Media[0].videoCodec : null;
+      case 'fileAudioChannels': {
+        return movieResponse.movieFile[0].mediainfo.audioChannels
+          ? new Date(movieResponse.movieFile[0].mediainfo.audioChannels)
+          : null;
       }
-      case 'genre': {
-        return libItem.genre ? libItem.genre.map((el) => el.tag) : null;
+      case 'runTime': {
+        return movieResponse.movieFile[0].mediainfo.runTime
+          ? new Date(movieResponse.movieFile[0].mediainfo.runTime)
+          : null;
       }
-      default: {
-        return null;
+      case 'monitored': {
+        return movieResponse.monitored ? movieResponse.monitored : null;
+      }
+      case 'tags': {
+        return await this.servarrService.RadarrApi.getTags();
+      }
+      case 'fileSize': {
+        return movieResponse.sizeOnDisk ? movieResponse.sizeOnDisk : null;
+      }
+      case 'releaseDate': {
+        return movieResponse.physicalRelease && movieResponse.digitalRelease
+          ? (await new Date(movieResponse.physicalRelease)) >
+            new Date(movieResponse.digitalRelease)
+            ? new Date(movieResponse.digitalRelease)
+            : new Date(movieResponse.physicalRelease)
+          : movieResponse.physicalRelease
+          ? new Date(movieResponse.physicalRelease)
+          : movieResponse.digitalRelease
+          ? new Date(movieResponse.digitalRelease)
+          : null;
+      }
+      case 'inCinemas': {
+        return movieResponse.inCinemas
+          ? new Date(movieResponse.inCinemas)
+          : null;
       }
     }
   }

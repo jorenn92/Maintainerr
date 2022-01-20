@@ -20,6 +20,8 @@ import {
   PlexLibraryItem,
   PlexLibraryResponse,
   PlexSeenBy,
+  PlexUser,
+  PlexUserAccount,
 } from './interfaces/library.interfaces';
 import {
   PlexMetadata,
@@ -85,6 +87,11 @@ export class PlexApiService {
   public async getStatus() {
     const response: PlexStatusResponse = await this.plexClient.query('/');
     return response.MediaContainer;
+  }
+
+  public async getUsers(): Promise<PlexUserAccount[]> {
+    const response = await this.plexClient.query('/accounts');
+    return response.MediaContainer.Account as PlexUserAccount[];
   }
 
   public async getLibraries(): Promise<PlexLibrary[]> {

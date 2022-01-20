@@ -58,6 +58,8 @@ export interface SonarrSeries {
     ignoreEpisodesWithoutFiles?: boolean;
     searchForMissingEpisodes?: boolean;
   };
+  statistics?: SonarrStatistics;
+  ended?: boolean;
 }
 
 export interface AddSeriesOptions {
@@ -77,4 +79,13 @@ export interface AddSeriesOptions {
 export interface LanguageProfile {
   id: number;
   name: string;
+}
+
+export interface SonarrStatistics {
+  seasonCount: number;
+  episodeFileCount: number;
+  episodeCount: number;
+  totalEpisodeCount: number;
+  sizeOnDisk: number;
+  percentOfEpisodes: number;
 }

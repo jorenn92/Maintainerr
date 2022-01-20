@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { isNull } from 'lodash';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import {
@@ -8,6 +9,7 @@ import {
   RuleType,
 } from './constants/rules.constants';
 import { RuleDto } from './dtos/rule.dto';
+import { RuleDbDto } from './dtos/ruleDB.dto';
 import { RulesDto } from './dtos/rules.dto';
 import { ValueGetterService } from './getter/getter.service';
 import { RulesService } from './rules.service';
@@ -31,23 +33,23 @@ export class RuleExecutorService {
     this.ruleConstants = new RuleConstants();
     this.plexData = { page: 1, finished: false, data: [] };
   }
-  public executeAllRules() {
-    this.getAllActiveRuleGroups().then((ruleGroups) => {
+  public async executeAllRules() {
+    await this.getAllActiveRuleGroups().then(async (ruleGroups) => {
       if (ruleGroups) {
-        ruleGroups.forEach(async (rulegroup) => {
+        for (const rulegroup of ruleGroups) {
           this.workerData = [];
           this.plexData = { page: 0, finished: false, data: [] };
           while (!this.plexData.finished) {
-            await this.getPlexData(rulegroup.libraryId).then(() => {
-              console.log(`length:  ${this.plexData.data.length}`);
-              rulegroup.rules.forEach((rule) => {
-                const parsedRule = JSON.parse(rule.ruleJson) as RuleDto;
-                this.executeRule(parsedRule);
-              });
-            });
+            await this.getPlexData(rulegroup.libraryId);
+            for (const rule of rulegroup.rules) {
+              const parsedRule = JSON.parse(
+                (rule as RuleDbDto).ruleJson,
+              ) as RuleDto;
+              await this.executeRule(parsedRule);
+            }
           }
-          console.log(this.workerData.length); // TODO : Add to collection
-        });
+          console.log(this.workerData.map((e) => e.title)); // TODO : Add to collection
+        }
       }
     });
   }
@@ -58,11 +60,6 @@ export class RuleExecutorService {
 
   private async getPlexData(libraryId: number): Promise<void> {
     const size = 50;
-    console.log(
-      `getting page ${this.plexData.page + 1}, finished is ${
-        this.plexData.finished
-      }`,
-    );
     const response = await this.plexApi.getLibraryContents(
       libraryId.toString(),
       {
@@ -78,36 +75,42 @@ export class RuleExecutorService {
     this.plexData.page++;
   }
 
-  private executeRule(rule: RuleDto) {
+  private async executeRule(rule: RuleDto) {
     let data: PlexLibraryItem[];
     let firstVal: any;
     let secondVal: any;
 
-    if (!rule.operator || rule.operator === RuleOperators.OR) {
+    if (isNull(rule.operator) || +rule.operator === +RuleOperators.OR) {
       data = this.plexData.data;
     } else {
       data = this.workerData;
     }
-    data.forEach((el) => {
-      firstVal = this.valueGetter.get(rule.firstVal, el);
+    for (const [index, el] of data.entries()) {
+      firstVal = await this.valueGetter.get(rule.firstVal, el);
       if (rule.lastVal) {
-        secondVal = this.valueGetter.get(rule.lastVal, el);
+        secondVal = await this.valueGetter.get(rule.lastVal, el);
       } else {
         secondVal =
           rule.customVal.ruleTypeId === +RuleType.DATE
             ? new Date(+rule.customVal.value * 1000)
             : rule.customVal.ruleTypeId === +RuleType.TEXT
             ? rule.customVal.value
+            : rule.customVal.ruleTypeId === +RuleType.NUMBER
+            ? +rule.customVal.value
             : null;
       }
-
       if (firstVal && secondVal) {
-        if (this.doRuleAction(firstVal, secondVal, rule.action)) {
-          console.log(`comparing ${firstVal} to ${secondVal}`);
-          this.workerData.push(el);
+        if (isNull(rule.operator) || rule.operator === RuleOperators.OR) {
+          if (this.doRuleAction(firstVal, secondVal, rule.action)) {
+            this.workerData.push(el);
+          }
+        } else {
+          if (!this.doRuleAction(firstVal, secondVal, rule.action)) {
+            this.workerData.splice(index);
+          }
         }
       }
-    });
+    }
 
     // alle plexLibraryItems uiteindelijk in workerdata steken.
   }
@@ -120,10 +123,29 @@ export class RuleExecutorService {
       return val1 < val2;
     }
     if (action === RulePossibility.EQUALS) {
-      return val1 === val2;
+      if (!Array.isArray(val1)) {
+        return val1 === val2;
+      } else {
+        return val1.every((e) => (val2 as unknown as T[]).includes(e));
+      }
     }
     if (action === RulePossibility.CONTAINS) {
-      return (val1 as unknown as T[]).includes(val2);
+      try {
+        if (!Array.isArray(val2)) {
+          return (val1 as unknown as T[]).includes(val2);
+        } else {
+          if (val2.length > 0) {
+            const test = val2.every((el) => {
+              return (val1 as unknown as T[]).includes(el);
+            });
+            return test;
+          } else {
+            return false;
+          }
+        }
+      } catch (_err) {
+        return null;
+      }
     }
     if (action === RulePossibility.BEFORE) {
       return val1 <= val2;
@@ -133,22 +155,14 @@ export class RuleExecutorService {
     }
     if (action === RulePossibility.IN_LAST) {
       return (
-        (val1 as unknown as Date) >=
-        new Date(
-          new Date().setDate(
-            new Date().getTime() - (val2 as unknown as number),
-          ),
-        )
+        (val1 as unknown as Date) >= (val2 as unknown as Date) &&
+        (val1 as unknown as Date) <= new Date() // Frontend moet berekening maken en epoch time in s meegeven
       );
     }
     if (action === RulePossibility.IN_NEXT) {
       return (
-        (val1 as unknown as Date) <=
-        new Date(
-          new Date().setDate(
-            new Date().getDate() + (val2 as unknown as number),
-          ),
-        )
+        (val1 as unknown as Date) <= (val2 as unknown as Date) && // Frontend moet berekening maken en epoch time in s meegeven
+        (val1 as unknown as Date) >= new Date()
       );
     }
   }

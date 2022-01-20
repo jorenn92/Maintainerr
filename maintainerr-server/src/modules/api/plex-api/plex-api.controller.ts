@@ -51,6 +51,10 @@ export class PlexApiController {
   getSeenBy(@Param('id') id: string) {
     return this.plexApiService.getSeenBy(id);
   }
+  @Get('users')
+  getUser(){
+    return this.plexApiService.getUsers();
+  }
   @Get('meta/:id/children')
   getChildrenMetadata(@Param('id') id: string) {
     return this.plexApiService.getChildrenMetadata(id);

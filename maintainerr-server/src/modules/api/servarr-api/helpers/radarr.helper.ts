@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
 import { LoggerService } from 'src/logger/logger.service';
 import { SettingsService } from 'src/settings/settings.service';
-import { ServarrApiService } from './common/servarr-api.service';
-import { RadarrMovie, RadarrMovieOptions } from './interfaces/radarr.interface';
+import { ServarrApi } from '../common/servarr-api.service';
+import {
+  RadarrMovie,
+  RadarrMovieOptions,
+} from '../interfaces/radarr.interface';
 
 const { getSettings } = new SettingsService();
 const RADARR_API_PATH = '/api/v3/';
-export class RadarrApiService extends ServarrApiService<{ movieId: number }> {
+export class RadarrApi extends ServarrApi<{ movieId: number }> {
   logger: LoggerService;
   constructor({ url, apiKey }: { url: string; apiKey: string }) {
     super({ url, apiKey, apiName: 'Radarr' });

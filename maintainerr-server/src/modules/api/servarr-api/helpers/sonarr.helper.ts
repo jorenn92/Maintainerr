@@ -1,17 +1,13 @@
-import { Injectable } from '@nestjs/common';
 import { LoggerService } from 'src/logger/logger.service';
-import { SettingsService } from 'src/settings/settings.service';
-import { ServarrApiService } from './common/servarr-api.service';
+import { ServarrApi } from '../common/servarr-api.service';
 import {
   AddSeriesOptions,
   LanguageProfile,
   SonarrSeason,
   SonarrSeries,
-} from './interfaces/sonarr.interface';
+} from '../interfaces/sonarr.interface';
 
-const { getSettings } = new SettingsService();
-
-export class SonarrApiService extends ServarrApiService<{
+export class SonarrApi extends ServarrApi<{
   seriesId: number;
   episodeId: number;
 }> {
@@ -65,7 +61,6 @@ export class SonarrApiService extends ServarrApiService<{
       if (!response.data[0]) {
         throw new Error('Series not found');
       }
-
       return response.data[0];
     } catch (e) {
       this.logger.logger.error('Error retrieving series by tvdb ID', {

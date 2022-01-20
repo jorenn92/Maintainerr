@@ -26,6 +26,7 @@ export class RuleType {
     RulePossibility.BIGGER,
     RulePossibility.SMALLER,
     RulePossibility.EQUALS,
+    RulePossibility.CONTAINS,
   ]);
   static readonly DATE = new RuleType('1', [
     RulePossibility.BIGGER,
@@ -35,17 +36,12 @@ export class RuleType {
     RulePossibility.AFTER,
     RulePossibility.IN_LAST,
     RulePossibility.IN_NEXT,
+    RulePossibility.CONTAINS,
   ]);
   static readonly TEXT = new RuleType('2', [
     RulePossibility.EQUALS,
     RulePossibility.CONTAINS,
   ]);
-  static readonly USER = new RuleType('3', [RulePossibility.EQUALS]);
-  static readonly NUMBERGROUP = new RuleType('4', [RulePossibility.CONTAINS]);
-  static readonly DATEGROUP = new RuleType('5', [RulePossibility.CONTAINS]);
-  static readonly TEXTGROUP = new RuleType('6', [RulePossibility.CONTAINS]);
-  static readonly USERGROUP = new RuleType('7', [RulePossibility.CONTAINS]);
-
   private constructor(
     private readonly key: string,
     public readonly possibilities: number[],
@@ -81,7 +77,7 @@ export class RuleConstants {
         {
           id: 1,
           name: 'seenBy',
-          type: RuleType.USERGROUP,
+          type: RuleType.NUMBER, // returns id[]
         } as Property,
         {
           id: 2,
@@ -96,7 +92,7 @@ export class RuleConstants {
         {
           id: 4,
           name: 'people',
-          type: RuleType.TEXTGROUP,
+          type: RuleType.TEXT, // return text[]
         } as Property,
         {
           id: 5,
@@ -132,7 +128,32 @@ export class RuleConstants {
         {
           id: 11,
           name: 'genre',
-          type: RuleType.TEXTGROUP,
+          type: RuleType.TEXT, // return text[]
+        } as Property,
+        {
+          id: 12,
+          name: 'sw_allEpisodesSeenBy',
+          type: RuleType.NUMBER, // return id's []
+        } as Property,
+        {
+          id: 13,
+          name: 'sw_lastWatched',
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 14,
+          name: 'sw_episodes',
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 15,
+          name: 'sw_viewedEpisodes',
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 16,
+          name: 'sw_lastEpisodeAddedAt',
+          type: RuleType.DATE,
         } as Property,
       ],
     },
@@ -140,7 +161,7 @@ export class RuleConstants {
       id: Application.RADARR,
       name: 'Radarr',
       props: [
-        { id: 0, name: 'addDate', type: RuleType.DATE, apiLoc: '' } as Property,
+        { id: 0, name: 'addDate', type: RuleType.DATE } as Property,
         {
           id: 1,
           name: 'fileDate',
@@ -149,42 +170,62 @@ export class RuleConstants {
         {
           id: 2,
           name: 'tags',
-          type: RuleType.TEXTGROUP,
+          type: RuleType.TEXT, // return text[]
         } as Property,
-        { id: 3, name: 'profile', type: RuleType.TEXT } as Property,
-        { id: 4, name: 'size', type: RuleType.NUMBER } as Property,
+        { id: 3, name: 'profile', type: RuleType.TEXT } as Property, // TODO
+        { id: 4, name: 'fileSize', type: RuleType.NUMBER } as Property,
         {
           id: 5,
           name: 'releaseDate',
           type: RuleType.DATE,
         } as Property,
+        { id: 6, name: 'monitored', type: RuleType.NUMBER } as Property,
+        { id: 7, name: 'inCinemas', type: RuleType.DATE } as Property,
+        { id: 8, name: 'fileAudioChannels', type: RuleType.NUMBER } as Property,
+        { id: 9, name: 'fileQuality', type: RuleType.NUMBER } as Property,
+        { id: 10, name: 'fileDate', type: RuleType.NUMBER } as Property,
+        { id: 11, name: 'runTime', type: RuleType.NUMBER } as Property,
       ],
     },
     {
       id: Application.SONARR,
       name: 'Sonarr',
       props: [
-        { id: 0, name: 'addDate', type: RuleType.DATE, apiLoc: '' } as Property,
+        { id: 0, name: 'addDate', type: RuleType.DATE } as Property,
         {
           id: 1,
-          name: 'fileDate',
+          name: 'diskSizeEntireShow',
           type: RuleType.DATE,
         } as Property,
         {
           id: 2,
           name: 'tags',
-          type: RuleType.TEXTGROUP,
+          type: RuleType.TEXT, // return text[]
         } as Property,
-        { id: 3, name: 'profile', type: RuleType.TEXT, apiLoc: '' } as Property,
-        { id: 4, name: 'size', type: RuleType.NUMBER, apiLoc: '' } as Property,
+        { id: 3, name: 'qualityProfileId', type: RuleType.NUMBER } as Property,
         {
-          id: 5,
-          name: 'releaseDate',
+          id: 4,
+          name: 'firstAirDate',
           type: RuleType.DATE,
         } as Property,
         {
-          id: 6,
+          id: 5,
           name: 'seasons',
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 6,
+          name: 'status',
+          type: RuleType.TEXT,
+        } as Property,
+        {
+          id: 7,
+          name: 'ended',
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 8,
+          name: 'monitored',
           type: RuleType.NUMBER,
         } as Property,
       ],
@@ -193,7 +234,7 @@ export class RuleConstants {
       id: Application.OVERSEERR,
       name: 'Overseerr',
       props: [
-        { id: 0, name: 'addUser', type: RuleType.USER, apiLoc: '' } as Property,
+        { id: 0, name: 'addUser', type: RuleType.NUMBER } as Property, //  returns id[]
         {
           id: 1,
           name: 'requestDate',
@@ -207,6 +248,11 @@ export class RuleConstants {
         {
           id: 3,
           name: 'approvalDate',
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 4,
+          name: 'mediaAddedAt',
           type: RuleType.DATE,
         } as Property,
       ],

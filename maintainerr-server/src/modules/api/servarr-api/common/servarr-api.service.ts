@@ -9,9 +9,8 @@ import {
   SystemStatus,
   Tag,
 } from '../interfaces/servarr.interface';
-import { Injectable } from '@nestjs/common';
 
-export class ServarrApiService<QueueItemAppendT> extends ExternalApiService {
+export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
   static buildUrl(settings: DVRSettings, path?: string): string {
     return `${settings.useSsl ? 'https' : 'http'}://${settings.hostname}:${
       settings.port

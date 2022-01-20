@@ -26,4 +26,45 @@ export interface RadarrMovie {
   added: string;
   downloaded: boolean;
   hasFile: boolean;
+  movieFile: RadarrMovieFile[];
+  sizeOnDisk: number;
+  physicalRelease: string;
+  digitalRelease: string;
+  inCinemas: string;
+}
+
+export interface RadarrMediaInfo {
+  audioAdditionalFeatures: string;
+  audioBitrate: number;
+  audioChannels: number;
+  audioCodec: string;
+  audioLanguages: string;
+  audioStreamCount: number;
+  videoBitDepth: number;
+  videoBitrate: number;
+  videoCodec: string;
+  videoFps: number;
+  resolution: string;
+  runTime: string;
+  scanType: string;
+  subtitles: string;
+}
+
+export interface RadarrMovieFile {
+  dateAdded: string;
+  quality: RadarrQualityContainer;
+  size: number;
+  mediainfo: RadarrMediaInfo;
+}
+
+export interface RadarrQualityContainer {
+  quality: RadarrQuality;
+}
+
+export interface RadarrQuality {
+  id: number;
+  name: string;
+  source: string;
+  resolution: number;
+  modifier: string;
 }

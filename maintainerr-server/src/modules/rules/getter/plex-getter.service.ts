@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PlexLibraryItem } from 'src/modules/api/plex-api/interfaces/library.interfaces';
+import { isNull } from 'lodash';
+import {
+  PlexHub,
+  PlexLibraryItem,
+  PlexSeenBy,
+  PlexUser,
+} from 'src/modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from 'src/modules/api/plex-api/plex-api.service';
 import {
   Application,
@@ -17,21 +23,22 @@ export class PlexGetterService {
     ).props;
   }
 
-  get(id: number, libItem: PlexLibraryItem) {
+  async get(id: number, libItem: PlexLibraryItem) {
     const prop = this.plexProperties.find((el) => el.id === id);
     switch (prop.name) {
       case 'addDate': {
         return libItem.addedAt ? new Date(+libItem.addedAt * 1000) : null;
       }
       case 'seenBy': {
-        return this.plexApi
+        // const plexUsers = (await this.plexApi.getUsers()).map((el) => {
+        //   return { plexId: el.id, username: el.name } as PlexUser;
+        // });
+        const viewers: PlexSeenBy[] = await this.plexApi
           .getSeenBy(libItem.ratingKey)
-          .then((seenby) => {
-            return seenby.map((el) => el.accountID);
-          })
           .catch((_err) => {
             return null;
           });
+        return viewers ? viewers.map((el) => +el.accountID) : null;
       }
       case 'releaseDate': {
         return libItem.originallyAvailableAt
@@ -39,21 +46,35 @@ export class PlexGetterService {
           : null;
       }
       case 'rating': {
-        return +libItem.rating;
+        return libItem.rating ? +libItem.rating : null;
       }
       case 'people': {
         return libItem.role ? libItem.role.map((el) => el.tag) : null;
       }
       case 'viewCount': {
-        return +libItem.viewCount;
+        return libItem.viewCount ? +libItem.viewCount : null;
       }
       case 'collections': {
-        return +0; // TODO
+        return null; // TODO
       }
       case 'lastViewedAt': {
-        return libItem.lastViewedAt
-          ? new Date(+libItem.lastViewedAt * 1000)
-          : null;
+        return await this.plexApi
+          .getSeenBy(libItem.ratingKey)
+          .then((seenby) => {
+            if (seenby.length > 0) {
+              return new Date(
+                +seenby
+                  .map((el) => el.viewedAt)
+                  .sort()
+                  .reverse()[0] * 1000,
+              );
+            } else {
+              return null;
+            }
+          })
+          .catch((_err) => {
+            return null;
+          });
       }
       case 'fileVideoResolution': {
         return libItem.Media[0].videoResolution
@@ -68,6 +89,62 @@ export class PlexGetterService {
       }
       case 'genre': {
         return libItem.genre ? libItem.genre.map((el) => el.tag) : null;
+      }
+      case 'sw_allEpisodesSeenBy': {
+        const seasons = await this.plexApi.getChildrenMetadata(
+          libItem.ratingKey,
+        );
+        let allViewers: PlexSeenBy[] = [];
+        for (const season of seasons) {
+          const episodes = await this.plexApi.getChildrenMetadata(
+            season.ratingKey,
+          );
+          for (const episode of episodes) {
+            if (season.index === 1 && episode.index === 1) {
+              const viewers: PlexSeenBy[] = await this.plexApi
+                .getSeenBy(episode.ratingKey)
+                .catch((_err) => {
+                  return null;
+                });
+              allViewers =
+                viewers && viewers.length > 0
+                  ? allViewers.concat(viewers)
+                  : allViewers;
+            } else {
+              const viewers: PlexSeenBy[] = await this.plexApi
+                .getSeenBy(episode.ratingKey)
+                .catch((_err) => {
+                  return null;
+                });
+
+              if (allViewers) {
+                allViewers.forEach((el, index) => {
+                  if (
+                    !viewers ||
+                    !viewers.find((viewEl) => el.accountID === viewEl.accountID)
+                  ) {
+                    allViewers.splice(index);
+                  }
+                });
+              }
+            }
+          }
+        }
+        return allViewers && allViewers.length > 0
+          ? allViewers.map((el) => el.accountID)
+          : null;
+      }
+      case 'sw_lastSeenEpisode': {
+        return libItem.lastViewedAt ? +libItem.lastViewedAt : null;
+      }
+      case 'sw_episodes': {
+        return libItem.leafCount ? +libItem.leafCount : null;
+      }
+      case 'sw_viewedEpisodes': {
+        return libItem.viewedLeafCount ? +libItem.viewedLeafCount : null;
+      }
+      case 'sw_lastEpisodeAddedAt': {
+        return libItem.updatedAt ? +libItem.updatedAt : null;
       }
       default: {
         return null;

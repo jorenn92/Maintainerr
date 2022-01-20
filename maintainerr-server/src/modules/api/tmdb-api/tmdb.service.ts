@@ -24,12 +24,12 @@ import {
   TmdbSeasonWithEpisodes,
   TmdbTvDetails,
   TmdbUpcomingMoviesResponse,
-} from './interfaces/moviedb.interface';
+} from './interfaces/tmdb.interface';
 
 const { getSettings } = new SettingsService();
 const ANIME_KEYWORD_ID = 210024;
 
-export class MovieDbApiService extends ExternalApiService {
+export class TmdbApiService extends ExternalApiService {
   private region?: string;
   private originalLanguage?: string;
   constructor(
@@ -512,7 +512,6 @@ export class MovieDbApiService extends ExternalApiService {
           },
         },
       );
-
       return data;
     } catch (e) {
       throw new Error(`[TMDb] Failed to find by external ID: ${e.message}`);

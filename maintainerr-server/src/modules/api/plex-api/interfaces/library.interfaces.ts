@@ -29,6 +29,8 @@ export interface PlexLibraryItem {
   rating: number;
   genre?: PlexGenre[];
   role?: PlexActor[];
+  leafCount?: number;
+  viewedLeafCount?: number;
 }
 
 export interface PlexLibraryResponse {
@@ -80,6 +82,24 @@ export interface PlexHub {
   promotedToOwnHome: boolean;
   promotedToSharedHome: boolean;
   deletable: boolean;
+}
+
+export interface PlexUser {
+  plexId: number;
+  username: string;
+}
+export interface PlexUserResponse {
+  Account: PlexUserAccount[];
+}
+export interface PlexUserAccount {
+  id: number;
+  key: string;
+  name: string;
+  defaultAudioLanguage: string;
+  autoSelectAudio: true;
+  defaultSubtitleLanguage: string;
+  subtitleMode: number;
+  thumb: string;
 }
 
 export interface PlexSeenBy extends PlexLibraryItem {
