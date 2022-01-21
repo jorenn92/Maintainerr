@@ -5,11 +5,11 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class CreateRulesTable1642429729589 implements MigrationInterface {
+export class CreateCollectionTables1642754819422 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'rule_group',
+        name: 'collection',
         columns: [
           {
             name: 'id',
@@ -17,7 +17,15 @@ export class CreateRulesTable1642429729589 implements MigrationInterface {
             isPrimary: true,
           },
           {
-            name: 'name',
+            name: 'plexId',
+            type: 'integer',
+          },
+          {
+            name: 'libraryId',
+            type: 'integer',
+          },
+          {
+            name: 'title',
             type: 'text',
           },
           {
@@ -26,17 +34,19 @@ export class CreateRulesTable1642429729589 implements MigrationInterface {
             isNullable: true,
           },
           {
-            name: 'collectionId',
-            type: 'integer',
-            isNullable: true,
-          },
-          {
-            name: 'libraryId',
-            type: 'integer',
-          },
-          {
             name: 'isActive',
             type: 'integer',
+          },
+          {
+            name: 'VisibleOnHome',
+            type: 'integer',
+            default: false,
+          },
+          {
+            name: 'deleteAfterDays',
+            type: 'integer',
+            isNullable: true,
+            default: null,
           },
         ],
       }),
@@ -45,7 +55,7 @@ export class CreateRulesTable1642429729589 implements MigrationInterface {
 
     await queryRunner.createTable(
       new Table({
-        name: 'rules',
+        name: 'collection_media',
         columns: [
           {
             name: 'id',
@@ -53,16 +63,22 @@ export class CreateRulesTable1642429729589 implements MigrationInterface {
             isPrimary: true,
           },
           {
-            name: 'ruleJson',
+            name: 'collectionId',
+            type: 'integer',
+          },
+          {
+            name: 'plexId',
+            type: 'integer',
+            isNullable: true,
+          },
+          {
+            name: 'tmdbId',
+            type: 'integer',
+            isNullable: true,
+          },
+          {
+            name: 'addDate',
             type: 'text',
-          },
-          {
-            name: 'isActive',
-            type: 'integer',
-          },
-          {
-            name: 'ruleGroupId',
-            type: 'integer',
           },
         ],
       }),
@@ -70,24 +86,24 @@ export class CreateRulesTable1642429729589 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'rules',
+      'collection_media',
       new TableForeignKey({
-        columnNames: ['ruleGroupId'],
+        columnNames: ['collectionId'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'rule_group',
+        referencedTableName: 'collection',
         onDelete: 'CASCADE',
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const table = await queryRunner.getTable('rules');
+    const table = await queryRunner.getTable('collection_media');
     const foreignKey = table.foreignKeys.find(
-      (fk) => fk.columnNames.indexOf('ruleGroupId') !== -1,
+      (fk) => fk.columnNames.indexOf('collectionId') !== -1,
     );
-    await queryRunner.dropForeignKey('rules', foreignKey);
-    await queryRunner.dropColumn('rules', 'ruleGroupId');
-    await queryRunner.dropTable('rules');
-    await queryRunner.dropTable('rule_group');
+    await queryRunner.dropForeignKey('collection_media', foreignKey);
+    await queryRunner.dropColumn('collection_media', 'collectionId');
+    await queryRunner.dropTable('collection_media');
+    await queryRunner.dropTable('collection');
   }
 }

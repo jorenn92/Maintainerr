@@ -13,7 +13,7 @@ import {
   CreateUpdateCollection,
 } from './interfaces/collection.interface';
 import { PlexApiService } from './plex-api.service';
-import { PlexHub, PlexLibraryItem } from './interfaces/library.interfaces';
+import { PlexHub, PlexLibraryItem, PlexLibraryResponse } from './interfaces/library.interfaces';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
 import { BasicResponseDto } from './dto/basic-response.dto';
 
@@ -52,7 +52,7 @@ export class PlexApiController {
     return this.plexApiService.getSeenBy(id);
   }
   @Get('users')
-  getUser(){
+  getUser() {
     return this.plexApiService.getUsers();
   }
   @Get('meta/:id/children')
@@ -127,9 +127,8 @@ export class PlexApiController {
   async deleteCollection(
     @Param('collectionId', new ParseIntPipe()) collectionId: number,
   ) {
-    const collection: boolean = await this.plexApiService.deleteCollection(
-      collectionId.toString(),
-    );
+    const collection: BasicResponseDto =
+      await this.plexApiService.deleteCollection(collectionId.toString());
     return collection;
   }
   @Put('library/collection/settings')

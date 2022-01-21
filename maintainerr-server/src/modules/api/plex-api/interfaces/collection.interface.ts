@@ -1,4 +1,4 @@
-export interface PlexCollection {
+export class PlexCollection {
   ratingKey: string;
   key: string;
   guid: string;
@@ -21,5 +21,5 @@ export interface CreateUpdateCollection {
   collectionId?: string;
   title?: string;
   summary?: string;
-  child: string;
+  child?: string;
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
+import { CollectionsService } from '../collections/collections.service';
 import { Property, RuleConstants } from './constants/rules.constants';
 import { RuleDto } from './dtos/rule.dto';
 import { RulesDto } from './dtos/rules.dto';
@@ -16,10 +17,12 @@ export interface ReturnStatus {
 export class RulesService {
   ruleConstants: RuleConstants;
   constructor(
-    @InjectRepository(Rules) private rulesRepository: Repository<Rules>,
+    @InjectRepository(Rules)
+    private readonly rulesRepository: Repository<Rules>,
     @InjectRepository(RuleGroup)
-    private ruleGroupRepository: Repository<RuleGroup>,
-    private connection: Connection,
+    private readonly ruleGroupRepository: Repository<RuleGroup>,
+    private readonly collectionService: CollectionsService,
+    private readonly connection: Connection,
   ) {
     this.ruleConstants = new RuleConstants();
   }
@@ -45,12 +48,20 @@ export class RulesService {
     return rulegroups as RulesDto[];
   }
 
+  async getRuleGroupById(ruleGroupId: number): Promise<RuleGroup> {
+    return await this.ruleGroupRepository.findOne(ruleGroupId);
+  }
+
   async setRules(params: RulesDto) {
     // {
     //   "name": "test",
     //   "description": "dit is een test",
     //   "libraryId" : 1,
     //   "active": true,
+    //   "collection": {
+    //     "visibleOnHome": true,
+    //     "deleteAfterDays" : null,
+    //   }
     //   "rules" : [
     //     { "operator": null, "firstVal": [1,0], "lastVal": [3,1],"action": 2},
     //     { "operator": 0, "firstVal": [0,0], "lastVal": [1,0],"action": 1}
@@ -63,23 +74,35 @@ export class RulesService {
         state = this.validateRule(rule);
       }
     }, this);
+
     if (state.code === 1) {
+      // create the collection
+      const collection = (
+        await this.collectionService.createCollection({
+          libraryId: params.libraryId,
+          title: params.name,
+          description: params.description,
+          isActive: params.isActive,
+          visibleOnHome: params.collection?.visibleOnHome,
+          deleteAfterDays: params.collection?.deleteAfterDays,
+        })
+      ).dbCollection;
+      // create group
       const groupId = await this.createNewGroup(
         params.name,
         params.description,
         params.libraryId,
+        collection.id,
         params.isActive ? params.isActive : true,
       );
+      // create rules
       params.rules.forEach(async (rule) => {
         const ruleJson = JSON.stringify(rule);
-        await this.connection
-          .createQueryBuilder()
-          .insert()
-          .into(Rules)
-          .values([{ ruleJson: ruleJson, ruleGroupId: groupId }])
-          .execute();
+        await this.rulesRepository.save([
+          { ruleJson: ruleJson, ruleGroupId: groupId },
+        ]);
       });
-      // execute for the first time
+
       return state;
     } else {
       return state;
@@ -137,7 +160,8 @@ export class RulesService {
     name: string,
     description: string,
     libraryId: number,
-    active = true,
+    collectionId: number,
+    isActive = true,
   ): Promise<number> {
     const groupId = await this.connection
       .createQueryBuilder()
@@ -148,11 +172,11 @@ export class RulesService {
           name: name,
           description: description,
           libraryId: libraryId,
-          isActive: active,
+          collection: collectionId,
+          isActive: isActive,
         },
       ])
       .execute();
-    console.log(groupId);
     return groupId.identifiers[0].id;
   }
 }

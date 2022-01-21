@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Collection } from 'src/modules/collections/entities/collection.entities';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Rules } from './rules.entities';
 
 @Entity()
@@ -17,6 +25,10 @@ export class RuleGroup {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @OneToOne(() => Collection)
+  @JoinColumn()
+  collection: number;
 
   @OneToMany((type) => Rules, (rules) => rules.ruleGroup)
   rules: Rules[];

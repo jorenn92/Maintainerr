@@ -7,5 +7,9 @@ export class RulesDto {
   name: string;
   description: string;
   isActive?: boolean;
+  collection?: {
+    visibleOnHome: boolean;
+    deleteAfterDays: number | null;
+  };
   rules: RuleDto[] | RuleDbDto[];
 }

@@ -223,15 +223,15 @@ export class PlexApiService {
     return collection;
   }
 
-  public async createCollection(body: CreateUpdateCollection) {
+  public async createCollection(params: CreateUpdateCollection) {
     const response = await this.plexClient.postQuery<PlexLibraryResponse>({
-      uri: `/library/collections?type=1&title=${body.title}&sectionId=${body.libraryId}`,
+      uri: `/library/collections?type=1&title=${params.title}&sectionId=${params.libraryId}`,
     });
     const collection: PlexCollection = response.MediaContainer
       .Metadata[0] as PlexCollection;
-    if (body.summary) {
-      body.collectionId = collection.ratingKey;
-      return this.updateCollection(body);
+    if (params.summary) {
+      params.collectionId = collection.ratingKey;
+      return this.updateCollection(params);
     }
     return collection;
   }
@@ -244,11 +244,25 @@ export class PlexApiService {
     return await this.getCollection(body.collectionId);
   }
 
-  public async deleteCollection(collectionId: string) {
-    const response = await this.plexClient.deleteQuery<PlexLibraryResponse>({
-      uri: `/library/collections/${collectionId}`,
-    });
-    return response;
+  public async deleteCollection(
+    collectionId: string,
+  ): Promise<BasicResponseDto> {
+    try {
+      const response = await this.plexClient.deleteQuery<PlexLibraryResponse>({
+        uri: `/library/collections/${collectionId}`,
+      });
+    } catch (_err) {
+      return {
+        status: 'NOK',
+        code: 0,
+        message: 'Something went wrong while deleting the collection from Plex',
+      };
+    }
+    return {
+      status: 'OK',
+      code: 1,
+      message: 'Success',
+    };
   }
 
   public async getCollectionChildren(

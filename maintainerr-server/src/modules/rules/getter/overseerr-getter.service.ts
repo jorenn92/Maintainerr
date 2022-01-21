@@ -9,6 +9,7 @@ import {
   PlexUser,
 } from 'src/modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from 'src/modules/api/plex-api/plex-api.service';
+import { TmdbIdService } from 'src/modules/api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from 'src/modules/api/tmdb-api/tmdb.service';
 import {
   Application,
@@ -23,6 +24,7 @@ export class OverseerrGetterService {
     private readonly overseerrApi: OverseerrApiService,
     private readonly tmdbApi: TmdbApiService,
     private readonly plexApi: PlexApiService,
+    private readonly tmdbIdHelper: TmdbIdService,
   ) {
     const ruleConstanst = new RuleConstants();
     this.plexProperties = ruleConstanst.applications.find(
@@ -32,33 +34,8 @@ export class OverseerrGetterService {
 
   async get(id: number, libItem: PlexLibraryItem) {
     const prop = this.plexProperties.find((el) => el.id === id);
-    const tmdb = libItem.Guid
-      ? +libItem.Guid.find((el) => el.id.includes('tmdb')).id.split('://')[1]
-      : libItem.guid.includes('tmdb')
-      ? +libItem.guid.split('://')[1].split('?')[0]
-      : libItem.guid.includes('tvdb')
-      ? await this.tmdbApi
-          .getByExternalId({
-            externalId: +libItem.guid.split('://')[1].split('?')[0],
-            type: 'tvdb',
-          })
-          .then((resp) =>
-            resp?.movie_results.length > 0
-              ? resp?.movie_results[0].id
-              : resp?.tv_results[0].id,
-          )
-      : libItem.guid.includes('imdb')
-      ? await this.tmdbApi
-          .getByExternalId({
-            externalId: libItem.guid.split('://')[1].split('?')[0].toString(),
-            type: 'imdb',
-          })
-          .then((resp) =>
-            resp?.movie_results.length > 0
-              ? resp?.movie_results[0].id
-              : resp?.tv_results[0].id,
-          )
-      : null;
+    const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
+
     let mediaResponse: OverSeerrMediaResponse;
     if (tmdb) {
       if (libItem.type === 'movie') {

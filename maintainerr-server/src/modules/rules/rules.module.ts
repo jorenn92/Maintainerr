@@ -14,6 +14,7 @@ import { OverseerrGetterService } from './getter/overseerr-getter.service';
 import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
 import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { TmdbApiModule } from '../api/tmdb-api/tmdb.module';
+import { CollectionsModule } from '../collections/collections.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TmdbApiModule } from '../api/tmdb-api/tmdb.module';
     TypeOrmModule.forFeature([Rules, RuleGroup]),
     OverseerrApiModule,
     TmdbApiModule,
+    CollectionsModule,
   ],
   providers: [
     RulesService,

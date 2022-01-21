@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { isNull } from 'lodash';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { CollectionsService } from '../collections/collections.service';
+import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
 import {
   RuleConstants,
   RuleOperators,
@@ -11,6 +13,7 @@ import {
 import { RuleDto } from './dtos/rule.dto';
 import { RuleDbDto } from './dtos/ruleDB.dto';
 import { RulesDto } from './dtos/rules.dto';
+import { RuleGroup } from './entities/rule-group.entities';
 import { ValueGetterService } from './getter/getter.service';
 import { RulesService } from './rules.service';
 
@@ -26,9 +29,10 @@ export class RuleExecutorService {
   plexData: PlexData;
   workerData: PlexLibraryItem[];
   constructor(
-    private rulesService: RulesService,
-    private valueGetter: ValueGetterService,
-    private plexApi: PlexApiService,
+    private readonly rulesService: RulesService,
+    private readonly valueGetter: ValueGetterService,
+    private readonly plexApi: PlexApiService,
+    private readonly collectionService: CollectionsService,
   ) {
     this.ruleConstants = new RuleConstants();
     this.plexData = { page: 1, finished: false, data: [] };
@@ -48,10 +52,66 @@ export class RuleExecutorService {
               await this.executeRule(parsedRule);
             }
           }
-          console.log(this.workerData.map((e) => e.title)); // TODO : Add to collection
+          console.log(this.workerData.map((e) => e.title));
+          await this.handleCollection(
+            await this.rulesService.getRuleGroupById(rulegroup.id),
+          );
         }
       }
     });
+  }
+
+  private async handleCollection(rulegroup: RuleGroup) {
+    let collection = await this.collectionService.getCollection(
+      rulegroup.collection,
+    );
+
+    const data = this.workerData.map((e) => {
+      return +e.ratingKey;
+    });
+
+    if (collection) {
+      // const dataToAdd = collection.collectionMedia
+      //   .filter((el) => !data.includes(el.plexId))
+      //   .map((el) => {
+      //     return { plexId: el.plexId };
+      //   });
+      let currentCollectionData = (
+        await this.collectionService.getCollectionMedia(collection.id)
+      )?.map((e) => {
+        return e.plexId;
+      });
+
+      currentCollectionData = currentCollectionData
+        ? currentCollectionData
+        : [];
+
+      const dataToAdd = data
+        .filter((el) => !currentCollectionData.includes(el))
+        .map((el) => {
+          return { plexId: el };
+        });
+
+      const dataToRemove = currentCollectionData
+        .filter((el) => !data.includes(el))
+        .map((el) => {
+          return { plexId: el };
+        });
+
+      collection = await this.collectionService.addToCollection(
+        collection.id,
+        dataToAdd,
+      );
+
+      collection = await this.collectionService.removeFromCollection(
+        collection.id,
+        dataToRemove,
+      );
+      return collection;
+    } else {
+      // log error: Collection not found
+      console.log(`collection not found with id ${rulegroup.collection}`);
+    }
   }
 
   private async getAllActiveRuleGroups(): Promise<RulesDto[]> {

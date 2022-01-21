@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getConnectionOptions } from 'typeorm';
 import { OverseerrApiModule } from 'src/modules/api/overseerr-api/overseerr-api.module';
+import { CollectionsModule } from 'src/modules/collections/collections.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { OverseerrApiModule } from 'src/modules/api/overseerr-api/overseerr-api.
     ServarrApiModule,
     OverseerrApiModule,
     RulesModule,
+    CollectionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
