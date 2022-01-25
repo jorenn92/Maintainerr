@@ -213,9 +213,32 @@ export class PlexApiService {
     return collection;
   }
 
-  public async getCollection(collectionId: string): Promise<PlexCollection> {
+  public async deleteMediaFromDisk(plexId: number | string): Promise<void> {
+    this.loggerService.logger.info('Deleting media from Plex library.', {
+      label: 'Plex API',
+      plexId,
+    });
+    try {
+      await this.plexClient.deleteQuery<void>({
+        uri: `/library/metadata/${plexId}`,
+      });
+    } catch (e) {
+      this.loggerService.logger.info(
+        'Something went wrong while deleting media from Plex.',
+        {
+          label: 'Plex API',
+          errorMessage: e.message,
+          plexId,
+        },
+      );
+    }
+  }
+
+  public async getCollection(
+    collectionId: string | number,
+  ): Promise<PlexCollection> {
     const response = await this.plexClient.query<PlexLibraryResponse>({
-      uri: `/library/collections/${collectionId}?`,
+      uri: `/library/collections/${+collectionId}?`,
     });
     const collection: PlexCollection = response.MediaContainer
       .Metadata as PlexCollection;
@@ -241,7 +264,7 @@ export class PlexApiService {
       uri: `/library/sections/${body.libraryId}/all?type=18&id=${body.collectionId}&title.value=${body.title}&summary.value=${body.summary}`,
       // &titleSort.value=&summary.value=&contentRating.value=&title.locked=1&titleSort.locked=1&contentRating.locked=1`,
     });
-    return await this.getCollection(body.collectionId);
+    return await this.getCollection(+body.collectionId);
   }
 
   public async deleteCollection(
@@ -264,7 +287,6 @@ export class PlexApiService {
       message: 'Success',
     };
   }
-
   public async getCollectionChildren(
     collectionId: string,
   ): Promise<PlexLibraryItem[]> {

@@ -195,4 +195,26 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       );
     }
   }
+
+  public async deleteMovie(movieId: number, deleteFiles = true) {
+    this.logger.logger.info('Deleting movie from Radarr', {
+      label: 'Radarr API',
+      movieId,
+    });
+
+    try {
+      await this.runDelete(
+        `movie/${movieId}?addImportExclusion=false&deleteFiles=${deleteFiles}`,
+      );
+    } catch (e) {
+      this.logger.logger.info(
+        "Couldn't delete movie. Does it exist in radarr?",
+        {
+          label: 'Radarr API',
+          errorMessage: e.message,
+          movieId,
+        },
+      );
+    }
+  }
 }

@@ -28,7 +28,7 @@ export interface PlexLibraryItem {
   originallyAvailableAt: string;
   rating: number;
   genre?: PlexGenre[];
-  role?: PlexActor[];
+  Role?: PlexActor[];
   leafCount?: number;
   viewedLeafCount?: number;
 }

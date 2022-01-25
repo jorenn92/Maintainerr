@@ -49,7 +49,7 @@ export class PlexGetterService {
         return libItem.rating ? +libItem.rating : null;
       }
       case 'people': {
-        return libItem.role ? libItem.role.map((el) => el.tag) : null;
+        return libItem.Role ? libItem.Role.map((el) => el.tag) : null;
       }
       case 'viewCount': {
         return libItem.viewCount ? +libItem.viewCount : null;

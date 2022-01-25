@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { isNull } from 'lodash';
+import { cloneDeep, isNull } from 'lodash';
+import { LoggerService } from 'src/logger/logger.service';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
-import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
 import {
   RuleConstants,
   RuleOperators,
@@ -33,49 +33,43 @@ export class RuleExecutorService {
     private readonly valueGetter: ValueGetterService,
     private readonly plexApi: PlexApiService,
     private readonly collectionService: CollectionsService,
+    private readonly loggerService: LoggerService,
   ) {
     this.ruleConstants = new RuleConstants();
     this.plexData = { page: 1, finished: false, data: [] };
   }
   public async executeAllRules() {
-    await this.getAllActiveRuleGroups().then(async (ruleGroups) => {
-      if (ruleGroups) {
-        for (const rulegroup of ruleGroups) {
-          this.workerData = [];
-          this.plexData = { page: 0, finished: false, data: [] };
-          while (!this.plexData.finished) {
-            await this.getPlexData(rulegroup.libraryId);
-            for (const rule of rulegroup.rules) {
-              const parsedRule = JSON.parse(
-                (rule as RuleDbDto).ruleJson,
-              ) as RuleDto;
-              await this.executeRule(parsedRule);
-            }
+    const ruleGroups = await this.getAllActiveRuleGroups();
+    if (ruleGroups) {
+      for (const rulegroup of ruleGroups) {
+        this.workerData = [];
+        this.plexData = { page: 0, finished: false, data: [] };
+        while (!this.plexData.finished) {
+          await this.getPlexData(rulegroup.libraryId);
+          for (const rule of rulegroup.rules) {
+            const parsedRule = JSON.parse(
+              (rule as RuleDbDto).ruleJson,
+            ) as RuleDto;
+            await this.executeRule(parsedRule);
           }
-          console.log(this.workerData.map((e) => e.title));
-          await this.handleCollection(
-            await this.rulesService.getRuleGroupById(rulegroup.id),
-          );
         }
+
+        await this.handleCollection(
+          await this.rulesService.getRuleGroupById(rulegroup.id),
+        );
       }
-    });
+    }
   }
 
   private async handleCollection(rulegroup: RuleGroup) {
     let collection = await this.collectionService.getCollection(
-      rulegroup.collection,
+      rulegroup.collectionId,
     );
-
     const data = this.workerData.map((e) => {
       return +e.ratingKey;
     });
 
     if (collection) {
-      // const dataToAdd = collection.collectionMedia
-      //   .filter((el) => !data.includes(el.plexId))
-      //   .map((el) => {
-      //     return { plexId: el.plexId };
-      //   });
       let currentCollectionData = (
         await this.collectionService.getCollectionMedia(collection.id)
       )?.map((e) => {
@@ -98,6 +92,18 @@ export class RuleExecutorService {
           return { plexId: el };
         });
 
+      if (dataToRemove.length > 0) {
+        this.logInfo(
+          `Removing ${dataToRemove.length} media items from '${collection.title}'.`,
+        );
+      }
+
+      if (dataToAdd.length > 0) {
+        this.logInfo(
+          `Adding ${dataToAdd.length} media items to '${collection.title}'.`,
+        );
+      }
+
       collection = await this.collectionService.addToCollection(
         collection.id,
         dataToAdd,
@@ -110,7 +116,7 @@ export class RuleExecutorService {
       return collection;
     } else {
       // log error: Collection not found
-      console.log(`collection not found with id ${rulegroup.collection}`);
+      console.log(`collection not found with id ${rulegroup.collectionId}`);
     }
   }
 
@@ -139,16 +145,18 @@ export class RuleExecutorService {
     let data: PlexLibraryItem[];
     let firstVal: any;
     let secondVal: any;
+    const indexesToSplice: number[] = [];
 
     if (isNull(rule.operator) || +rule.operator === +RuleOperators.OR) {
       data = this.plexData.data;
     } else {
       data = this.workerData;
     }
-    for (const [index, el] of data.entries()) {
-      firstVal = await this.valueGetter.get(rule.firstVal, el);
+    // for (const [index, el] of data.entries()) {
+    for (let i = data.length - 1; i >= 0; i--) {
+      firstVal = await this.valueGetter.get(rule.firstVal, data[i]);
       if (rule.lastVal) {
-        secondVal = await this.valueGetter.get(rule.lastVal, el);
+        secondVal = await this.valueGetter.get(rule.lastVal, data[i]);
       } else {
         secondVal =
           rule.customVal.ruleTypeId === +RuleType.DATE
@@ -158,21 +166,33 @@ export class RuleExecutorService {
             : rule.customVal.ruleTypeId === +RuleType.NUMBER
             ? +rule.customVal.value
             : null;
+        if (
+          firstVal instanceof Date &&
+          rule.customVal.ruleTypeId === +RuleType.NUMBER
+        ) {
+          if (
+            [RulePossibility.IN_LAST, RulePossibility.BEFORE].includes(
+              rule.action,
+            )
+          ) {
+            secondVal = new Date(new Date().getTime() - +secondVal * 1000);
+          } else {
+            secondVal = new Date(new Date().getTime() + +secondVal * 1000);
+          }
+        }
       }
       if (firstVal && secondVal) {
         if (isNull(rule.operator) || rule.operator === RuleOperators.OR) {
           if (this.doRuleAction(firstVal, secondVal, rule.action)) {
-            this.workerData.push(el);
+            this.workerData.push(data[i]);
           }
         } else {
           if (!this.doRuleAction(firstVal, secondVal, rule.action)) {
-            this.workerData.splice(index);
+            data.splice(i, 1);
           }
         }
       }
     }
-
-    // alle plexLibraryItems uiteindelijk in workerdata steken.
   }
 
   private doRuleAction<T>(val1: T, val2: T, action: RulePossibility): boolean {
@@ -186,7 +206,26 @@ export class RuleExecutorService {
       if (!Array.isArray(val1)) {
         return val1 === val2;
       } else {
-        return val1.every((e) => (val2 as unknown as T[]).includes(e));
+        return val1.every((e) => {
+          if (Array.isArray(val2)) {
+            return (val2 as unknown as T[]).includes(e);
+          } else {
+            return e === val2;
+          }
+        });
+      }
+    }
+    if (action === RulePossibility.NOT_EQUALS) {
+      if (!Array.isArray(val1)) {
+        return val1 !== val2;
+      } else {
+        return val1.every((e) => {
+          if (Array.isArray(val2)) {
+            return !(val2 as unknown as T[]).includes(e);
+          } else {
+            return e !== val2;
+          }
+        });
       }
     }
     if (action === RulePossibility.CONTAINS) {
@@ -215,15 +254,21 @@ export class RuleExecutorService {
     }
     if (action === RulePossibility.IN_LAST) {
       return (
-        (val1 as unknown as Date) >= (val2 as unknown as Date) &&
-        (val1 as unknown as Date) <= new Date() // Frontend moet berekening maken en epoch time in s meegeven
+        val1 >= val2 && // time in s
+        (val1 as unknown as Date) <= new Date()
       );
     }
     if (action === RulePossibility.IN_NEXT) {
       return (
-        (val1 as unknown as Date) <= (val2 as unknown as Date) && // Frontend moet berekening maken en epoch time in s meegeven
+        val1 <= val2 && //  time in s
         (val1 as unknown as Date) >= new Date()
       );
     }
+  }
+
+  private async logInfo(message: string) {
+    this.loggerService.logger.info(message, {
+      label: 'Rule Worker',
+    });
   }
 }

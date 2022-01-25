@@ -9,6 +9,7 @@ import {
 } from '../api/plex-api/interfaces/collection.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
+import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
 import { AddCollectionMedia } from './interfaces/collection-media.interface';
@@ -27,6 +28,8 @@ export class CollectionsService {
     private readonly collectionRepo: Repository<Collection>,
     @InjectRepository(CollectionMedia)
     private readonly CollectionMediaRepo: Repository<CollectionMedia>,
+    @InjectRepository(RuleGroup)
+    private readonly ruleGroupRepo: Repository<RuleGroup>,
     private readonly connection: Connection,
     private readonly plexApi: PlexApiService,
     private readonly tmdbIdHelper: TmdbIdService,
@@ -63,6 +66,13 @@ export class CollectionsService {
         summary: collection?.description,
       };
       plexCollection = await this.createPlexCollection(collectionObj);
+      await this.plexApi.UpdateCollectionSettings({
+        libraryId: collectionObj.libraryId,
+        collectionId: plexCollection.ratingKey,
+        recommended: false,
+        ownHome: collection.visibleOnHome,
+        sharedHome: collection.visibleOnHome,
+      });
     }
     // create collection in db
     const collectionDb: addCollectionDbResponse = await this.addCollectionToDB(
@@ -95,12 +105,41 @@ export class CollectionsService {
     };
   }
 
+  async updateCollection(collection: ICollection): Promise<{
+    plexCollection?: PlexCollection;
+    dbCollection?: ICollection;
+  }> {
+    const dbCollection = await this.collectionRepo.findOne(+collection.id);
+    let plexColl: PlexCollection;
+    if (dbCollection?.plexId) {
+      const collectionObj: CreateUpdateCollection = {
+        libraryId: collection.libraryId.toString(),
+        title: collection.title,
+        collectionId: +dbCollection.plexId,
+        summary: collection?.description,
+      };
+      plexColl = await this.plexApi.updateCollection(collectionObj);
+      await this.plexApi.UpdateCollectionSettings({
+        libraryId: dbCollection.libraryId,
+        collectionId: dbCollection.plexId,
+        recommended: false,
+        ownHome: collection.visibleOnHome,
+        sharedHome: collection.visibleOnHome,
+      });
+    }
+    const dbResp: ICollection = await this.collectionRepo.save({
+      ...dbCollection,
+      ...collection,
+    });
+
+    return { plexCollection: plexColl, dbCollection: dbResp };
+  }
+
   async addToCollection(
     collectionDbId: number,
     media: AddCollectionMedia[],
   ): Promise<Collection> {
     let collection = await this.collectionRepo.findOne(collectionDbId);
-
     if (!collection.plexId) {
       const newColl = await this.createPlexCollection({
         libraryId: collection.libraryId.toString(),
@@ -111,10 +150,17 @@ export class CollectionsService {
         ...collection,
         plexId: +newColl.ratingKey,
       });
+      await this.plexApi.UpdateCollectionSettings({
+        libraryId: collection.libraryId,
+        collectionId: collection.plexId,
+        recommended: false,
+        ownHome: collection.visibleOnHome,
+        sharedHome: collection.visibleOnHome,
+      });
     }
     // add children to collection
     for (const childMedia of media) {
-      this.addChildToCollection(
+      await this.addChildToCollection(
         { plexId: +collection.plexId, dbId: collection.id },
         childMedia.plexId,
       );
@@ -126,16 +172,23 @@ export class CollectionsService {
     collectionDbId: number,
     media: AddCollectionMedia[],
   ) {
-    let collection = await this.collectionRepo.findOne(collectionDbId);
+    const collection = await this.collectionRepo.findOne(collectionDbId);
     for (const childMedia of media) {
-      this.removeChildFromCollection(
+      await this.removeChildFromCollection(
         { plexId: +collection.plexId, dbId: collection.id },
         childMedia.plexId,
       );
     }
-    collection = await this.collectionRepo.findOne(collectionDbId);
-    if (collection.collectionMedia?.length <= 0) {
+    const collectionMedia = await this.CollectionMediaRepo.find({
+      collectionId: collectionDbId,
+    });
+
+    if (collectionMedia.length <= 0) {
       await this.plexApi.deleteCollection(collection.plexId.toString());
+      await this.collectionRepo.save({
+        ...collection,
+        plexId: null,
+      });
     }
     return await this.collectionRepo.findOne(collectionDbId);
   }
@@ -148,7 +201,51 @@ export class CollectionsService {
     if (status.status === 'OK') {
       return await this.RemoveCollectionFromDB(collection);
     }
-  } // Verwijder collectie in DB en Plex
+  }
+
+  public async deactivateCollection(collectionDbId: number) {
+    const collection = await this.collectionRepo.findOne(collectionDbId);
+
+    const status = await this.plexApi.deleteCollection(
+      collection.plexId.toString(),
+    );
+
+    await this.CollectionMediaRepo.delete({ collectionId: collection.id });
+    await this.collectionRepo.save({
+      ...collection,
+      isActive: false,
+      plexId: null,
+    });
+
+    const rulegroup = await this.ruleGroupRepo.findOne({
+      collectionId: collection.id,
+    });
+    if (rulegroup) {
+      await this.ruleGroupRepo.save({
+        ...rulegroup,
+        isActive: false,
+      });
+    }
+  }
+
+  public async activateCollection(collectionDbId: number) {
+    const collection = await this.collectionRepo.findOne(collectionDbId);
+
+    await this.collectionRepo.save({
+      ...collection,
+      isActive: true,
+    });
+
+    const rulegroup = await this.ruleGroupRepo.findOne({
+      collectionId: collection.id,
+    });
+    if (rulegroup) {
+      await this.ruleGroupRepo.save({
+        ...rulegroup,
+        isActive: true,
+      });
+    }
+  }
 
   private async addChildToCollection(
     collectionIds: { plexId: number; dbId: number },
@@ -183,12 +280,12 @@ export class CollectionsService {
 
   private async removeChildFromCollection(
     collectionIds: { plexId: number; dbId: number },
-    childId: number,
+    childPlexId: number,
   ) {
     const responseColl: BasicResponseDto =
       await this.plexApi.deleteChildFromCollection(
         collectionIds.plexId.toString(),
-        childId.toString(),
+        childPlexId.toString(),
       );
     if (responseColl.status === 'OK') {
       await this.connection
@@ -198,10 +295,11 @@ export class CollectionsService {
         .where([
           {
             collectionId: collectionIds.dbId,
-            plexId: childId,
+            plexId: childPlexId,
           },
         ])
         .execute();
+      console.log('removed');
     } else {
       // log error: Couldn't remove media from collection
     }

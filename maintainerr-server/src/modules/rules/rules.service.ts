@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { CollectionsService } from '../collections/collections.service';
-import { Property, RuleConstants } from './constants/rules.constants';
+import {
+  Property,
+  RuleConstants,
+  RulePossibility,
+} from './constants/rules.constants';
 import { RuleDto } from './dtos/rule.dto';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleGroup } from './entities/rule-group.entities';
@@ -96,13 +100,12 @@ export class RulesService {
         params.isActive ? params.isActive : true,
       );
       // create rules
-      params.rules.forEach(async (rule) => {
+      for (const rule of params.rules) {
         const ruleJson = JSON.stringify(rule);
         await this.rulesRepository.save([
           { ruleJson: ruleJson, ruleGroupId: groupId },
         ]);
-      });
-
+      }
       return state;
     } else {
       return state;
@@ -141,11 +144,17 @@ export class RulesService {
             );
           }
         }
+        if (
+          (rule.action === RulePossibility.IN_LAST ||
+            RulePossibility.IN_NEXT) &&
+          rule.customVal.ruleTypeId === 0
+        ) {
+          return this.createReturnStatus(true, 'Success');
+        } else {
+          return this.createReturnStatus(false, 'Validation failed');
+        }
       } else {
         return this.createReturnStatus(false, 'No second value found');
-      }
-      if (!val1) {
-        return this.createReturnStatus(false, 'Rule not found');
       }
     } catch {
       return this.createReturnStatus(false, 'Unexpected error occurred');
@@ -172,7 +181,7 @@ export class RulesService {
           name: name,
           description: description,
           libraryId: libraryId,
-          collection: collectionId,
+          collectionId: collectionId,
           isActive: isActive,
         },
       ])

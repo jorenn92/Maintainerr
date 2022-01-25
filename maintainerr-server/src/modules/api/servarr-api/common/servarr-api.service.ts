@@ -138,4 +138,12 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
       throw new Error(`[${this.apiName}] Failed to run command: ${e.message}`);
     }
   }
+
+  protected async runDelete(command: string): Promise<void> {
+    try {
+      await this.axios.delete(`/${command}`);
+    } catch (e) {
+      throw new Error(`[${this.apiName}] Failed to run delete: ${e.message}`);
+    }
+  }
 }

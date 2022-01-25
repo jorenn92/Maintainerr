@@ -26,7 +26,7 @@ export interface RadarrMovie {
   added: string;
   downloaded: boolean;
   hasFile: boolean;
-  movieFile: RadarrMovieFile[];
+  movieFile: RadarrMovieFile;
   sizeOnDisk: number;
   physicalRelease: string;
   digitalRelease: string;

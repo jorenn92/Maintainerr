@@ -15,6 +15,7 @@ import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
 import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { TmdbApiModule } from '../api/tmdb-api/tmdb.module';
 import { CollectionsModule } from '../collections/collections.module';
+import { LoggerModule } from 'src/logger/logger.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CollectionsModule } from '../collections/collections.module';
     OverseerrApiModule,
     TmdbApiModule,
     CollectionsModule,
+    LoggerModule,
   ],
   providers: [
     RulesService,

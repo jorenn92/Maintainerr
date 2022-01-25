@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { LoggerService } from 'src/logger/logger.service';
 import { OverseerrApi } from './helpers/overseerr-api.helper';
 
 export interface OverSeerrMediaResponse {
@@ -98,7 +99,7 @@ interface OverseerMedia {
 
 @Injectable()
 export class OverseerrApiService extends OverseerrApi {
-  constructor() {
+  constructor(private readonly loggerService: LoggerService) {
     super({
       url: `http://192.168.0.2:5055/api/v1`,
       apiKey:
@@ -106,13 +107,13 @@ export class OverseerrApiService extends OverseerrApi {
     });
   }
 
-  public async getMovie(id: string): Promise<OverSeerrMediaResponse> {
+  public async getMovie(id: string | number): Promise<OverSeerrMediaResponse> {
     const response: OverSeerrMediaResponse = await this.get(`/movie/${id}`);
     return response;
   }
 
   public async getShow(
-    showId: string,
+    showId: string | number,
     season?: string,
   ): Promise<OverSeerrMediaResponse> {
     const response: OverSeerrMediaResponse = season
@@ -128,14 +129,30 @@ export class OverseerrApiService extends OverseerrApi {
     return response;
   }
 
-  public async deleteMediaItem(mediaId: string) {
-    const response: OverseerBasicApiResponse = await this.delete(
-      `/media/${mediaId}`,
-    );
-    return response;
+  public async deleteMediaItem(mediaId: string | number) {
+    try {
+      const response: OverseerBasicApiResponse = await this.delete(
+        `/media/${mediaId}`,
+      );
+      return response;
+    } catch (e) {
+      this.loggerService.logger.info(
+        "Couldn't delete media. Does it exist in Overseerr?",
+        {
+          label: 'Overseerr API',
+          errorMessage: e.message,
+          mediaId,
+        },
+      );
+      return null;
+    }
   }
 
-  public async removeMediaByTmdbId(id: string, type: 'movie' | 'tv') {
+  public async removeMediaByTmdbId(id: string | number, type: 'movie' | 'tv') {
+    this.loggerService.logger.info('Deleting media from Overseerr.', {
+      label: 'Overseerr API',
+      id,
+    });
     let media: OverSeerrMediaResponse;
     if (type === 'movie') {
       media = await this.getMovie(id);
@@ -147,8 +164,16 @@ export class OverseerrApiService extends OverseerrApi {
         if (request?.media) {
           this.deleteMediaItem(request.media.id.toString());
         }
-        //    this.deleteRequest(request.id.toString());
-      } catch (_err) {}
+      } catch (e) {
+        this.loggerService.logger.info(
+          "Couldn't delete media. Does it exist in Overseerr?",
+          {
+            label: 'Overseerr API',
+            errorMessage: e.message,
+            id,
+          },
+        );
+      }
     }
   }
 }

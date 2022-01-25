@@ -2,6 +2,7 @@ export const enum RulePossibility {
   BIGGER,
   SMALLER,
   EQUALS,
+  NOT_EQUALS,
   CONTAINS,
   BEFORE,
   AFTER,
@@ -26,12 +27,14 @@ export class RuleType {
     RulePossibility.BIGGER,
     RulePossibility.SMALLER,
     RulePossibility.EQUALS,
+    RulePossibility.NOT_EQUALS,
     RulePossibility.CONTAINS,
   ]);
   static readonly DATE = new RuleType('1', [
     RulePossibility.BIGGER,
     RulePossibility.SMALLER,
     RulePossibility.EQUALS,
+    RulePossibility.NOT_EQUALS,
     RulePossibility.BEFORE,
     RulePossibility.AFTER,
     RulePossibility.IN_LAST,
@@ -40,6 +43,7 @@ export class RuleType {
   ]);
   static readonly TEXT = new RuleType('2', [
     RulePossibility.EQUALS,
+    RulePossibility.NOT_EQUALS,
     RulePossibility.CONTAINS,
   ]);
   private constructor(

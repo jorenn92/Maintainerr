@@ -209,6 +209,25 @@ export class SonarrApi extends ServarrApi<{
     }
   }
 
+  public async deleteShow(seriesId: number | string, deleteFiles = true) {
+    this.logger.logger.info('Deleting series from Sonarr.', {
+      label: 'Sonarr API',
+      seriesId,
+    });
+    try {
+      await this.runDelete(`series/${seriesId}?deleteFiles=${deleteFiles}`);
+    } catch (e) {
+      this.logger.logger.info(
+        "Couldn't delete show. Does it exist in sonarr?",
+        {
+          label: 'Sonarr API',
+          errorMessage: e.message,
+          seriesId,
+        },
+      );
+    }
+  }
+
   private buildSeasonList(
     seasons: number[],
     existingSeasons?: SonarrSeason[],
