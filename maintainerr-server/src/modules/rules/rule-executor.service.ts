@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { CronExpression } from '@nestjs/schedule';
 import { cloneDeep, isNull } from 'lodash';
 import { LoggerService } from 'src/logger/logger.service';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
+import { SettingsService } from '../settings/settings.service';
+import { TasksService } from '../tasks/tasks.service';
 import {
   RuleConstants,
   RuleOperators,
@@ -23,7 +26,7 @@ interface PlexData {
   data: PlexLibraryItem[];
 }
 @Injectable()
-export class RuleExecutorService {
+export class RuleExecutorService implements OnApplicationBootstrap {
   ruleConstants: RuleConstants;
   userId: string;
   plexData: PlexData;
@@ -34,10 +37,22 @@ export class RuleExecutorService {
     private readonly plexApi: PlexApiService,
     private readonly collectionService: CollectionsService,
     private readonly loggerService: LoggerService,
+    private readonly taskService: TasksService,
+    private readonly settings: SettingsService,
   ) {
     this.ruleConstants = new RuleConstants();
     this.plexData = { page: 1, finished: false, data: [] };
   }
+
+  onApplicationBootstrap() {
+    this.taskService.createJob(
+      'RuleHandler',
+      // this.settings.rules_handler_job_cron,
+      CronExpression.EVERY_5_MINUTES,
+      this.executeAllRules,
+    );
+  }
+
   public async executeAllRules() {
     const ruleGroups = await this.getAllActiveRuleGroups();
     if (ruleGroups) {
@@ -53,7 +68,7 @@ export class RuleExecutorService {
             await this.executeRule(parsedRule);
           }
         }
-
+        console.log(this.workerData);
         await this.handleCollection(
           await this.rulesService.getRuleGroupById(rulegroup.id),
         );

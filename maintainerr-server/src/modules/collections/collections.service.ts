@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LoggerService } from 'src/logger/logger.service';
 import { Connection, Repository } from 'typeorm';
 
 import { BasicResponseDto } from '../api/plex-api/dto/basic-response.dto';
@@ -33,6 +34,7 @@ export class CollectionsService {
     private readonly connection: Connection,
     private readonly plexApi: PlexApiService,
     private readonly tmdbIdHelper: TmdbIdService,
+    private readonly loggerService: LoggerService,
   ) {}
 
   async getCollection(id?: number, title?: string) {
@@ -251,6 +253,8 @@ export class CollectionsService {
     collectionIds: { plexId: number; dbId: number },
     childId: number,
   ) {
+    this.infoLogger(`Adding media to collection..`);
+
     const tmdbId: number = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
       childId.toString(),
     );
@@ -274,7 +278,7 @@ export class CollectionsService {
         ])
         .execute();
     } else {
-      // log error: Couldn't add media to collection
+      this.infoLogger(`Couldn't add media to collection..`);
     }
   }
 
@@ -282,6 +286,8 @@ export class CollectionsService {
     collectionIds: { plexId: number; dbId: number },
     childPlexId: number,
   ) {
+    this.infoLogger(`Removing media from collection..`);
+
     const responseColl: BasicResponseDto =
       await this.plexApi.deleteChildFromCollection(
         collectionIds.plexId.toString(),
@@ -301,7 +307,7 @@ export class CollectionsService {
         .execute();
       console.log('removed');
     } else {
-      // log error: Couldn't remove media from collection
+      this.infoLogger(`Couldn't remove media from collection..`);
     }
   }
 
@@ -309,6 +315,7 @@ export class CollectionsService {
     collection: ICollection,
     plexId?: number,
   ): Promise<addCollectionDbResponse> {
+    this.infoLogger(`Adding collection to the Database..`);
     try {
       return (
         await this.connection
@@ -330,13 +337,16 @@ export class CollectionsService {
       ).generatedMaps[0] as addCollectionDbResponse;
     } catch (_err) {
       // Log error
-      console.log('failed creating DB collection');
+      this.infoLogger(
+        `Something went wrong creating the collection in the Database..`,
+      );
     }
   }
 
   private async RemoveCollectionFromDB(
     collection: ICollection,
   ): Promise<BasicResponseDto> {
+    this.infoLogger(`Removing collection from Database..`);
     try {
       await this.connection
         .createQueryBuilder()
@@ -350,6 +360,9 @@ export class CollectionsService {
         .execute();
       return { status: 'OK', code: 1, message: 'Success' };
     } catch (_err) {
+      this.infoLogger(
+        `Something went wrong deleting the collection from the Database..`,
+      );
       return { status: 'NOK', code: 0, message: 'Removing from DB failed' };
     }
   }
@@ -357,7 +370,13 @@ export class CollectionsService {
   private async createPlexCollection(
     collectionData: CreateUpdateCollection,
   ): Promise<PlexCollection> {
-    // create collection in plex
+    this.infoLogger(`Creating collection in Plex..`);
     return (await this.plexApi.createCollection(collectionData))[0];
+  }
+
+  private infoLogger(message: string) {
+    this.loggerService.logger.info(message, {
+      label: 'Collection Manager',
+    });
   }
 }

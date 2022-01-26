@@ -16,6 +16,7 @@ import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { TmdbApiModule } from '../api/tmdb-api/tmdb.module';
 import { CollectionsModule } from '../collections/collections.module';
 import { LoggerModule } from 'src/logger/logger.module';
+import { TasksModule } from '../tasks/tasks.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { LoggerModule } from 'src/logger/logger.module';
     TmdbApiModule,
     CollectionsModule,
     LoggerModule,
+    TasksModule,
   ],
   providers: [
     RulesService,

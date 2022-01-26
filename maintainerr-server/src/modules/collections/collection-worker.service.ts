@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoggerService } from 'src/logger/logger.service';
 import { Repository } from 'typeorm';
@@ -6,12 +7,14 @@ import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service'
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
+import { SettingsService } from '../settings/settings.service';
+import { TasksService } from '../tasks/tasks.service';
 import { CollectionsService } from './collections.service';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
 
 @Injectable()
-export class CollectionWorkerService {
+export class CollectionWorkerService implements OnApplicationBootstrap {
   constructor(
     @InjectRepository(Collection)
     private readonly collectionRepo: Repository<Collection>,
@@ -23,7 +26,17 @@ export class CollectionWorkerService {
     private readonly servarrApi: ServarrService,
     private readonly tmdbApi: TmdbApiService,
     private readonly loggerService: LoggerService,
+    private readonly taskService: TasksService,
+    private readonly settings: SettingsService,
   ) {}
+
+  onApplicationBootstrap() {
+    this.taskService.createJob(
+      'CollectionHandler',
+      this.settings.collection_handler_job_cron,
+      this.handle,
+    );
+  }
 
   public async handle() {
     // loop over all active collections
