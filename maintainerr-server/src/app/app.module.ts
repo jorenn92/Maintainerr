@@ -44,7 +44,7 @@ export class AppModule implements OnModuleInit {
     private readonly servarr: ServarrService,
   ) {}
   async onModuleInit() {
-    // Initialize that stuff that needs settings here.. Otherwise problems
+    // Initialize stuff needing settings here.. Otherwise problems
     await this.settings.init();
     await this.plexApi.initialize({});
     await this.servarr.init();
