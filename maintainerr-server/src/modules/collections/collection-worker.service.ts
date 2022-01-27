@@ -1,7 +1,5 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { CronExpression } from '@nestjs/schedule';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LoggerService } from 'src/logger/logger.service';
 import { Repository } from 'typeorm';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
@@ -15,6 +13,8 @@ import { CollectionMedia } from './entities/collection_media.entities';
 
 @Injectable()
 export class CollectionWorkerService implements OnApplicationBootstrap {
+  private readonly logger = new Logger(CollectionWorkerService.name);
+  private jobCreationAttempts = 0;
   constructor(
     @InjectRepository(Collection)
     private readonly collectionRepo: Repository<Collection>,
@@ -25,17 +25,29 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
     private readonly overseerrApi: OverseerrApiService,
     private readonly servarrApi: ServarrService,
     private readonly tmdbApi: TmdbApiService,
-    private readonly loggerService: LoggerService,
     private readonly taskService: TasksService,
     private readonly settings: SettingsService,
   ) {}
 
   onApplicationBootstrap() {
-    this.taskService.createJob(
+    this.jobCreationAttempts++;
+    const state = this.taskService.createJob(
       'CollectionHandler',
       this.settings.collection_handler_job_cron,
-      this.handle,
+      this.handle.bind(this),
     );
+    if (state.code === 0) {
+      if (this.jobCreationAttempts <= 3) {
+        this.logger.log(
+          'Creation of job CollectionHandler failed. Retrying in 10s..',
+        );
+        setTimeout(() => {
+          this.onApplicationBootstrap();
+        }, 10000);
+      } else {
+        this.logger.error(`Creation of job CollectionHandler failed.`);
+      }
+    }
   }
 
   public async handle() {
@@ -99,8 +111,9 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
   }
 
   private infoLogger(message: string) {
-    this.loggerService.logger.info(message, {
-      label: 'Collection Handler',
-    });
+    // this.loggerService.logger.info(message, {
+    //   label: 'Collection Handler',
+    // });
+    this.logger.log(message);
   }
 }

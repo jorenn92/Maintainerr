@@ -12,16 +12,19 @@ import { OverseerrApiModule } from 'src/modules/api/overseerr-api/overseerr-api.
 import { CollectionsModule } from 'src/modules/collections/collections.module';
 import { SettingsModule } from 'src/modules/settings/settings.module';
 import { SettingsService } from '../modules/settings/settings.service';
+import { PlexApiService } from 'src/modules/api/plex-api/plex-api.service';
+import { OverseerrApiService } from 'src/modules/api/overseerr-api/overseerr-api.service';
+import { ServarrService } from 'src/modules/api/servarr-api/servarr.service';
 
 @Module({
   imports: [
-    SettingsModule,
     TypeOrmModule.forRootAsync({
       useFactory: async () =>
         Object.assign(await getConnectionOptions(), {
           autoLoadEntities: true,
         }),
     }),
+    SettingsModule,
     PlexApiModule,
     ExternalApiModule,
     TmdbApiModule,
@@ -34,8 +37,17 @@ import { SettingsService } from '../modules/settings/settings.service';
   providers: [AppService],
 })
 export class AppModule implements OnModuleInit {
-  constructor(private readonly settings: SettingsService) {}
+  constructor(
+    private readonly settings: SettingsService,
+    private readonly plexApi: PlexApiService,
+    private readonly overseerApi: OverseerrApiService,
+    private readonly servarr: ServarrService,
+  ) {}
   async onModuleInit() {
+    // Initialize that stuff that needs settings here.. Otherwise problems
     await this.settings.init();
+    await this.plexApi.initialize({});
+    await this.servarr.init();
+    await this.overseerApi.init();
   }
 }

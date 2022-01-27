@@ -10,7 +10,6 @@ import { CollectionWorkerService } from './collection-worker.service';
 import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
-import { LoggerModule } from 'src/logger/logger.module';
 import { TasksModule } from '../tasks/tasks.module';
 
 @Module({
@@ -20,7 +19,6 @@ import { TasksModule } from '../tasks/tasks.module';
     OverseerrApiModule,
     TmdbApiModule,
     ServarrApiModule,
-    LoggerModule,
     TasksModule,
   ],
   providers: [CollectionsService, CollectionWorkerService],

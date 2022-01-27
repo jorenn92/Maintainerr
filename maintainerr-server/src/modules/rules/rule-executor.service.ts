@@ -1,7 +1,5 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { CronExpression } from '@nestjs/schedule';
-import { cloneDeep, isNull } from 'lodash';
-import { LoggerService } from 'src/logger/logger.service';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { isNull } from 'lodash';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
@@ -25,8 +23,12 @@ interface PlexData {
   finished: boolean;
   data: PlexLibraryItem[];
 }
+
 @Injectable()
 export class RuleExecutorService implements OnApplicationBootstrap {
+  private readonly logger = new Logger(RuleExecutorService.name);
+  private jobCreationAttempts = 0;
+
   ruleConstants: RuleConstants;
   userId: string;
   plexData: PlexData;
@@ -36,7 +38,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     private readonly valueGetter: ValueGetterService,
     private readonly plexApi: PlexApiService,
     private readonly collectionService: CollectionsService,
-    private readonly loggerService: LoggerService,
     private readonly taskService: TasksService,
     private readonly settings: SettingsService,
   ) {
@@ -45,15 +46,36 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   onApplicationBootstrap() {
-    this.taskService.createJob(
+    this.jobCreationAttempts++;
+    const state = this.taskService.createJob(
       'RuleHandler',
-      // this.settings.rules_handler_job_cron,
-      CronExpression.EVERY_5_MINUTES,
-      this.executeAllRules,
+      this.settings.rules_handler_job_cron,
+      this.executeAllRules.bind(this),
+    );
+    if (state.code === 0) {
+      if (this.jobCreationAttempts <= 3) {
+        this.logger.log(
+          'Creation of job RuleHandler failed. Retrying in 10s..',
+        );
+        setTimeout(() => {
+          this.onApplicationBootstrap();
+        }, 10000);
+      } else {
+        this.logger.error(`Creation of job RuleHandler failed.`);
+      }
+    }
+  }
+
+  public updateJob(cron: string) {
+    return this.taskService.updateJob(
+      'RuleHandler',
+      cron,
+      this.executeAllRules.bind(this),
     );
   }
 
   public async executeAllRules() {
+    this.logger.log('Starting Execution of all active rules.');
     const ruleGroups = await this.getAllActiveRuleGroups();
     if (ruleGroups) {
       for (const rulegroup of ruleGroups) {
@@ -68,10 +90,10 @@ export class RuleExecutorService implements OnApplicationBootstrap {
             await this.executeRule(parsedRule);
           }
         }
-        console.log(this.workerData);
         await this.handleCollection(
           await this.rulesService.getRuleGroupById(rulegroup.id),
         );
+        this.logger.log('Execution of all active rules done.');
       }
     }
   }
@@ -282,7 +304,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   private async logInfo(message: string) {
-    this.loggerService.logger.info(message, {
+    this.logger.log(message, {
       label: 'Rule Worker',
     });
   }

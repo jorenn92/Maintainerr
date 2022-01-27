@@ -13,7 +13,7 @@ import {
   CreateUpdateCollection,
 } from './interfaces/collection.interface';
 import { PlexApiService } from './plex-api.service';
-import { PlexHub, PlexLibraryItem, PlexLibraryResponse } from './interfaces/library.interfaces';
+import { PlexHub, PlexLibraryItem } from './interfaces/library.interfaces';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
 import { BasicResponseDto } from './dto/basic-response.dto';
 
@@ -28,10 +28,10 @@ export class PlexApiController {
   getLibraries() {
     return this.plexApiService.getLibraries();
   }
-  @Get('libraries/sync')
-  syncLibraries() {
-    return this.plexApiService.syncLibraries();
-  }
+  // @Get('libraries/sync')
+  // syncLibraries() {
+  //   return this.plexApiService.syncLibraries();
+  // }
   @Get('library/:id/content/:page')
   getLibraryContent(
     @Param('id') id: string,

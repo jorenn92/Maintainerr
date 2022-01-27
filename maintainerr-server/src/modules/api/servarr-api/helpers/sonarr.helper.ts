@@ -1,4 +1,4 @@
-import { LoggerService } from 'src/logger/logger.service';
+import { Logger } from '@nestjs/common';
 import { ServarrApi } from '../common/servarr-api.service';
 import {
   AddSeriesOptions,
@@ -11,10 +11,10 @@ export class SonarrApi extends ServarrApi<{
   seriesId: number;
   episodeId: number;
 }> {
-  logger: LoggerService;
+  logger: Logger;
   constructor({ url, apiKey }: { url: string; apiKey: string }) {
     super({ url, apiKey, apiName: 'Sonarr' });
-    this.logger = new LoggerService();
+    this.logger = new Logger(SonarrApi.name);
   }
 
   public async getSeries(): Promise<SonarrSeries[]> {
@@ -41,7 +41,7 @@ export class SonarrApi extends ServarrApi<{
 
       return response.data;
     } catch (e) {
-      this.logger.logger.error('Error retrieving series by series title', {
+      this.logger.error('Error retrieving series by series title', {
         label: 'Sonarr API',
         errorMessage: e.message,
         title,
@@ -63,7 +63,7 @@ export class SonarrApi extends ServarrApi<{
       }
       return response.data[0];
     } catch (e) {
-      this.logger.logger.error('Error retrieving series by tvdb ID', {
+      this.logger.error('Error retrieving series by tvdb ID', {
         label: 'Sonarr API',
         errorMessage: e.message,
         tvdbId: id,
@@ -87,12 +87,12 @@ export class SonarrApi extends ServarrApi<{
         );
 
         if (newSeriesResponse.data.id) {
-          this.logger.logger.info('Updated existing series in Sonarr.', {
+          this.logger.log('Updated existing series in Sonarr.', {
             label: 'Sonarr',
             seriesId: newSeriesResponse.data.id,
             seriesTitle: newSeriesResponse.data.title,
           });
-          this.logger.logger.debug('Sonarr update details', {
+          this.logger.debug('Sonarr update details', {
             label: 'Sonarr',
             movie: newSeriesResponse.data,
           });
@@ -103,7 +103,7 @@ export class SonarrApi extends ServarrApi<{
 
           return newSeriesResponse.data;
         } else {
-          this.logger.logger.error('Failed to update series in Sonarr', {
+          this.logger.error('Failed to update series in Sonarr', {
             label: 'Sonarr',
             options,
           });
@@ -139,13 +139,13 @@ export class SonarrApi extends ServarrApi<{
       );
 
       if (createdSeriesResponse.data.id) {
-        this.logger.logger.info('Sonarr accepted request', { label: 'Sonarr' });
-        this.logger.logger.debug('Sonarr add details', {
+        this.logger.log('Sonarr accepted request', { label: 'Sonarr' });
+        this.logger.debug('Sonarr add details', {
           label: 'Sonarr',
           movie: createdSeriesResponse.data,
         });
       } else {
-        this.logger.logger.error('Failed to add movie to Sonarr', {
+        this.logger.error('Failed to add movie to Sonarr', {
           label: 'Sonarr',
           options,
         });
@@ -154,7 +154,7 @@ export class SonarrApi extends ServarrApi<{
 
       return createdSeriesResponse.data;
     } catch (e) {
-      this.logger.logger.error(
+      this.logger.error(
         'Something went wrong while adding a series to Sonarr.',
         {
           label: 'Sonarr API',
@@ -177,7 +177,7 @@ export class SonarrApi extends ServarrApi<{
 
       return data;
     } catch (e) {
-      this.logger.logger.error(
+      this.logger.error(
         'Something went wrong while retrieving Sonarr language profiles.',
         {
           label: 'Sonarr API',
@@ -190,7 +190,7 @@ export class SonarrApi extends ServarrApi<{
   }
 
   public async searchSeries(seriesId: number): Promise<void> {
-    this.logger.logger.info('Executing series search command.', {
+    this.logger.log('Executing series search command.', {
       label: 'Sonarr API',
       seriesId,
     });
@@ -198,7 +198,7 @@ export class SonarrApi extends ServarrApi<{
     try {
       await this.runCommand('SeriesSearch', { seriesId });
     } catch (e) {
-      this.logger.logger.error(
+      this.logger.log(
         'Something went wrong while executing Sonarr series search.',
         {
           label: 'Sonarr API',
@@ -210,21 +210,18 @@ export class SonarrApi extends ServarrApi<{
   }
 
   public async deleteShow(seriesId: number | string, deleteFiles = true) {
-    this.logger.logger.info('Deleting series from Sonarr.', {
+    this.logger.log('Deleting series from Sonarr.', {
       label: 'Sonarr API',
       seriesId,
     });
     try {
       await this.runDelete(`series/${seriesId}?deleteFiles=${deleteFiles}`);
     } catch (e) {
-      this.logger.logger.info(
-        "Couldn't delete show. Does it exist in sonarr?",
-        {
-          label: 'Sonarr API',
-          errorMessage: e.message,
-          seriesId,
-        },
-      );
+      this.logger.log("Couldn't delete show. Does it exist in sonarr?", {
+        label: 'Sonarr API',
+        errorMessage: e.message,
+        seriesId,
+      });
     }
   }
 

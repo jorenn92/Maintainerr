@@ -13,6 +13,50 @@ export class CreateSettingsTable1643209754541 implements MigrationInterface {
             isPrimary: true,
           },
           {
+            name: 'clientId',
+            type: 'string',
+          },
+          {
+            name: 'applicationTitle',
+            type: 'string',
+          },
+          {
+            name: 'applicationUrl',
+            type: 'string',
+          },
+          {
+            name: 'apikey',
+            type: 'string',
+          },
+          {
+            name: 'overseerr_url',
+            type: 'string',
+          },
+          {
+            name: 'locale',
+            type: 'string',
+          },
+          {
+            name: 'cacheImages',
+            type: 'integer',
+          },
+          {
+            name: 'plex_name',
+            type: 'string',
+          },
+          {
+            name: 'plex_hostname',
+            type: 'string',
+          },
+          {
+            name: 'plex_port',
+            type: 'integer',
+          },
+          {
+            name: 'plex_ssl',
+            type: 'integer',
+          },
+          {
             name: 'overseerr_url',
             type: 'string',
             isNullable: true,

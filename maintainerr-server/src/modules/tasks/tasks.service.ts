@@ -21,7 +21,7 @@ export class TasksService implements TaskScheduler {
   ): Status {
     try {
       const job = new CronJob(cronExp, () => {
-        task;
+        task();
       });
 
       this.schedulerRegistry.addCronJob(name, job);
@@ -33,9 +33,8 @@ export class TasksService implements TaskScheduler {
         `Task ${name} created successfully`,
       );
     } catch (e) {
-      this.logger.error(
-        `An error occurred while creating the ${name} task: ${e}`,
-      );
+      this.logger.error(`An error occurred while creating the ${name} task`);
+      this.logger.debug(e);
       return this.status.createStatus(
         false,
         `An error occurred while creating the ${name} task`,
@@ -45,7 +44,7 @@ export class TasksService implements TaskScheduler {
 
   public updateJob(
     name: string,
-    cronExp: CronExpression,
+    cronExp: CronExpression | string,
     task: () => void,
   ): Status {
     const output = this.removeJob(name);

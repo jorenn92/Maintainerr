@@ -1,11 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import NodePlexAPI from 'plex-api';
-import { LoggerService } from 'src/logger/logger.service';
-import {
-  PlexSettings,
-  SettingsService,
-  Library,
-} from 'src/settings/settings.service';
+import { PlexSettings } from 'src/modules/settings/interfaces/plex-settings.interface';
+import { SettingsService } from 'src/modules/settings/settings.service';
 import { BasicResponseDto } from './dto/basic-response.dto';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
 import {
@@ -20,7 +16,6 @@ import {
   PlexLibraryItem,
   PlexLibraryResponse,
   PlexSeenBy,
-  PlexUser,
   PlexUserAccount,
 } from './interfaces/library.interfaces';
 import {
@@ -28,60 +23,74 @@ import {
   PlexMetadataResponse,
 } from './interfaces/media.interface';
 import { PlexStatusResponse } from './interfaces/server.interface';
-const { getSettings } = new SettingsService();
 
 @Injectable()
 export class PlexApiService {
   private plexClient: NodePlexAPI;
   private machineId: string;
-  constructor(private loggerService: LoggerService) {
+  private readonly logger = new Logger(PlexApiService.name);
+  constructor(
+    @Inject(forwardRef(() => SettingsService))
+    private readonly settings: SettingsService,
+  ) {
     this.initialize({});
-    this.setMachineId();
   }
 
-  initialize({
+  private async getDbSettings(): Promise<PlexSettings> {
+    return {
+      name: this.settings.plex_name,
+      machineId: this.machineId,
+      ip: this.settings.plex_hostname,
+      port: this.settings.plex_port,
+      useSsl: this.settings.plex_ssl === 1 ? true : false,
+      libraries: [],
+      webAppUrl: this.settings.plex_hostname,
+    };
+  }
+  public async initialize({
     plexToken,
-    plexSettings,
     timeout,
   }: {
     plexToken?: string;
-    plexSettings?: PlexSettings;
+    // plexSettings?: PlexSettings;
     timeout?: number;
   }) {
-    const settings = getSettings();
     plexToken = plexToken || 'zFYx-sGQ4Xrnzpxsv_GW';
-    let settingsPlex: PlexSettings | undefined;
-    plexSettings
-      ? (settingsPlex = plexSettings)
-      : (settingsPlex = getSettings().plex);
-
-    this.plexClient = new NodePlexAPI({
-      hostname: settingsPlex.ip,
-      port: settingsPlex.port,
-      https: settingsPlex.useSsl,
-      timeout: timeout,
-      token: plexToken,
-      authenticator: {
-        authenticate: (
-          _plexApi,
-          cb: (err?: string, token?: string) => void,
-        ) => {
-          if (!plexToken) {
-            return cb('Plex Token not found!');
-          }
-          cb(undefined, plexToken);
+    const settingsPlex = await this.getDbSettings();
+    if (settingsPlex.ip) {
+      this.plexClient = new NodePlexAPI({
+        hostname: settingsPlex.ip,
+        port: settingsPlex.port,
+        https: settingsPlex.useSsl,
+        timeout: timeout,
+        token: plexToken,
+        authenticator: {
+          authenticate: (
+            _plexApi,
+            cb: (err?: string, token?: string) => void,
+          ) => {
+            if (!plexToken) {
+              return cb('Plex Token not found!');
+            }
+            cb(undefined, plexToken);
+          },
         },
-      },
-      // requestOptions: {
-      //   includeChildren: 1,
-      // },
-      options: {
-        identifier: 'ca2dd7de-35d4-4216-8f27-ac57f80056fe', //settings.clientId
-        product: 'Maintainerr',
-        deviceName: 'Maintainerr',
-        platform: 'Maintainerr',
-      },
-    });
+        // requestOptions: {
+        //   includeChildren: 1,
+        // },
+        options: {
+          identifier: 'ca2dd7de-35d4-4216-8f27-ac57f80056fe', // this.settings.clientId
+          product: 'Maintainerr', // this.settings.applicationTitle
+          deviceName: 'Maintainerr', // this.settings.applicationTitle
+          platform: 'Maintainerr', // this.settings.applicationTitle
+        },
+      });
+      this.setMachineId();
+    } else {
+      this.logger.log(
+        "Plex API isn't fully initialized, required settings aren't set",
+      );
+    }
   }
 
   public async getStatus() {
@@ -102,45 +111,45 @@ export class PlexApiService {
     return response.MediaContainer.Directory;
   }
 
-  public async syncLibraries(): Promise<void> {
-    const settings = getSettings();
+  // public async syncLibraries(): Promise<void> {
+  //   const settings = this.getDbSettings();
 
-    try {
-      const libraries = await this.getLibraries();
+  //   try {
+  //     const libraries = await this.getLibraries();
 
-      const newLibraries: Library[] = libraries
-        // Remove libraries that are not movie or show
-        .filter(
-          (library) => library.type === 'movie' || library.type === 'show',
-        )
-        // Remove libraries that do not have a metadata agent set (usually personal video libraries)
-        .filter((library) => library.agent !== 'com.plexapp.agents.none')
-        .map((library) => {
-          const existing = settings.plex.libraries.find(
-            (l) => l.id === library.key && l.name === library.title,
-          );
+  //     const newLibraries = libraries
+  //       // Remove libraries that are not movie or show
+  //       .filter(
+  //         (library) => library.type === 'movie' || library.type === 'show',
+  //       )
+  //       // Remove libraries that do not have a metadata agent set (usually personal video libraries)
+  //       .filter((library) => library.agent !== 'com.plexapp.agents.none')
+  //       .map(async (library) => {
+  //         const existing = (await settings).libraries.find(
+  //           (l) => l.id === library.key && l.name === library.title,
+  //         );
 
-          return {
-            id: library.key,
-            name: library.title,
-            enabled: existing?.enabled ?? false,
-            type: library.type,
-            lastScan: existing?.lastScan,
-          };
-        });
+  //         return {
+  //           id: library.key,
+  //           name: library.title,
+  //           enabled: existing?.enabled ?? false,
+  //           type: library.type,
+  //           lastScan: existing?.lastScan,
+  //         };
+  //       });
 
-      settings.plex.libraries = newLibraries;
-    } catch (e) {
-      this.loggerService.logger.error('Failed to fetch Plex libraries', {
-        label: 'Plex API',
-        message: e.message,
-      });
+  //     settings.libraries = newLibraries;
+  //   } catch (e) {
+  //     this.logger.error('Failed to fetch Plex libraries', {
+  //       label: 'Plex API',
+  //       message: e.message,
+  //     });
 
-      settings.plex.libraries = [];
-    }
+  //     (await settings).libraries = [];
+  //   }
 
-    settings.save();
-  }
+  //   // settings.save();
+  // }
 
   public async getLibraryContents(
     id: string,
@@ -214,7 +223,7 @@ export class PlexApiService {
   }
 
   public async deleteMediaFromDisk(plexId: number | string): Promise<void> {
-    this.loggerService.logger.info('Deleting media from Plex library.', {
+    this.logger.log('Deleting media from Plex library.', {
       label: 'Plex API',
       plexId,
     });
@@ -223,14 +232,11 @@ export class PlexApiService {
         uri: `/library/metadata/${plexId}`,
       });
     } catch (e) {
-      this.loggerService.logger.info(
-        'Something went wrong while deleting media from Plex.',
-        {
-          label: 'Plex API',
-          errorMessage: e.message,
-          plexId,
-        },
-      );
+      this.logger.log('Something went wrong while deleting media from Plex.', {
+        label: 'Plex API',
+        errorMessage: e.message,
+        plexId,
+      });
     }
   }
 
@@ -271,7 +277,7 @@ export class PlexApiService {
     collectionId: string,
   ): Promise<BasicResponseDto> {
     try {
-      const response = await this.plexClient.deleteQuery<PlexLibraryResponse>({
+      await this.plexClient.deleteQuery<PlexLibraryResponse>({
         uri: `/library/collections/${collectionId}`,
       });
     } catch (_err) {
@@ -338,7 +344,7 @@ export class PlexApiService {
     }
   }
 
-  async UpdateCollectionSettings(
+  public async UpdateCollectionSettings(
     params: CollectionHubSettingsDto,
   ): Promise<PlexHub> {
     const response: PlexHubResponse = await this.plexClient.postQuery({
@@ -353,8 +359,10 @@ export class PlexApiService {
     const response = await this.getStatus();
     if (response.machineIdentifier) {
       this.machineId = response.machineIdentifier;
+      return response.machineIdentifier;
     } else {
-      this.loggerService.logger.error("Couldn't reach Plex");
+      this.logger.error("Couldn't reach Plex");
+      return null;
     }
   }
 }

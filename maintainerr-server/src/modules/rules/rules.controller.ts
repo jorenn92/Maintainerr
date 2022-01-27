@@ -29,4 +29,9 @@ export class RulesController {
   async setRules(@Body() body: RulesDto): Promise<ReturnStatus> {
     return await this.rulesService.setRules(body);
   }
+
+  @Post()
+  async updateJob(@Body() body: { cron: string }): Promise<ReturnStatus> {
+    return await this.ruleExecutorService.updateJob(body.cron);
+  }
 }

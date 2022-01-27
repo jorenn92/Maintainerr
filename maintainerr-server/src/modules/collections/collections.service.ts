@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LoggerService } from 'src/logger/logger.service';
 import { Connection, Repository } from 'typeorm';
 
 import { BasicResponseDto } from '../api/plex-api/dto/basic-response.dto';
@@ -24,6 +23,7 @@ interface addCollectionDbResponse {
 }
 @Injectable()
 export class CollectionsService {
+  private readonly logger = new Logger(CollectionsService.name);
   constructor(
     @InjectRepository(Collection)
     private readonly collectionRepo: Repository<Collection>,
@@ -34,7 +34,6 @@ export class CollectionsService {
     private readonly connection: Connection,
     private readonly plexApi: PlexApiService,
     private readonly tmdbIdHelper: TmdbIdService,
-    private readonly loggerService: LoggerService,
   ) {}
 
   async getCollection(id?: number, title?: string) {
@@ -142,30 +141,33 @@ export class CollectionsService {
     media: AddCollectionMedia[],
   ): Promise<Collection> {
     let collection = await this.collectionRepo.findOne(collectionDbId);
-    if (!collection.plexId) {
-      const newColl = await this.createPlexCollection({
-        libraryId: collection.libraryId.toString(),
-        title: collection.title,
-        summary: collection.description,
-      });
-      collection = await this.collectionRepo.save({
-        ...collection,
-        plexId: +newColl.ratingKey,
-      });
-      await this.plexApi.UpdateCollectionSettings({
-        libraryId: collection.libraryId,
-        collectionId: collection.plexId,
-        recommended: false,
-        ownHome: collection.visibleOnHome,
-        sharedHome: collection.visibleOnHome,
-      });
-    }
-    // add children to collection
-    for (const childMedia of media) {
-      await this.addChildToCollection(
-        { plexId: +collection.plexId, dbId: collection.id },
-        childMedia.plexId,
-      );
+
+    if (media.length > 0) {
+      if (!collection.plexId) {
+        const newColl = await this.createPlexCollection({
+          libraryId: collection.libraryId.toString(),
+          title: collection.title,
+          summary: collection.description,
+        });
+        collection = await this.collectionRepo.save({
+          ...collection,
+          plexId: +newColl.ratingKey,
+        });
+        await this.plexApi.UpdateCollectionSettings({
+          libraryId: collection.libraryId,
+          collectionId: collection.plexId,
+          recommended: false,
+          ownHome: collection.visibleOnHome,
+          sharedHome: collection.visibleOnHome,
+        });
+      }
+      // add children to collection
+      for (const childMedia of media) {
+        await this.addChildToCollection(
+          { plexId: +collection.plexId, dbId: collection.id },
+          childMedia.plexId,
+        );
+      }
     }
     return collection;
   }
@@ -175,24 +177,27 @@ export class CollectionsService {
     media: AddCollectionMedia[],
   ) {
     const collection = await this.collectionRepo.findOne(collectionDbId);
-    for (const childMedia of media) {
-      await this.removeChildFromCollection(
-        { plexId: +collection.plexId, dbId: collection.id },
-        childMedia.plexId,
-      );
-    }
-    const collectionMedia = await this.CollectionMediaRepo.find({
-      collectionId: collectionDbId,
-    });
 
-    if (collectionMedia.length <= 0) {
-      await this.plexApi.deleteCollection(collection.plexId.toString());
-      await this.collectionRepo.save({
-        ...collection,
-        plexId: null,
+    if (media.length > 0) {
+      for (const childMedia of media) {
+        await this.removeChildFromCollection(
+          { plexId: +collection.plexId, dbId: collection.id },
+          childMedia.plexId,
+        );
+      }
+      const collectionMedia = await this.CollectionMediaRepo.find({
+        collectionId: collectionDbId,
       });
+
+      if (collectionMedia.length <= 0) {
+        await this.plexApi.deleteCollection(collection.plexId.toString());
+        await this.collectionRepo.save({
+          ...collection,
+          plexId: null,
+        });
+      }
     }
-    return await this.collectionRepo.findOne(collectionDbId);
+    return collection;
   }
 
   async deleteCollection(collectionDbId: number) {
@@ -375,8 +380,9 @@ export class CollectionsService {
   }
 
   private infoLogger(message: string) {
-    this.loggerService.logger.info(message, {
-      label: 'Collection Manager',
-    });
+    // this.loggerService.logger.info(message, {
+    //   label: 'Collection Manager',
+    // });
+    this.logger.log(message);
   }
 }

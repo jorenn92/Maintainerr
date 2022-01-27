@@ -1,13 +1,39 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
+import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
+import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { ServarrService } from '../api/servarr-api/servarr.service';
+import { SettingDto } from "./dto's/setting.dto";
 import { Settings } from './entities/settings.entities';
 
 @Injectable()
-export class SettingsService implements OnModuleInit {
+export class SettingsService implements SettingDto {
+  private readonly logger = new Logger(SettingsService.name);
   id: number;
 
-  Overseerr_url: string;
+  clientId: string;
+
+  applicationTitle: string;
+
+  applicationUrl: string;
+
+  apikey: string;
+
+  locale: string;
+
+  cacheImages: number;
+
+  plex_name: string;
+
+  plex_hostname: string;
+
+  plex_port: number;
+
+  plex_ssl: number;
+
+  overseerr_url: string;
 
   overseerr_api_key: string;
 
@@ -24,18 +50,31 @@ export class SettingsService implements OnModuleInit {
   rules_handler_job_cron: string;
 
   constructor(
+    @Inject(forwardRef(() => PlexApiService))
+    private readonly plexApi: PlexApiService,
+    @Inject(forwardRef(() => ServarrService))
+    private readonly servarr: ServarrService,
+    @Inject(forwardRef(() => OverseerrApiService))
+    private readonly overseerr: OverseerrApiService,
     @InjectRepository(Settings)
-    private readonly settings: Repository<Settings>,
+    private readonly settingsRepo: Repository<Settings>,
   ) {}
 
-  onModuleInit() {
-    this.init();
-  }
   public async init() {
-    const settingsDb = await this.settings.findOne();
+    const settingsDb = await this.settingsRepo.findOne({ cache: false });
     if (settingsDb) {
       this.id = settingsDb?.id;
-      this.Overseerr_url = settingsDb?.Overseerr_url;
+      this.clientId = settingsDb?.clientId;
+      this.applicationTitle = settingsDb?.applicationTitle;
+      this.applicationUrl = settingsDb?.applicationUrl;
+      this.apikey = settingsDb?.apikey;
+      this.locale = settingsDb?.locale;
+      this.cacheImages = settingsDb?.cacheImages;
+      this.plex_name = settingsDb?.plex_name;
+      this.plex_hostname = settingsDb?.plex_hostname;
+      this.plex_port = settingsDb?.plex_port;
+      this.plex_ssl = settingsDb?.plex_ssl;
+      this.overseerr_url = settingsDb?.overseerr_url;
       this.overseerr_api_key = settingsDb?.overseerr_api_key;
       this.radarr_url = settingsDb?.radarr_url;
       this.radarr_api_key = settingsDb?.radarr_api_key;
@@ -45,8 +84,36 @@ export class SettingsService implements OnModuleInit {
         settingsDb?.collection_handler_job_cron;
       this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;
     } else {
-      await this.settings.insert({});
+      this.logger.log('Settings not found.. Creating initial settings');
+      await this.settingsRepo.insert({
+        overseerr_api_key: this.generateApiKey(),
+      });
       this.init();
     }
+  }
+
+  public async updateSettings(
+    settings: Settings,
+  ): Promise<{ code: 0 | 1; message: string }> {
+    try {
+      const settingsDb = await this.settingsRepo.findOne();
+      await this.settingsRepo.save({
+        ...settingsDb,
+        ...settings,
+      });
+      await this.init();
+      this.logger.log('Settings updated');
+      this.plexApi.initialize({});
+      this.servarr.init();
+      this.overseerr.init();
+      return { code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Something went wrong while updating settings');
+      return { code: 0, message: 'Failure' };
+    }
+  }
+
+  private generateApiKey(): string {
+    return Buffer.from(`${Date.now()}${randomUUID()})`).toString('base64');
   }
 }

@@ -14,7 +14,8 @@ import { Rules } from './entities/rules.entities';
 
 export interface ReturnStatus {
   code: 0 | 1;
-  result: string;
+  result?: string;
+  message?: string;
 }
 
 @Injectable()

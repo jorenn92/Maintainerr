@@ -1,6 +1,6 @@
 // import cacheManager, { AvailableCacheIds } from '../../lib/cache';
-import { DVRSettings } from 'src/settings/settings.service';
 import { ExternalApiService } from 'src/modules/api/external-api/external-api.service';
+import { DVRSettings } from 'src/modules/settings/interfaces/dvr-settings.interface';
 import {
   QualityProfile,
   QueueItem,

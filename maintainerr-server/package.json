@@ -29,6 +29,7 @@
     "axios": "^0.24.0",
     "crypto": "^1.0.1",
     "fs": "^0.0.1-security",
+    "generate-api-key": "^1.0.0",
     "lodash": "^4.17.21",
     "node-cache": "^5.1.2",
     "path": "^0.12.7",

@@ -1,18 +1,16 @@
-import { LoggerService } from 'src/logger/logger.service';
-import { SettingsService } from 'src/settings/settings.service';
+import { Logger } from '@nestjs/common';
 import { ServarrApi } from '../common/servarr-api.service';
 import {
   RadarrMovie,
   RadarrMovieOptions,
 } from '../interfaces/radarr.interface';
 
-const { getSettings } = new SettingsService();
 const RADARR_API_PATH = '/api/v3/';
 export class RadarrApi extends ServarrApi<{ movieId: number }> {
-  logger: LoggerService;
+  logger: Logger;
   constructor({ url, apiKey }: { url: string; apiKey: string }) {
     super({ url, apiKey, apiName: 'Radarr' });
-    this.logger = new LoggerService();
+    this.logger = new Logger(RadarrApi.name);
   }
 
   public getMovies = async (): Promise<RadarrMovie[]> => {
@@ -21,7 +19,8 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
       return response.data;
     } catch (e) {
-      throw new Error(`[Radarr] Failed to retrieve movies: ${e.message}`);
+      this.logger.error(`Failed to retrieve movies`);
+      this.logger.debug(`Failed to retrieve movies: ${e.message}`);
     }
   };
 
@@ -30,7 +29,8 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       const response = await this.axios.get<RadarrMovie>(`/movie/${id}`);
       return response.data;
     } catch (e) {
-      throw new Error(`[Radarr] Failed to retrieve movie: ${e.message}`);
+      this.logger.error(`[Radarr] Failed to retrieve movie with id ${id}`);
+      this.logger.debug(`[Radarr] Failed to retrieve movie: ${e.message}`);
     }
   };
 
@@ -48,11 +48,8 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
       return response.data[0];
     } catch (e) {
-      this.logger.logger.error('Error retrieving movie by TMDb ID', {
-        label: 'Radarr API',
-        errorMessage: e.message,
-        tmdbId: id,
-      });
+      this.logger.error(`Error retrieving movie by TMDb ID ${id}`);
+      this.logger.debug(e);
       throw new Error('Movie not found');
     }
   }
@@ -64,12 +61,8 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       const movie = await this.getMovieByTmdbId(options.tmdbId);
 
       if (movie.downloaded) {
-        this.logger.logger.info(
+        this.logger.log(
           'Title already exists and is available. Skipping add and returning success',
-          {
-            label: 'Radarr',
-            movie,
-          },
         );
         return movie;
       }
@@ -94,18 +87,9 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
         });
 
         if (response.data.monitored) {
-          this.logger.logger.info(
+          this.logger.log(
             'Found existing title in Radarr and set it to monitored.',
-            {
-              label: 'Radarr',
-              movieId: response.data.id,
-              movieTitle: response.data.title,
-            },
           );
-          this.logger.logger.debug('Radarr update details', {
-            label: 'Radarr',
-            movie: response.data,
-          });
 
           if (options.searchNow) {
             this.searchMovie(response.data.id);
@@ -113,21 +97,14 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
           return response.data;
         } else {
-          this.logger.logger.error(
-            'Failed to update existing movie in Radarr.',
-            {
-              label: 'Radarr',
-              options,
-            },
-          );
+          this.logger.error('Failed to update existing movie in Radarr.');
           throw new Error('Failed to update existing movie in Radarr');
         }
       }
 
       if (movie.id) {
-        this.logger.logger.info(
+        this.logger.log(
           'Movie is already monitored in Radarr. Skipping add and returning success',
-          { label: 'Radarr' },
         );
         return movie;
       }
@@ -149,72 +126,39 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       });
 
       if (response.data.id) {
-        this.logger.logger.info('Radarr accepted request', { label: 'Radarr' });
-        this.logger.logger.debug('Radarr add details', {
-          label: 'Radarr',
-          movie: response.data,
-        });
+        this.logger.log('Radarr accepted request');
       } else {
-        this.logger.logger.error('Failed to add movie to Radarr', {
-          label: 'Radarr',
-          options,
-        });
-        throw new Error('Failed to add movie to Radarr');
+        this.logger.error('Failed to add movie to Radarr');
       }
       return response.data;
     } catch (e) {
-      this.logger.logger.error(
+      this.logger.error(
         'Failed to add movie to Radarr. This might happen if the movie already exists, in which case you can safely ignore this error.',
-        {
-          label: 'Radarr',
-          errorMessage: e.message,
-          options,
-          response: e?.response?.data,
-        },
       );
-      throw new Error('Failed to add movie to Radarr');
     }
   };
 
   public async searchMovie(movieId: number): Promise<void> {
-    this.logger.logger.info('Executing movie search command', {
-      label: 'Radarr API',
-      movieId,
-    });
+    this.logger.log('Executing movie search command');
 
     try {
       await this.runCommand('MoviesSearch', { movieIds: [movieId] });
     } catch (e) {
-      this.logger.logger.error(
+      this.logger.error(
         'Something went wrong while executing Radarr movie search.',
-        {
-          label: 'Radarr API',
-          errorMessage: e.message,
-          movieId,
-        },
       );
     }
   }
 
   public async deleteMovie(movieId: number, deleteFiles = true) {
-    this.logger.logger.info('Deleting movie from Radarr', {
-      label: 'Radarr API',
-      movieId,
-    });
+    this.logger.log('Deleting movie from Radarr');
 
     try {
       await this.runDelete(
         `movie/${movieId}?addImportExclusion=false&deleteFiles=${deleteFiles}`,
       );
     } catch (e) {
-      this.logger.logger.info(
-        "Couldn't delete movie. Does it exist in radarr?",
-        {
-          label: 'Radarr API',
-          errorMessage: e.message,
-          movieId,
-        },
-      );
+      this.logger.log("Couldn't delete movie. Does it exist in radarr?");
     }
   }
 }

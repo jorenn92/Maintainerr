@@ -15,7 +15,6 @@ import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
 import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { TmdbApiModule } from '../api/tmdb-api/tmdb.module';
 import { CollectionsModule } from '../collections/collections.module';
-import { LoggerModule } from 'src/logger/logger.module';
 import { TasksModule } from '../tasks/tasks.module';
 
 @Module({
@@ -26,7 +25,6 @@ import { TasksModule } from '../tasks/tasks.module';
     OverseerrApiModule,
     TmdbApiModule,
     CollectionsModule,
-    LoggerModule,
     TasksModule,
   ],
   providers: [

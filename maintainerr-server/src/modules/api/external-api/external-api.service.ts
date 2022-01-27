@@ -34,7 +34,7 @@ export class ExternalApiService {
     this.baseUrl = baseUrl;
     this.cache = options.nodeCache;
   }
-  protected async get<T>(
+  public async get<T>(
     endpoint: string,
     config?: AxiosRequestConfig,
     ttl?: number,
@@ -53,7 +53,7 @@ export class ExternalApiService {
     return response.data;
   }
 
-  protected async delete<T>(
+  public async delete<T>(
     endpoint: string,
     config?: AxiosRequestConfig,
   ): Promise<T> {
@@ -61,7 +61,7 @@ export class ExternalApiService {
     return response.data;
   }
 
-  protected async getRolling<T>(
+  public async getRolling<T>(
     endpoint: string,
     config?: AxiosRequestConfig,
     ttl?: number,

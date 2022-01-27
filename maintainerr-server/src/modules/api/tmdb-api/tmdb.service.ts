@@ -1,7 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { sortBy } from 'lodash';
-import { LoggerService } from 'src/logger/logger.service';
-import { SettingsService } from 'src/settings/settings.service';
 import { ExternalApiService } from '../external-api/external-api.service';
 import {
   DiscoverMovieOptions,
@@ -26,14 +24,13 @@ import {
   TmdbUpcomingMoviesResponse,
 } from './interfaces/tmdb.interface';
 
-const { getSettings } = new SettingsService();
 const ANIME_KEYWORD_ID = 210024;
 
 export class TmdbApiService extends ExternalApiService {
   private region?: string;
   private originalLanguage?: string;
   constructor(
-    private logger: LoggerService,
+    private logger: Logger,
     {
       region,
       originalLanguage,

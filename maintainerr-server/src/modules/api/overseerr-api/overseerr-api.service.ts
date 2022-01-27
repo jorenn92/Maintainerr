@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { LoggerService } from 'src/logger/logger.service';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { SettingsService } from 'src/modules/settings/settings.service';
 import { OverseerrApi } from './helpers/overseerr-api.helper';
 
 export interface OverSeerrMediaResponse {
@@ -98,17 +98,24 @@ interface OverseerMedia {
 }
 
 @Injectable()
-export class OverseerrApiService extends OverseerrApi {
-  constructor(private readonly loggerService: LoggerService) {
-    super({
-      url: `http://192.168.0.2:5055/api/v1`,
-      apiKey:
-        'MTYyODA3MDUwNzU1NjMwNmZjNzk4LWMwMWItNGM2OC04NmU4LTA5ZGU2NzQ1ODc4Yyk=',
+export class OverseerrApiService {
+  api: OverseerrApi;
+
+  private readonly logger = new Logger(OverseerrApiService.name);
+  constructor(
+    @Inject(forwardRef(() => SettingsService))
+    private readonly settings: SettingsService,
+  ) {}
+
+  public async init() {
+    this.api = new OverseerrApi({
+      url: `${this.settings.overseerr_url}/api/v1`,
+      apiKey: `${this.settings.overseerr_api_key}`,
     });
   }
 
   public async getMovie(id: string | number): Promise<OverSeerrMediaResponse> {
-    const response: OverSeerrMediaResponse = await this.get(`/movie/${id}`);
+    const response: OverSeerrMediaResponse = await this.api.get(`/movie/${id}`);
     return response;
   }
 
@@ -117,13 +124,13 @@ export class OverseerrApiService extends OverseerrApi {
     season?: string,
   ): Promise<OverSeerrMediaResponse> {
     const response: OverSeerrMediaResponse = season
-      ? await this.get(`/tv/${showId}/season/${season}`)
-      : await this.get(`/tv/${showId}`);
+      ? await this.api.get(`/tv/${showId}/season/${season}`)
+      : await this.api.get(`/tv/${showId}`);
     return response;
   }
 
   public async deleteRequest(requestId: string) {
-    const response: OverseerBasicApiResponse = await this.delete(
+    const response: OverseerBasicApiResponse = await this.api.delete(
       `/request/${requestId}`,
     );
     return response;
@@ -131,25 +138,22 @@ export class OverseerrApiService extends OverseerrApi {
 
   public async deleteMediaItem(mediaId: string | number) {
     try {
-      const response: OverseerBasicApiResponse = await this.delete(
+      const response: OverseerBasicApiResponse = await this.api.delete(
         `/media/${mediaId}`,
       );
       return response;
     } catch (e) {
-      this.loggerService.logger.info(
-        "Couldn't delete media. Does it exist in Overseerr?",
-        {
-          label: 'Overseerr API',
-          errorMessage: e.message,
-          mediaId,
-        },
-      );
+      this.logger.log("Couldn't delete media. Does it exist in Overseerr?", {
+        label: 'Overseerr API',
+        errorMessage: e.message,
+        mediaId,
+      });
       return null;
     }
   }
 
   public async removeMediaByTmdbId(id: string | number, type: 'movie' | 'tv') {
-    this.loggerService.logger.info('Deleting media from Overseerr.', {
+    this.logger.log('Deleting media from Overseerr.', {
       label: 'Overseerr API',
       id,
     });
@@ -165,14 +169,11 @@ export class OverseerrApiService extends OverseerrApi {
           this.deleteMediaItem(request.media.id.toString());
         }
       } catch (e) {
-        this.loggerService.logger.info(
-          "Couldn't delete media. Does it exist in Overseerr?",
-          {
-            label: 'Overseerr API',
-            errorMessage: e.message,
-            id,
-          },
-        );
+        this.logger.log("Couldn't delete media. Does it exist in Overseerr?", {
+          label: 'Overseerr API',
+          errorMessage: e.message,
+          id,
+        });
       }
     }
   }

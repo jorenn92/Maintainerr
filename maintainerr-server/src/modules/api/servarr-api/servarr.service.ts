@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { SettingsService } from 'src/modules/settings/settings.service';
 import { RadarrApi } from './helpers/radarr.helper';
 import { SonarrApi } from './helpers/sonarr.helper';
 
@@ -6,14 +7,19 @@ import { SonarrApi } from './helpers/sonarr.helper';
 export class ServarrService {
   RadarrApi: RadarrApi;
   SonarrApi: SonarrApi;
-  constructor() {
+  constructor(
+    @Inject(forwardRef(() => SettingsService))
+    private readonly settings: SettingsService,
+  ) {}
+
+  public async init() {
     this.RadarrApi = new RadarrApi({
-      url: 'http://192.168.0.2:7878/api/v3/',
-      apiKey: '52d7528e1490412e8f98e5413b11ee33',
+      url: `${this.settings.radarr_url}/api/v3/`,
+      apiKey: `${this.settings.radarr_api_key}`,
     });
     this.SonarrApi = new SonarrApi({
-      url: 'http://192.168.0.2:8989/api/v3/',
-      apiKey: 'dc57f15a469d494492c896c1d26e0069',
+      url: `${this.settings.sonarr_url}/api/v3/`,
+      apiKey: `${this.settings.sonarr_api_key}`,
     });
   }
 }
