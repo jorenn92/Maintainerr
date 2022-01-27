@@ -12,7 +12,7 @@ import {
   RuleType,
 } from './constants/rules.constants';
 import { RuleDto } from './dtos/rule.dto';
-import { RuleDbDto } from './dtos/ruleDB.dto';
+import { RuleDbDto } from './dtos/ruleDb.dto';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleGroup } from './entities/rule-group.entities';
 import { ValueGetterService } from './getter/getter.service';

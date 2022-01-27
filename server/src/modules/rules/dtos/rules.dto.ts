@@ -1,5 +1,5 @@
 import { RuleDto } from './rule.dto';
-import { RuleDbDto } from './ruleDB.dto';
+import { RuleDbDto } from './ruleDb.dto';
 
 export class RulesDto {
   id?: number;
