@@ -9,7 +9,8 @@ RUN apk update && \
     npm i -g @nestjs/cli && \
     npm install && \ 
     npm run build && \
-    rm -rf node_modules
+    rm -rf node_modules && \
+    rm -f package-lock.json
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
