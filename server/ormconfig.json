@@ -1,6 +1,6 @@
 {
     "type": "sqlite",
-    "database": "maintainerr.sqlite",
+    "database": "./data/maintainerr.sqlite",
     "entities": [
         "dist/**/*.entity{.ts,.js}"
     ],
