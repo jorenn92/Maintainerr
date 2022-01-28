@@ -1,6 +1,7 @@
 FROM node:16-alpine3.15
 
 COPY server/ /opt/server/
+VOLUME [ "/opt/server/data" ]
 
 WORKDIR /opt/server/
 
