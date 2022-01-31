@@ -1,0 +1,38 @@
+{
+  "name": "maintainerr",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "axios": "^0.25.0",
+    "next": "12.0.9",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-transition-group": "^4.4.2",
+    "swr": "^1.2.0"
+  },
+  "devDependencies": {
+    "@svgr/webpack": "^6.2.1",
+    "@babel/cli": "^7.16.8",
+    "@tailwindcss/aspect-ratio": "^0.4.0",
+    "@tailwindcss/forms": "^0.4.0",
+    "@tailwindcss/typography": "^0.5.0",
+    "@types/node": "17.0.13",
+    "@types/react": "17.0.38",
+    "@types/react-transition-group": "^4.4.4",
+    "autoprefixer": "^10.4.2",
+    "babel-plugin-react-intl": "^8.2.25",
+    "babel-plugin-react-intl-auto": "^3.3.0",
+    "eslint": "8.7.0",
+    "eslint-config-next": "12.0.9",
+    "postcss": "^8.4.5",
+    "prettier": "^2.5.1",
+    "prettier-plugin-tailwindcss": "^0.1.4",
+    "tailwindcss": "^3.0.18",
+    "typescript": "4.5.5"
+  }
+}
