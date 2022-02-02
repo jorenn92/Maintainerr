@@ -44,6 +44,24 @@
     top: env(safe-area-inset-top);
   }
 
+  .add-button {
+    background-color: #005c0f;
+  }
+  
+
+  .add-button:hover {
+    background: #1f4525;
+  }
+
+  .cancel-button {
+    background-color: #520000;
+  }
+  
+
+  .cancel-button:hover {
+    background: #471c1c;
+  }
+
   .edit-button {
     background-color: #cc7b19;
   }
@@ -55,6 +73,7 @@
   .delete-button {
     background-color: #d60d0d;
   }
+  
 
   .delete-button:hover {
     background: #f03737;
@@ -215,8 +234,16 @@
     @apply text-2xl font-bold leading-8 text-gray-100;
   }
 
+  .sm-heading {
+    @apply text-lg font-bold leading-8 text-gray-100;
+  }
+
   .description {
     @apply mt-1 max-w-4xl text-sm leading-5 text-gray-400;
+  }
+
+  .sm-description {
+    @apply mt-1 max-w-4xl text-xs leading-5 text-gray-400;
   }
 
   img.avatar-sm {
@@ -293,6 +320,8 @@
 
   input[type='text'],
   input[type='password'],
+  input[type='number'],
+  input[type='date'],
   select,
   textarea {
     @apply block w-full min-w-0 flex-1 rounded-md border border-gray-500 bg-gray-700 text-white transition duration-150 ease-in-out sm:text-sm sm:leading-5;

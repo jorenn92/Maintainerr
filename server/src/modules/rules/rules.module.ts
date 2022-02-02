@@ -16,12 +16,14 @@ import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { TmdbApiModule } from '../api/tmdb-api/tmdb.module';
 import { CollectionsModule } from '../collections/collections.module';
 import { TasksModule } from '../tasks/tasks.module';
+import { Collection } from '../collections/entities/collection.entities';
+import { CollectionMedia } from '../collections/entities/collection_media.entities';
 
 @Module({
   imports: [
     PlexApiModule,
     ServarrApiModule,
-    TypeOrmModule.forFeature([Rules, RuleGroup]),
+    TypeOrmModule.forFeature([Rules, RuleGroup, Collection, CollectionMedia]),
     OverseerrApiModule,
     TmdbApiModule,
     CollectionsModule,

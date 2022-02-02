@@ -216,6 +216,11 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           } else {
             secondVal = new Date(new Date().getTime() + +secondVal * 1000);
           }
+        } else if (
+          firstVal instanceof Date &&
+          rule.customVal.ruleTypeId === +RuleType.DATE
+        ) {
+          secondVal = new Date(+secondVal);
         }
       }
       if (firstVal && secondVal) {

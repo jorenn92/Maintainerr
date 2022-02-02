@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { CollectionsService } from '../collections/collections.service';
+import { Collection } from '../collections/entities/collection.entities';
+import { CollectionMedia } from '../collections/entities/collection_media.entities';
 import {
   Property,
   RuleConstants,
@@ -20,12 +22,18 @@ export interface ReturnStatus {
 
 @Injectable()
 export class RulesService {
+  private readonly logger = new Logger(RulesService.name);
+
   ruleConstants: RuleConstants;
   constructor(
     @InjectRepository(Rules)
     private readonly rulesRepository: Repository<Rules>,
     @InjectRepository(RuleGroup)
     private readonly ruleGroupRepository: Repository<RuleGroup>,
+    @InjectRepository(Collection)
+    private readonly collectionRepository: Repository<Collection>,
+    @InjectRepository(CollectionMedia)
+    private readonly collectionMediaRepository: Repository<CollectionMedia>,
     private readonly collectionService: CollectionsService,
     private readonly connection: Connection,
   ) {
@@ -55,6 +63,28 @@ export class RulesService {
 
   async getRuleGroupById(ruleGroupId: number): Promise<RuleGroup> {
     return await this.ruleGroupRepository.findOne(ruleGroupId);
+  }
+
+  async deleteRuleGroup(ruleGroupId: number): Promise<ReturnStatus> {
+    try {
+      const group = await this.ruleGroupRepository.findOne(ruleGroupId);
+      if (group.collectionId) {
+        this.collectionMediaRepository.delete({
+          collectionId: group.collectionId,
+        });
+        this.collectionRepository.delete({ id: group.collectionId });
+      }
+
+      this.rulesRepository.delete({ ruleGroupId: ruleGroupId });
+      this.ruleGroupRepository.delete(ruleGroupId);
+      this.logger.log(
+        `Removed rulegroup with id ${ruleGroupId} from the database`,
+      );
+      return this.createReturnStatus(true, 'Success');
+    } catch (err) {
+      this.logger.error(err);
+      return this.createReturnStatus(false, 'Delete Failed');
+    }
   }
 
   async setRules(params: RulesDto) {

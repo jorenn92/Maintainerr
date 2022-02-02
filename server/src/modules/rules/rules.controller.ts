@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleExecutorService } from './rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
@@ -20,6 +20,10 @@ export class RulesController {
   @Get()
   getRuleGroups() {
     return this.rulesService.getRuleGroups(false);
+  }
+  @Delete('/:id')
+  deleteRuleGroup(@Param('id') id: string) {
+    return this.rulesService.deleteRuleGroup(+id);
   }
   @Post('/execute')
   executeRules() {
