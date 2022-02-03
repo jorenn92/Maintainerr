@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^1.0.5",
     "axios": "^0.25.0",
     "next": "12.0.9",
     "react": "17.0.2",
@@ -16,8 +17,8 @@
     "swr": "^1.2.0"
   },
   "devDependencies": {
-    "@svgr/webpack": "^6.2.1",
     "@babel/cli": "^7.16.8",
+    "@svgr/webpack": "^6.2.1",
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/forms": "^0.4.0",
     "@tailwindcss/typography": "^0.5.0",

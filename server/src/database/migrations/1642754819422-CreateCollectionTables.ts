@@ -80,6 +80,11 @@ export class CreateCollectionTables1642754819422 implements MigrationInterface {
             name: 'addDate',
             type: 'text',
           },
+          {
+            name: 'image_path',
+            type: 'text',
+            isNullable: true,
+          },
         ],
       }),
       true,

@@ -8,7 +8,14 @@ import {
   PlexCollection,
 } from '../api/plex-api/interfaces/collection.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
+import {
+  TmdbMovieDetails,
+  TmdbMovieResult,
+  TmdbTvDetails,
+  TmdbTvResult,
+} from '../api/tmdb-api/interfaces/tmdb.interface';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
+import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
@@ -33,6 +40,7 @@ export class CollectionsService {
     private readonly ruleGroupRepo: Repository<RuleGroup>,
     private readonly connection: Connection,
     private readonly plexApi: PlexApiService,
+    private readonly tmdbApi: TmdbApiService,
     private readonly tmdbIdHelper: TmdbIdService,
   ) {}
 
@@ -48,8 +56,22 @@ export class CollectionsService {
     return await this.CollectionMediaRepo.find({ collectionId: id });
   }
 
-  async getCollections() {
-    return await this.collectionRepo.find();
+  async getCollections(libraryId?: number) {
+    const collections = await this.collectionRepo.find(
+      libraryId ? { libraryId: libraryId } : null,
+    );
+
+    return await Promise.all(
+      collections.map(async (col) => {
+        const colls = await this.CollectionMediaRepo.find({
+          collectionId: +col.id,
+        });
+        return {
+          ...col,
+          media: colls,
+        };
+      }),
+    );
   }
 
   async createCollection(
@@ -258,11 +280,17 @@ export class CollectionsService {
     collectionIds: { plexId: number; dbId: number },
     childId: number,
   ) {
-    this.infoLogger(`Adding media to collection..`);
+    this.infoLogger(`Adding media with id ${childId} to collection..`);
 
-    const tmdbId: number = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
+    const tmdb: number = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
       childId.toString(),
     );
+
+    // TODO: Create 1 tmdb function. Instead of the 2 calls / item we do now
+    let tmdbMedia: TmdbTvDetails | TmdbMovieDetails =
+      await this.tmdbApi.getMovie({ movieId: tmdb });
+    if (!tmdbMedia) tmdbMedia = await this.tmdbApi.getTvShow({ tvId: tmdb });
+
     const responseColl: PlexCollection | BasicResponseDto =
       await this.plexApi.addChildToCollection(
         collectionIds.plexId.toString(),
@@ -278,7 +306,8 @@ export class CollectionsService {
             collectionId: collectionIds.dbId,
             plexId: childId,
             addDate: new Date().toDateString(),
-            tmdbId: tmdbId,
+            tmdbId: tmdb ? tmdb : tmdb,
+            image_path: tmdbMedia?.poster_path,
           },
         ])
         .execute();
@@ -353,6 +382,7 @@ export class CollectionsService {
   ): Promise<BasicResponseDto> {
     this.infoLogger(`Removing collection from Database..`);
     try {
+      await this.CollectionMediaRepo.delete({ collectionId: collection.id });
       await this.connection
         .createQueryBuilder()
         .delete()

@@ -2,7 +2,7 @@ import { FormEvent, useContext, useEffect, useState } from 'react'
 import { IRule } from '../'
 import ConstantsContext, {
   IProperty,
-} from '../../../../../store/constants-context'
+} from '../../../../../contexts/constants-context'
 
 enum RulePossibility {
   BIGGER,
@@ -29,6 +29,7 @@ enum RuleOperators {
 interface IRuleInput {
   id?: number
   onCommit: (id: number, rule: IRule) => void
+  onIncomplete: (id: number) => void
 }
 
 const RuleInput = (props: IRuleInput) => {
@@ -78,7 +79,8 @@ const RuleInput = (props: IRuleInput) => {
     if (
       firstval &&
       action &&
-      ((secondVal !== 'custom_date' &&
+      ((secondVal &&
+        secondVal !== 'custom_date' &&
         secondVal !== 'custom_days' &&
         secondVal !== 'custom_number') ||
         customVal)
@@ -86,7 +88,7 @@ const RuleInput = (props: IRuleInput) => {
       const ruleValues = {
         operator: operator ? operator : null,
         firstVal: JSON.parse(firstval),
-        action: action,
+        action: +action,
       }
       if (customVal) {
         props.onCommit(props.id ? props.id : 0, {
@@ -110,6 +112,8 @@ const RuleInput = (props: IRuleInput) => {
           ...ruleValues,
         })
       }
+    } else {
+      props.onIncomplete(props.id ? props.id : 0)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }
@@ -168,39 +172,43 @@ const RuleInput = (props: IRuleInput) => {
   return (
     <div className="mt-10 h-full w-full" onSubmit={submit}>
       <div className="section h-full w-full">
-        <h3 className="sm-heading">Rule</h3>
+        <h3 className="sm-heading">
+          {props.id ? `Rule #${props.id + 1}` : `Rule #1`}
+        </h3>
         <p className="description">Specifications of the rule</p>
       </div>
-      {props.id ? props.id > 0 ? (
-        <div className="form-row">
-          <label htmlFor="operator" className="text-label">
-            Operator
-          </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              <select
-                name="operator"
-                id="operator"
-                onChange={updateOperator}
-                value={operator}
-              >
-                <option value={undefined}> </option>
-                {Object.keys(RuleOperators).map(
-                  (value: string, key: number) => {
-                    if (!isNaN(+value)) {
-                      return (
-                        <option key={key} value={key}>
-                          {RuleOperators[key]}
-                        </option>
-                      )
+      {props.id ? (
+        props.id > 0 ? (
+          <div className="form-row">
+            <label htmlFor="operator" className="text-label">
+              Operator
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <select
+                  name="operator"
+                  id="operator"
+                  onChange={updateOperator}
+                  value={operator}
+                >
+                  <option value={undefined}> </option>
+                  {Object.keys(RuleOperators).map(
+                    (value: string, key: number) => {
+                      if (!isNaN(+value)) {
+                        return (
+                          <option key={key} value={key}>
+                            {RuleOperators[key]}
+                          </option>
+                        )
+                      }
                     }
-                  }
-                )}
-              </select>
+                  )}
+                </select>
+              </div>
             </div>
           </div>
-        </div>
-      ) : undefined : undefined}
+        ) : undefined
+      ) : undefined}
 
       <div className="form-row">
         <label htmlFor="first_val" className="text-label">

@@ -18,6 +18,9 @@ export class CollectionMedia {
   @Column()
   addDate: Date;
 
+  @Column({ nullable: true })
+  image_path: string;
+
   @ManyToOne((type) => Collection, (collection) => collection.collectionMedia, {
     onDelete: 'CASCADE',
   })

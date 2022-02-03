@@ -35,6 +35,43 @@
     background: linear-gradient(180deg, rgba(31, 41, 55, 1) 0%, #131928 100%);
   }
 
+  .collection {
+    @apply border-r border-gray-700;
+  }
+  .collection-backdrop {
+    display: block;
+    overflow: hidden;
+    position: absolute;
+    inset: 0px;
+    box-sizing: border-box;
+    margin: 0px;
+    /* background-image: linear-gradient(
+      135deg,
+      rgba(17, 24, 39, 0.47) 0%,
+      rgb(17, 24, 39) 60%
+    ); */
+  }
+  .backdrop-image {
+    position: absolute;
+    inset: 0px;
+    box-sizing: border-box;
+    padding: 0px;
+    border: none;
+    margin: auto;
+    /* width: 0px;
+    height: 0px; */
+    min-width: 50%;
+    max-width: 50%;
+    min-height: 50%;
+    max-height: 50%;
+    opacity: 0.08;
+    object-fit: cover;
+    float: left;
+    display: inline-block;
+    background-repeat: no-repeat;
+    /* object-position: 50% 50%; */
+  }
+
   .slideover {
     padding-top: calc(1.5rem + env(safe-area-inset-top));
     padding-bottom: 1.5rem;
@@ -47,7 +84,6 @@
   .add-button {
     background-color: #005c0f;
   }
-  
 
   .add-button:hover {
     background: #1f4525;
@@ -56,7 +92,6 @@
   .cancel-button {
     background-color: #520000;
   }
-  
 
   .cancel-button:hover {
     background: #471c1c;
@@ -73,7 +108,6 @@
   .delete-button {
     background-color: #d60d0d;
   }
-  
 
   .delete-button:hover {
     background: #f03737;

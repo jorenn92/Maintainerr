@@ -1,14 +1,12 @@
-import React, { LegacyRef, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import GetApiHandler, { PostApiHandler } from '../../../../helpers/ApiHandler'
 import Image from 'next/image'
 import RuleCreator, { IRule } from '../../Rule/RuleCreator'
-import { ConstantsContextProvider } from '../../../../store/constants-context'
-
-interface ILibrary {
-  key: string
-  type: string
-  title: string
-}
+import { ConstantsContextProvider } from '../../../../contexts/constants-context'
+import LibrariesContext, {
+  ILibrary,
+} from '../../../../contexts/libraries-context'
+import Alert from '../../../Common/Alert'
 
 interface AddModal {
   onCancel: () => void
@@ -19,7 +17,7 @@ interface ICreateApiObject {
   name: string
   description: string
   libraryId: number
-  active: boolean
+  isActive: boolean
   collection: {
     visibleOnHome: boolean
     deleteAfterDays: number
@@ -30,7 +28,6 @@ interface ICreateApiObject {
 const AddModal = (props: AddModal) => {
   const [selectedLibraryId, setSelectedLibraryId] = useState('1')
   const [isLoading, setIsLoading] = useState(true)
-  const [libraries, setLibraries] = useState([])
   const nameRef = useRef<any>()
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
@@ -39,6 +36,8 @@ const AddModal = (props: AddModal) => {
   const [active, setActive] = useState<boolean>(true)
   const [rules, setRules] = useState<IRule[]>([])
   const [error, setError] = useState<boolean>(false)
+  const [formIncomplete, setFormIncomplete] = useState<boolean>(false)
+  const LibrariesCtx = useContext(LibrariesContext)
 
   function setLibraryId(event: { target: { value: string } }) {
     setSelectedLibraryId(event.target.value)
@@ -55,37 +54,52 @@ const AddModal = (props: AddModal) => {
 
   useEffect(() => {
     setIsLoading(true)
-
-    GetApiHandler('/plex/libraries/').then((resp) => {
-      if (resp) {
-        setLibraries(resp)
-      } else {
-        setLibraries([])
-      }
+    if (LibrariesCtx.libraries.length <= 0) {
+      GetApiHandler('/plex/libraries/').then((resp) => {
+        if (resp) {
+          LibrariesCtx.addLibraries(resp)
+        } else {
+          LibrariesCtx.addLibraries([])
+        }
+        setIsLoading(false)
+      })
+    } else {
       setIsLoading(false)
-    })
+    }
   }, [])
 
   const create = (e: any) => {
     e.preventDefault()
-    const creationObj: ICreateApiObject = {
-      name: nameRef.current.value,
-      description: descriptionRef.current.value,
-      libraryId: +libraryRef.current.value,
-      active: active,
-      collection: {
-        visibleOnHome: showHome,
-        deleteAfterDays: +deleteAfterRef.current.value,
-      },
-      rules: rules,
-    }
+    if (
+      nameRef.current.value &&
+      libraryRef.current.value &&
+      deleteAfterRef.current.value &&
+      rules.length > 0
+    ) {
+      setFormIncomplete(false)
+      const creationObj: ICreateApiObject = {
+        name: nameRef.current.value,
+        description: descriptionRef.current.value,
+        libraryId: +libraryRef.current.value,
+        isActive: active,
+        collection: {
+          visibleOnHome: showHome,
+          deleteAfterDays: +deleteAfterRef.current.value,
+        },
+        rules: rules,
+      }
 
-    PostApiHandler('/rules', creationObj).then((resp) => {
-      if (resp.code === 1) props.onSuccess()
-      else setError(true)
-    }).catch((err) => {
-      setError(true);
-    });
+      PostApiHandler('/rules', creationObj)
+        .then((resp) => {
+          if (resp.code === 1) props.onSuccess()
+          else setError(true)
+        })
+        .catch((err) => {
+          setError(true)
+        })
+    } else {
+      setFormIncomplete(true)
+    }
   }
 
   if (isLoading) {
@@ -102,14 +116,23 @@ const AddModal = (props: AddModal) => {
         <h3 className="heading">Add Rule Group</h3>
         <p className="description">Add a new rule group</p>
       </div>
-      {
-        error ? <div className='absolute top-2 text-red-800'> ERROR ! </div> : null
-      }
+      {error ? (
+        <Alert>
+          Something went wrong saving the group.. Please verify that all values
+          are valid
+        </Alert>
+      ) : undefined}
+      {formIncomplete ? (
+        <Alert>
+          Not all required (*) fields contain values and atleast 1 valid rule is
+          required
+        </Alert>
+      ) : undefined}
       <div className="section">
         <form>
           <div className="form-row">
             <label htmlFor="name" className="text-label">
-              Name
+              Name *
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -136,7 +159,7 @@ const AddModal = (props: AddModal) => {
 
           <div className="form-row">
             <label htmlFor="library" className="text-label">
-              Library
+              Library *
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -147,7 +170,7 @@ const AddModal = (props: AddModal) => {
                   onChange={setLibraryId}
                   ref={libraryRef}
                 >
-                  {libraries.map((data: ILibrary) => {
+                  {LibrariesCtx.libraries.map((data: ILibrary) => {
                     return (
                       <option key={data.key} value={data.key}>
                         {data.title}
@@ -199,7 +222,7 @@ const AddModal = (props: AddModal) => {
 
           <div className="form-row">
             <label htmlFor="collection_deleteDays" className="text-label">
-              Items deleted after
+              Items deleted after *
             </label>
             <div className="form-input">
               <div className="form-input-field">

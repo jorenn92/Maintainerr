@@ -1,8 +1,16 @@
-import type { NextPage } from "next";
-import Layout from "../components/Layout";
+import type { NextPage } from 'next'
+import Router, { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import Layout from '../components/Layout'
 
 const Home: NextPage = () => {
-  return <></>
-};
+  const router = useRouter()
 
-export default Home;
+  useEffect(() => {
+    router.push('/rules')
+  }, [])
+  
+  return <></>
+}
+
+export default Home

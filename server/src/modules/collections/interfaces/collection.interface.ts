@@ -1,3 +1,5 @@
+import { CollectionMedia } from '../entities/collection_media.entities';
+
 export interface ICollection {
   id?: number;
   plexId?: number;
@@ -7,4 +9,5 @@ export interface ICollection {
   isActive: boolean;
   visibleOnHome?: boolean;
   deleteAfterDays?: number; // amount of days after add
+  media?: CollectionMedia[];
 }

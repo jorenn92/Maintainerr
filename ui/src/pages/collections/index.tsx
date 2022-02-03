@@ -1,7 +1,8 @@
 import { NextPage } from 'next'
+import Collection from '../../components/Collection'
 
 const collections: NextPage = () => {
-  return <div>TEST</div>
+  return <Collection />
 }
 
 export default collections

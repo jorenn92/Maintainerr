@@ -1,10 +1,9 @@
+import Error from 'next/error'
 import Image from 'next/image'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import GetApiHandler from '../../../../helpers/ApiHandler'
-import ConstantsContext, {
-  ConstantsContextProvider,
-} from '../../../../store/constants-context'
-import AddButton from '../../../Common/AddButton'
+import ConstantsContext from '../../../../contexts/constants-context'
+import Alert from '../../../Common/Alert'
 import RuleInput from './RuleInput'
 
 interface IRulesToCreate {
@@ -17,7 +16,7 @@ export interface IRule {
   firstVal: [string, string]
   lastVal?: [string, string]
   customVal?: { ruleTypeId: number; value: string | number }
-  action: string
+  action: number
 }
 
 interface iRuleCreator {
@@ -26,7 +25,6 @@ interface iRuleCreator {
 }
 
 const RuleCreator = (props: iRuleCreator) => {
-  const rules: IRule[] = []
   const [isLoading, setIsLoading] = useState(true)
   const [ruleAmount, setRuleAmount] = useState<number>(1)
   const [createdRules, setCreatedRules] = useState<IRulesToCreate[]>([])
@@ -42,23 +40,33 @@ const RuleCreator = (props: iRuleCreator) => {
   }, [])
 
   useEffect(() => {
-    props.onUpdate(createdRules.map(el => el.rule))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    props.onUpdate(createdRules.map((el) => el.rule))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createdRules])
 
   const ruleCommited = (id: number, rule: IRule) => {
     if (createdRules) {
-      const index = createdRules?.findIndex((el) => el.id === id)
-      if (index !== -1) {
-        createdRules?.splice(+index)
-      }
-      setCreatedRules([...createdRules, { id: id, rule: rule }])
+      const rules = createdRules.filter((el) => el.id !== id)
+      setCreatedRules([...rules, { id: id, rule: rule }])
+    }
+  }
+
+  const ruleOmitted = (id: number) => {
+    if (createdRules) {
+      const rules = createdRules?.filter((el) => el.id !== id)
+      setCreatedRules([...rules])
     }
   }
 
   const addRule = (e: any) => {
     e.preventDefault()
     setRuleAmount(ruleAmount + 1)
+  }
+
+  const removeRule = (e: any) => {
+    e.preventDefault()
+    setCreatedRules(createdRules.filter((el) => el.id !== ruleAmount - 1))
+    setRuleAmount(ruleAmount - 1)
   }
 
   let ruleAmountArr: number[] = [],
@@ -76,18 +84,38 @@ const RuleCreator = (props: iRuleCreator) => {
 
   return (
     <div className="h-full w-full">
+      {createdRules.length !== ruleAmountArr.length ? (
+        <Alert>{`Some incomplete rules won't get saved`} </Alert>
+      ) : undefined}
+
       {ruleAmountArr.map((id) => (
-        <RuleInput key={id - 1} id={id - 1} onCommit={ruleCommited} />
+        <RuleInput
+          key={id - 1}
+          id={id - 1}
+          onCommit={ruleCommited}
+          onIncomplete={ruleOmitted}
+        />
       ))}
 
       <div className="mt-5 flex">
-        <button
-          className="m-auto h-10 w-20 rounded-full bg-slate-500 text-gray-200 shadow-lg"
-          onClick={addRule}
-        >
-          {' '}
-          +{' '}
-        </button>
+        <div className="m-auto">
+          <button
+            className="mr-5 h-10 w-20 rounded-full bg-slate-500 text-gray-200 shadow-lg"
+            onClick={addRule}
+          >
+            {' '}
+            +{' '}
+          </button>
+          {ruleAmountArr.length > 1 ? (
+            <button
+              className="h-10 w-20 rounded-full bg-slate-500 text-gray-200 shadow-lg"
+              onClick={removeRule}
+            >
+              {' '}
+              -{' '}
+            </button>
+          ) : null}
+        </div>
       </div>
     </div>
   )

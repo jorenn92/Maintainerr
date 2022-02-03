@@ -79,6 +79,8 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     const ruleGroups = await this.getAllActiveRuleGroups();
     if (ruleGroups) {
       for (const rulegroup of ruleGroups) {
+        this.logger.log(`Executing ${rulegroup.name}`);
+
         this.workerData = [];
         this.plexData = { page: 0, finished: false, data: [] };
         while (!this.plexData.finished) {
@@ -93,7 +95,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         await this.handleCollection(
           await this.rulesService.getRuleGroupById(rulegroup.id),
         );
-        this.logger.log('Execution of all active rules done.');
+        this.logger.log(`Execution of rule ${rulegroup.name} done.`);
       }
     }
   }

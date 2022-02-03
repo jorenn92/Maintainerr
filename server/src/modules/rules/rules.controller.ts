@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleExecutorService } from './rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
@@ -18,8 +26,11 @@ export class RulesController {
     return this.rulesService.getRules(id);
   }
   @Get()
-  getRuleGroups() {
-    return this.rulesService.getRuleGroups(false);
+  getRuleGroups(@Query() query: { activeOnly: boolean; libraryId?: number }) {
+    return this.rulesService.getRuleGroups(
+      query.activeOnly !== undefined ? query.activeOnly : false,
+      query.libraryId ? query.libraryId : undefined,
+    );
   }
   @Delete('/:id')
   deleteRuleGroup(@Param('id') id: string) {

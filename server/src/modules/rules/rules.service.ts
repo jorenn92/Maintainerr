@@ -49,7 +49,10 @@ export class RulesService {
       .where('ruleGroupId = :id', { id: ruleGroupId })
       .getMany();
   }
-  async getRuleGroups(activeOnly = false): Promise<RulesDto[]> {
+  async getRuleGroups(
+    activeOnly = false,
+    libraryId?: number,
+  ): Promise<RulesDto[]> {
     const rulegroups = await this.connection
       // .getRepository(RuleGroup)
       .createQueryBuilder('rule_group', 'rg')
@@ -57,6 +60,7 @@ export class RulesService {
       .leftJoinAndSelect('rg.rules', 'r')
       .orderBy('r.id')
       .where(activeOnly ? 'rg.isActive = true' : '')
+      .where(libraryId ? `rg.libraryId = ${libraryId}` : '')
       .getMany();
     return rulegroups as RulesDto[];
   }
@@ -69,14 +73,11 @@ export class RulesService {
     try {
       const group = await this.ruleGroupRepository.findOne(ruleGroupId);
       if (group.collectionId) {
-        this.collectionMediaRepository.delete({
-          collectionId: group.collectionId,
-        });
-        this.collectionRepository.delete({ id: group.collectionId });
+        await this.collectionService.deleteCollection(group.collectionId);
       }
 
-      this.rulesRepository.delete({ ruleGroupId: ruleGroupId });
-      this.ruleGroupRepository.delete(ruleGroupId);
+      await this.rulesRepository.delete({ ruleGroupId: ruleGroupId });
+      await this.ruleGroupRepository.delete(ruleGroupId);
       this.logger.log(
         `Removed rulegroup with id ${ruleGroupId} from the database`,
       );
@@ -114,12 +115,12 @@ export class RulesService {
       // create the collection
       const collection = (
         await this.collectionService.createCollection({
-          libraryId: params.libraryId,
+          libraryId: +params.libraryId,
           title: params.name,
           description: params.description,
           isActive: params.isActive,
           visibleOnHome: params.collection?.visibleOnHome,
-          deleteAfterDays: params.collection?.deleteAfterDays,
+          deleteAfterDays: +params.collection?.deleteAfterDays,
         })
       ).dbCollection;
       // create group
@@ -128,7 +129,7 @@ export class RulesService {
         params.description,
         params.libraryId,
         collection.id,
-        params.isActive ? params.isActive : true,
+        params.isActive !== undefined ? params.isActive : true,
       );
       // create rules
       for (const rule of params.rules) {
@@ -153,7 +154,7 @@ export class RulesService {
           .find((el) => el.id === rule.lastVal[0])
           .props.find((el) => el.id === rule.lastVal[1]);
         if (val1.type === val2.type) {
-          if (val1.type.possibilities.includes(rule.action)) {
+          if (val1.type.possibilities.includes(+rule.action)) {
             return this.createReturnStatus(true, 'Success');
           } else {
             return this.createReturnStatus(
@@ -166,7 +167,7 @@ export class RulesService {
         }
       } else if (rule.customVal) {
         if (val1.type.toString() === rule.customVal.ruleTypeId.toString()) {
-          if (val1.type.possibilities.includes(rule.action)) {
+          if (val1.type.possibilities.includes(+rule.action)) {
             return this.createReturnStatus(true, 'Success');
           } else {
             return this.createReturnStatus(
@@ -211,8 +212,8 @@ export class RulesService {
         {
           name: name,
           description: description,
-          libraryId: libraryId,
-          collectionId: collectionId,
+          libraryId: +libraryId,
+          collectionId: +collectionId,
           isActive: isActive,
         },
       ])

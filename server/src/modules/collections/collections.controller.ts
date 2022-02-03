@@ -47,4 +47,11 @@ export class CollectionsController {
   activate(@Param('id') id: number) {
     return this.collectionService.activateCollection(id);
   }
+
+  @Get()
+  getCollections(@Param('libraryId') libraryId: number) {
+    return this.collectionService.getCollections(
+      libraryId ? libraryId : undefined,
+    );
+  }
 }
