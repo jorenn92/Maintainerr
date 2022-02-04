@@ -10,15 +10,15 @@ const ApiHandler = async (
     switch (method) {
       case 'get':
         return await axios
-          .get(`http://localhost:3001/api${url}`)
+          .get(`/api${url}`)
           .then((res) => res.data)
       case 'post':
         return await axios
-          .post(`http://localhost:3001/api${url}`, payload)
+          .post(`/api${url}`, payload)
           .then((res) => res.data)
       case 'delete':
         return await axios
-          .delete(`http://localhost:3001/api${url}`, payload)
+          .delete(`/api${url}`, payload)
           .then((res) => res.data)
     }
   }
