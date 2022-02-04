@@ -1,8 +1,8 @@
 #!/usr/bin/env ash
 
-npx typeorm migration:run
 
 cd /opt/server
+npx typeorm migration:run
 node dist/main &
 
 cd /opt/ui
