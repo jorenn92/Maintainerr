@@ -22,6 +22,7 @@ RUN chmod +x /opt/start.sh && \
 WORKDIR /opt/ui/
 
 RUN npm install && \ 
+    npm install --save sharp && \ 
     npm run build && \
     rm -rf node_modules && \
     rm -f package-lock.json
@@ -38,5 +39,3 @@ WORKDIR /opt/ui/
 RUN  npm install --only=production
 
 ENTRYPOINT ["/opt/start.sh"]
-
-# CMD ["node", "dist/main"]
