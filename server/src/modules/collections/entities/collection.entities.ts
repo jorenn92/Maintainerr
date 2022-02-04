@@ -28,6 +28,9 @@ export class Collection {
   @Column({ nullable: true, default: null })
   deleteAfterDays: number;
 
+  @Column({ nullable: false, default: 1 })
+  type: 1 | 2;
+
   @OneToMany(
     (type) => CollectionMedia,
     (collectionMedia) => collectionMedia.collectionId,

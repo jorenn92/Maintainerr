@@ -2,6 +2,7 @@ import { CollectionMedia } from '../entities/collection_media.entities';
 
 export interface ICollection {
   id?: number;
+  type: 1 | 2;
   plexId?: number;
   libraryId: number;
   title: string;

@@ -26,16 +26,16 @@ export class RadarrGetterService {
 
   async get(id: number, libItem: PlexLibraryItem) {
     const prop = this.plexProperties.find((el) => el.id === id);
-    const tmdbId = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
+    const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
       libItem.ratingKey,
     );
-    if (!tmdbId) {
+    if (!tmdb) {
       console.log('id not found');
       return null;
     }
 
     const movieResponse = await this.servarrService.RadarrApi.getMovieByTmdbId(
-      tmdbId,
+      tmdb.id,
     );
     switch (prop.name) {
       case 'addDate': {

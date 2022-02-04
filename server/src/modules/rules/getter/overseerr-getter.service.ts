@@ -39,9 +39,9 @@ export class OverseerrGetterService {
     let mediaResponse: OverSeerrMediaResponse;
     if (tmdb) {
       if (libItem.type === 'movie') {
-        mediaResponse = await this.overseerrApi.getMovie(tmdb.toString());
+        mediaResponse = await this.overseerrApi.getMovie(tmdb.id.toString());
       } else {
-        mediaResponse = await this.overseerrApi.getShow(tmdb.toString());
+        mediaResponse = await this.overseerrApi.getShow(tmdb.id.toString());
       }
     }
     if (mediaResponse && mediaResponse.mediaInfo) {

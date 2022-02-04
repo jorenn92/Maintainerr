@@ -254,7 +254,7 @@ export class PlexApiService {
 
   public async createCollection(params: CreateUpdateCollection) {
     const response = await this.plexClient.postQuery<PlexLibraryResponse>({
-      uri: `/library/collections?type=1&title=${params.title}&sectionId=${params.libraryId}`,
+      uri: `/library/collections?type=${params.type}&title=${params.title}&sectionId=${params.libraryId}`,
     });
     const collection: PlexCollection = response.MediaContainer
       .Metadata[0] as PlexCollection;

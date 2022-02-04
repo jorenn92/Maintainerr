@@ -10,15 +10,17 @@ export class TmdbIdService {
     private readonly tmdbApi: TmdbApiService,
     private readonly plexApi: PlexApiService,
   ) {}
-  async getTmdbIdFromPlexRatingKey(ratingKey: string): Promise<number | null> {
+  async getTmdbIdFromPlexRatingKey(
+    ratingKey: string,
+  ): Promise<{ type: 'movie' | 'tv'; id: number | undefined }> {
     const libItem: PlexMetadata = await this.plexApi.getMetadata(ratingKey);
     return this.getTmdbIdFromPlexData(libItem);
   }
 
   async getTmdbIdFromPlexData(
     libItem: PlexMetadata | PlexLibraryItem,
-  ): Promise<number | null> {
-    return libItem.Guid
+  ): Promise<{ type: 'movie' | 'tv'; id: number | undefined }> {
+    const id = libItem.Guid
       ? +libItem.Guid.find((el) => el.id.includes('tmdb')).id.split('://')[1]
       : libItem.guid.includes('tmdb')
       ? +libItem.guid.split('://')[1].split('?')[0]
@@ -44,6 +46,12 @@ export class TmdbIdService {
               ? resp?.movie_results[0].id
               : resp?.tv_results[0].id,
           )
-      : null;
+      : undefined;
+    return {
+      type: ['show', 'season', 'episode'].includes(libItem.type)
+        ? 'tv'
+        : 'movie',
+      id: id,
+    };
   }
 }

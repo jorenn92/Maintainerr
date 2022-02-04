@@ -154,7 +154,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       );
       return collection;
     } else {
-      // log error: Collection not found
       console.log(`collection not found with id ${rulegroup.collectionId}`);
     }
   }

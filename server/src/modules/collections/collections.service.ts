@@ -85,6 +85,7 @@ export class CollectionsService {
     if (!empty) {
       const collectionObj: CreateUpdateCollection = {
         libraryId: collection.libraryId.toString(),
+        type: collection.type,
         title: collection.title,
         summary: collection?.description,
       };
@@ -138,6 +139,7 @@ export class CollectionsService {
       const collectionObj: CreateUpdateCollection = {
         libraryId: collection.libraryId.toString(),
         title: collection.title,
+        type: collection.type,
         collectionId: +dbCollection.plexId,
         summary: collection?.description,
       };
@@ -168,6 +170,7 @@ export class CollectionsService {
       if (!collection.plexId) {
         const newColl = await this.createPlexCollection({
           libraryId: collection.libraryId.toString(),
+          type: collection.type,
           title: collection.title,
           summary: collection.description,
         });
@@ -288,22 +291,26 @@ export class CollectionsService {
   ) {
     this.infoLogger(`Adding media with id ${childId} to collection..`);
 
-    const tmdb: number = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
+    const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
       childId.toString(),
     );
 
-    // TODO: Create 1 tmdb function. Instead of the 2 calls / item we do now
-    let tmdbMedia: TmdbTvDetails | TmdbMovieDetails =
-      await this.tmdbApi.getMovie({ movieId: tmdb });
-    if (tmdbMedia.success)
-      // Success param is only added when movie doesn't exist
-      tmdbMedia = await this.tmdbApi.getTvShow({ tvId: tmdb });
+    let tmdbMedia: TmdbTvDetails | TmdbMovieDetails;
+    switch (tmdb.type) {
+      case 'movie':
+        tmdbMedia = await this.tmdbApi.getMovie({ movieId: tmdb.id });
+        break;
+      case 'tv':
+        tmdbMedia = await this.tmdbApi.getTvShow({ tvId: tmdb.id });
+        break;
+    }
 
     const responseColl: PlexCollection | BasicResponseDto =
       await this.plexApi.addChildToCollection(
         collectionIds.plexId.toString(),
         childId.toString(),
       );
+
     if ('ratingKey' in responseColl) {
       await this.connection
         .createQueryBuilder()
@@ -314,7 +321,7 @@ export class CollectionsService {
             collectionId: collectionIds.dbId,
             plexId: childId,
             addDate: new Date().toDateString(),
-            tmdbId: tmdb ? tmdb : tmdb,
+            tmdbId: tmdbMedia?.id,
             image_path: tmdbMedia?.poster_path,
           },
         ])
@@ -369,6 +376,7 @@ export class CollectionsService {
               title: collection.title,
               description: collection?.description,
               plexId: plexId,
+              type: collection.type,
               libraryId: collection.libraryId,
               isActive: collection.isActive,
               visibleOnHome: collection?.visibleOnHome,
@@ -414,7 +422,12 @@ export class CollectionsService {
     collectionData: CreateUpdateCollection,
   ): Promise<PlexCollection> {
     this.infoLogger(`Creating collection in Plex..`);
-    return (await this.plexApi.createCollection(collectionData))[0];
+    const resp = await this.plexApi.createCollection(collectionData);
+    if (resp?.ratingKey) {
+      return resp;
+    } else {
+      return resp[0];
+    }
   }
 
   private infoLogger(message: string) {

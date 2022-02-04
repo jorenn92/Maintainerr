@@ -38,6 +38,11 @@ export class CreateCollectionTables1642754819422 implements MigrationInterface {
             type: 'integer',
           },
           {
+            name: 'type',
+            type: 'integer',
+            default: 1,
+          },
+          {
             name: 'VisibleOnHome',
             type: 'integer',
             default: false,

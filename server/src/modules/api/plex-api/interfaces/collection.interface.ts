@@ -19,6 +19,7 @@ export class PlexCollection {
 export interface CreateUpdateCollection {
   libraryId: string;
   collectionId?: number | string;
+  type: 1 | 2;
   title?: string;
   summary?: string;
   child?: string;

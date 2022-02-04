@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
+import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
 import { Collection } from '../collections/entities/collection.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
@@ -35,6 +36,7 @@ export class RulesService {
     @InjectRepository(CollectionMedia)
     private readonly collectionMediaRepository: Repository<CollectionMedia>,
     private readonly collectionService: CollectionsService,
+    private readonly plexApi: PlexApiService,
     private readonly connection: Connection,
   ) {
     this.ruleConstants = new RuleConstants();
@@ -113,9 +115,13 @@ export class RulesService {
 
     if (state.code === 1) {
       // create the collection
+      const lib = (await this.plexApi.getLibraries()).find(
+        (el) => +el.key === +params.libraryId,
+      );
       const collection = (
         await this.collectionService.createCollection({
           libraryId: +params.libraryId,
+          type: lib.type === 'movie' ? 1 : 2,
           title: params.name,
           description: params.description,
           isActive: params.isActive,
