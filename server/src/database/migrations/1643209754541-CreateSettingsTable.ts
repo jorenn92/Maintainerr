@@ -14,27 +14,23 @@ export class CreateSettingsTable1643209754541 implements MigrationInterface {
           },
           {
             name: 'clientId',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'applicationTitle',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'applicationUrl',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'apikey',
-            type: 'string',
-          },
-          {
-            name: 'overseerr_url',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'locale',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'cacheImages',
@@ -42,11 +38,11 @@ export class CreateSettingsTable1643209754541 implements MigrationInterface {
           },
           {
             name: 'plex_name',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'plex_hostname',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'plex_port',
@@ -58,43 +54,43 @@ export class CreateSettingsTable1643209754541 implements MigrationInterface {
           },
           {
             name: 'overseerr_url',
-            type: 'string',
+            type: 'varchar',
             isNullable: true,
           },
           {
             name: 'overseerr_api_key',
-            type: 'string',
+            type: 'varchar',
             isNullable: true,
           },
           {
             name: 'radarr_url',
-            type: 'string',
+            type: 'varchar',
             isNullable: true,
           },
           {
             name: 'radarr_api_key',
-            type: 'string',
+            type: 'varchar',
             isNullable: true,
           },
           {
             name: 'sonarr_url',
-            type: 'string',
+            type: 'varchar',
             isNullable: true,
           },
           {
             name: 'sonarr_api_key',
-            type: 'string',
+            type: 'varchar',
             isNullable: true,
           },
           {
             name: 'collection_handler_job_cron',
-            type: 'string',
-            default: CronExpression.EVERY_12_HOURS,
+            type: 'varchar',
+            default: `'${CronExpression.EVERY_12_HOURS}'`,
           },
           {
             name: 'rules_handler_job_cron',
-            type: 'string',
-            default: CronExpression.EVERY_8_HOURS,
+            type: 'varchar',
+            default: `'${CronExpression.EVERY_8_HOURS}'`,
           },
         ],
       }),

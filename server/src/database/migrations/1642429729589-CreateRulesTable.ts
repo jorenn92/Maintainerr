@@ -18,11 +18,11 @@ export class CreateRulesTable1642429729589 implements MigrationInterface {
           },
           {
             name: 'name',
-            type: 'text',
+            type: 'varchar',
           },
           {
             name: 'description',
-            type: 'text',
+            type: 'varchar',
             isNullable: true,
           },
           {
@@ -54,7 +54,7 @@ export class CreateRulesTable1642429729589 implements MigrationInterface {
           },
           {
             name: 'ruleJson',
-            type: 'text',
+            type: 'varchar',
           },
           {
             name: 'isActive',
