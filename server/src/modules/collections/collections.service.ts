@@ -224,11 +224,17 @@ export class CollectionsService {
 
   async deleteCollection(collectionDbId: number) {
     const collection = await this.collectionRepo.findOne(collectionDbId);
-    const status = await this.plexApi.deleteCollection(
-      collection.plexId.toString(),
-    );
+
+    let status = { code: 1, status: 'OK' };
+    if (collection.plexId) {
+      status = await this.plexApi.deleteCollection(
+        collection.plexId.toString(),
+      );
+    }
     if (status.status === 'OK') {
       return await this.RemoveCollectionFromDB(collection);
+    } else {
+      this.logger.error('An error occurred while deleting the collection.');
     }
   }
 
