@@ -11,7 +11,8 @@ VOLUME [ "/opt/server/data" ]
 
 WORKDIR /opt/server/
 
-RUN apk update && \
+RUN chmod +x /opt/start.sh && \
+    apk update && \
     npm i -g @nestjs/cli && \
     npm install && \ 
     npm run build && \
