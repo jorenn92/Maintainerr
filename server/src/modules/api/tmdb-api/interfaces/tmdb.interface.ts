@@ -121,6 +121,7 @@ export interface TmdbProductionCompany {
 
 export interface TmdbMovieDetails {
   id: number;
+  success?: boolean;
   imdb_id?: string;
   adult: boolean;
   backdrop_path?: string;

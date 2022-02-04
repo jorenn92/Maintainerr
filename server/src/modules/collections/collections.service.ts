@@ -295,7 +295,9 @@ export class CollectionsService {
     // TODO: Create 1 tmdb function. Instead of the 2 calls / item we do now
     let tmdbMedia: TmdbTvDetails | TmdbMovieDetails =
       await this.tmdbApi.getMovie({ movieId: tmdb });
-    if (!tmdbMedia) tmdbMedia = await this.tmdbApi.getTvShow({ tvId: tmdb });
+    if (tmdbMedia.success)
+      // Success param is only added when movie doesn't exist
+      tmdbMedia = await this.tmdbApi.getTvShow({ tvId: tmdb });
 
     const responseColl: PlexCollection | BasicResponseDto =
       await this.plexApi.addChildToCollection(
