@@ -7,6 +7,8 @@ COPY server/ /opt/server/
 COPY ui/ /opt/ui/
 COPY start.sh /opt/start.sh
 
+RUN mkdir /opt/server/data
+
 VOLUME [ "/opt/server/data" ]
 
 WORKDIR /opt/server/
