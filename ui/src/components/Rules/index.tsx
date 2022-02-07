@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import React, { useContext, useEffect, useState } from 'react'
 import LibrariesContext from '../../contexts/libraries-context'
-import GetApiHandler from '../../helpers/ApiHandler'
+import GetApiHandler from '../../utils/ApiHandler'
 import AddButton from '../Common/AddButton'
 import LibrarySwticher from '../Common/LibrarySwitcher'
 import RuleGroup, { IRuleGroup } from './RuleGroup'

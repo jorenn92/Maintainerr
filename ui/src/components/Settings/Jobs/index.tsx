@@ -1,7 +1,7 @@
 import { SaveIcon } from '@heroicons/react/solid'
 import { useContext, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
-import { PostApiHandler } from '../../../helpers/ApiHandler'
+import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 

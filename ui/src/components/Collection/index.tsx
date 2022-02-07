@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import LibrariesContext, { ILibrary } from '../../contexts/libraries-context'
-import GetApiHandler from '../../helpers/ApiHandler'
+import GetApiHandler from '../../utils/ApiHandler'
 import LibrarySwticher from '../Common/LibrarySwitcher'
 import CollectionItem from './CollectionItem'
 

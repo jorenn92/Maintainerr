@@ -2,7 +2,7 @@ import EditButton from '../../Common/EditButton'
 import DeleteButton from '../../Common/DeleteButton'
 import { IRule } from '../Rule'
 import { useContext, useState } from 'react'
-import { DeleteApiHandler } from '../../../helpers/ApiHandler'
+import { DeleteApiHandler } from '../../../utils/ApiHandler'
 import LibrariesContext from '../../../contexts/libraries-context'
 
 export interface IRuleGroup {

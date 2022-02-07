@@ -1,7 +1,7 @@
 import Error from 'next/error'
 import Image from 'next/image'
 import { useContext, useEffect, useState } from 'react'
-import GetApiHandler from '../../../../helpers/ApiHandler'
+import GetApiHandler from '../../../../utils/ApiHandler'
 import ConstantsContext from '../../../../contexts/constants-context'
 import Alert from '../../../Common/Alert'
 import RuleInput from './RuleInput'

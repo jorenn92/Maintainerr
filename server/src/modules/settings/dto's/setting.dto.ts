@@ -21,6 +21,8 @@ export class SettingDto {
 
   plex_ssl: number;
 
+  plex_auth_token: string;
+
   overseerr_url: string;
 
   overseerr_api_key: string;

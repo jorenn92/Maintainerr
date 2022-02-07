@@ -53,6 +53,11 @@ export class CreateSettingsTable1643209754541 implements MigrationInterface {
             type: 'integer',
           },
           {
+            name: 'plex_auth_token',
+            type: 'varchar',
+            isNullable: true,
+          },
+          {
             name: 'overseerr_url',
             type: 'varchar',
             isNullable: true,

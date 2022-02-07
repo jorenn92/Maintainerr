@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import SettingsContext from '../../contexts/settings-context'
-import GetApiHandler from '../../helpers/ApiHandler'
+import GetApiHandler from '../../utils/ApiHandler'
 import SettingsTabs, { SettingsRoute } from './Tabs'
 
 const SettingsWrapper: React.FC = ({ children }) => {

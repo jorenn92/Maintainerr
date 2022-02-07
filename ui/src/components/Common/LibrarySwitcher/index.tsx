@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react'
 import LibrariesContext from '../../../contexts/libraries-context'
-import GetApiHandler from '../../../helpers/ApiHandler'
+import GetApiHandler from '../../../utils/ApiHandler'
 
 interface ILibrarySwitcher {
   onSwitch: (libraryId: number) => void

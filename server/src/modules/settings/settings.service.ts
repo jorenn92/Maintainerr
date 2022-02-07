@@ -33,6 +33,8 @@ export class SettingsService implements SettingDto {
 
   plex_ssl: number;
 
+  plex_auth_token: string;
+
   overseerr_url: string;
 
   overseerr_api_key: string;
@@ -74,6 +76,7 @@ export class SettingsService implements SettingDto {
       this.plex_hostname = settingsDb?.plex_hostname;
       this.plex_port = settingsDb?.plex_port;
       this.plex_ssl = settingsDb?.plex_ssl;
+      this.plex_auth_token = settingsDb?.plex_auth_token;
       this.overseerr_url = settingsDb?.overseerr_url;
       this.overseerr_api_key = settingsDb?.overseerr_api_key;
       this.radarr_url = settingsDb?.radarr_url;

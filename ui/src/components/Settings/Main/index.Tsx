@@ -1,7 +1,7 @@
 import { RefreshIcon, SaveIcon } from '@heroicons/react/solid'
 import React, { useContext, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
-import GetApiHandler, { PostApiHandler } from '../../../helpers/ApiHandler'
+import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 

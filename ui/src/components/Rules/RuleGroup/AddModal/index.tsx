@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import GetApiHandler, { PostApiHandler } from '../../../../helpers/ApiHandler'
+import GetApiHandler, { PostApiHandler } from '../../../../utils/ApiHandler'
 import Image from 'next/image'
 import RuleCreator, { IRule } from '../../Rule/RuleCreator'
 import { ConstantsContextProvider } from '../../../../contexts/constants-context'
