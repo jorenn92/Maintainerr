@@ -117,7 +117,7 @@ export class SettingsService implements SettingDto {
     }
   }
 
-  private generateApiKey(): string {
+  public generateApiKey(): string {
     return Buffer.from(`${Date.now()}${randomUUID()})`).toString('base64');
   }
 }

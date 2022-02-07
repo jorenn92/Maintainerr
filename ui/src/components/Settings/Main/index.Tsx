@@ -1,7 +1,7 @@
-import { SaveIcon } from '@heroicons/react/solid'
+import { RefreshIcon, SaveIcon } from '@heroicons/react/solid'
 import React, { useContext, useRef, useState } from 'react'
 import SettingsContext, { ISettings } from '../../../contexts/settings-context'
-import { PostApiHandler } from '../../../helpers/ApiHandler'
+import GetApiHandler, { PostApiHandler } from '../../../helpers/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 
@@ -37,6 +37,19 @@ const MainSettings = () => {
     } else {
       setError(true)
     }
+  }
+
+  const regenerateApi = async () => {
+    const key = await GetApiHandler('/settings/api/generate')
+
+    await PostApiHandler('/settings', {
+      apikey: key,
+    })
+
+    settingsCtx.addSettings({
+      ...settingsCtx.settings,
+      apikey: key,
+    })
   }
 
   return (
@@ -82,6 +95,15 @@ const MainSettings = () => {
                   ref={apiKeyRef}
                   defaultValue={settingsCtx.settings.apikey}
                 ></input>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    regenerateApi()
+                  }}
+                  className="ml-3 input-action"
+                >
+                  <RefreshIcon />
+                </button>
               </div>
             </div>
           </div>

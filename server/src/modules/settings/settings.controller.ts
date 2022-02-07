@@ -10,6 +10,10 @@ export class SettingsController {
   getSettings() {
     return this.settingsService.getSettings();
   }
+  @Get('/api/generate')
+  generateApiKey() {
+    return this.settingsService.generateApiKey();
+  }
   @Post()
   updateSettings(@Body() payload: SettingDto) {
     return this.settingsService.updateSettings(payload);

@@ -27,7 +27,7 @@
     padding-top: env(safe-area-inset-top);
     height: calc(4rem + env(safe-area-inset-top));
   }
-
+ 
   .sidebar {
     @apply border-r border-gray-700;
     padding-top: env(safe-area-inset-top);
