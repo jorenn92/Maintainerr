@@ -24,7 +24,7 @@ const PlexSettings = () => {
     ) {
       const payload = {
         plex_hostname: hostnameRef.current.value,
-        plex_port: portRef.current.value,
+        plex_port: +portRef.current.value,
         plex_name: nameRef.current.value,
         plex_ssl: sslRef.current.checked ? 1 : 0,
       }
