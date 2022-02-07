@@ -86,10 +86,14 @@ export class SettingsService implements SettingDto {
     } else {
       this.logger.log('Settings not found.. Creating initial settings');
       await this.settingsRepo.insert({
-        overseerr_api_key: this.generateApiKey(),
+        apikey: this.generateApiKey(),
       });
       this.init();
     }
+  }
+
+  public async getSettings() {
+    return this.settingsRepo.findOne();
   }
 
   public async updateSettings(

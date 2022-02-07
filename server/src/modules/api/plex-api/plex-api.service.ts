@@ -55,40 +55,46 @@ export class PlexApiService {
     // plexSettings?: PlexSettings;
     timeout?: number;
   }) {
-    plexToken = plexToken || 'zFYx-sGQ4Xrnzpxsv_GW';
-    const settingsPlex = await this.getDbSettings();
-    if (settingsPlex.ip) {
-      this.plexClient = new NodePlexAPI({
-        hostname: settingsPlex.ip,
-        port: settingsPlex.port,
-        https: settingsPlex.useSsl,
-        timeout: timeout,
-        token: plexToken,
-        authenticator: {
-          authenticate: (
-            _plexApi,
-            cb: (err?: string, token?: string) => void,
-          ) => {
-            if (!plexToken) {
-              return cb('Plex Token not found!');
-            }
-            cb(undefined, plexToken);
+    try {
+      plexToken = plexToken || 'zFYx-sGQ4Xrnzpxsv_GW';
+      const settingsPlex = await this.getDbSettings();
+      if (settingsPlex.ip) {
+        this.plexClient = new NodePlexAPI({
+          hostname: settingsPlex.ip,
+          port: settingsPlex.port,
+          https: settingsPlex.useSsl,
+          timeout: timeout,
+          token: plexToken,
+          authenticator: {
+            authenticate: (
+              _plexApi,
+              cb: (err?: string, token?: string) => void,
+            ) => {
+              if (!plexToken) {
+                return cb('Plex Token not found!');
+              }
+              cb(undefined, plexToken);
+            },
           },
-        },
-        // requestOptions: {
-        //   includeChildren: 1,
-        // },
-        options: {
-          identifier: 'ca2dd7de-35d4-4216-8f27-ac57f80056fe', // this.settings.clientId
-          product: 'Maintainerr', // this.settings.applicationTitle
-          deviceName: 'Maintainerr', // this.settings.applicationTitle
-          platform: 'Maintainerr', // this.settings.applicationTitle
-        },
-      });
-      this.setMachineId();
-    } else {
-      this.logger.log(
-        "Plex API isn't fully initialized, required settings aren't set",
+          // requestOptions: {
+          //   includeChildren: 1,
+          // },
+          options: {
+            identifier: 'ca2dd7de-35d4-4216-8f27-ac57f80056fe', // this.settings.clientId
+            product: 'Maintainerr', // this.settings.applicationTitle
+            deviceName: 'Maintainerr', // this.settings.applicationTitle
+            platform: 'Maintainerr', // this.settings.applicationTitle
+          },
+        });
+        this.setMachineId();
+      } else {
+        this.logger.log(
+          "Plex API isn't fully initialized, required settings aren't set",
+        );
+      }
+    } catch (_err) {
+      this.logger.error(
+        `Couldn't connect to Plex.. Please check your settings`,
       );
     }
   }
@@ -110,46 +116,6 @@ export class PlexApiService {
 
     return response.MediaContainer.Directory;
   }
-
-  // public async syncLibraries(): Promise<void> {
-  //   const settings = this.getDbSettings();
-
-  //   try {
-  //     const libraries = await this.getLibraries();
-
-  //     const newLibraries = libraries
-  //       // Remove libraries that are not movie or show
-  //       .filter(
-  //         (library) => library.type === 'movie' || library.type === 'show',
-  //       )
-  //       // Remove libraries that do not have a metadata agent set (usually personal video libraries)
-  //       .filter((library) => library.agent !== 'com.plexapp.agents.none')
-  //       .map(async (library) => {
-  //         const existing = (await settings).libraries.find(
-  //           (l) => l.id === library.key && l.name === library.title,
-  //         );
-
-  //         return {
-  //           id: library.key,
-  //           name: library.title,
-  //           enabled: existing?.enabled ?? false,
-  //           type: library.type,
-  //           lastScan: existing?.lastScan,
-  //         };
-  //       });
-
-  //     settings.libraries = newLibraries;
-  //   } catch (e) {
-  //     this.logger.error('Failed to fetch Plex libraries', {
-  //       label: 'Plex API',
-  //       message: e.message,
-  //     });
-
-  //     (await settings).libraries = [];
-  //   }
-
-  //   // settings.save();
-  // }
 
   public async getLibraryContents(
     id: string,

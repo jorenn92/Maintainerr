@@ -1,7 +1,11 @@
 import { NextPage } from 'next'
+import { useRouter } from 'next/router'
+import SettingsWrapper from '../../components/Settings'
 
-const settings: NextPage = () => {
-  return <div>TEST</div>
+const Settings: NextPage = () => {
+  const router = useRouter()
+  router.push('/settings/main')
+  return <SettingsWrapper></SettingsWrapper>
 }
 
-export default settings
+export default Settings
