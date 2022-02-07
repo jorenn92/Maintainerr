@@ -310,7 +310,6 @@ export class CollectionsService {
         collectionIds.plexId.toString(),
         childId.toString(),
       );
-
     if ('ratingKey' in responseColl) {
       await this.connection
         .createQueryBuilder()
@@ -399,21 +398,23 @@ export class CollectionsService {
     this.infoLogger(`Removing collection from Database..`);
     try {
       await this.CollectionMediaRepo.delete({ collectionId: collection.id });
-      await this.connection
-        .createQueryBuilder()
-        .delete()
-        .from(Collection)
-        .where([
-          {
-            id: collection.id,
-          },
-        ])
-        .execute();
+      await this.collectionRepo.delete(collection.id);
+      // await this.connection
+      //   .createQueryBuilder()
+      //   .delete()
+      //   .from(Collection)
+      //   .where([
+      //     {
+      //       id: collection.id,
+      //     },
+      //   ])
+      //   .execute();
       return { status: 'OK', code: 1, message: 'Success' };
     } catch (_err) {
       this.infoLogger(
         `Something went wrong deleting the collection from the Database..`,
       );
+      this.logger.error(_err);
       return { status: 'NOK', code: 0, message: 'Removing from DB failed' };
     }
   }
