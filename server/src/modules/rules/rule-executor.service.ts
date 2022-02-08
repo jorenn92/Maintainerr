@@ -310,8 +310,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   private async logInfo(message: string) {
-    this.logger.log(message, {
-      label: 'Rule Worker',
-    });
+    this.logger.log(message);
   }
 }
