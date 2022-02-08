@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { SettingDto } from "./dto's/setting.dto";
 import { SettingsService } from './settings.service';
 
@@ -13,6 +13,11 @@ export class SettingsController {
   @Get('/api/generate')
   generateApiKey() {
     return this.settingsService.generateApiKey();
+  }
+
+  @Delete('/plex/auth')
+  deletePlexApiAuth() {
+    return this.settingsService.deletePlexApiAuth();
   }
   @Post()
   updateSettings(@Body() payload: SettingDto) {

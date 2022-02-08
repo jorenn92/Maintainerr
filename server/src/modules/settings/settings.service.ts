@@ -2,6 +2,7 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
+import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
@@ -96,12 +97,29 @@ export class SettingsService implements SettingDto {
   }
 
   public async getSettings() {
-    return this.settingsRepo.findOne();
+    try {
+      return this.settingsRepo.findOne();
+    } catch (err) {
+      this.logger.error(
+        'Something went wrong while getting settings. Is the database file locked?',
+      );
+      return { status: 'NOK', code: 0, message: err };
+    }
   }
 
-  public async updateSettings(
-    settings: Settings,
-  ): Promise<{ code: 0 | 1; message: string }> {
+  public async deletePlexApiAuth(): Promise<BasicResponseDto> {
+    try {
+      await this.settingsRepo.update({}, { plex_auth_token: undefined });
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (err) {
+      this.logger.error(
+        'Something went wrong while deleting the Plex auth token',
+      );
+      return { status: 'NOK', code: 0, message: err };
+    }
+  }
+
+  public async updateSettings(settings: Settings): Promise<BasicResponseDto> {
     try {
       const settingsDb = await this.settingsRepo.findOne();
       await this.settingsRepo.save({
@@ -113,10 +131,10 @@ export class SettingsService implements SettingDto {
       this.plexApi.initialize({});
       this.servarr.init();
       this.overseerr.init();
-      return { code: 1, message: 'Success' };
+      return { status: 'OK', code: 1, message: 'Success' };
     } catch (e) {
       this.logger.error('Something went wrong while updating settings');
-      return { code: 0, message: 'Failure' };
+      return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
 

@@ -5,6 +5,7 @@ export interface PlexSettings {
   machineId?: string;
   ip: string;
   port: number;
+  auth_token: string;
   useSsl?: boolean;
   libraries: Library[];
   webAppUrl?: string;

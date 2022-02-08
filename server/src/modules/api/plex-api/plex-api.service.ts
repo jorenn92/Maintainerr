@@ -42,6 +42,7 @@ export class PlexApiService {
       machineId: this.machineId,
       ip: this.settings.plex_hostname,
       port: this.settings.plex_port,
+      auth_token: this.settings.plex_auth_token,
       useSsl: this.settings.plex_ssl === 1 ? true : false,
       libraries: [],
       webAppUrl: this.settings.plex_hostname,
@@ -56,9 +57,9 @@ export class PlexApiService {
     timeout?: number;
   }) {
     try {
-      plexToken = plexToken || 'zFYx-sGQ4Xrnzpxsv_GW';
       const settingsPlex = await this.getDbSettings();
-      if (settingsPlex.ip) {
+      plexToken = plexToken || settingsPlex.auth_token;
+      if (settingsPlex.ip && plexToken) {
         this.plexClient = new NodePlexAPI({
           hostname: settingsPlex.ip,
           port: settingsPlex.port,
@@ -80,7 +81,7 @@ export class PlexApiService {
           //   includeChildren: 1,
           // },
           options: {
-            identifier: 'ca2dd7de-35d4-4216-8f27-ac57f80056fe', // this.settings.clientId
+            identifier: '695b47f5-3c61-4cbd-8eb3-bcc3d6d06ac5', // this.settings.clientId
             product: 'Maintainerr', // this.settings.applicationTitle
             deviceName: 'Maintainerr', // this.settings.applicationTitle
             platform: 'Maintainerr', // this.settings.applicationTitle

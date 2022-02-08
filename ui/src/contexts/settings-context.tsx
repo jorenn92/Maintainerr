@@ -19,7 +19,7 @@ export interface ISettings {
   plex_hostname: string
   plex_port: number
   plex_ssl: number
-  plex_auth_token: string
+  plex_auth_token: string | null
   overseerr_api_key: string
   radarr_url: string
   radarr_api_key: string

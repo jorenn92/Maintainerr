@@ -1,11 +1,12 @@
 import { SaveIcon } from '@heroicons/react/solid'
-import { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
-import { PostApiHandler } from '../../../utils/ApiHandler'
+import { DeleteApiHandler, PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import PlexLoginButton from '../../Login/Plex'
 import axios from 'axios'
+import { stat } from 'fs'
 
 const PlexSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -16,6 +17,7 @@ const PlexSettings = () => {
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
   const [tokenValid, setTokenValid] = useState<Boolean>(false)
+  const [clearTokenClicked, setClearTokenClicked] = useState<Boolean>(false)
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -61,7 +63,7 @@ const PlexSettings = () => {
         ...settingsCtx.settings,
         plex_auth_token: token,
       })
-      verifyToken()
+      verifyToken(token)
     })
   }
 
@@ -69,20 +71,42 @@ const PlexSettings = () => {
     setError(true)
   }
 
-  const verifyToken = () => {
-    axios
-      .get('https://plex.tv/api/v2/user', {
-        headers: {
-          'X-Plex-Product': 'Maintainerr',
-          'X-Plex-Version': '2.0',
-          'X-Plex-Client-Identifier': '695b47f5-3c61-4cbd-8eb3-bcc3d6d06ac5',
-          'X-Plex-Token': settingsCtx.settings.plex_auth_token,
-        },
+  const deleteToken = async () => {
+    const status = await DeleteApiHandler('/settings/plex/auth')
+
+    if (Boolean(status.code)) {
+      settingsCtx.addSettings({
+        ...settingsCtx.settings,
+        plex_auth_token: null,
       })
-      .then((response) => {
-        setTokenValid(response.status === 200 ? true : false)
-      })
-      .catch(() => setTokenValid(false))
+      setError(false)
+      setChanged(true)
+      setTokenValid(false)
+      setClearTokenClicked(false);
+    } else {
+      setError(true)
+    }
+  }
+
+  const verifyToken = (token?: string) => {
+    const authToken = token || settingsCtx.settings.plex_auth_token
+    if (authToken) {
+      axios
+        .get('https://plex.tv/api/v2/user', {
+          headers: {
+            'X-Plex-Product': 'Maintainerr',
+            'X-Plex-Version': '2.0',
+            'X-Plex-Client-Identifier': '695b47f5-3c61-4cbd-8eb3-bcc3d6d06ac5',
+            'X-Plex-Token': authToken,
+          },
+        })
+        .then((response) => {
+          setTokenValid(response.status === 200 ? true : false)
+        })
+        .catch(() => setTokenValid(false))
+    } else {
+      setTokenValid(false)
+    }
   }
 
   useEffect(() => {
@@ -174,18 +198,32 @@ const PlexSettings = () => {
 
           <div className="form-row">
             <label htmlFor="ssl" className="text-label">
-              Authenticate
+              Authentication
             </label>
             <div className="form-input">
               <div className="form-input-field">
-                {/* <Button onSubmit={} buttonType="warning"><span>Authenticate with Plex</span></Button> */}
                 {tokenValid ? (
-                  <Button
-                    onSubmit={(e: any) => e.preventDefault()}
-                    buttonType="success"
-                  >
-                    Authenticated
-                  </Button>
+                  clearTokenClicked ? (
+                    <Button
+                      onClick={(e: React.FormEvent) => {
+                        e.preventDefault()
+                        deleteToken()
+                      }}
+                      buttonType="warning"
+                    >
+                      Clear credentials?
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={(e: React.FormEvent) => {
+                        e.preventDefault()
+                        setClearTokenClicked(true)
+                      }}
+                      buttonType="success"
+                    >
+                      Authenticated
+                    </Button>
+                  )
                 ) : (
                   <PlexLoginButton
                     onAuthToken={authsuccess}
