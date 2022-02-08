@@ -385,13 +385,6 @@ export class RuleConstants {
           type: RuleType.NUMBER,
         } as Property, //  returns id[]
         {
-          id: 0,
-          name: 'amountRequested',
-          humanName: 'Amount of requests',
-          mediaType: MediaType.BOTH,
-          type: RuleType.NUMBER,
-        } as Property,
-        {
           id: 1,
           name: 'requestDate',
           humanName: 'Request date',
@@ -418,6 +411,13 @@ export class RuleConstants {
           humanName: 'Media downloaded date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
+        } as Property,
+        {
+          id: 5,
+          name: 'amountRequested',
+          humanName: 'Amount of requests',
+          mediaType: MediaType.BOTH,
+          type: RuleType.NUMBER,
         } as Property,
       ],
     },
