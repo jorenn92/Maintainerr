@@ -7,6 +7,7 @@ import LibrariesContext, {
   ILibrary,
 } from '../../../../contexts/libraries-context'
 import Alert from '../../../Common/Alert'
+import ArrAction from './ArrAction'
 
 interface AddModal {
   onCancel: () => void
@@ -17,6 +18,7 @@ interface ICreateApiObject {
   name: string
   description: string
   libraryId: number
+  arrAction: number
   isActive: boolean
   collection: {
     visibleOnHome: boolean
@@ -26,13 +28,15 @@ interface ICreateApiObject {
 }
 
 const AddModal = (props: AddModal) => {
-  const [selectedLibraryId, setSelectedLibraryId] = useState('1')
+  const [selectedLibraryId, setSelectedLibraryId] = useState<string>('1')
+  const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
   const [isLoading, setIsLoading] = useState(true)
   const nameRef = useRef<any>()
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
   const deleteAfterRef = useRef<any>()
   const [showHome, setShowHome] = useState<boolean>(true)
+  const [arrOption, setArrOption] = useState<number>()
   const [active, setActive] = useState<boolean>(true)
   const [rules, setRules] = useState<IRule[]>([])
   const [error, setError] = useState<boolean>(false)
@@ -41,7 +45,6 @@ const AddModal = (props: AddModal) => {
 
   function setLibraryId(event: { target: { value: string } }) {
     setSelectedLibraryId(event.target.value)
-    console.log(event.target.value)
   }
 
   function updateRules(rules: IRule[]) {
@@ -51,6 +54,13 @@ const AddModal = (props: AddModal) => {
   const cancel = () => {
     props.onCancel()
   }
+
+  useEffect(() => {
+    const lib = LibrariesCtx.libraries.find(
+      (el: ILibrary) => +el.key === +selectedLibraryId
+    )
+    setSelectedLibrary(lib)
+  }, [selectedLibraryId])
 
   useEffect(() => {
     setIsLoading(true)
@@ -81,6 +91,7 @@ const AddModal = (props: AddModal) => {
         name: nameRef.current.value,
         description: descriptionRef.current.value,
         libraryId: +libraryRef.current.value,
+        arrAction: arrOption ? arrOption : 0,
         isActive: active,
         collection: {
           visibleOnHome: showHome,
@@ -181,6 +192,17 @@ const AddModal = (props: AddModal) => {
               </div>
             </div>
           </div>
+          {selectedLibrary!.type === 'movie' ? (
+            <ArrAction
+              title="Radarr"
+              onUpdate={(e: number) => setArrOption(e)}
+            />
+          ) : (
+            <ArrAction
+              title="Sonarr"
+              onUpdate={(e: number) => setArrOption(e)}
+            />
+          )}
 
           <div className="form-row">
             <label htmlFor="active" className="text-label">

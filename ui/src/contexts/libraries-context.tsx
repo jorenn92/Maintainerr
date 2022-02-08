@@ -8,7 +8,7 @@ import {
 
 export interface ILibrary {
   key: string
-  type: string
+  type: 'movie' | 'show'
   title: string
 }
 const LibrariesContext = createContext({
