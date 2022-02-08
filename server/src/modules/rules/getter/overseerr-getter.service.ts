@@ -60,6 +60,9 @@ export class OverseerrGetterService {
           }
           return usersIds;
         }
+        case 'amountRequested': {
+          return mediaResponse?.mediaInfo.requests.length;
+        }
         case 'requestDate': {
           return new Date(mediaResponse?.mediaInfo?.requests[0]?.createdAt);
         }
