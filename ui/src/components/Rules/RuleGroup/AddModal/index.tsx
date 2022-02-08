@@ -277,7 +277,7 @@ const AddModal = (props: AddModal) => {
             </p>
           </div>
           <ConstantsContextProvider>
-            <RuleCreator onCancel={cancel} onUpdate={updateRules} />
+            <RuleCreator mediaType={selectedLibrary ? selectedLibrary.type === 'movie' ? 1 : 2 : 0} onCancel={cancel} onUpdate={updateRules} />
           </ConstantsContextProvider>
 
           <div className="mt-5 flex h-full w-full">

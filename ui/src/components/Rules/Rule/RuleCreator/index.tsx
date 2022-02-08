@@ -2,7 +2,9 @@ import Error from 'next/error'
 import Image from 'next/image'
 import { useContext, useEffect, useState } from 'react'
 import GetApiHandler from '../../../../utils/ApiHandler'
-import ConstantsContext from '../../../../contexts/constants-context'
+import ConstantsContext, {
+  MediaType,
+} from '../../../../contexts/constants-context'
 import Alert from '../../../Common/Alert'
 import RuleInput from './RuleInput'
 
@@ -20,6 +22,7 @@ export interface IRule {
 }
 
 interface iRuleCreator {
+  mediaType?: MediaType
   onUpdate: (rules: IRule[]) => void
   onCancel: () => void
 }
@@ -92,6 +95,7 @@ const RuleCreator = (props: iRuleCreator) => {
         <RuleInput
           key={id - 1}
           id={id - 1}
+          mediaType={props.mediaType}
           onCommit={ruleCommited}
           onIncomplete={ruleOmitted}
         />

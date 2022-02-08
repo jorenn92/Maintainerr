@@ -2,6 +2,7 @@ import { FormEvent, useContext, useEffect, useState } from 'react'
 import { IRule } from '../'
 import ConstantsContext, {
   IProperty,
+  MediaType,
 } from '../../../../../contexts/constants-context'
 
 enum RulePossibility {
@@ -28,6 +29,7 @@ enum RuleOperators {
 
 interface IRuleInput {
   id?: number
+  mediaType?: MediaType
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
 }
@@ -224,18 +226,20 @@ const RuleInput = (props: IRuleInput) => {
             >
               <option value={undefined}></option>
               {ConstantsCtx.constants.applications?.map((app) => {
-                return (
+                return app.mediaType === MediaType.BOTH ||
+                  props.mediaType === app.mediaType ? (
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
-                      return (
+                      return prop.mediaType === MediaType.BOTH ||
+                        props.mediaType === prop.mediaType ? (
                         <option
                           key={app.id + 10 + prop.id}
                           value={JSON.stringify([app.id, prop.id])}
-                        >{`${app.name} - ${prop.name}`}</option>
-                      )
+                        >{`${app.name} - ${prop.humanName}`}</option>
+                      ) : undefined
                     })}
                   </optgroup>
-                )
+                ) : undefined
               })}
             </select>
           </div>
@@ -297,20 +301,22 @@ const RuleInput = (props: IRuleInput) => {
               </optgroup>
               {/* <option value="custom_calc">Custom calculation.. </option> */}
               {ConstantsCtx.constants.applications?.map((app) => {
-                return (
+                return app.mediaType === MediaType.BOTH ||
+                  props.mediaType === app.mediaType ? (
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
                       if (+prop.type.key === ruleType) {
-                        return (
+                        return prop.mediaType === MediaType.BOTH ||
+                          props.mediaType === prop.mediaType ? (
                           <option
                             key={app.id + 10 + prop.id}
                             value={JSON.stringify([app.id, prop.id])}
-                          >{`${app.name} - ${prop.name}`}</option>
-                        )
+                          >{`${app.name} - ${prop.humanName}`}</option>
+                        ) : undefined
                       }
                     })}
                   </optgroup>
-                )
+                ) : undefined
               })}
             </select>
           </div>
