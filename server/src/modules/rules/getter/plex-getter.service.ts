@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { isNull } from 'lodash';
 import {
-  PlexHub,
   PlexLibraryItem,
   PlexSeenBy,
-  PlexUser,
 } from 'src/modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from 'src/modules/api/plex-api/plex-api.service';
 import {
@@ -52,7 +49,8 @@ export class PlexGetterService {
         return libItem.Role ? libItem.Role.map((el) => el.tag) : null;
       }
       case 'viewCount': {
-        return libItem.viewCount ? +libItem.viewCount : 0;
+        const count = await this.plexApi.getSeenBy(libItem.ratingKey);
+        return count ? count.length : 0;
       }
       case 'collections': {
         return null; // TODO
