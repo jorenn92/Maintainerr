@@ -38,7 +38,7 @@ export class PlexGetterService {
           .catch((_err) => {
             return null;
           });
-        return viewers ? viewers.map((el) => +el.accountID) : null;
+        return viewers ? viewers.map((el) => +el.accountID) : [];
       }
       case 'releaseDate': {
         return libItem.originallyAvailableAt
@@ -46,13 +46,13 @@ export class PlexGetterService {
           : null;
       }
       case 'rating': {
-        return libItem.rating ? +libItem.rating : null;
+        return libItem.rating ? +libItem.rating : 0;
       }
       case 'people': {
         return libItem.Role ? libItem.Role.map((el) => el.tag) : null;
       }
       case 'viewCount': {
-        return libItem.viewCount ? +libItem.viewCount : null;
+        return libItem.viewCount ? +libItem.viewCount : 0;
       }
       case 'collections': {
         return null; // TODO
@@ -82,7 +82,7 @@ export class PlexGetterService {
           : null;
       }
       case 'fileBitrate': {
-        return libItem.Media[0].bitrate ? libItem.Media[0].bitrate : null;
+        return libItem.Media[0].bitrate ? libItem.Media[0].bitrate : 0;
       }
       case 'fileVideoCodec': {
         return libItem.Media[0].videoCodec ? libItem.Media[0].videoCodec : null;
@@ -138,10 +138,10 @@ export class PlexGetterService {
         return libItem.lastViewedAt ? +libItem.lastViewedAt : null;
       }
       case 'sw_episodes': {
-        return libItem.leafCount ? +libItem.leafCount : null;
+        return libItem.leafCount ? +libItem.leafCount : 0;
       }
       case 'sw_viewedEpisodes': {
-        return libItem.viewedLeafCount ? +libItem.viewedLeafCount : null;
+        return libItem.viewedLeafCount ? +libItem.viewedLeafCount : 0;
       }
       case 'sw_lastEpisodeAddedAt': {
         return libItem.updatedAt ? +libItem.updatedAt : null;
