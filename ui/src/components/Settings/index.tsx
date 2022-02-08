@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import SettingsContext from '../../contexts/settings-context'
 import GetApiHandler from '../../utils/ApiHandler'
+import LoadingSpinner from '../Common/LoadingSpinner'
 import SettingsTabs, { SettingsRoute } from './Tabs'
 
 const SettingsWrapper: React.FC = ({ children }) => {
@@ -41,10 +42,14 @@ const SettingsWrapper: React.FC = ({ children }) => {
   ]
 
   useEffect(() => {
-    GetApiHandler('/settings').then((resp) => {
-      settingsCtx.addSettings(resp)
+    if (settingsCtx.settings?.id === undefined) {
+      GetApiHandler('/settings').then((resp) => {
+        settingsCtx.addSettings(resp)
+        setLoaded(true)
+      })
+    } else {
       setLoaded(true)
-    })
+    }
   }, [])
 
   if (loaded) {
@@ -60,8 +65,7 @@ const SettingsWrapper: React.FC = ({ children }) => {
     return (
       <>
         <div className="mt-6">
-          {/* TODO: loader implementeren */}
-          Loading...
+          <LoadingSpinner />
         </div>
       </>
     )

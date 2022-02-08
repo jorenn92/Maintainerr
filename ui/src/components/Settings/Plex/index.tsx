@@ -6,7 +6,6 @@ import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import PlexLoginButton from '../../Login/Plex'
 import axios from 'axios'
-import { stat } from 'fs'
 
 const PlexSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -82,7 +81,7 @@ const PlexSettings = () => {
       setError(false)
       setChanged(true)
       setTokenValid(false)
-      setClearTokenClicked(false);
+      setClearTokenClicked(false)
     } else {
       setError(true)
     }
@@ -199,6 +198,10 @@ const PlexSettings = () => {
           <div className="form-row">
             <label htmlFor="ssl" className="text-label">
               Authentication
+              <span className="label-tip">
+                {`Authentication with the server's admin account is required to access the
+                Plex API`}
+              </span>
             </label>
             <div className="form-input">
               <div className="form-input-field">
