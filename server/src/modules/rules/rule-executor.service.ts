@@ -224,7 +224,10 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           secondVal = new Date(+secondVal);
         }
       }
-      if (firstVal && secondVal) {
+      if (
+        (firstVal !== undefined || null) &&
+        (secondVal !== undefined || null)
+      ) {
         if (isNull(rule.operator) || rule.operator === RuleOperators.OR) {
           if (this.doRuleAction(firstVal, secondVal, rule.action)) {
             this.workerData.push(data[i]);

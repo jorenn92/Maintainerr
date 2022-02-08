@@ -380,7 +380,7 @@ export class RuleConstants {
         {
           id: 0,
           name: 'addUser',
-          humanName: 'Added by user',
+          humanName: 'Requested by user',
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
         } as Property, //  returns id[]
