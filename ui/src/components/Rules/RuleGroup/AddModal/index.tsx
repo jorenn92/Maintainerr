@@ -201,6 +201,17 @@ const AddModal = (props: AddModal) => {
             <ArrAction
               title="Sonarr"
               onUpdate={(e: number) => setArrOption(e)}
+              options={[{
+                id: 0,
+                name: 'Delete entire show',
+              }, {
+                id: 1,
+                name: 'Delete & unmonitor all seasons',
+              }, 
+              {
+                id: 2,
+                name: 'Delete & unmonitor existing seasons',
+              }]}
             />
           )}
 

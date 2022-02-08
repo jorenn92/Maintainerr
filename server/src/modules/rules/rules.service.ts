@@ -91,21 +91,6 @@ export class RulesService {
   }
 
   async setRules(params: RulesDto) {
-    // {
-    //   "name": "test",
-    //   "description": "dit is een test",
-    //   "libraryId" : 1,
-    //   "active": true,
-    //   "collection": {
-    //     "visibleOnHome": true,
-    //     "deleteAfterDays" : null,
-    //   }
-    //   "rules" : [
-    //     { "operator": null, "firstVal": [1,0], "lastVal": [3,1],"action": 2},
-    //     { "operator": 0, "firstVal": [0,0], "lastVal": [1,0],"action": 1}
-    //   ]
-    // }
-
     let state: ReturnStatus = this.createReturnStatus(true, 'Success');
     params.rules.forEach((rule) => {
       if (state.code === 1) {
@@ -124,6 +109,7 @@ export class RulesService {
           type: lib.type === 'movie' ? 1 : 2,
           title: params.name,
           description: params.description,
+          arrAction: params.arrAction ? params.arrAction : 0,
           isActive: params.isActive,
           visibleOnHome: params.collection?.visibleOnHome,
           deleteAfterDays: +params.collection?.deleteAfterDays,

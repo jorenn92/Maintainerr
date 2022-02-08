@@ -22,6 +22,12 @@ export const enum Application {
   OVERSEERR,
 }
 
+export const enum ArrAction {
+  DELETE,
+  UNMONITOR,
+  SW_UNMONITOR_EXISTING_SEASONS,
+}
+
 export class RuleType {
   static readonly NUMBER = new RuleType('0', [
     RulePossibility.BIGGER,

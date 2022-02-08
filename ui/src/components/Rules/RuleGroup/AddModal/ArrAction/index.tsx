@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 interface ArrActionProps {
   title: string
+  options?: Option[]
   onUpdate: (value: number) => void
 }
 
@@ -13,16 +14,18 @@ interface Option {
 const ArrAction = (props: ArrActionProps) => {
   const [state, setState] = useState<string>()
 
-  const options: Option[] = [
-    {
-      id: 0,
-      name: 'Delete',
-    },
-    {
-      id: 1,
-      name: 'Unmonitor',
-    },
-  ]
+  const options: Option[] = props.options
+    ? props.options
+    : [
+        {
+          id: 0,
+          name: 'Delete',
+        },
+        {
+          id: 1,
+          name: 'Unmonitor',
+        },
+      ]
 
   return (
     <div className="form-row">

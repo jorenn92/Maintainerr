@@ -16,6 +16,7 @@ import {
 } from '../api/tmdb-api/interfaces/tmdb.interface';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
+import { ArrAction } from '../rules/constants/rules.constants';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
@@ -377,6 +378,7 @@ export class CollectionsService {
               plexId: plexId,
               type: collection.type,
               libraryId: collection.libraryId,
+              arrAction: collection.arrAction ? collection.arrAction : 0,
               isActive: collection.isActive,
               visibleOnHome: collection?.visibleOnHome,
               deleteAfterDays: collection?.deleteAfterDays,

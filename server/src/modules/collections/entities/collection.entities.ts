@@ -22,6 +22,9 @@ export class Collection {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ default: 0 })
+  arrAction: number;
+
   @Column({ default: false })
   visibleOnHome: boolean;
 

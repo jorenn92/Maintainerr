@@ -8,6 +8,7 @@ export interface ICollection {
   title: string;
   description?: string;
   isActive: boolean;
+  arrAction: number;
   visibleOnHome?: boolean;
   deleteAfterDays?: number; // amount of days after add
   media?: CollectionMedia[];

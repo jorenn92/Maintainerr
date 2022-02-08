@@ -7,6 +7,7 @@ export class RulesDto {
   name: string;
   description: string;
   isActive?: boolean;
+  arrAction?: number;
   collection?: {
     visibleOnHome: boolean;
     deleteAfterDays: number | null;
