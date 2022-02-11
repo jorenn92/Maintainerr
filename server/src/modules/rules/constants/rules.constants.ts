@@ -8,6 +8,7 @@ export const enum RulePossibility {
   AFTER,
   IN_LAST,
   IN_NEXT,
+  //NOT_CONTAINS TODO
 }
 
 export const enum RuleOperators {

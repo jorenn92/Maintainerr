@@ -1,5 +1,3 @@
-import Error from 'next/error'
-import Image from 'next/image'
 import { useContext, useEffect, useState } from 'react'
 import GetApiHandler from '../../../../utils/ApiHandler'
 import ConstantsContext, {
@@ -7,6 +5,9 @@ import ConstantsContext, {
 } from '../../../../contexts/constants-context'
 import Alert from '../../../Common/Alert'
 import RuleInput from './RuleInput'
+import LoadingSpinner from '../../../Common/LoadingSpinner'
+import SectionHeading from '../../../Common/SectionHeading'
+import _ from 'lodash'
 
 interface IRulesToCreate {
   id: number
@@ -17,6 +18,7 @@ export interface IRule {
   operator: string | null
   firstVal: [string, string]
   lastVal?: [string, string]
+  section?: number
   customVal?: { ruleTypeId: number; value: string | number }
   action: number
 }
@@ -29,9 +31,14 @@ interface iRuleCreator {
 
 const RuleCreator = (props: iRuleCreator) => {
   const [isLoading, setIsLoading] = useState(true)
-  const [ruleAmount, setRuleAmount] = useState<number>(1)
+  const [ruleAmount, setRuleAmount] = useState<[number, number[]]>([1, [1]])
+  const [totalRules, setTotalRules] = useState<number>(0)
   const [createdRules, setCreatedRules] = useState<IRulesToCreate[]>([])
   const ConstantsCtx = useContext(ConstantsContext)
+  const [ruleAmountArr, setRuleAmountArr] = useState<[number[], [number[]]]>([
+    [1],
+    [[1]],
+  ])
 
   useEffect(() => {
     setIsLoading(true)
@@ -63,24 +70,67 @@ const RuleCreator = (props: iRuleCreator) => {
 
   const addRule = (e: any) => {
     e.preventDefault()
-    setRuleAmount(ruleAmount + 1)
+    let rules = [...ruleAmount[1]]
+    rules[rules.length - 1] = rules[rules.length - 1] + 1
+    setRuleAmount([ruleAmount[0], rules])
   }
 
   const removeRule = (e: any) => {
     e.preventDefault()
-    setCreatedRules(createdRules.filter((el) => el.id !== ruleAmount - 1))
-    setRuleAmount(ruleAmount - 1)
+    setCreatedRules(
+      createdRules.filter((el) => el.id !== ruleAmount[1].length - 1)
+    )
+    const rules = [...ruleAmount[1]]
+    rules[rules.length - 1] = rules[rules.length - 1] - 1
+    setRuleAmount([ruleAmount[0], rules])
   }
 
-  let ruleAmountArr: number[] = [],
-    i = 0,
-    len = ruleAmount
-  while (++i <= len) ruleAmountArr.push(i)
+  const addSection = (e: any) => {
+    e.preventDefault()
+    const rules = [...ruleAmount[1]]
+    rules.push(1)
+    setRuleAmount([ruleAmount[0] + 1, rules])
+  }
+
+  const removeSection = (e: any) => {
+    e.preventDefault()
+    const rules = _.cloneDeep(ruleAmount[1])
+    rules.pop()
+    setRuleAmount([ruleAmount[0] - 1, rules])
+  }
+
+  useEffect(() => {
+    let s = 0,
+      r = 0,
+      lenS = ruleAmount[0]
+
+    const worker: [number[], [number[]]] = [[], [[]]]
+
+    while (++s <= lenS)
+      worker[0].push(s), s > 1 ? worker[1].push([]) : undefined
+
+    for (const sec of worker[0]) {
+      r = 0
+      while (++r <= ruleAmount[1][sec - 1]) worker[1][sec - 1].push(r)
+    }
+    setRuleAmountArr(worker)
+  }, [ruleAmount])
+
+  useEffect(() => {
+    let counter = 0
+    ruleAmountArr[0].forEach((sid) => {
+      let c = _.clone(sid)
+      counter = counter + ruleAmount[1][sid - 1]
+    })
+    setTotalRules(counter)
+  }, [ruleAmountArr])
+
+  useEffect(() => {}, [totalRules])
 
   if (isLoading) {
     return (
       <span className='className="h-full w-full'>
-        <Image layout="fill" src="/spinner.svg" alt="Loading..."></Image>
+        <LoadingSpinner />
       </span>
     )
   }
@@ -90,33 +140,65 @@ const RuleCreator = (props: iRuleCreator) => {
       {createdRules.length !== ruleAmountArr.length ? (
         <Alert>{`Some incomplete rules won't get saved`} </Alert>
       ) : undefined}
-
-      {ruleAmountArr.map((id) => (
-        <RuleInput
-          key={id - 1}
-          id={id - 1}
-          mediaType={props.mediaType}
-          onCommit={ruleCommited}
-          onIncomplete={ruleOmitted}
-        />
-      ))}
+      {ruleAmountArr[0].map((sid) => {
+        return (
+          <div key={sid - 1}>
+            <SectionHeading id={sid} name={'Section'} />
+            <div className="ml-5">
+              {ruleAmountArr[1][sid - 1].map((id) => (
+                // ruleAmount[1].map((amount, idx) => idx <= (sid -1)).reduce((pv, cv, idx) => cv + pv );
+                <RuleInput
+                  key={sid + id - 1}
+                  id={ruleAmount[1].length > 1 ? ruleAmount[1].reduce((pv, cv, idx) =>
+                    sid === 1
+                      ? cv - (cv - id)
+                      : idx <= sid - 1
+                      ? idx === sid - 1
+                        ? cv - (cv - id) + pv
+                        : cv + pv
+                      : pv
+                  ) : ruleAmount[1][0] - (ruleAmount[1][0] - id)}
+                  tagId={id}
+                  // tagId={ruleAmount[1].reduce((pv, cv, idx) => idx <= (sid - 1) ? idx === (sid - 1) ? (cv - (cv - (id - 1))) +  pv : cv + pv : pv)}
+                  section={sid}
+                  mediaType={props.mediaType}
+                  onCommit={ruleCommited}
+                  onIncomplete={ruleOmitted}
+                />
+              ))}
+            </div>
+          </div>
+        )
+      })}
 
       <div className="mt-5 flex">
-        <div className="m-auto">
+        <div className="">
+          <button
+            className="mr-5 h-10 w-24 rounded-full bg-slate-500 text-gray-200 shadow-lg"
+            onClick={addSection}
+          >
+            <span>+ Section</span>
+          </button>
+          {ruleAmountArr[0].length > 1 ? (
+            <button
+              className="mr-5 h-10 w-24 rounded-full bg-slate-500 text-gray-200 shadow-lg"
+              onClick={removeSection}
+            >
+              <span>- Section </span>
+            </button>
+          ) : null}
           <button
             className="mr-5 h-10 w-20 rounded-full bg-slate-500 text-gray-200 shadow-lg"
             onClick={addRule}
           >
-            {' '}
-            +{' '}
+            <span>+ Rule</span>
           </button>
-          {ruleAmountArr.length > 1 ? (
+          {ruleAmountArr[1][ruleAmount[1].length - 1]?.length > 1 ? (
             <button
               className="h-10 w-20 rounded-full bg-slate-500 text-gray-200 shadow-lg"
               onClick={removeRule}
             >
-              {' '}
-              -{' '}
+              <span>- Rule</span>
             </button>
           ) : null}
         </div>

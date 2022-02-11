@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { isNull } from 'lodash';
+import { AbstractRepository } from 'typeorm';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
@@ -33,6 +34,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   userId: string;
   plexData: PlexData;
   workerData: PlexLibraryItem[];
+  resultData: PlexLibraryItem[];
   constructor(
     private readonly rulesService: RulesService,
     private readonly valueGetter: ValueGetterService,
@@ -82,15 +84,39 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         this.logger.log(`Executing ${rulegroup.name}`);
 
         this.workerData = [];
+        this.resultData = [];
+
         this.plexData = { page: 0, finished: false, data: [] };
         while (!this.plexData.finished) {
           await this.getPlexData(rulegroup.libraryId);
+
+          let currentSection = 0;
+          let sectionActionAnd = false;
+
           for (const rule of rulegroup.rules) {
             const parsedRule = JSON.parse(
               (rule as RuleDbDto).ruleJson,
             ) as RuleDto;
-            await this.executeRule(parsedRule);
+            if (currentSection === (rule as RuleDbDto).section) {
+              // if section didn't change
+              // execute and store in work array
+              await this.executeRule(parsedRule);
+            } else {
+              // handle section action
+              this.handleSectionAction(sectionActionAnd);
+
+              // save new section action
+              sectionActionAnd = parsedRule.action === 0;
+
+              // reset first action of new section
+              parsedRule.action === undefined;
+
+              // Execute the rule and set the new section
+              await this.executeRule(parsedRule);
+              currentSection = (rule as RuleDbDto).section;
+            }
           }
+          this.handleSectionAction(sectionActionAnd); // Handle last section
         }
         await this.handleCollection(
           await this.rulesService.getRuleGroupById(rulegroup.id),
@@ -100,11 +126,25 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     }
   }
 
+  private handleSectionAction(sectionActionAnd: boolean) {
+    if (!sectionActionAnd) {
+      // section action is OR, then push in result array
+      this.resultData.push(...this.workerData);
+    } else {
+      // section action is AND, then filter media not in work array out of result array
+      this.resultData = this.resultData.filter((el) =>
+        this.workerData.some((workEl) => workEl.ratingKey === el.ratingKey),
+      );
+    }
+    // empty workerdata. prepare for execution of new section
+    this.workerData = [];
+  }
+
   private async handleCollection(rulegroup: RuleGroup) {
     let collection = await this.collectionService.getCollection(
       rulegroup.collectionId,
     );
-    const data = this.workerData.map((e) => {
+    const data = this.resultData.map((e) => {
       return +e.ratingKey;
     });
 
@@ -243,7 +283,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
 
   private doRuleAction<T>(val1: T, val2: T, action: RulePossibility): boolean {
     if (action === RulePossibility.BIGGER) {
-      if (val1 > val2) console.log(`comparing ${val1} vs ${val2}`);
       return val1 > val2;
     }
     if (action === RulePossibility.SMALLER) {

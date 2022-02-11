@@ -61,6 +61,11 @@ export class CreateRulesTable1642429729589 implements MigrationInterface {
             type: 'integer',
           },
           {
+            name: 'section',
+            type: 'integer',
+            default: 0,
+          },
+          {
             name: 'ruleGroupId',
             type: 'integer',
           },

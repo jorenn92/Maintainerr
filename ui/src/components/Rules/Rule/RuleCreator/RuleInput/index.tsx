@@ -29,7 +29,9 @@ enum RuleOperators {
 
 interface IRuleInput {
   id?: number
+  tagId?: number
   mediaType?: MediaType
+  section?: number
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
 }
@@ -91,6 +93,7 @@ const RuleInput = (props: IRuleInput) => {
         operator: operator ? operator : null,
         firstVal: JSON.parse(firstval),
         action: +action,
+        section: props.section ? props.section - 1 : 0,
       }
       if (customVal) {
         props.onCommit(props.id ? props.id : 0, {
@@ -170,20 +173,32 @@ const RuleInput = (props: IRuleInput) => {
     })
     return prop
   }
-
   return (
     <div className="mt-10 h-full w-full" onSubmit={submit}>
       <div className="section h-full w-full">
         <h3 className="sm-heading">
-          {props.id ? `Rule #${props.id + 1}` : `Rule #1`}
+          {props.tagId
+            ? `Rule #${props.tagId}`
+            : props.id
+            ? `Rule #${props.id}`
+            : `Rule #1`}
         </h3>
-        <p className="description">Specifications of the rule</p>
       </div>
-      {props.id ? (
-        props.id > 0 ? (
+      {props.id !== 1 ? (
+        (props.id && props.id > 0) || (props.section && props.section > 1) ? (
           <div className="form-row">
             <label htmlFor="operator" className="text-label">
               Operator
+              {!props.id ||
+              (props.tagId ? props.tagId === 1 : props.id === 1) ? (
+                <span className="label-tip">
+                  {`Section ${props.section}'s action on all previous section results.`}
+                </span>
+              ) : (
+                <span className="label-tip">
+                  {`Action on the previous rule.`}
+                </span>
+              )}
             </label>
             <div className="form-input">
               <div className="form-input-field">

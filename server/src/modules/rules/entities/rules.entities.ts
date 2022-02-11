@@ -12,6 +12,9 @@ export class Rules {
   @Column()
   ruleGroupId: number;
 
+  @Column({ default: 0 })
+  section: number;
+
   @Column({ default: true })
   isActive: boolean;
 
