@@ -292,13 +292,17 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       if (!Array.isArray(val1)) {
         return val1 === val2;
       } else {
-        return val1.every((e) => {
-          if (Array.isArray(val2)) {
-            return (val2 as unknown as T[]).includes(e);
-          } else {
-            return e === val2;
-          }
-        });
+        if (val1.length > 0) {
+          return val1.every((e) => {
+            if (Array.isArray(val2)) {
+              return (val2 as unknown as T[]).includes(e);
+            } else {
+              return e === val2;
+            }
+          });
+        } else {
+          return false;
+        }
       }
     }
     if (action === RulePossibility.NOT_EQUALS) {
