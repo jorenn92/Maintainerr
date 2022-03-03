@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import GetApiHandler from '../../../../utils/ApiHandler'
 import ConstantsContext, {
   MediaType,
@@ -25,15 +25,22 @@ export interface IRule {
 
 interface iRuleCreator {
   mediaType?: MediaType
+  editData?: { rules: IRule[] }
   onUpdate: (rules: IRule[]) => void
   onCancel: () => void
 }
 
 const RuleCreator = (props: iRuleCreator) => {
   const [isLoading, setIsLoading] = useState(true)
-  const [ruleAmount, setRuleAmount] = useState<[number, number[]]>([1, [1]])
+  const [editSections, setEditSections] = useState<number>()
+  const [ruleAmount, setRuleAmount] = useState<[number, number[]]>(
+    // editSections ? [editSections, sectionAmounts] : [1, [1]]
+    [1, [1]]
+  )
   const [totalRules, setTotalRules] = useState<number>(0)
+  const [editData, setEditData] = useState<{ rules: IRule[] }>()
   const [createdRules, setCreatedRules] = useState<IRulesToCreate[]>([])
+  const rulesCreated = useRef<IRulesToCreate[]>([]);
   const ConstantsCtx = useContext(ConstantsContext)
   const [ruleAmountArr, setRuleAmountArr] = useState<[number[], [number[]]]>([
     [1],
@@ -43,6 +50,16 @@ const RuleCreator = (props: iRuleCreator) => {
   useEffect(() => {
     setIsLoading(true)
 
+    // If we're editing.. initiate edit flow
+    if (props.editData) {
+      setEditData(props.editData)
+      const editSec = props.editData
+        ? props.editData.rules[props.editData.rules.length - 1]?.section! + 1
+        : undefined
+
+      editSec !== undefined ? setEditSections(editSec) : undefined
+    }
+
     GetApiHandler('/rules/constants').then((resp) => {
       ConstantsCtx.addConstants(resp)
       setIsLoading(false)
@@ -50,21 +67,53 @@ const RuleCreator = (props: iRuleCreator) => {
   }, [])
 
   useEffect(() => {
-    props.onUpdate(createdRules.map((el) => el.rule))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (editSections) {
+      const sectionAmounts = [] as number[]
+      // set sectionAmount
+      editData
+        ? editData.rules.forEach((el) =>
+            el.section !== undefined
+              ? sectionAmounts[el.section]
+                ? sectionAmounts[el.section]++
+                : (sectionAmounts[el.section] = 1)
+              : (sectionAmounts[0] = 1)
+          )
+        : undefined
+      setRuleAmount([editSections, sectionAmounts])
+    }
+  }, [editSections])
+
+  useEffect(() => {
+    // props.onUpdate(createdRules.map((el) => el.rule))
+    console.log(createdRules)
   }, [createdRules])
 
   const ruleCommited = (id: number, rule: IRule) => {
-    if (createdRules) {
-      const rules = createdRules.filter((el) => el.id !== id)
+    // if (createdRules) {
+    //   console.log(id)
+    //   const rules = createdRules.filter((el) => el.id !== id)
+    //   console.log([...rules, { id: id, rule: rule }]);
+    //   setCreatedRules([...rules, { id: id, rule: rule }])
+    // }
+    if (rulesCreated) {
+      console.log(id)
+      const rules = rulesCreated.current.filter((el) => el.id !== id)
+      rulesCreated.current = [...rules, { id: id, rule: rule }];
       setCreatedRules([...rules, { id: id, rule: rule }])
+      props.onUpdate(rulesCreated.current.map((el) => el.rule))
     }
   }
 
   const ruleOmitted = (id: number) => {
-    if (createdRules) {
-      const rules = createdRules?.filter((el) => el.id !== id)
+    // if (createdRules) {
+    //   const rules = createdRules?.filter((el) => el.id !== id)
+    //   setCreatedRules([...rules])
+    // }
+    if (rulesCreated) {
+      const rules = rulesCreated.current?.filter((el) => el.id !== id)
+      rulesCreated.current = [...rules]
       setCreatedRules([...rules])
+      props.onUpdate(rulesCreated.current.map((el) => el.rule))
     }
   }
 
@@ -77,9 +126,9 @@ const RuleCreator = (props: iRuleCreator) => {
 
   const removeRule = (e: any) => {
     e.preventDefault()
-    setCreatedRules(
-      createdRules.filter((el) => el.id !== ruleAmount[1].length - 1)
-    )
+    // setCreatedRules(
+      rulesCreated.current.filter((el) => el.id !== ruleAmount[1].length - 1)
+    // )
     const rules = [...ruleAmount[1]]
     rules[rules.length - 1] = rules[rules.length - 1] - 1
     setRuleAmount([ruleAmount[0], rules])
@@ -123,9 +172,9 @@ const RuleCreator = (props: iRuleCreator) => {
       counter = counter + ruleAmount[1][sid - 1]
     })
     setTotalRules(counter)
-  }, [ruleAmountArr])
+    console.log(ruleAmountArr)
 
-  useEffect(() => {}, [totalRules])
+  }, [ruleAmountArr])
 
   if (isLoading) {
     return (
@@ -146,20 +195,41 @@ const RuleCreator = (props: iRuleCreator) => {
             <SectionHeading id={sid} name={'Section'} />
             <div className="ml-5">
               {ruleAmountArr[1][sid - 1].map((id) => (
-                // ruleAmount[1].map((amount, idx) => idx <= (sid -1)).reduce((pv, cv, idx) => cv + pv );
                 <RuleInput
                   key={sid + id - 1}
-                  id={ruleAmount[1].length > 1 ? ruleAmount[1].reduce((pv, cv, idx) =>
-                    sid === 1
-                      ? cv - (cv - id)
-                      : idx <= sid - 1
-                      ? idx === sid - 1
-                        ? cv - (cv - id) + pv
-                        : cv + pv
-                      : pv
-                  ) : ruleAmount[1][0] - (ruleAmount[1][0] - id)}
+                  id={
+                    ruleAmount[1].length > 1
+                      ? ruleAmount[1].reduce((pv, cv, idx) =>
+                          sid === 1
+                            ? cv - (cv - id)
+                            : idx <= sid - 1
+                            ? idx === sid - 1
+                              ? cv - (cv - id) + pv
+                              : cv + pv
+                            : pv
+                        )
+                      : ruleAmount[1][0] - (ruleAmount[1][0] - id)
+                  }
                   tagId={id}
-                  // tagId={ruleAmount[1].reduce((pv, cv, idx) => idx <= (sid - 1) ? idx === (sid - 1) ? (cv - (cv - (id - 1))) +  pv : cv + pv : pv)}
+                  editData={
+                    editData
+                      ? {
+                          rule: editData.rules[
+                            (ruleAmount[1].length > 1
+                              ? ruleAmount[1].reduce((pv, cv, idx) =>
+                                  sid === 1
+                                    ? cv - (cv - id)
+                                    : idx <= sid - 1
+                                    ? idx === sid - 1
+                                      ? cv - (cv - id) + pv
+                                      : cv + pv
+                                    : pv
+                                )
+                              : ruleAmount[1][0] - (ruleAmount[1][0] - id)) - 1
+                          ],
+                        }
+                      : undefined
+                  }
                   section={sid}
                   mediaType={props.mediaType}
                   onCommit={ruleCommited}

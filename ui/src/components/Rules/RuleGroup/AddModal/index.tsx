@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import GetApiHandler, { PostApiHandler } from '../../../../utils/ApiHandler'
+import GetApiHandler, { PostApiHandler, PutApiHandler } from '../../../../utils/ApiHandler'
 import Image from 'next/image'
 import RuleCreator, { IRule } from '../../Rule/RuleCreator'
 import { ConstantsContextProvider } from '../../../../contexts/constants-context'
@@ -8,8 +8,11 @@ import LibrariesContext, {
 } from '../../../../contexts/libraries-context'
 import Alert from '../../../Common/Alert'
 import ArrAction from './ArrAction'
+import { IRuleGroup } from '..'
+import { ICollection } from '../../../Collection'
 
 interface AddModal {
+  editData?: IRuleGroup
   onCancel: () => void
   onSuccess: () => void
 }
@@ -28,17 +31,28 @@ interface ICreateApiObject {
 }
 
 const AddModal = (props: AddModal) => {
-  const [selectedLibraryId, setSelectedLibraryId] = useState<string>('1')
+  const [selectedLibraryId, setSelectedLibraryId] = useState<string>(
+    props.editData ? props.editData.libraryId.toString() : '1'
+  )
   const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
+  const [collection, setCollection] = useState<ICollection>()
   const [isLoading, setIsLoading] = useState(true)
   const nameRef = useRef<any>()
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
   const deleteAfterRef = useRef<any>()
-  const [showHome, setShowHome] = useState<boolean>(true)
+  const [showHome, setShowHome] = useState<boolean>(
+    props.editData ? props.editData.isActive : true
+  )
   const [arrOption, setArrOption] = useState<number>()
-  const [active, setActive] = useState<boolean>(true)
-  const [rules, setRules] = useState<IRule[]>([])
+  const [active, setActive] = useState<boolean>(
+    props.editData ? props.editData.isActive : true
+  )
+  const [rules, setRules] = useState<IRule[]>(
+    props.editData
+      ? props.editData.rules.map((r) => JSON.parse(r.ruleJson) as IRule)
+      : []
+  )
   const [error, setError] = useState<boolean>(false)
   const [formIncomplete, setFormIncomplete] = useState<boolean>(false)
   const LibrariesCtx = useContext(LibrariesContext)
@@ -71,6 +85,13 @@ const AddModal = (props: AddModal) => {
         } else {
           LibrariesCtx.addLibraries([])
         }
+      })
+    }
+    if (props.editData) {
+      GetApiHandler(
+        `/collections/collection/${props.editData.collectionId}`
+      ).then((resp) => {
+        resp ? setCollection(resp) : undefined
         setIsLoading(false)
       })
     } else {
@@ -100,7 +121,18 @@ const AddModal = (props: AddModal) => {
         rules: rules,
       }
 
-      PostApiHandler('/rules', creationObj)
+      if (!props.editData) {
+        PostApiHandler('/rules', creationObj)
+          .then((resp) => {
+            if (resp.code === 1) props.onSuccess()
+            else setError(true)
+          })
+          .catch((err) => {
+            setError(true)
+          })
+      } else {
+        console.log(`updating ${props.editData.id}`)
+        PutApiHandler('/rules', {id: props.editData.id, ...creationObj})
         .then((resp) => {
           if (resp.code === 1) props.onSuccess()
           else setError(true)
@@ -108,6 +140,7 @@ const AddModal = (props: AddModal) => {
         .catch((err) => {
           setError(true)
         })
+      }
     } else {
       setFormIncomplete(true)
     }
@@ -147,7 +180,13 @@ const AddModal = (props: AddModal) => {
             </label>
             <div className="form-input">
               <div className="form-input-field">
-                <input name="name" id="name" type="text" ref={nameRef}></input>
+                <input
+                  name="name"
+                  id="name"
+                  type="text"
+                  ref={nameRef}
+                  defaultValue={props.editData?.name}
+                ></input>
               </div>
             </div>
           </div>
@@ -162,6 +201,7 @@ const AddModal = (props: AddModal) => {
                   name="description"
                   id="description"
                   rows={5}
+                  defaultValue={props.editData?.description}
                   ref={descriptionRef}
                 ></textarea>
               </div>
@@ -192,7 +232,7 @@ const AddModal = (props: AddModal) => {
               </div>
             </div>
           </div>
-          {selectedLibrary!.type === 'movie' ? (
+          {selectedLibrary && selectedLibrary!.type === 'movie' ? (
             <ArrAction
               title="Radarr"
               onUpdate={(e: number) => setArrOption(e)}
@@ -201,17 +241,20 @@ const AddModal = (props: AddModal) => {
             <ArrAction
               title="Sonarr"
               onUpdate={(e: number) => setArrOption(e)}
-              options={[{
-                id: 0,
-                name: 'Delete entire show',
-              }, {
-                id: 1,
-                name: 'Delete & unmonitor all seasons',
-              }, 
-              {
-                id: 2,
-                name: 'Delete & unmonitor existing seasons',
-              }]}
+              options={[
+                {
+                  id: 0,
+                  name: 'Delete entire show',
+                },
+                {
+                  id: 1,
+                  name: 'Delete & unmonitor all seasons',
+                },
+                {
+                  id: 2,
+                  name: 'Delete & unmonitor existing seasons',
+                },
+              ]}
             />
           )}
 
@@ -225,7 +268,7 @@ const AddModal = (props: AddModal) => {
                   type="checkbox"
                   name="active"
                   id="active"
-                  defaultChecked
+                  defaultChecked={active}
                   onChange={() => {
                     setActive(!active)
                   }}
@@ -247,7 +290,7 @@ const AddModal = (props: AddModal) => {
                   onChange={() => {
                     setShowHome(!showHome)
                   }}
-                  defaultChecked
+                  defaultChecked={showHome}
                 />
               </div>
             </div>
@@ -263,7 +306,7 @@ const AddModal = (props: AddModal) => {
                   type="number"
                   name="collection_deleteDays"
                   id="collection_deleteDays"
-                  defaultValue={30}
+                  defaultValue={collection ? collection.deleteAfterDays : 30}
                   ref={deleteAfterRef}
                 />
               </div>
@@ -277,7 +320,14 @@ const AddModal = (props: AddModal) => {
             </p>
           </div>
           <ConstantsContextProvider>
-            <RuleCreator mediaType={selectedLibrary ? selectedLibrary.type === 'movie' ? 1 : 2 : 0} onCancel={cancel} onUpdate={updateRules} />
+            <RuleCreator
+              mediaType={
+                selectedLibrary ? (selectedLibrary.type === 'movie' ? 1 : 2) : 0
+              }
+              editData={{ rules: rules }}
+              onCancel={cancel}
+              onUpdate={updateRules}
+            />
           </ConstantsContextProvider>
 
           <div className="mt-5 flex h-full w-full">
@@ -288,7 +338,7 @@ const AddModal = (props: AddModal) => {
                 type="submit"
                 onClick={create}
               >
-                Create
+                Save
               </button>
               <button
                 className="cancel-button ml-5 h-10 w-20 rounded-full text-white shadow-md"

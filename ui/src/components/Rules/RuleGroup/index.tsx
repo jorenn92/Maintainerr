@@ -1,6 +1,6 @@
 import EditButton from '../../Common/EditButton'
 import DeleteButton from '../../Common/DeleteButton'
-import { IRule } from '../Rule'
+import { IRuleJson } from '../Rule'
 import { useContext, useState } from 'react'
 import { DeleteApiHandler } from '../../../utils/ApiHandler'
 import LibrariesContext from '../../../contexts/libraries-context'
@@ -12,17 +12,23 @@ export interface IRuleGroup {
   libraryId: number
   isActive: boolean
   collectionId: number
-  rules: IRule[]
+  rules: IRuleJson[]
 }
 
-const RuleGroup = (props: { group: IRuleGroup; onDelete: () => void }) => {
+const RuleGroup = (props: {
+  group: IRuleGroup
+  onDelete: () => void
+  onEdit: (group: IRuleGroup) => void
+}) => {
   const [showsureDelete, setShowSureDelete] = useState<boolean>(false)
   const LibrariesCtx = useContext(LibrariesContext)
-  const onEdit = () => {
-    console.log('clicked edit')
-  }
+
   const onRemove = () => {
     setShowSureDelete(true)
+  }
+
+  const onEdit = () => {
+    props.onEdit(props.group)
   }
 
   const confirmedDelete = () => {
@@ -37,10 +43,9 @@ const RuleGroup = (props: { group: IRuleGroup; onDelete: () => void }) => {
   }
 
   return (
-    <div className="relative mb-5 flex-col sm:flex-row flex w-full overflow-hidden rounded-xl bg-gray-800 bg-cover bg-center p-4 text-gray-400 shadow ring-1 ring-gray-700">
-      
-      <div className="relative z-10 flex sm:w-5/6 w-full min-w-0 flex-col pr-4 sm:flex-row">
-        <div className="flex flex-col sm:w-5/6 mb-3 sm:mb-0 ">
+    <div className="relative mb-5 flex w-full flex-col overflow-hidden rounded-xl bg-gray-800 bg-cover bg-center p-4 text-gray-400 shadow ring-1 ring-gray-700 sm:flex-row">
+      <div className="relative z-10 flex w-full min-w-0 flex-col pr-4 sm:w-5/6 sm:flex-row">
+        <div className="mb-3 flex flex-col sm:mb-0 sm:w-5/6 ">
           <div className="flex text-xs font-medium text-white">
             <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-base font-bold text-white sm:text-lg">
               {props.group.name}
@@ -52,11 +57,13 @@ const RuleGroup = (props: { group: IRuleGroup; onDelete: () => void }) => {
           </div>
         </div>
 
-        <div className="flex-col text-left sm:w-1/6 w-full "> 
-        <span className='font-medium text-sm'>Status </span>
-        {
-            props.group.isActive ? <span className='text-green-900 text-sm font-bold'>Active</span> : <span className='text-red-900 text-sm font-bold'>Inactive</span>
-          }
+        <div className="w-full flex-col text-left sm:w-1/6 ">
+          <span className="text-sm font-medium">Status </span>
+          {props.group.isActive ? (
+            <span className="text-sm font-bold text-green-900">Active</span>
+          ) : (
+            <span className="text-sm font-bold text-red-900">Inactive</span>
+          )}
           <div className="m-auto mr-2 flex text-sm font-medium">
             {`Library ${
               LibrariesCtx.libraries.find(
@@ -76,7 +83,7 @@ const RuleGroup = (props: { group: IRuleGroup; onDelete: () => void }) => {
         </div>
       </div>
 
-      <div className="m-auto sm:w-1/6 w-full">
+      <div className="m-auto w-full sm:w-1/6">
         <div className="mb-2 flex h-auto ">
           <EditButton onClick={onEdit} text="Edit" />
         </div>

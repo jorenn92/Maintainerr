@@ -1,4 +1,4 @@
-export interface IRule {
+export interface IRuleJson {
     id: number
     ruleJson: string
     ruleGroupId: number

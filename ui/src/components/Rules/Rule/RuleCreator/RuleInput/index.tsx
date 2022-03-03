@@ -27,11 +27,18 @@ enum RuleOperators {
   OR,
 }
 
+enum CustomParams {
+  CUSTOM_NUMBER = 'custom_number',
+  CUSTOM_DAYS = 'custom_days',
+  CUSTOM_DATE = 'custom_date',
+}
+
 interface IRuleInput {
   id?: number
   tagId?: number
   mediaType?: MediaType
   section?: number
+  editData?: { rule: IRule }
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
 }
@@ -50,6 +57,30 @@ const RuleInput = (props: IRuleInput) => {
   const [possibilities, setPossibilities] = useState<number[]>([])
   const [ruleType, setRuleType] = useState<number>(0)
 
+  useEffect(() => {
+    if (props.editData?.rule) {
+      setOperator(props.editData.rule.operator?.toString())
+      setFirstVal(JSON.stringify(props.editData.rule.firstVal))
+      setAction(props.editData.rule.action.toString())
+
+      if (props.editData.rule.customVal) {
+        switch (props.editData.rule.customVal.ruleTypeId) {
+          case 0:
+            // TODO: improve this.. Currently this is a hack to determine if param is amount of days or really a number
+            if (props.editData.rule.customVal.value > 1600000)
+              setSecondVal(CustomParams.CUSTOM_DAYS)
+            else setSecondVal(CustomParams.CUSTOM_NUMBER)
+            break
+          case 1:
+            setSecondVal(CustomParams.CUSTOM_DATE)
+            break
+        }
+        setCustomVal(props.editData.rule.customVal.value.toString())
+      } else {
+        setSecondVal(JSON.stringify(props.editData.rule.lastVal))
+      }
+    }
+  }, [])
   const updateFirstValue = (event: { target: { value: string } }) => {
     setFirstVal(event.target.value)
     setSecondVal(undefined)
@@ -125,7 +156,6 @@ const RuleInput = (props: IRuleInput) => {
 
   useEffect(() => {
     submit(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [secondVal, customVal])
 
   useEffect(() => {

@@ -9,7 +9,9 @@ import AddModal from './RuleGroup/AddModal'
 
 const Rules: React.FC = () => {
   const [addModalActive, setAddModal] = useState(false)
+  const [editModalActive, setEditModal] = useState(false)
   const [data, setData] = useState()
+  const [editData, setEditData] = useState<IRuleGroup>()
   const LibrariesCtx = useContext(LibrariesContext)
   const [selectedLibrary, setSelectedLibrary] = useState<number>(9999)
   const [isLoading, setIsLoading] = useState(true)
@@ -41,6 +43,12 @@ const Rules: React.FC = () => {
   const refreshData = (): void => {
     fetchData().then((resp) => setData(resp))
     setAddModal(false)
+    setEditModal(false)
+  }
+
+  const editHandler = (group: IRuleGroup): void => {
+    setEditData(group)
+    setEditModal(true)
   }
 
   if (!data || isLoading) {
@@ -62,6 +70,18 @@ const Rules: React.FC = () => {
     )
   }
 
+  if (editModalActive) {
+    return (
+      <AddModal
+        onSuccess={refreshData}
+        editData={editData}
+        onCancel={() => {
+          setEditModal(false)
+        }}
+      />
+    )
+  }
+
   return (
     <>
       <div className="w-full">
@@ -71,6 +91,7 @@ const Rules: React.FC = () => {
           {(data as IRuleGroup[]).map((el) => (
             <RuleGroup
               onDelete={refreshData}
+              onEdit={editHandler}
               key={el.id}
               group={el as IRuleGroup}
             />
