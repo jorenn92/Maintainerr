@@ -1,6 +1,5 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { isNull } from 'lodash';
-import { AbstractRepository } from 'typeorm';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';

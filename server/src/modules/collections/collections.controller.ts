@@ -54,4 +54,10 @@ export class CollectionsController {
       libraryId ? libraryId : undefined,
     );
   }
+  @Get('/collection/:id')
+  getCollection(@Param('id') collectionId: number) {
+    return this.collectionService.getCollection(
+      collectionId ? collectionId : undefined,
+    );
+  }
 }

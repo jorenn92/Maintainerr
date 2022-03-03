@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { RulesDto } from './dtos/rules.dto';
@@ -44,7 +45,11 @@ export class RulesController {
   async setRules(@Body() body: RulesDto): Promise<ReturnStatus> {
     return await this.rulesService.setRules(body);
   }
-
+  @Put()
+  async updateRule(@Body() body: RulesDto): Promise<ReturnStatus> {
+    this.rulesService.deleteRuleGroup(body.id);
+    return await this.rulesService.setRules(body);
+  }
   @Post()
   async updateJob(@Body() body: { cron: string }): Promise<ReturnStatus> {
     return await this.ruleExecutorService.updateJob(body.cron);
