@@ -11,6 +11,7 @@ import {
   RulePossibility,
 } from './constants/rules.constants';
 import { RuleDto } from './dtos/rule.dto';
+import { RuleDbDto } from './dtos/ruleDb.dto';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
@@ -127,7 +128,11 @@ export class RulesService {
       for (const rule of params.rules) {
         const ruleJson = JSON.stringify(rule);
         await this.rulesRepository.save([
-          { ruleJson: ruleJson, ruleGroupId: groupId },
+          {
+            ruleJson: ruleJson,
+            ruleGroupId: groupId,
+            section: (rule as RuleDbDto).section,
+          },
         ]);
       }
       return state;

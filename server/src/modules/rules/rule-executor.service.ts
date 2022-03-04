@@ -102,6 +102,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
               await this.executeRule(parsedRule);
             } else {
               // handle section action
+              console.log('nieuwe section');
               this.handleSectionAction(sectionActionAnd);
 
               // save new section action
@@ -237,7 +238,9 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       } else {
         secondVal =
           rule.customVal.ruleTypeId === +RuleType.DATE
-            ? new Date(+rule.customVal.value * 1000)
+            ? rule.customVal.value.includes('-')
+              ? new Date(rule.customVal.value)
+              : new Date(+rule.customVal.value * 1000)
             : rule.customVal.ruleTypeId === +RuleType.TEXT
             ? rule.customVal.value
             : rule.customVal.ruleTypeId === +RuleType.NUMBER

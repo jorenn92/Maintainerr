@@ -109,7 +109,7 @@ export class RuleConstants {
           name: 'releaseDate',
           humanName: 'Release date',
           mediaType: MediaType.BOTH,
-          type: RuleType.TEXT,
+          type: RuleType.DATE,
         } as Property,
         {
           id: 3,

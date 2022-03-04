@@ -38,8 +38,8 @@ export class PlexGetterService {
         return viewers ? viewers.map((el) => +el.accountID) : [];
       }
       case 'releaseDate': {
-        return libItem.originallyAvailableAt
-          ? new Date(+libItem.originallyAvailableAt * 1000)
+        return new Date(libItem.originallyAvailableAt)
+          ? new Date(libItem.originallyAvailableAt)
           : null;
       }
       case 'rating': {
