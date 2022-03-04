@@ -186,7 +186,7 @@ const RuleCreator = (props: iRuleCreator) => {
 
   return (
     <div className="h-full w-full">
-      {createdRules.length !== ruleAmountArr.length ? (
+      {rulesCreated.current.length !== ruleAmount[1].reduce((pv, cv) => pv + cv ) ? (
         <Alert>{`Some incomplete rules won't get saved`} </Alert>
       ) : undefined}
       {ruleAmountArr[0].map((sid) => {
