@@ -83,19 +83,8 @@ const RuleCreator = (props: iRuleCreator) => {
     }
   }, [editSections])
 
-  useEffect(() => {
-    // props.onUpdate(createdRules.map((el) => el.rule))
-  }, [createdRules])
-
   const ruleCommited = (id: number, rule: IRule) => {
-    // if (createdRules) {
-    //   console.log(id)
-    //   const rules = createdRules.filter((el) => el.id !== id)
-    //   console.log([...rules, { id: id, rule: rule }]);
-    //   setCreatedRules([...rules, { id: id, rule: rule }])
-    // }
     if (rulesCreated) {
-      console.log(rule)
       const rules = rulesCreated.current.filter((el) => el.id !== id)
       rulesCreated.current = [...rules, { id: id, rule: rule }];
       setCreatedRules([...rules, { id: id, rule: rule }])
@@ -104,10 +93,6 @@ const RuleCreator = (props: iRuleCreator) => {
   }
 
   const ruleOmitted = (id: number) => {
-    // if (createdRules) {
-    //   const rules = createdRules?.filter((el) => el.id !== id)
-    //   setCreatedRules([...rules])
-    // }
     if (rulesCreated) {
       const rules = rulesCreated.current?.filter((el) => el.id !== id)
       rulesCreated.current = [...rules]
@@ -125,9 +110,7 @@ const RuleCreator = (props: iRuleCreator) => {
 
   const removeRule = (e: any) => {
     e.preventDefault()
-    // setCreatedRules(
-      rulesCreated.current.filter((el) => el.id !== ruleAmount[1].length - 1)
-    // )
+    ruleOmitted(ruleAmount[1][ruleAmount[1].length - 1])
     const rules = [...ruleAmount[1]]
     rules[rules.length - 1] = rules[rules.length - 1] - 1
     setRuleAmount([ruleAmount[0], rules])
