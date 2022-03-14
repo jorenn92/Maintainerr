@@ -66,7 +66,8 @@ const RuleInput = (props: IRuleInput) => {
       if (props.editData.rule.customVal) {
         switch (props.editData.rule.customVal.ruleTypeId) {
           case 0:
-            if (props.editData.rule.customVal.value as number % 86400 === 0) { // TODO: improve this.. Currently this is a hack to determine if param is amount of days or really a number
+            // TODO: improve this.. Currently this is a hack to determine if param is amount of days or really a number
+            if (props.editData.rule.customVal.value as number % 86400 === 0 && props.editData.rule.customVal.value as number != 0) { 
               setSecondVal(CustomParams.CUSTOM_DAYS)
               setRuleType(0)
             } else {

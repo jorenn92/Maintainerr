@@ -89,7 +89,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         this.plexData = { page: 0, finished: false, data: [] };
         while (!this.plexData.finished) {
           await this.getPlexData(rulegroup.libraryId);
-
           let currentSection = 0;
           let sectionActionAnd = false;
 
@@ -103,10 +102,9 @@ export class RuleExecutorService implements OnApplicationBootstrap {
               await this.executeRule(parsedRule);
             } else {
               // handle section action
-              console.log(rule);
               this.handleSectionAction(sectionActionAnd);
               // save new section action
-              sectionActionAnd = parsedRule.action === 0;
+              sectionActionAnd = +parsedRule.operator === 0;
               // reset first operator of new section
               parsedRule.operator = null;
               // Execute the rule and set the new section
@@ -131,9 +129,19 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       this.resultData.push(...this.workerData);
     } else {
       // section action is AND, then filter media not in work array out of result array
-      this.resultData = this.resultData.filter((el) =>
-        this.workerData.some((workEl) => workEl.ratingKey === el.ratingKey),
-      );
+      this.resultData = this.resultData.filter((el) => {
+        // If in current data.. Otherwise we're removing previously added media
+        if (
+          this.plexData.data.some((plexEl) => plexEl.ratingKey === el.ratingKey)
+        ) {
+          return this.workerData.some(
+            (workEl) => workEl.ratingKey === el.ratingKey,
+          );
+        } else {
+          // If not in current data, skip check
+          return true;
+        }
+      });
     }
     // empty workerdata. prepare for execution of new section
     this.workerData = [];
@@ -275,7 +283,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           }
         } else {
           if (!this.doRuleAction(firstVal, secondVal, rule.action)) {
-            data.splice(i, 1);
+            this.workerData.splice(i, 1);
           }
         }
       }
