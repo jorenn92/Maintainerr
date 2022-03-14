@@ -354,7 +354,6 @@ export class CollectionsService {
           },
         ])
         .execute();
-      console.log('removed');
     } else {
       this.infoLogger(`Couldn't remove media from collection..`);
     }
