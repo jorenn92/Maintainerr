@@ -41,9 +41,7 @@ const AddModal = (props: AddModal) => {
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
   const deleteAfterRef = useRef<any>()
-  const [showHome, setShowHome] = useState<boolean>(
-    props.editData ? props.editData.isActive : true
-  )
+  const [showHome, setShowHome] = useState<boolean>(true)
   const [arrOption, setArrOption] = useState<number>()
   const [active, setActive] = useState<boolean>(
     props.editData ? props.editData.isActive : true
@@ -90,8 +88,9 @@ const AddModal = (props: AddModal) => {
     if (props.editData) {
       GetApiHandler(
         `/collections/collection/${props.editData.collectionId}`
-      ).then((resp) => {
+      ).then((resp : ICollection ) => {
         resp ? setCollection(resp) : undefined
+        resp ? setShowHome(resp.visibleOnHome!) : undefined
         setIsLoading(false)
       })
     } else {
@@ -266,8 +265,8 @@ const AddModal = (props: AddModal) => {
               <div className="form-input-field">
                 <input
                   type="checkbox"
-                  name="active"
-                  id="active"
+                  name="is_active"
+                  id="is_active"
                   defaultChecked={active}
                   onChange={() => {
                     setActive(!active)
@@ -287,10 +286,10 @@ const AddModal = (props: AddModal) => {
                   type="checkbox"
                   name="collection_visible"
                   id="collection_visible"
+                  defaultChecked={showHome}
                   onChange={() => {
                     setShowHome(!showHome)
                   }}
-                  defaultChecked={showHome}
                 />
               </div>
             </div>

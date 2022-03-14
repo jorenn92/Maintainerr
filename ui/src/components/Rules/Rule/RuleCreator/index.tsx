@@ -85,7 +85,6 @@ const RuleCreator = (props: iRuleCreator) => {
 
   useEffect(() => {
     // props.onUpdate(createdRules.map((el) => el.rule))
-    console.log(createdRules)
   }, [createdRules])
 
   const ruleCommited = (id: number, rule: IRule) => {
@@ -96,7 +95,7 @@ const RuleCreator = (props: iRuleCreator) => {
     //   setCreatedRules([...rules, { id: id, rule: rule }])
     // }
     if (rulesCreated) {
-      console.log(id)
+      console.log(rule)
       const rules = rulesCreated.current.filter((el) => el.id !== id)
       rulesCreated.current = [...rules, { id: id, rule: rule }];
       setCreatedRules([...rules, { id: id, rule: rule }])
@@ -172,7 +171,6 @@ const RuleCreator = (props: iRuleCreator) => {
       counter = counter + ruleAmount[1][sid - 1]
     })
     setTotalRules(counter)
-    console.log(ruleAmountArr)
 
   }, [ruleAmountArr])
 

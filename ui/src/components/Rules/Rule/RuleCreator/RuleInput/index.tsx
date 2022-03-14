@@ -66,8 +66,7 @@ const RuleInput = (props: IRuleInput) => {
       if (props.editData.rule.customVal) {
         switch (props.editData.rule.customVal.ruleTypeId) {
           case 0:
-            // TODO: improve this.. Currently this is a hack to determine if param is amount of days or really a number
-            if (props.editData.rule.customVal.value > 1600000) {
+            if (props.editData.rule.customVal.value as number % 86400 === 0) { // TODO: improve this.. Currently this is a hack to determine if param is amount of days or really a number
               setSecondVal(CustomParams.CUSTOM_DAYS)
               setRuleType(0)
             } else {
@@ -88,6 +87,7 @@ const RuleInput = (props: IRuleInput) => {
       }
     }
   }, [])
+
   const updateFirstValue = (event: { target: { value: string } }) => {
     setFirstVal(event.target.value)
     setSecondVal(undefined)
@@ -158,12 +158,11 @@ const RuleInput = (props: IRuleInput) => {
     } else {
       props.onIncomplete(props.id ? props.id : 0)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }
 
   useEffect(() => {
     submit(null)
-  }, [secondVal, customVal])
+  }, [secondVal, customVal, operator, action, firstval])
 
   useEffect(() => {
     if (firstval) {
