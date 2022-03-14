@@ -1,4 +1,5 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import _ from 'lodash';
 import { isNull } from 'lodash';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
@@ -102,15 +103,12 @@ export class RuleExecutorService implements OnApplicationBootstrap {
               await this.executeRule(parsedRule);
             } else {
               // handle section action
-              console.log('nieuwe section');
+              console.log(rule);
               this.handleSectionAction(sectionActionAnd);
-
               // save new section action
               sectionActionAnd = parsedRule.action === 0;
-
-              // reset first action of new section
-              parsedRule.action === undefined;
-
+              // reset first operator of new section
+              parsedRule.operator = null;
               // Execute the rule and set the new section
               await this.executeRule(parsedRule);
               currentSection = (rule as RuleDbDto).section;
@@ -129,6 +127,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   private handleSectionAction(sectionActionAnd: boolean) {
     if (!sectionActionAnd) {
       // section action is OR, then push in result array
+      //console.log(this.workerData.map((el) => el.title));
       this.resultData.push(...this.workerData);
     } else {
       // section action is AND, then filter media not in work array out of result array
@@ -226,9 +225,9 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     const indexesToSplice: number[] = [];
 
     if (isNull(rule.operator) || +rule.operator === +RuleOperators.OR) {
-      data = this.plexData.data;
+      data = _.cloneDeep(this.plexData.data);
     } else {
-      data = this.workerData;
+      data = _.cloneDeep(this.workerData);
     }
     // for (const [index, el] of data.entries()) {
     for (let i = data.length - 1; i >= 0; i--) {
