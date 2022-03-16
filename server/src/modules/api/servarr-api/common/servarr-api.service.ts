@@ -1,4 +1,5 @@
 // import cacheManager, { AvailableCacheIds } from '../../lib/cache';
+import { AxiosResponse } from 'axios';
 import { ExternalApiService } from 'src/modules/api/external-api/external-api.service';
 import { DVRSettings } from 'src/modules/settings/interfaces/dvr-settings.interface';
 import {
@@ -141,9 +142,17 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
 
   protected async runDelete(command: string): Promise<void> {
     try {
-      await this.axios.delete(`/${command}`);
+      await this.delete(`/${command}`);
     } catch (e) {
-      throw new Error(`[${this.apiName}] Failed to run delete: ${e.message}`);
+      throw new Error(`[${this.apiName}] Failed to run DELETE: ${e.message}`);
+    }
+  }
+
+  protected async runPut(command: string, body: string): Promise<void> {
+    try {
+      await this.put(`/${command}`, body);
+    } catch (e) {
+      throw new Error(`[${this.apiName}] Failed to run PUT: ${e.message}`);
     }
   }
 }

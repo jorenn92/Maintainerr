@@ -125,7 +125,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   private handleSectionAction(sectionActionAnd: boolean) {
     if (!sectionActionAnd) {
       // section action is OR, then push in result array
-      //console.log(this.workerData.map((el) => el.title));
       this.resultData.push(...this.workerData);
     } else {
       // section action is AND, then filter media not in work array out of result array
@@ -201,7 +200,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       );
       return collection;
     } else {
-      console.log(`collection not found with id ${rulegroup.collectionId}`);
+      this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
     }
   }
 

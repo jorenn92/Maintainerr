@@ -11,6 +11,52 @@ export interface SonarrSeason {
   };
 }
 
+export interface SonarrEpisode {
+  seriesId: number;
+  seasonNumber: number;
+  relativePath: string;
+  path: string;
+  size: number;
+  dateAdded: Date;
+  sceneName?: string;
+  releaseGroup?: string;
+  language?: {
+    id: number;
+    name: string;
+  };
+  quality?: {
+    quality: {
+      id: number;
+      name: string;
+      source: string;
+      resolution: number;
+    };
+    revision?: {
+      version: number;
+      real: number;
+      isRepack: boolean;
+    };
+  };
+  mediaInfo?: {
+    audioBitrate: number;
+    audioChannels: number;
+    audioCodec: string;
+    audioLanguages: string;
+    audioStreamCount: number;
+    videoBitDepth: number;
+    videoBitrate: number;
+    videoCodec: string;
+    videoFps: number;
+    resolution: string;
+    runTime: string;
+    scanType: string;
+    subtitles: string;
+  };
+  qualityCutoffNotMet: boolean;
+  languageCutoffNotMet: boolean;
+  id: number;
+}
+
 export interface SonarrSeries {
   title: string;
   sortTitle: string;

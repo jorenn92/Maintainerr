@@ -9,4 +9,8 @@ export class RadarrController {
   getMovie() {
     return this.servarr.RadarrApi.getMovie({ id: 2780 });
   }
+  @Get('/test')
+  testRadarr() {
+    this.servarr.RadarrApi.unmonitorMovie(3313, true);
+  }
 }

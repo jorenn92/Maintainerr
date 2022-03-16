@@ -30,7 +30,6 @@ export class RadarrGetterService {
       libItem.ratingKey,
     );
     if (!tmdb) {
-      console.log('id not found');
       return null;
     }
 
@@ -42,8 +41,6 @@ export class RadarrGetterService {
         return movieResponse.added ? new Date(movieResponse.added) : null;
       }
       case 'fileDate': {
-        // console.log(movieResponse.movieFile);
-
         return movieResponse?.movieFile?.dateAdded
           ? new Date(movieResponse.movieFile.dateAdded)
           : null;

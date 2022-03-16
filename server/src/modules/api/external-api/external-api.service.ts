@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import NodeCache from 'node-cache';
 
@@ -58,6 +57,15 @@ export class ExternalApiService {
     config?: AxiosRequestConfig,
   ): Promise<T> {
     const response = await this.axios.delete<T>(endpoint, config);
+    return response.data;
+  }
+
+  public async put<T>(
+    endpoint: string,
+    data: string,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
+    const response = await this.axios.put<T>(endpoint, data, config);
     return response.data;
   }
 

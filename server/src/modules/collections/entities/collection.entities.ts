@@ -1,4 +1,3 @@
-import { CronExpression } from '@nestjs/schedule';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { CollectionMedia } from './collection_media.entities';
 

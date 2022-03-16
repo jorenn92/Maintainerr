@@ -13,3 +13,9 @@ export interface ICollection {
   deleteAfterDays?: number; // amount of days after add
   media?: CollectionMedia[];
 }
+
+export enum ServarrAction {
+  DELETE,
+  DELETE_UNMONITOR_ALL,
+  DELETE_UNMONITOR_EXISTING,
+}

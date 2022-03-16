@@ -3,6 +3,7 @@ import { ServarrApi } from '../common/servarr-api.service';
 import {
   AddSeriesOptions,
   LanguageProfile,
+  SonarrEpisode,
   SonarrSeason,
   SonarrSeries,
 } from '../interfaces/sonarr.interface';
@@ -222,6 +223,47 @@ export class SonarrApi extends ServarrApi<{
         errorMessage: e.message,
         seriesId,
       });
+    }
+  }
+
+  public async unmonitorSeasons(
+    seriesId: number | string,
+    type: 'all' | 'existing' = 'all',
+    deleteFiles = true,
+  ) {
+    this.logger.log('Unmonitoring all seasons from Sonarr.', {
+      label: 'Sonarr API',
+      seriesId,
+    });
+    try {
+      const data: SonarrSeries = await this.axios.get(`series/${seriesId}`);
+
+      data.seasons = data.seasons.map((s) => {
+        if (type === 'all' || s.statistics?.episodeFileCount > 0) {
+          s.monitored = false;
+        }
+        return s;
+      });
+      await this.runPut(`series/`, JSON.stringify(data));
+
+      // delete files
+      if (deleteFiles) {
+        const episodes: SonarrEpisode[] = await this.axios.get(
+          `episodefile?seriesId=${seriesId}`,
+        );
+        episodes.forEach(async (e) => {
+          await this.runDelete(`episodefile/${e.id}`);
+        });
+      }
+    } catch (e) {
+      this.logger.log(
+        "Couldn't unmonitor/delete show. Does it exist in sonarr?",
+        {
+          label: 'Sonarr API',
+          errorMessage: e.message,
+          seriesId,
+        },
+      );
     }
   }
 

@@ -51,6 +51,7 @@ export interface RadarrMediaInfo {
 }
 
 export interface RadarrMovieFile {
+  id: number;
   dateAdded: string;
   quality: RadarrQualityContainer;
   size: number;

@@ -2,10 +2,10 @@ import { Logger } from '@nestjs/common';
 import { ServarrApi } from '../common/servarr-api.service';
 import {
   RadarrMovie,
+  RadarrMovieFile,
   RadarrMovieOptions,
 } from '../interfaces/radarr.interface';
 
-const RADARR_API_PATH = '/api/v3/';
 export class RadarrApi extends ServarrApi<{ movieId: number }> {
   logger: Logger;
   constructor({ url, apiKey }: { url: string; apiKey: string }) {
@@ -151,14 +151,31 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
   }
 
   public async deleteMovie(movieId: number, deleteFiles = true) {
-    this.logger.log('Deleting movie from Radarr');
-
     try {
       await this.runDelete(
         `movie/${movieId}?addImportExclusion=false&deleteFiles=${deleteFiles}`,
       );
     } catch (e) {
       this.logger.log("Couldn't delete movie. Does it exist in radarr?");
+    }
+  }
+
+  public async unmonitorMovie(movieId: number, deleteFiles = true) {
+    try {
+      const movieData: RadarrMovie = await this.get(`movie/${movieId}`);
+      movieData.monitored = false;
+      await this.runPut(`movie/${movieId}`, JSON.stringify(movieData));
+
+      if (deleteFiles) {
+        const movieFiles: RadarrMovieFile[] = await this.get(
+          `moviefile?movieId=${movieId}`,
+        );
+        movieFiles.forEach(
+          async (e) => await this.runDelete(`moviefile/${e.id}`),
+        );
+      }
+    } catch (e) {
+      this.logger.warn("Couldn't unmonitor movie. Does it exist in radarr?");
     }
   }
 }
