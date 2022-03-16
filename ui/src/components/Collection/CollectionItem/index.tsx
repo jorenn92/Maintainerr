@@ -39,7 +39,7 @@ const CollectionItem = (props: ICollectionItem) => {
               <a className="hover:underline">{props.collection.title}</a>
             </Link>
           </div>
-          <div className="whitespace-nowrap text-base text-gray-400 sm:overflow-ellipsis sm:whitespace-normal sm:text-lg">
+          <div className="text-base sm:max-h-20 max-h-12 text-gray-400 overflow-hidden hover:overflow-y-scroll whitespace-normal sm:text-lg">
             {props.collection.description}
           </div>
         </div>

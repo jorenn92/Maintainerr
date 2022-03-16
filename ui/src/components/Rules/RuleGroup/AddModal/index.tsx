@@ -91,6 +91,7 @@ const AddModal = (props: AddModal) => {
       ).then((resp : ICollection ) => {
         resp ? setCollection(resp) : undefined
         resp ? setShowHome(resp.visibleOnHome!) : undefined
+        resp ? setArrOption(resp.arrAction) : undefined
         setIsLoading(false)
       })
     } else {
@@ -234,6 +235,7 @@ const AddModal = (props: AddModal) => {
           {selectedLibrary && selectedLibrary!.type === 'movie' ? (
             <ArrAction
               title="Radarr"
+              default={arrOption}
               onUpdate={(e: number) => setArrOption(e)}
             />
           ) : (
@@ -243,15 +245,15 @@ const AddModal = (props: AddModal) => {
               options={[
                 {
                   id: 0,
-                  name: 'Delete entire show',
+                  name: 'Delete show from Sonarr',
                 },
                 {
                   id: 1,
-                  name: 'Delete & unmonitor all seasons',
+                  name: 'Delete files & unmonitor all seasons',
                 },
                 {
                   id: 2,
-                  name: 'Delete & unmonitor existing seasons',
+                  name: 'Delete files & unmonitor existing seasons',
                 },
               ]}
             />

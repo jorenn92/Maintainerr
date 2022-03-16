@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 interface ArrActionProps {
   title: string
+  default?: number
   options?: Option[]
   onUpdate: (value: number) => void
 }
@@ -12,7 +13,7 @@ interface Option {
 }
 
 const ArrAction = (props: ArrActionProps) => {
-  const [state, setState] = useState<string>()
+  const [state, setState] = useState<string>(props.default ? props.default.toString() : '0')
 
   const options: Option[] = props.options
     ? props.options

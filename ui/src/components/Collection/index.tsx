@@ -13,6 +13,8 @@ export interface ICollection {
   isActive: boolean
   visibleOnHome?: boolean
   deleteAfterDays?: number
+  type: number
+  arrAction: number
   media: ICollectionMedia[]
 }
 
