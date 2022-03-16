@@ -278,10 +278,17 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       ) {
         if (isNull(rule.operator) || rule.operator === RuleOperators.OR) {
           if (this.doRuleAction(firstVal, secondVal, rule.action)) {
-            this.workerData.push(data[i]);
+            // add to workerdata if not yet available
+            if (
+              this.workerData.find((e) => e.ratingKey === data[i].ratingKey) ===
+              undefined
+            ) {
+              this.workerData.push(data[i]);
+            }
           }
         } else {
           if (!this.doRuleAction(firstVal, secondVal, rule.action)) {
+            // remove from workerdata
             this.workerData.splice(i, 1);
           }
         }
@@ -327,6 +334,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       }
     }
     if (action === RulePossibility.CONTAINS) {
+      // console.log(`${val1} vs ${val2}`);
       try {
         if (!Array.isArray(val2)) {
           return (val1 as unknown as T[]).includes(val2);
@@ -345,10 +353,11 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       }
     }
     if (action === RulePossibility.BEFORE) {
-      return val1 <= val2;
+      // console.log(`comparing ${val1} to ${val2}`);
+      return val1 && val2 ? val1 <= val2 : false;
     }
     if (action === RulePossibility.AFTER) {
-      return val1 >= val2;
+      return val1 && val2 ? val1 >= val2 : false;
     }
     if (action === RulePossibility.IN_LAST) {
       return (

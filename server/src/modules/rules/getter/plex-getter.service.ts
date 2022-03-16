@@ -128,12 +128,15 @@ export class PlexGetterService {
             }
           }
         }
+
         return allViewers && allViewers.length > 0
           ? allViewers.map((el) => el.accountID)
           : null;
       }
-      case 'sw_lastSeenEpisode': {
-        return libItem.lastViewedAt ? +libItem.lastViewedAt : null;
+      case 'sw_lastWatched': {
+        return libItem.lastViewedAt
+          ? new Date(+libItem.lastViewedAt * 1000)
+          : null;
       }
       case 'sw_episodes': {
         return libItem.leafCount ? +libItem.leafCount : 0;

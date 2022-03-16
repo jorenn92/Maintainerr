@@ -185,7 +185,7 @@ export class RuleConstants {
         {
           id: 13,
           name: 'sw_lastWatched',
-          humanName: 'Last watched at',
+          humanName: 'Last episode seen at',
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
         } as Property,
