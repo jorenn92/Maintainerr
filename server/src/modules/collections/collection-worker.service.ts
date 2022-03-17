@@ -10,7 +10,7 @@ import { TasksService } from '../tasks/tasks.service';
 import { CollectionsService } from './collections.service';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
-import { ICollection, ServarrAction } from './interfaces/collection.interface';
+import { ServarrAction } from './interfaces/collection.interface';
 
 @Injectable()
 export class CollectionWorkerService implements OnApplicationBootstrap {

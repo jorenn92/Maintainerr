@@ -146,17 +146,19 @@ export class PlexGetterService {
         return libItem.viewedLeafCount ? +libItem.viewedLeafCount : 0;
       }
       case 'sw_lastEpisodeAddedAt': {
-        return await this.plexApi
-          .getChildrenMetadata(libItem.ratingKey)
-          .then((seasons) => {
-            return this.plexApi
-              .getChildrenMetadata(seasons[seasons.length - 1].ratingKey)
-              .then((eps) => {
-                return eps[eps.length - 1]?.addedAt
-                  ? +eps[eps.length - 1].addedAt
-                  : null;
-              });
-          });
+        return new Date(
+          +(await this.plexApi
+            .getChildrenMetadata(libItem.ratingKey)
+            .then((seasons) => {
+              return this.plexApi
+                .getChildrenMetadata(seasons[seasons.length - 1].ratingKey)
+                .then((eps) => {
+                  return eps[eps.length - 1]?.addedAt
+                    ? +eps[eps.length - 1].addedAt
+                    : null;
+                });
+            })) * 1000,
+        );
       }
       default: {
         return null;
