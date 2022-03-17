@@ -143,7 +143,37 @@ export class PlexGetterService {
         return libItem.leafCount ? +libItem.leafCount : 0;
       }
       case 'sw_viewedEpisodes': {
-        return libItem.viewedLeafCount ? +libItem.viewedLeafCount : 0;
+        let viewCount = 0;
+        const seasons = await this.plexApi.getChildrenMetadata(
+          libItem.ratingKey,
+        );
+        for (const season of seasons) {
+          const episodes = await this.plexApi.getChildrenMetadata(
+            season.ratingKey,
+          );
+          for (const episode of episodes) {
+            const views = await this.plexApi.getWatchHistory(episode.ratingKey);
+            views?.length > 0 ? viewCount++ : undefined;
+          }
+        }
+        return viewCount;
+      }
+      case 'sw_amountOfViews': {
+        let viewCount = 0;
+        const seasons = await this.plexApi.getChildrenMetadata(
+          libItem.ratingKey,
+        );
+        for (const season of seasons) {
+          const episodes = await this.plexApi.getChildrenMetadata(
+            season.ratingKey,
+          );
+          for (const episode of episodes) {
+            const views = await this.plexApi.getWatchHistory(episode.ratingKey);
+            viewCount =
+              views?.length > 0 ? viewCount + views.length : viewCount;
+          }
+        }
+        return viewCount;
       }
       case 'sw_lastEpisodeAddedAt': {
         return new Date(
