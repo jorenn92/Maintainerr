@@ -210,6 +210,13 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
         } as Property,
+        {
+          id: 17,
+          name: 'sw_amountOfViews',
+          humanName: 'Total views across episodes',
+          mediaType: MediaType.SHOW,
+          type: RuleType.NUMBER,
+        } as Property,
       ],
     },
     {
