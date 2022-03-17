@@ -171,7 +171,7 @@ export class PlexApiService {
     return response.MediaContainer.Metadata;
   }
 
-  public async getSeenBy(itemId: string): Promise<PlexSeenBy[]> {
+  public async getWatchHistory(itemId: string): Promise<PlexSeenBy[]> {
     const response: PlexLibraryResponse =
       await this.plexClient.query<PlexLibraryResponse>({
         uri: `/status/sessions/history/all?sort=viewedAt:desc&metadataItemID=${itemId}`,

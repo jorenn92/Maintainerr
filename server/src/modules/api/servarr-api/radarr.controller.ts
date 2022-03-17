@@ -1,5 +1,4 @@
 import { Controller, Get } from '@nestjs/common';
-import { RadarrApi } from './helpers/radarr.helper';
 import { ServarrService } from './servarr.service';
 
 @Controller('api/radarr')
@@ -11,6 +10,6 @@ export class RadarrController {
   }
   @Get('/test')
   testRadarr() {
-    this.servarr.RadarrApi.unmonitorMovie(3313, true);
+    this.servarr.SonarrApi.unmonitorSeasons(87, 'existing', false);
   }
 }

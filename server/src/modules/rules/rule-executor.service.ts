@@ -354,6 +354,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     }
     if (action === RulePossibility.BEFORE) {
       // console.log(`comparing ${val1} to ${val2}`);
+      // console.log(val1 && val2 ? val1 <= val2 : false);
       return val1 && val2 ? val1 <= val2 : false;
     }
     if (action === RulePossibility.AFTER) {

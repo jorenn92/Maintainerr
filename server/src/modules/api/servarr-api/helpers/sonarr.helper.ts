@@ -53,23 +53,24 @@ export class SonarrApi extends ServarrApi<{
 
   public async getSeriesByTvdbId(id: number): Promise<SonarrSeries> {
     try {
-      const response = await this.axios.get<SonarrSeries[]>('/series/lookup', {
-        params: {
-          term: `tvdb:${id}`,
-        },
-      });
+      const response = await this.axios.get<SonarrSeries[]>(
+        `/series/lookup?term=tvdb:${id}`,
+      );
 
       if (!response.data[0]) {
-        throw new Error('Series not found');
+        this.logger.warn('Error retrieving series by tvdb ID', {
+          label: 'Sonarr API',
+          errorMessage: '',
+          tvdbId: id,
+        });
       }
       return response.data[0];
     } catch (e) {
-      this.logger.error('Error retrieving series by tvdb ID', {
+      this.logger.warn('Error retrieving series by tvdb ID', {
         label: 'Sonarr API',
         errorMessage: e.message,
         tvdbId: id,
       });
-      throw new Error('Series not found');
     }
   }
 
@@ -230,13 +231,10 @@ export class SonarrApi extends ServarrApi<{
     seriesId: number | string,
     type: 'all' | 'existing' = 'all',
     deleteFiles = true,
-  ) {
-    this.logger.log('Unmonitoring all seasons from Sonarr.', {
-      label: 'Sonarr API',
-      seriesId,
-    });
+  ): Promise<void> {
     try {
-      const data: SonarrSeries = await this.axios.get(`series/${seriesId}`);
+      const data: SonarrSeries = (await this.axios.get(`series/${seriesId}`))
+        .data;
 
       data.seasons = data.seasons.map((s) => {
         if (type === 'all' || s.statistics?.episodeFileCount > 0) {
@@ -248,9 +246,9 @@ export class SonarrApi extends ServarrApi<{
 
       // delete files
       if (deleteFiles) {
-        const episodes: SonarrEpisode[] = await this.axios.get(
-          `episodefile?seriesId=${seriesId}`,
-        );
+        const episodes: SonarrEpisode[] = (
+          await this.axios.get(`episodefile?seriesId=${seriesId}`)
+        ).data;
         episodes.forEach(async (e) => {
           await this.runDelete(`episodefile/${e.id}`);
         });
@@ -259,12 +257,12 @@ export class SonarrApi extends ServarrApi<{
       this.logger.log(
         "Couldn't unmonitor/delete show. Does it exist in sonarr?",
         {
-          label: 'Sonarr API',
           errorMessage: e.message,
           seriesId,
         },
       );
     }
+    this.logger.log(`Unmonitored seasons from Sonarr show with ID ${seriesId}`);
   }
 
   private buildSeasonList(

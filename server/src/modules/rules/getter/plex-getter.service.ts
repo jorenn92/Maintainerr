@@ -31,7 +31,7 @@ export class PlexGetterService {
         //   return { plexId: el.id, username: el.name } as PlexUser;
         // });
         const viewers: PlexSeenBy[] = await this.plexApi
-          .getSeenBy(libItem.ratingKey)
+          .getWatchHistory(libItem.ratingKey)
           .catch((_err) => {
             return null;
           });
@@ -49,7 +49,7 @@ export class PlexGetterService {
         return libItem.Role ? libItem.Role.map((el) => el.tag) : null;
       }
       case 'viewCount': {
-        const count = await this.plexApi.getSeenBy(libItem.ratingKey);
+        const count = await this.plexApi.getWatchHistory(libItem.ratingKey);
         return count ? count.length : 0;
       }
       case 'collections': {
@@ -57,7 +57,7 @@ export class PlexGetterService {
       }
       case 'lastViewedAt': {
         return await this.plexApi
-          .getSeenBy(libItem.ratingKey)
+          .getWatchHistory(libItem.ratingKey)
           .then((seenby) => {
             if (seenby.length > 0) {
               return new Date(
@@ -100,7 +100,7 @@ export class PlexGetterService {
           for (const episode of episodes) {
             if (season.index === 1 && episode.index === 1) {
               const viewers: PlexSeenBy[] = await this.plexApi
-                .getSeenBy(episode.ratingKey)
+                .getWatchHistory(episode.ratingKey)
                 .catch((_err) => {
                   return null;
                 });
@@ -110,7 +110,7 @@ export class PlexGetterService {
                   : allViewers;
             } else {
               const viewers: PlexSeenBy[] = await this.plexApi
-                .getSeenBy(episode.ratingKey)
+                .getWatchHistory(episode.ratingKey)
                 .catch((_err) => {
                   return null;
                 });
@@ -134,9 +134,10 @@ export class PlexGetterService {
           : null;
       }
       case 'sw_lastWatched': {
-        return libItem.lastViewedAt
-          ? new Date(+libItem.lastViewedAt * 1000)
-          : null;
+        const watchHistory = await this.plexApi.getWatchHistory(
+          libItem.ratingKey,
+        );
+        return watchHistory ? new Date(+watchHistory[0].viewedAt * 1000) : null;
       }
       case 'sw_episodes': {
         return libItem.leafCount ? +libItem.leafCount : 0;

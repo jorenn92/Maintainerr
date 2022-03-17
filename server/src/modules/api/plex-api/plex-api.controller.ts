@@ -49,7 +49,7 @@ export class PlexApiController {
   }
   @Get('meta/:id/seen')
   getSeenBy(@Param('id') id: string) {
-    return this.plexApiService.getSeenBy(id);
+    return this.plexApiService.getWatchHistory(id);
   }
   @Get('users')
   getUser() {

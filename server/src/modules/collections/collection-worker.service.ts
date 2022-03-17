@@ -10,7 +10,7 @@ import { TasksService } from '../tasks/tasks.service';
 import { CollectionsService } from './collections.service';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
-import { ServarrAction } from './interfaces/collection.interface';
+import { ICollection, ServarrAction } from './interfaces/collection.interface';
 
 @Injectable()
 export class CollectionWorkerService implements OnApplicationBootstrap {
@@ -107,34 +107,41 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
           break;
       }
     } else {
-      const tmdbShow = await this.tmdbApi.getTvShow({ tvId: media.tmdbId });
-      const sonarrMedia = await this.servarrApi.SonarrApi.getSeriesByTvdbId(
-        tmdbShow?.external_ids?.tvdb_id,
-      );
-      if (sonarrMedia) {
-        switch (collection.arrAction) {
-          case ServarrAction.DELETE:
-            await this.servarrApi.SonarrApi.deleteShow(sonarrMedia.id);
-            this.infoLogger('Removed show from Sonarr');
-            break;
-          case ServarrAction.DELETE_UNMONITOR_ALL:
-            await this.servarrApi.SonarrApi.unmonitorSeasons(
-              sonarrMedia.id,
-              'all',
-              true,
-            );
-            this.infoLogger('Unmonitored show in Sonarr');
-            break;
-          case ServarrAction.DELETE_UNMONITOR_EXISTING:
-            await this.servarrApi.SonarrApi.unmonitorSeasons(
-              sonarrMedia.id,
-              'existing',
-              true,
-            );
-            this.infoLogger(
-              'Unmonitored existing episodes from show in Sonarr',
-            );
-            break;
+      // get the tvdb id
+      const tvdbId = await this.tvdbidFinder(media);
+
+      console.log(tvdbId);
+      if (tvdbId) {
+        const sonarrMedia = await this.servarrApi.SonarrApi.getSeriesByTvdbId(
+          tvdbId,
+        );
+        if (sonarrMedia) {
+          switch (collection.arrAction) {
+            case ServarrAction.DELETE:
+              await this.servarrApi.SonarrApi.deleteShow(sonarrMedia.id);
+              this.infoLogger('Removed show from Sonarr');
+              break;
+            case ServarrAction.DELETE_UNMONITOR_ALL:
+              await this.servarrApi.SonarrApi.unmonitorSeasons(
+                sonarrMedia.id,
+                'all',
+                true,
+              );
+              this.infoLogger('Unmonitored show in Sonarr');
+              break;
+            case ServarrAction.DELETE_UNMONITOR_EXISTING:
+              await this.servarrApi.SonarrApi.unmonitorSeasons(
+                sonarrMedia.id,
+                'existing',
+                true,
+              );
+              this.infoLogger(
+                'Unmonitored existing episodes from show in Sonarr',
+              );
+              break;
+          }
+        } else {
+          this.infoLogger(`Couldn't find tvdbid for tmdbid ${media.tmdbId}`);
         }
       } else {
         this.infoLogger(`Couldn't find tvdbid for tmdbid ${media.tmdbId}`);
@@ -146,6 +153,19 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
     );
     await this.plexApi.deleteMediaFromDisk(media.plexId);
     this.infoLogger(`Removed media with tmdbid ${media.tmdbId}`);
+  }
+
+  private async tvdbidFinder(media: CollectionMedia) {
+    let tvdbid = undefined;
+    const tmdbShow = await this.tmdbApi.getTvShow({ tvId: media.tmdbId });
+    if (!tmdbShow?.external_ids?.tvdb_id) {
+      const plexData = await this.plexApi.getMetadata(media.plexId.toString());
+      const tvdbidPlex = plexData.Guid.find((el) => el.id.includes('tvdb'));
+      tvdbid = tvdbidPlex.id.split('tvdb://')[1];
+    } else {
+      tvdbid = tmdbShow.external_ids.tvdb_id;
+    }
+    return tvdbid;
   }
 
   private infoLogger(message: string) {
