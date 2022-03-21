@@ -164,6 +164,25 @@ export class TmdbApiService extends ExternalApiService {
     }
   };
 
+  // TODO: ADD CACHING!!!!
+  public getImagePath = async ({
+    tmdbId,
+    type,
+  }: {
+    tmdbId: number;
+    type: 'movie' | 'show';
+  }): Promise<string> => {
+    try {
+      if (type === 'movie') {
+        return (await this.getMovie({ movieId: tmdbId }))?.poster_path;
+      } else {
+        return (await this.getTvShow({ tvId: tmdbId }))?.poster_path;
+      }
+    } catch (e) {
+      throw new Error(`[TMDb] Failed to fetch image path: ${e.message}`);
+    }
+  };
+
   public getTvSeason = async ({
     tvId,
     seasonNumber,

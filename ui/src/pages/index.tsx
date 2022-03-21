@@ -6,7 +6,7 @@ const Home: NextPage = () => {
   const router = useRouter()
 
   useEffect(() => {
-    router.push('/rules')
+    router.push('/overview')
   }, [router])
   
   return <></>

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import LibrariesContext, { ILibrary } from '../../contexts/libraries-context'
 import GetApiHandler from '../../utils/ApiHandler'
-import LibrarySwticher from '../Common/LibrarySwitcher'
+import LibrarySwitcher from '../Common/LibrarySwitcher'
 import CollectionItem from './CollectionItem'
 
 export interface ICollection {
@@ -52,7 +52,7 @@ const Collection = () => {
 
   return (
     <>
-      <LibrarySwticher onSwitch={onSwitchLibrary} />
+      <LibrarySwitcher onSwitch={onSwitchLibrary} />
       <div className="flex flex-col sm:flex-row">
         {collections?.map((col) => (
           <CollectionItem key={col.id} collection={col} />

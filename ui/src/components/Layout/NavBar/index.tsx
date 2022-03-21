@@ -13,6 +13,11 @@ interface NavBarLink {
 
 const navBarItems: NavBarLink[] = [
   {
+    key: '0',
+    href: '/overview',
+    name: 'Overview',
+  },
+  {
     key: '1',
     href: '/rules',
     name: 'Rules',

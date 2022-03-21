@@ -4,9 +4,10 @@ import GetApiHandler from '../../../utils/ApiHandler'
 
 interface ILibrarySwitcher {
   onSwitch: (libraryId: number) => void
+  allPossible?: Boolean
 }
 
-const LibrarySwticher = (props: ILibrarySwitcher) => {
+const LibrarySwitcher = (props: ILibrarySwitcher) => {
   const LibrariesCtx = useContext(LibrariesContext)
 
   const onSwitchLibrary = (event: { target: { value: string } }) => {
@@ -18,6 +19,9 @@ const LibrarySwticher = (props: ILibrarySwitcher) => {
       GetApiHandler('/plex/libraries/').then((resp) => {
         if (resp) {
           LibrariesCtx.addLibraries(resp)
+          props.allPossible !== undefined && !props.allPossible
+            ? props.onSwitch(+resp[0].key)
+            : undefined
         } else {
           LibrariesCtx.addLibraries([])
         }
@@ -27,22 +31,24 @@ const LibrarySwticher = (props: ILibrarySwitcher) => {
 
   return (
     <>
-        <div className="mb-5 w-full">
-          <form>
-            <select placeholder="Libraries" onChange={onSwitchLibrary}>
+      <div className="mb-5 w-full">
+        <form>
+          <select placeholder="Libraries" onChange={onSwitchLibrary}>
+            {props.allPossible === undefined || props.allPossible ? (
               <option value={9999}>All</option>
-              {LibrariesCtx.libraries.map((el) => {
-                return (
-                  <option key={el.key} value={el.key}>
-                    {el.title}
-                  </option>
-                )
-              })}
-            </select>
-          </form>
-        </div>
+            ) : undefined}
+            {LibrariesCtx.libraries.map((el) => {
+              return (
+                <option key={el.key} value={el.key}>
+                  {el.title}
+                </option>
+              )
+            })}
+          </select>
+        </form>
+      </div>
     </>
   )
 }
 
-export default LibrarySwticher
+export default LibrarySwitcher
