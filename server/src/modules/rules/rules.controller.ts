@@ -46,7 +46,7 @@ export class RulesController {
   async setRules(@Body() body: RulesDto): Promise<ReturnStatus> {
     return await this.rulesService.setRules(body);
   }
-  @Post()
+  @Post('/exclusion')
   async setExclusion(@Body() body: ExclusionDto): Promise<ReturnStatus> {
     return await this.rulesService.setExclusion(body);
   }
