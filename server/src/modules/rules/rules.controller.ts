@@ -50,6 +50,10 @@ export class RulesController {
   async setExclusion(@Body() body: ExclusionDto): Promise<ReturnStatus> {
     return await this.rulesService.setExclusion(body);
   }
+  @Delete('/exclusion/:id')
+  async removeExclusion(@Param('id') id: string): Promise<ReturnStatus> {
+    return await this.rulesService.removeExclusion(+id);
+  }
   @Put()
   async updateRule(@Body() body: RulesDto): Promise<ReturnStatus> {
     this.rulesService.deleteRuleGroup(body.id);

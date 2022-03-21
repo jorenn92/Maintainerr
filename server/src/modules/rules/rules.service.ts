@@ -163,6 +163,18 @@ export class RulesService {
     }
   }
 
+  async removeExclusion(id: number) {
+    try {
+      await this.exclusionRepo.delete(id);
+      return this.createReturnStatus(true, 'Success');
+    } catch (e) {
+      this.logger.warn(
+        `Removing exclusion with ID ${id} failed with error : ${e}`,
+      );
+      return this.createReturnStatus(false, 'Failed');
+    }
+  }
+
   async getExclusions(rulegroupId: number) {
     if (rulegroupId) {
       const exclusions = await this.exclusionRepo.find({

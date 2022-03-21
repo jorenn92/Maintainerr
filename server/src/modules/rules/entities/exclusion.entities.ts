@@ -8,6 +8,6 @@ export class Exclusion {
   @Column()
   plexId: number;
 
-  @Column()
+  @Column({ nullable: true })
   rulegroupId: number;
 }
