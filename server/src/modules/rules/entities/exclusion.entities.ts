@@ -9,5 +9,5 @@ export class Exclusion {
   plexId: number;
 
   @Column({ nullable: true })
-  rulegroupId: number;
+  ruleGroupId: number;
 }

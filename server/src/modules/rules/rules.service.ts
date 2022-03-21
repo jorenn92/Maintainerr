@@ -85,6 +85,7 @@ export class RulesService {
       }
 
       await this.rulesRepository.delete({ ruleGroupId: ruleGroupId });
+      await this.exclusionRepo.delete({ ruleGroupId: ruleGroupId });
       await this.ruleGroupRepository.delete(ruleGroupId);
       this.logger.log(
         `Removed rulegroup with id ${ruleGroupId} from the database`,
@@ -148,10 +149,14 @@ export class RulesService {
 
   async setExclusion(data: ExclusionDto) {
     try {
+      const old = await this.exclusionRepo.findOne({
+        ...data,
+      });
+
       await this.exclusionRepo.save([
         {
-          plexId: data.plexId,
-          rulegroupId: data.ruleGroupId,
+          ...old,
+          ...data,
         },
       ]);
       return this.createReturnStatus(true, 'Success');
@@ -178,11 +183,11 @@ export class RulesService {
   async getExclusions(rulegroupId: number) {
     if (rulegroupId) {
       const exclusions = await this.exclusionRepo.find({
-        rulegroupId: rulegroupId,
+        ruleGroupId: rulegroupId,
       });
       return exclusions.concat(
         await this.exclusionRepo.find({
-          rulegroupId: null,
+          ruleGroupId: null,
         }),
       );
     }
