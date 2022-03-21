@@ -8,6 +8,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { ExclusionDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleExecutorService } from './rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
@@ -44,6 +45,10 @@ export class RulesController {
   @Post()
   async setRules(@Body() body: RulesDto): Promise<ReturnStatus> {
     return await this.rulesService.setRules(body);
+  }
+  @Post()
+  async setExclusion(@Body() body: ExclusionDto): Promise<ReturnStatus> {
+    return await this.rulesService.setExclusion(body);
   }
   @Put()
   async updateRule(@Body() body: RulesDto): Promise<ReturnStatus> {

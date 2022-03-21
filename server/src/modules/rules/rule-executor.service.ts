@@ -150,9 +150,16 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     let collection = await this.collectionService.getCollection(
       rulegroup.collectionId,
     );
-    const data = this.resultData.map((e) => {
+    const exclusions = await this.rulesService.getExclusions(rulegroup.id);
+
+    let data = this.resultData.map((e) => {
       return +e.ratingKey;
     });
+
+    // filter exclusions out of resultData
+    data = data.filter(
+      (el) => exclusions.find((e) => +e.plexId === +el) === undefined,
+    );
 
     if (collection) {
       let currentCollectionData = (

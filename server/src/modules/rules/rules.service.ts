@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
+import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
 import { Collection } from '../collections/entities/collection.entities';
@@ -10,9 +11,11 @@ import {
   RuleConstants,
   RulePossibility,
 } from './constants/rules.constants';
+import { ExclusionDto } from './dtos/exclusion.dto';
 import { RuleDto } from './dtos/rule.dto';
 import { RuleDbDto } from './dtos/ruleDb.dto';
 import { RulesDto } from './dtos/rules.dto';
+import { Exclusion } from './entities/exclusion.entities';
 import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
 
@@ -36,6 +39,8 @@ export class RulesService {
     private readonly collectionRepository: Repository<Collection>,
     @InjectRepository(CollectionMedia)
     private readonly collectionMediaRepository: Repository<CollectionMedia>,
+    @InjectRepository(Exclusion)
+    private readonly exclusionRepo: Repository<Exclusion>,
     private readonly collectionService: CollectionsService,
     private readonly plexApi: PlexApiService,
     private readonly connection: Connection,
@@ -139,6 +144,37 @@ export class RulesService {
     } else {
       return state;
     }
+  }
+
+  async setExclusion(data: ExclusionDto) {
+    try {
+      await this.exclusionRepo.save([
+        {
+          plexId: data.plexId,
+          rulegroupId: data.ruleGroupId,
+        },
+      ]);
+      return this.createReturnStatus(true, 'Success');
+    } catch (e) {
+      this.logger.warn(
+        `Adding exclusion for Plex ID ${data.plexId} and rulegroup ID ${data.ruleGroupId} failed with error : ${e}`,
+      );
+      return this.createReturnStatus(false, 'Failed');
+    }
+  }
+
+  async getExclusions(rulegroupId: number) {
+    if (rulegroupId) {
+      const exclusions = await this.exclusionRepo.find({
+        rulegroupId: rulegroupId,
+      });
+      return exclusions.concat(
+        await this.exclusionRepo.find({
+          rulegroupId: null,
+        }),
+      );
+    }
+    return [];
   }
 
   private validateRule(rule: RuleDto): ReturnStatus {

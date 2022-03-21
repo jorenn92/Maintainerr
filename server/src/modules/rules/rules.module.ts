@@ -18,12 +18,19 @@ import { CollectionsModule } from '../collections/collections.module';
 import { TasksModule } from '../tasks/tasks.module';
 import { Collection } from '../collections/entities/collection.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
+import { Exclusion } from './entities/exclusion.entities';
 
 @Module({
   imports: [
     PlexApiModule,
     ServarrApiModule,
-    TypeOrmModule.forFeature([Rules, RuleGroup, Collection, CollectionMedia]),
+    TypeOrmModule.forFeature([
+      Rules,
+      RuleGroup,
+      Collection,
+      CollectionMedia,
+      Exclusion,
+    ]),
     OverseerrApiModule,
     TmdbApiModule,
     CollectionsModule,
