@@ -10,13 +10,10 @@ import {
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import {
   TmdbMovieDetails,
-  TmdbMovieResult,
   TmdbTvDetails,
-  TmdbTvResult,
 } from '../api/tmdb-api/interfaces/tmdb.interface';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
-import { ArrAction } from '../rules/constants/rules.constants';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
