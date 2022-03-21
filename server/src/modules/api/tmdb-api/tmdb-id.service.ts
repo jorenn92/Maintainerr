@@ -21,13 +21,13 @@ export class TmdbIdService {
     libItem: PlexMetadata | PlexLibraryItem,
   ): Promise<{ type: 'movie' | 'tv'; id: number | undefined }> {
     const id = libItem.Guid
-      ? +libItem.Guid.find((el) => el.id.includes('tmdb')).id.split('://')[1]
+      ? +libItem.Guid.find((el) => el.id.includes('tmdb'))?.id.split('://')[1]
       : libItem.guid.includes('tmdb')
       ? +libItem.guid.split('://')[1].split('?')[0]
       : libItem.guid.includes('tvdb')
       ? await this.tmdbApi
           .getByExternalId({
-            externalId: +libItem.guid.split('://')[1].split('?')[0],
+            externalId: +libItem.guid.split('://')[1]?.split('?')[0],
             type: 'tvdb',
           })
           .then((resp) =>
@@ -38,13 +38,13 @@ export class TmdbIdService {
       : libItem.guid.includes('imdb')
       ? await this.tmdbApi
           .getByExternalId({
-            externalId: libItem.guid.split('://')[1].split('?')[0].toString(),
+            externalId: libItem.guid.split('://')[1]?.split('?')[0]?.toString(),
             type: 'imdb',
           })
           .then((resp) =>
             resp?.movie_results.length > 0
-              ? resp?.movie_results[0].id
-              : resp?.tv_results[0].id,
+              ? resp?.movie_results[0]?.id
+              : resp?.tv_results[0]?.id,
           )
       : undefined;
     return {
