@@ -1,10 +1,10 @@
-import Link from 'next/link'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 import Spinner from '../../../assets/spinner.svg'
 import Transition from '../Transition'
 import { useIsTouch } from '../../../hooks/useIsTouch'
 import CachedImage from '../CachedImage'
 import GetApiHandler from '../../../utils/ApiHandler'
+import { equal, strictEqual } from 'assert'
 
 interface IMediaCard {
   id: number
@@ -176,5 +176,6 @@ const MediaCard: React.FC<IMediaCard> = ({
     </div>
   )
 }
+const propsEqual = (prev: IMediaCard, next: IMediaCard) => prev.id === next.id
 
-export default MediaCard
+export default memo(MediaCard, propsEqual)

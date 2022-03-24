@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react'
-import GetApiHandler from '../../../utils/ApiHandler'
+import { prependOnceListener } from 'process'
+import { useEffect, useRef, useState } from 'react'
 import LoadingSpinner from '../../Common/LoadingSpinner'
 import MediaCard from '../../Common/MediaCard'
 
 interface IOverviewContent {
   data: IPlexMetadata[]
+  dataFinished: Boolean
   loading: Boolean
+  fetchData: () => void
 }
 
 export interface IPlexMetadata {
@@ -54,20 +56,52 @@ export interface IPlexMetadata {
 
 const OverviewContent = (props: IOverviewContent) => {
   useEffect(() => {
-    window.addEventListener('scroll', scrollHandler)
+    window.addEventListener('scroll', (event: Event) => {
+      if (!props.dataFinished) {
+        event.stopPropagation()
+        const winheight =
+          window.innerHeight ||
+          (document.documentElement || document.body).clientHeight
+        const docheight = getDocHeight()
+        const scrollTop =
+          window.pageYOffset ||
+          (
+            document.documentElement ||
+            document.body.parentNode ||
+            document.body
+          ).scrollTop
+        const trackLength = docheight - winheight
+        const pctScrolled = Math.floor((scrollTop / trackLength) * 100)
+
+        if (pctScrolled >= 80) {
+          props.fetchData()
+        }
+      }
+    })
+
+    // if (document.body.scrollHeight >= document.body.clientHeight) {
+    //   props.fetchData()
+    // }
   }, [])
 
-  const scrollHandler = (event: React.UIEvent<HTMLElement>) => {
-    event.stopPropagation()
-    console.log(event.currentTarget)
-    console.log('scrolled')
-
-    if (
-      event.currentTarget.scrollHeight - event.currentTarget.scrollTop ===
-      event.currentTarget.clientHeight
-    ) {
-      console.log('bottom')
+  useEffect(() => {
+    if (props.data.length <= 40) {
+      if (document.body.scrollHeight >= document.body.clientHeight) {
+        props.fetchData()
+      }
     }
+  }, [props.data])
+
+  const getDocHeight = () => {
+    var D = document
+    return Math.max(
+      D.body.scrollHeight,
+      D.documentElement.scrollHeight,
+      D.body.offsetHeight,
+      D.documentElement.offsetHeight,
+      D.body.clientHeight,
+      D.documentElement.clientHeight
+    )
   }
 
   if (props.loading) {
@@ -76,32 +110,27 @@ const OverviewContent = (props: IOverviewContent) => {
 
   if (props.data && props.data.length > 0) {
     return (
-      <div
-        onScroll={scrollHandler}
-        className="flex w-full flex-col flex-wrap overflow-auto sm:flex-row"
-      >
-        {props.data.map((el) => {
-          return (
-            <div className="mb-5 mr-5" key={+el.ratingKey}>
-              <MediaCard
-                id={+el.ratingKey}
-                image={''}
-                summary={el.summary}
-                year={el.year.toString()}
-                mediaType={
-                  el.type !== 'movie' && el.type !== 'show' ? 'movie' : el.type
-                }
-                title={el.title}
-                userScore={el.audienceRating ? el.audienceRating : 0}
-                tmdbid={
-                  el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
-                    'tmdb://'
-                  )[1]
-                }
-              />
-            </div>
-          )
-        })}
+      <div className="flex w-full flex-col flex-wrap overflow-auto sm:flex-row">
+        {props.data.map((el) => (
+          <div className="mb-5 mr-5" key={+el.ratingKey}>
+            <MediaCard
+              id={+el.ratingKey}
+              image={''}
+              summary={el.summary}
+              year={el.year.toString()}
+              mediaType={
+                el.type !== 'movie' && el.type !== 'show' ? 'movie' : el.type
+              }
+              title={el.title}
+              userScore={el.audienceRating ? el.audienceRating : 0}
+              tmdbid={
+                el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
+                  'tmdb://'
+                )[1]
+              }
+            />
+          </div>
+        ))}
       </div>
     )
   }

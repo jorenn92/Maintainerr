@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import {
   PlexCollection,
@@ -32,15 +33,17 @@ export class PlexApiController {
   // syncLibraries() {
   //   return this.plexApiService.syncLibraries();
   // }
-  @Get('library/:id/content/:page')
+  @Get('library/:id/content/:page?')
   getLibraryContent(
     @Param('id') id: string,
     @Param('page', new ParseIntPipe()) page: number,
+    @Query('amount') amount: number,
   ) {
-    const offset = (page - 1) * 50;
+    const size = amount ? amount : 50;
+    const offset = (page - 1) * size;
     return this.plexApiService.getLibraryContents(id, {
       offset: offset,
-      size: 50,
+      size: size,
     });
   }
   @Get('meta/:id')
