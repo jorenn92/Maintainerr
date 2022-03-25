@@ -123,10 +123,13 @@ export class OverseerrApiService {
     showId: string | number,
     season?: string,
   ): Promise<OverSeerrMediaResponse> {
-    const response: OverSeerrMediaResponse = season
-      ? await this.api.get(`/tv/${showId}/season/${season}`)
-      : await this.api.get(`/tv/${showId}`);
-    return response;
+    if (showId) {
+      const response: OverSeerrMediaResponse = season
+        ? await this.api.get(`/tv/${showId}/season/${season}`)
+        : await this.api.get(`/tv/${showId}`);
+      return response;
+    }
+    return undefined;
   }
 
   public async deleteRequest(requestId: string) {
