@@ -8,6 +8,7 @@ interface IOverviewContent {
   dataFinished: Boolean
   loading: Boolean
   fetchData: () => void
+  libraryId: number
 }
 
 export interface IPlexMetadata {
@@ -55,6 +56,7 @@ export interface IPlexMetadata {
 }
 
 const OverviewContent = (props: IOverviewContent) => {
+  console.log(props)
   useEffect(() => {
     window.addEventListener('scroll', (event: Event) => {
       if (!props.dataFinished) {
@@ -79,13 +81,13 @@ const OverviewContent = (props: IOverviewContent) => {
       }
     })
 
-    // if (document.body.scrollHeight >= document.body.clientHeight) {
-    //   props.fetchData()
-    // }
+    if (document.body.scrollHeight >= document.body.clientHeight) {
+      props.fetchData()
+    }
   }, [])
 
   useEffect(() => {
-    if (props.data.length <= 40) {
+    if (props.data.length < 20) {
       if (document.body.scrollHeight >= document.body.clientHeight) {
         props.fetchData()
       }
@@ -115,6 +117,7 @@ const OverviewContent = (props: IOverviewContent) => {
           <div className="mb-5 mr-5" key={+el.ratingKey}>
             <MediaCard
               id={+el.ratingKey}
+              libraryId={props.libraryId}
               image={''}
               summary={el.summary}
               year={el.year.toString()}

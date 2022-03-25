@@ -91,6 +91,7 @@ const Overview = () => {
           fetchData={debounce(() => fetchData(), 100)}
           loading={isLoading}
           data={data}
+          libraryId={selectedLibrary}
         />
       ) : undefined}
     </div>

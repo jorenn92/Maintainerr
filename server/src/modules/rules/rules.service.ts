@@ -180,16 +180,33 @@ export class RulesService {
     }
   }
 
-  async getExclusions(rulegroupId: number) {
-    if (rulegroupId) {
-      const exclusions = await this.exclusionRepo.find({
-        ruleGroupId: rulegroupId,
-      });
-      return exclusions.concat(
-        await this.exclusionRepo.find({
-          ruleGroupId: null,
-        }),
+  async removeAllExclusion(plexId: number) {
+    try {
+      await this.exclusionRepo.delete({ plexId: plexId });
+      return this.createReturnStatus(true, 'Success');
+    } catch (e) {
+      this.logger.warn(
+        `Removing all exclusions with plexId ${plexId} failed with error : ${e}`,
       );
+      return this.createReturnStatus(false, 'Failed');
+    }
+  }
+
+  async getExclusions(
+    rulegroupId?: number,
+    plexId?: number,
+  ): Promise<Exclusion[]> {
+    if (rulegroupId || plexId) {
+      const exclusions = await this.exclusionRepo.find(
+        rulegroupId ? { ruleGroupId: rulegroupId } : { plexId: plexId },
+      );
+      return rulegroupId
+        ? exclusions.concat(
+            await this.exclusionRepo.find({
+              ruleGroupId: null,
+            }),
+          )
+        : exclusions;
     }
     return [];
   }

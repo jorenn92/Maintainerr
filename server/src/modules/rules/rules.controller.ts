@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ExclusionDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
+import { Exclusion } from './entities/exclusion.entities';
 import { RuleExecutorService } from './rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
 
@@ -22,6 +23,10 @@ export class RulesController {
   @Get('/constants')
   getRuleConstants() {
     return this.rulesService.getRuleConstants;
+  }
+  @Get('/exclusion')
+  getExclusion(@Query() query: { rulegroupId?: number; plexId?: number }) {
+    return this.rulesService.getExclusions(query.rulegroupId, query.plexId);
   }
   @Get('/:id')
   getRules(@Param('id') id: string) {
@@ -53,6 +58,12 @@ export class RulesController {
   @Delete('/exclusion/:id')
   async removeExclusion(@Param('id') id: string): Promise<ReturnStatus> {
     return await this.rulesService.removeExclusion(+id);
+  }
+  @Delete('/exclusions/:plexId')
+  async removeAllExclusion(
+    @Param('plexId') plexId: string,
+  ): Promise<ReturnStatus> {
+    return await this.rulesService.removeAllExclusion(+plexId);
   }
   @Put()
   async updateRule(@Body() body: RulesDto): Promise<ReturnStatus> {

@@ -4,7 +4,8 @@ import Transition from '../Transition'
 import { useIsTouch } from '../../../hooks/useIsTouch'
 import CachedImage from '../CachedImage'
 import GetApiHandler from '../../../utils/ApiHandler'
-import { equal, strictEqual } from 'assert'
+import Button from '../Button'
+import ExcludeModal from '../../ExcludeModal'
 
 interface IMediaCard {
   id: number
@@ -17,6 +18,7 @@ interface IMediaCard {
   canExpand?: boolean
   inProgress?: boolean
   tmdbid?: string
+  libraryId: number
 }
 
 const MediaCard: React.FC<IMediaCard> = ({
@@ -25,6 +27,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   year,
   mediaType,
   title,
+  libraryId,
   tmdbid = undefined,
   inProgress = false,
   canExpand = false,
@@ -34,6 +37,8 @@ const MediaCard: React.FC<IMediaCard> = ({
   const [showDetail, setShowDetail] = useState(false)
   const [showRequestModal, setShowRequestModal] = useState(false)
   const [image, setImage] = useState(false)
+  const [excludeModal, setExcludeModal] = useState(false)
+  const [hasExclusion, setHasExclusion] = useState(false)
 
   useEffect(() => {
     if (tmdbid) {
@@ -41,7 +46,14 @@ const MediaCard: React.FC<IMediaCard> = ({
         setImage(resp)
       )
     }
+    getExclusions()
   }, [])
+
+  const getExclusions = () => {
+    GetApiHandler(`/rules/exclusion?plexId=${id}`).then((resp: []) =>
+      resp.length > 0 ? setHasExclusion(true) : setHasExclusion(false)
+    )
+  }
 
   // Just to get the year from the date
   if (year) {
@@ -50,6 +62,19 @@ const MediaCard: React.FC<IMediaCard> = ({
 
   return (
     <div className={canExpand ? 'w-full' : 'w-36 sm:w-36 md:w-44'}>
+      {excludeModal ? (
+        <ExcludeModal
+          plexId={id}
+          libraryId={libraryId}
+          onSubmit={() => {
+            setExcludeModal(false)
+            setTimeout(() => {
+              getExclusions()
+            }, 500)
+          }}
+          onCancel={() => setExcludeModal(false)}
+        />
+      ) : undefined}
       <div
         className={`relative transform-gpu cursor-default overflow-hidden rounded-xl bg-gray-800 bg-cover outline-none ring-1 transition duration-300 ${
           showDetail
@@ -97,6 +122,19 @@ const MediaCard: React.FC<IMediaCard> = ({
               </div>
             </div>
           </div>
+
+          {hasExclusion ? (
+            <div className="absolute right-0 flex items-center justify-between p-2">
+              <div
+                className={`pointer-events-none z-40 rounded-full shadow ${'bg-green-500'}`}
+              >
+                <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-white sm:h-5">
+                  {'EXCL'}
+                </div>
+              </div>
+            </div>
+          ) : undefined}
+
           <Transition
             show={isUpdating}
             enter="transition ease-in-out duration-300 transform opacity-0"
@@ -137,7 +175,7 @@ const MediaCard: React.FC<IMediaCard> = ({
                 }}
               >
                 <div className="flex h-full w-full items-end">
-                  <div className={`px-2 pb-11 text-white`}>
+                  <div className={`px-2 pb-1 text-white`}>
                     {year && <div className="text-sm font-medium">{year}</div>}
 
                     <h1
@@ -164,8 +202,28 @@ const MediaCard: React.FC<IMediaCard> = ({
                     >
                       {summary}
                     </div>
+                    <div>
+                      <Button
+                        buttonType="twin-primary-l"
+                        buttonSize="md"
+                        className="mt-2 h-6 w-1/2"
+                      >
+                        {'Add'}
+                      </Button>
+                      <Button
+                        buttonSize="md"
+                        buttonType="twin-primary-r"
+                        className="mt-2 h-6 w-1/2"
+                        onClick={() => {
+                          setExcludeModal(true)
+                        }}
+                      >
+                        {'Exclude'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
+
                 {/* </a>
               </Link> */}
               </div>
