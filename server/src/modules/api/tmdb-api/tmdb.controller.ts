@@ -16,4 +16,11 @@ export class TmdbApiController {
       type: 'imdb',
     });
   }
+  @Get('/image/:type/:tmdbId')
+  getImage(
+    @Param('tmdbId', new ParseIntPipe()) tmdbId: number,
+    @Param('type') type: 'movie' | 'show',
+  ) {
+    return this.movieDbApi.getImagePath({ tmdbId: tmdbId, type: type });
+  }
 }

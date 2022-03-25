@@ -3,7 +3,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import LibrariesContext from '../../contexts/libraries-context'
 import GetApiHandler from '../../utils/ApiHandler'
 import AddButton from '../Common/AddButton'
-import LibrarySwticher from '../Common/LibrarySwitcher'
+import LibrarySwitcher from '../Common/LibrarySwitcher'
+import LoadingSpinner from '../Common/LoadingSpinner'
 import RuleGroup, { IRuleGroup } from './RuleGroup'
 import AddModal from './RuleGroup/AddModal'
 
@@ -54,7 +55,7 @@ const Rules: React.FC = () => {
   if (!data || isLoading) {
     return (
       <span>
-        <Image layout="fill" src="/spinner.svg" alt="Loading..."></Image>
+        <LoadingSpinner />
       </span>
     )
   }
@@ -85,7 +86,7 @@ const Rules: React.FC = () => {
   return (
     <>
       <div className="w-full">
-        <LibrarySwticher onSwitch={onSwitchLibrary} />
+        <LibrarySwitcher onSwitch={onSwitchLibrary} />
 
         <div>
           {(data as IRuleGroup[]).map((el) => (

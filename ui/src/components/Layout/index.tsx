@@ -1,12 +1,15 @@
 import Head from 'next/head'
 import router from 'next/router'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
+import SearchContext from '../../contexts/search-context'
+import SearchBar from '../Common/SearchBar'
 import NavBar from './NavBar'
 
 const Layout: React.FC = (props) => {
   const [isScrolled, setIsScrolled] = useState(false)
 
   const [navBarOpen, setNavBarOpen] = useState(true)
+  const SearchCtx = useContext(SearchContext)
 
   const navbarClosed = () => {
     setNavBarOpen(!navBarOpen)
@@ -51,12 +54,20 @@ const Layout: React.FC = (props) => {
             >
               {/* <ArrowLeftIcon className="w-7" /> */}
             </button>
-            {/* <SearchInput /> */}
-            <div className="flex items-center">{/* <UserDropdown /> */}</div>
+            <SearchBar
+              onSearch={(text: string) => {
+                SearchCtx.addText(text)
+                router.push('/overview')
+              }}
+            />
+            {/* <div className="flex items-center"><UserDropdown /></div> */}
           </div>
         </div>
 
-        <main className="relative w-full top-16 z-0 focus:outline-none" tabIndex={0}>
+        <main
+          className="relative top-16 z-0 w-full focus:outline-none"
+          tabIndex={0}
+        >
           <div className="mb-6">
             <div className="max-w-8xl mx-auto px-4">{props.children}</div>
           </div>
