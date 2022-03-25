@@ -37,7 +37,7 @@ export class OverseerrGetterService {
     const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
 
     let mediaResponse: OverSeerrMediaResponse;
-    if (tmdb) {
+    if (tmdb && tmdb.id) {
       if (libItem.type === 'movie') {
         mediaResponse = await this.overseerrApi.getMovie(tmdb.id.toString());
       } else {
