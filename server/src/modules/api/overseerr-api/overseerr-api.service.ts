@@ -156,10 +156,6 @@ export class OverseerrApiService {
   }
 
   public async removeMediaByTmdbId(id: string | number, type: 'movie' | 'tv') {
-    this.logger.log('Deleting media from Overseerr.', {
-      label: 'Overseerr API',
-      id,
-    });
     let media: OverSeerrMediaResponse;
     if (type === 'movie') {
       media = await this.getMovie(id);

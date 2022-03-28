@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   OverseerrApiService,
   OverSeerrMediaResponse,
@@ -20,6 +20,8 @@ import {
 @Injectable()
 export class OverseerrGetterService {
   plexProperties: Property[];
+  private readonly logger = new Logger(OverseerrGetterService.name);
+
   constructor(
     private readonly overseerrApi: OverseerrApiService,
     private readonly tmdbApi: TmdbApiService,
@@ -47,18 +49,32 @@ export class OverseerrGetterService {
     if (mediaResponse && mediaResponse.mediaInfo) {
       switch (prop.name) {
         case 'addUser': {
-          const plexUsers = (await this.plexApi.getUsers()).map((el) => {
-            return { plexId: el.id, username: el.name } as PlexUser;
-          });
-          const usersIds: number[] = [];
-          for (const request of mediaResponse.mediaInfo?.requests) {
-            usersIds.push(
-              plexUsers.find(
-                (u) => u.username === request?.requestedBy?.plexUsername,
-              ).plexId,
-            );
+          try {
+            const plexUsers = (await this.plexApi.getUsers()).map((el) => {
+              return { plexId: el.id, username: el.name } as PlexUser;
+            });
+            const usersIds: number[] = [];
+            if (
+              mediaResponse &&
+              mediaResponse.mediaInfo &&
+              mediaResponse.mediaInfo.requests
+            ) {
+              for (const request of mediaResponse.mediaInfo.requests) {
+                usersIds.push(
+                  plexUsers.find(
+                    (u) => u.username === request.requestedBy?.plexUsername,
+                  )?.plexId,
+                );
+              }
+              return usersIds;
+            }
+            return [];
+          } catch (e) {
+            this.logger.warn("Couldn't get addUser from Overseerr", {
+              label: 'Overseerr API',
+              errorMessage: e.message,
+            });
           }
-          return usersIds;
         }
         case 'amountRequested': {
           return mediaResponse?.mediaInfo.requests.length;
