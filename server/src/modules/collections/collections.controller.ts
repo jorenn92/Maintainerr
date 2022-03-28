@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { CollectionWorkerService } from './collection-worker.service';
 import { CollectionsService } from './collections.service';
+import { AddCollectionMedia } from './interfaces/collection-media.interface';
 
 @Controller('api/collections')
 export class CollectionsController {
@@ -16,8 +17,19 @@ export class CollectionsController {
     );
   }
   @Post('/add')
-  addToCollection(@Body() request: any) {
-    this.collectionService.addToCollection(request.collectionId, request.media);
+  addToCollection(
+    @Body()
+    request: {
+      collectionId: number;
+      media: AddCollectionMedia[];
+      manual?: boolean;
+    },
+  ) {
+    this.collectionService.addToCollection(
+      request.collectionId,
+      request.media,
+      request.manual ? request.manual : false,
+    );
   }
   @Post('/remove')
   removeFromCollection(@Body() request: any) {

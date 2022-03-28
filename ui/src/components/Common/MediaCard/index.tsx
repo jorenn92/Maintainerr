@@ -223,9 +223,6 @@ const MediaCard: React.FC<IMediaCard> = ({
                     </div>
                   </div>
                 </div>
-
-                {/* </a>
-              </Link> */}
               </div>
             </div>
           </Transition>

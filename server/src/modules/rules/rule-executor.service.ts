@@ -156,15 +156,23 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       return +e.ratingKey;
     });
 
-    // filter exclusions out of resultData
+    // Filter exclusions out of resultData
     data = data.filter(
       (el) => exclusions.find((e) => +e.plexId === +el) === undefined,
     );
 
     if (collection) {
-      let currentCollectionData = (
-        await this.collectionService.getCollectionMedia(collection.id)
-      )?.map((e) => {
+      const collMediaData = await this.collectionService.getCollectionMedia(
+        collection.id,
+      );
+      // Add manually added media to data
+      const manualData = collMediaData
+        .filter((el) => el.isManual === true)
+        .map((e) => e.plexId);
+
+      data.push(...manualData);
+
+      let currentCollectionData = collMediaData.map((e) => {
         return e.plexId;
       });
 

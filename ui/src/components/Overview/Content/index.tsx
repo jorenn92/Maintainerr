@@ -56,7 +56,6 @@ export interface IPlexMetadata {
 }
 
 const OverviewContent = (props: IOverviewContent) => {
-  console.log(props)
   useEffect(() => {
     window.addEventListener('scroll', (event: Event) => {
       if (!props.dataFinished) {
