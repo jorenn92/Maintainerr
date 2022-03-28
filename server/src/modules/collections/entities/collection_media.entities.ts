@@ -21,6 +21,9 @@ export class CollectionMedia {
   @Column({ nullable: true })
   image_path: string;
 
+  @Column({ default: false, nullable: true })
+  isManual: boolean;
+
   @ManyToOne((type) => Collection, (collection) => collection.collectionMedia, {
     onDelete: 'CASCADE',
   })

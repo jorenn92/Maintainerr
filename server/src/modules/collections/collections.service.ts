@@ -161,38 +161,43 @@ export class CollectionsService {
   async addToCollection(
     collectionDbId: number,
     media: AddCollectionMedia[],
+    manual = false,
   ): Promise<Collection> {
     let collection = await this.collectionRepo.findOne(collectionDbId);
-
-    if (media.length > 0) {
-      if (!collection.plexId) {
-        const newColl = await this.createPlexCollection({
-          libraryId: collection.libraryId.toString(),
-          type: collection.type,
-          title: collection.title,
-          summary: collection.description,
-        });
-        collection = await this.collectionRepo.save({
-          ...collection,
-          plexId: +newColl.ratingKey,
-        });
-        await this.plexApi.UpdateCollectionSettings({
-          libraryId: collection.libraryId,
-          collectionId: collection.plexId,
-          recommended: false,
-          ownHome: collection.visibleOnHome,
-          sharedHome: collection.visibleOnHome,
-        });
+    if (collection) {
+      if (media.length > 0) {
+        if (!collection.plexId) {
+          const newColl = await this.createPlexCollection({
+            libraryId: collection.libraryId.toString(),
+            type: collection.type,
+            title: collection.title,
+            summary: collection.description,
+          });
+          collection = await this.collectionRepo.save({
+            ...collection,
+            plexId: +newColl.ratingKey,
+          });
+          await this.plexApi.UpdateCollectionSettings({
+            libraryId: collection.libraryId,
+            collectionId: collection.plexId,
+            recommended: false,
+            ownHome: collection.visibleOnHome,
+            sharedHome: collection.visibleOnHome,
+          });
+        }
+        // add children to collection
+        for (const childMedia of media) {
+          await this.addChildToCollection(
+            { plexId: +collection.plexId, dbId: collection.id },
+            childMedia.plexId,
+            manual,
+          );
+        }
       }
-      // add children to collection
-      for (const childMedia of media) {
-        await this.addChildToCollection(
-          { plexId: +collection.plexId, dbId: collection.id },
-          childMedia.plexId,
-        );
-      }
+      return collection;
+    } else {
+      this.logger.warn("Collection doesn't exist.");
     }
-    return collection;
   }
 
   async removeFromCollection(
@@ -235,7 +240,7 @@ export class CollectionsService {
     if (status.status === 'OK') {
       return await this.RemoveCollectionFromDB(collection);
     } else {
-      this.logger.error('An error occurred while deleting the collection.');
+      this.logger.warn('An error occurred while deleting the collection.');
     }
   }
 
@@ -286,6 +291,7 @@ export class CollectionsService {
   private async addChildToCollection(
     collectionIds: { plexId: number; dbId: number },
     childId: number,
+    manual = false,
   ) {
     this.infoLogger(`Adding media with id ${childId} to collection..`);
 
@@ -320,6 +326,7 @@ export class CollectionsService {
             addDate: new Date().toDateString(),
             tmdbId: tmdbMedia?.id,
             image_path: tmdbMedia?.poster_path,
+            isManual: manual,
           },
         ])
         .execute();
@@ -412,7 +419,7 @@ export class CollectionsService {
       this.infoLogger(
         `Something went wrong deleting the collection from the Database..`,
       );
-      this.logger.error(_err);
+      this.logger.warn(_err);
       return { status: 'NOK', code: 0, message: 'Removing from DB failed' };
     }
   }

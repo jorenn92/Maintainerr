@@ -95,6 +95,12 @@ export class CreateCollectionTables1642754819422 implements MigrationInterface {
             type: 'text',
             isNullable: true,
           },
+          {
+            name: 'isManual',
+            type: 'integer',
+            default: 0,
+            isNullable: true,
+          },
         ],
       }),
       true,
