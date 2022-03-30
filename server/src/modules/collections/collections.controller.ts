@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { CollectionWorkerService } from './collection-worker.service';
 import { CollectionsService } from './collections.service';
 import { AddCollectionMedia } from './interfaces/collection-media.interface';
@@ -61,7 +70,7 @@ export class CollectionsController {
   }
 
   @Get()
-  getCollections(@Param('libraryId') libraryId: number) {
+  getCollections(@Query('libraryId') libraryId: number) {
     return this.collectionService.getCollections(
       libraryId ? libraryId : undefined,
     );
@@ -71,5 +80,22 @@ export class CollectionsController {
     return this.collectionService.getCollection(
       collectionId ? collectionId : undefined,
     );
+  }
+  @Post('/media/add')
+  addManuallyToCollection(
+    @Body() request: { collectionId: number; mediaId: number },
+  ) {
+    return this.collectionService.addToCollection(
+      request.collectionId,
+      [{ plexId: request.mediaId }],
+      true,
+    );
+  }
+  @Delete('/media')
+  deleteMediaFromCollection(@Query('mediaId') mediaId: number) {
+    console.log(mediaId);
+    return this.collectionService.removeFromAllCollections([
+      { plexId: mediaId },
+    ]);
   }
 }

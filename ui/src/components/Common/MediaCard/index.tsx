@@ -6,6 +6,7 @@ import CachedImage from '../CachedImage'
 import GetApiHandler from '../../../utils/ApiHandler'
 import Button from '../Button'
 import ExcludeModal from '../../ExcludeModal'
+import AddModal from '../../AddModal'
 
 interface IMediaCard {
   id: number
@@ -38,6 +39,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   const [showRequestModal, setShowRequestModal] = useState(false)
   const [image, setImage] = useState(false)
   const [excludeModal, setExcludeModal] = useState(false)
+  const [addModal, setAddModal] = useState(false)
   const [hasExclusion, setHasExclusion] = useState(false)
 
   useEffect(() => {
@@ -73,6 +75,16 @@ const MediaCard: React.FC<IMediaCard> = ({
             }, 500)
           }}
           onCancel={() => setExcludeModal(false)}
+        />
+      ) : undefined}
+      {addModal ? (
+        <AddModal
+          plexId={id}
+          libraryId={libraryId}
+          onSubmit={() => {
+            setAddModal(false)
+          }}
+          onCancel={() => setAddModal(false)}
         />
       ) : undefined}
       <div
@@ -207,6 +219,9 @@ const MediaCard: React.FC<IMediaCard> = ({
                         buttonType="twin-primary-l"
                         buttonSize="md"
                         className="mt-2 h-6 w-1/2"
+                        onClick={() => {
+                          setAddModal(true)
+                        }}
                       >
                         {'Add'}
                       </Button>
