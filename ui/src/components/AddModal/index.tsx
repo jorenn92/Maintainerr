@@ -8,38 +8,33 @@ import Modal from '../Common/Modal'
 import { IPlexMetadata } from '../Overview/Content'
 import { IRuleGroup } from '../Rules/RuleGroup'
 
-interface IExcludeModal {
+interface IAddModal {
   onCancel: () => void
   onSubmit: () => void
   libraryId: number
   plexId: number
 }
 
-interface IExclusion {
-  plexId: number
-  ruleGroupId: number
+interface ICollectionMedia {
+  media?: []
+  id: number
+  plexId?: number
+  libraryId?: number
+  title: string
+  description?: string
+  isActive?: boolean
+  arrAction?: number
+  visibleOnHome?: boolean
+  deleteAfterDays?: number
+  type?: 1 | 2
+  collectionMedia?: []
 }
-
-const ExcludeModal = (props: IExcludeModal) => {
+const AddModal = (props: IAddModal) => {
   const [selected, setSelected] = useState<string>('9999999998')
-  const [options, setOptions] = useState<IRuleGroup[]>([
+  const [options, setOptions] = useState<ICollectionMedia[]>([
     {
       id: 9999999998,
-      name: 'Remove exclusions',
-      description: 'All',
-      libraryId: 0,
-      isActive: true,
-      collectionId: 0,
-      rules: [],
-    },
-    {
-      id: 9999999999,
-      name: 'Exclude for all',
-      description: 'All',
-      libraryId: 0,
-      isActive: true,
-      collectionId: 0,
-      rules: [],
+      title: 'Remove from all collections',
     },
   ])
 
@@ -50,18 +45,12 @@ const ExcludeModal = (props: IExcludeModal) => {
   const handleOk = () => {
     switch (selected) {
       case '9999999998':
-        DeleteApiHandler(`/rules/exclusions/${props.plexId}`)
-        break
-      case '9999999999':
-        PostApiHandler('/rules/exclusion', {
-          plexId: props.plexId,
-          ruleGroupId: null,
-        })
+        DeleteApiHandler(`/collections/media?mediaId=${props.plexId}`)
         break
       default:
-        PostApiHandler('/rules/exclusion', {
-          plexId: props.plexId,
-          ruleGroupId: selected,
+        PostApiHandler(`/collections/media/add`, {
+          mediaId: props.plexId,
+          collectionId: selected,
         })
         break
     }
@@ -69,7 +58,7 @@ const ExcludeModal = (props: IExcludeModal) => {
   }
 
   useEffect(() => {
-    GetApiHandler(`/rules?libraryId=${props.libraryId}`).then((resp) =>
+    GetApiHandler(`/collections?libraryId=${props.libraryId}`).then((resp) =>
       setOptions([...options, ...resp])
     )
   }, [])
@@ -81,15 +70,15 @@ const ExcludeModal = (props: IExcludeModal) => {
       onCancel={handleCancel}
       onOk={handleOk}
       okDisabled={false}
-      title={'Exclude media from rules'}
-      okText={'Exclude'}
+      title={'Add media to a collection'}
+      okText={'Add'}
       okButtonType={'primary'}
       iconSvg={''}
       backdrop={`https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/1`}
     >
       <div className="mt-6">
         <Alert
-          title={`Media will be excluded from the selected collection`}
+          title={`Media will be added to the selected collection`}
           type="info"
         />
 
@@ -101,10 +90,10 @@ const ExcludeModal = (props: IExcludeModal) => {
             setSelected(e.target.value)
           }}
         >
-          {options.map((e: IRuleGroup) => {
+          {options.map((e: ICollectionMedia) => {
             return (
               <option key={e.id} value={e.id}>
-                {e.name}
+                {e.title}
               </option>
             )
           })}
@@ -113,4 +102,4 @@ const ExcludeModal = (props: IExcludeModal) => {
     </Modal>
   )
 }
-export default ExcludeModal
+export default AddModal

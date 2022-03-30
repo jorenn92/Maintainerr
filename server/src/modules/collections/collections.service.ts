@@ -227,6 +227,18 @@ export class CollectionsService {
     }
     return collection;
   }
+  async removeFromAllCollections(media: AddCollectionMedia[]) {
+    try {
+      const collection = await this.collectionRepo.find();
+      collection.forEach((c) => this.removeFromCollection(c.id, media));
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.warn(
+        `An error occurred while removing media from all collections : ${e}`,
+      );
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
 
   async deleteCollection(collectionDbId: number) {
     const collection = await this.collectionRepo.findOne(collectionDbId);
