@@ -101,60 +101,102 @@ export class PlexApiService {
   }
 
   public async getStatus() {
-    const response: PlexStatusResponse = await this.plexClient.query('/');
-    return response.MediaContainer;
+    try {
+      const response: PlexStatusResponse = await this.plexClient.query('/');
+      return response.MediaContainer;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async getUsers(): Promise<PlexUserAccount[]> {
-    const response = await this.plexClient.query('/accounts');
-    return response.MediaContainer.Account as PlexUserAccount[];
+    try {
+      const response = await this.plexClient.query('/accounts');
+      return response.MediaContainer.Account as PlexUserAccount[];
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async getLibraries(): Promise<PlexLibrary[]> {
-    const response = await this.plexClient.query<PlexLibrariesResponse>(
-      '/library/sections',
-    );
+    try {
+      const response = await this.plexClient.query<PlexLibrariesResponse>(
+        '/library/sections',
+      );
 
-    return response.MediaContainer.Directory;
+      return response.MediaContainer.Directory;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async getLibraryContents(
     id: string,
     { offset = 0, size = 50 }: { offset?: number; size?: number } = {},
   ): Promise<{ totalSize: number; items: PlexLibraryItem[] }> {
-    const response = await this.plexClient.query<PlexLibraryResponse>({
-      uri: `/library/sections/${id}/all?includeGuids=1`,
-      extraHeaders: {
-        'X-Plex-Container-Start': `${offset}`,
-        'X-Plex-Container-Size': `${size}`,
-      },
-    });
+    try {
+      const response = await this.plexClient.query<PlexLibraryResponse>({
+        uri: `/library/sections/${id}/all?includeGuids=1`,
+        extraHeaders: {
+          'X-Plex-Container-Start': `${offset}`,
+          'X-Plex-Container-Size': `${size}`,
+        },
+      });
 
-    return {
-      totalSize: response.MediaContainer.totalSize,
-      items: response.MediaContainer.Metadata ?? [],
-    };
+      return {
+        totalSize: response.MediaContainer.totalSize,
+        items: response.MediaContainer.Metadata ?? [],
+      };
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async getMetadata(
     key: string,
     options: { includeChildren?: boolean } = {},
   ): Promise<PlexMetadata> {
-    const response = await this.plexClient.query<PlexMetadataResponse>(
-      `/library/metadata/${key}${
-        options.includeChildren ? '?includeChildren=1' : ''
-      }`,
-    );
+    try {
+      const response = await this.plexClient.query<PlexMetadataResponse>(
+        `/library/metadata/${key}${
+          options.includeChildren ? '?includeChildren=1' : ''
+        }`,
+      );
 
-    return response.MediaContainer.Metadata[0];
+      return response.MediaContainer.Metadata[0];
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async getChildrenMetadata(key: string): Promise<PlexMetadata[]> {
-    const response = await this.plexClient.query<PlexMetadataResponse>(
-      `/library/metadata/${key}/children`,
-    );
+    try {
+      const response = await this.plexClient.query<PlexMetadataResponse>(
+        `/library/metadata/${key}/children`,
+      );
 
-    return response.MediaContainer.Metadata;
+      return response.MediaContainer.Metadata;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async getRecentlyAdded(
@@ -163,30 +205,51 @@ export class PlexApiService {
       addedAt: Date.now() - 1000 * 60 * 60,
     },
   ): Promise<PlexLibraryItem[]> {
-    const response = await this.plexClient.query<PlexLibraryResponse>({
-      uri: `/library/sections/${id}/all?sort=addedAt%3Adesc&addedAt>>=${Math.floor(
-        options.addedAt / 1000,
-      )}`,
-    });
-    return response.MediaContainer.Metadata;
+    try {
+      const response = await this.plexClient.query<PlexLibraryResponse>({
+        uri: `/library/sections/${id}/all?sort=addedAt%3Adesc&addedAt>>=${Math.floor(
+          options.addedAt / 1000,
+        )}`,
+      });
+      return response.MediaContainer.Metadata;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async getWatchHistory(itemId: string): Promise<PlexSeenBy[]> {
-    const response: PlexLibraryResponse =
-      await this.plexClient.query<PlexLibraryResponse>({
-        uri: `/status/sessions/history/all?sort=viewedAt:desc&metadataItemID=${itemId}`,
-      });
-    return response.MediaContainer.Metadata as PlexSeenBy[];
+    try {
+      const response: PlexLibraryResponse =
+        await this.plexClient.query<PlexLibraryResponse>({
+          uri: `/status/sessions/history/all?sort=viewedAt:desc&metadataItemID=${itemId}`,
+        });
+      return response.MediaContainer.Metadata as PlexSeenBy[];
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async getCollections(libraryId: string): Promise<PlexCollection[]> {
-    const response = await this.plexClient.query<PlexLibraryResponse>({
-      uri: `/library/sections/${libraryId}/collections?`,
-    });
-    const collection: PlexCollection[] = response.MediaContainer
-      .Metadata as PlexCollection[];
+    try {
+      const response = await this.plexClient.query<PlexLibraryResponse>({
+        uri: `/library/sections/${libraryId}/collections?`,
+      });
+      const collection: PlexCollection[] = response.MediaContainer
+        .Metadata as PlexCollection[];
 
-    return collection;
+      return collection;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async deleteMediaFromDisk(plexId: number | string): Promise<void> {
@@ -210,34 +273,55 @@ export class PlexApiService {
   public async getCollection(
     collectionId: string | number,
   ): Promise<PlexCollection> {
-    const response = await this.plexClient.query<PlexLibraryResponse>({
-      uri: `/library/collections/${+collectionId}?`,
-    });
-    const collection: PlexCollection = response.MediaContainer
-      .Metadata as PlexCollection;
+    try {
+      const response = await this.plexClient.query<PlexLibraryResponse>({
+        uri: `/library/collections/${+collectionId}?`,
+      });
+      const collection: PlexCollection = response.MediaContainer
+        .Metadata as PlexCollection;
 
-    return collection;
+      return collection;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async createCollection(params: CreateUpdateCollection) {
-    const response = await this.plexClient.postQuery<PlexLibraryResponse>({
-      uri: `/library/collections?type=${params.type}&title=${params.title}&sectionId=${params.libraryId}`,
-    });
-    const collection: PlexCollection = response.MediaContainer
-      .Metadata[0] as PlexCollection;
-    if (params.summary) {
-      params.collectionId = collection.ratingKey;
-      return this.updateCollection(params);
+    try {
+      const response = await this.plexClient.postQuery<PlexLibraryResponse>({
+        uri: `/library/collections?type=${params.type}&title=${params.title}&sectionId=${params.libraryId}`,
+      });
+      const collection: PlexCollection = response.MediaContainer
+        .Metadata[0] as PlexCollection;
+      if (params.summary) {
+        params.collectionId = collection.ratingKey;
+        return this.updateCollection(params);
+      }
+      return collection;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
     }
-    return collection;
   }
 
   public async updateCollection(body: CreateUpdateCollection) {
-    await this.plexClient.putQuery<PlexLibraryResponse>({
-      uri: `/library/sections/${body.libraryId}/all?type=18&id=${body.collectionId}&title.value=${body.title}&summary.value=${body.summary}`,
-      // &titleSort.value=&summary.value=&contentRating.value=&title.locked=1&titleSort.locked=1&contentRating.locked=1`,
-    });
-    return await this.getCollection(+body.collectionId);
+    try {
+      await this.plexClient.putQuery<PlexLibraryResponse>({
+        uri: `/library/sections/${body.libraryId}/all?type=18&id=${body.collectionId}&title.value=${body.title}&summary.value=${body.summary}`,
+        // &titleSort.value=&summary.value=&contentRating.value=&title.locked=1&titleSort.locked=1&contentRating.locked=1`,
+      });
+      return await this.getCollection(+body.collectionId);
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async deleteCollection(
@@ -263,11 +347,18 @@ export class PlexApiService {
   public async getCollectionChildren(
     collectionId: string,
   ): Promise<PlexLibraryItem[]> {
-    const response: PlexLibraryResponse =
-      await this.plexClient.query<PlexLibrariesResponse>({
-        uri: `/library/collections/${collectionId}/children`,
-      });
-    return response.MediaContainer.Metadata as PlexLibraryItem[];
+    try {
+      const response: PlexLibraryResponse =
+        await this.plexClient.query<PlexLibrariesResponse>({
+          uri: `/library/collections/${collectionId}/children`,
+        });
+      return response.MediaContainer.Metadata as PlexLibraryItem[];
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async addChildToCollection(
@@ -314,22 +405,36 @@ export class PlexApiService {
   public async UpdateCollectionSettings(
     params: CollectionHubSettingsDto,
   ): Promise<PlexHub> {
-    const response: PlexHubResponse = await this.plexClient.postQuery({
-      uri: `/hubs/sections/${params.libraryId}/manage?metadataItemId=${
-        params.collectionId
-      }&promotedToRecommended=${+params.recommended}&promotedToOwnHome=${+params.ownHome}&promotedToSharedHome=${+params.sharedHome}`,
-    });
-    return response.MediaContainer.Hub[0] as PlexHub;
+    try {
+      const response: PlexHubResponse = await this.plexClient.postQuery({
+        uri: `/hubs/sections/${params.libraryId}/manage?metadataItemId=${
+          params.collectionId
+        }&promotedToRecommended=${+params.recommended}&promotedToOwnHome=${+params.ownHome}&promotedToSharedHome=${+params.sharedHome}`,
+      });
+      return response.MediaContainer.Hub[0] as PlexHub;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   private async setMachineId() {
-    const response = await this.getStatus();
-    if (response.machineIdentifier) {
-      this.machineId = response.machineIdentifier;
-      return response.machineIdentifier;
-    } else {
-      this.logger.error("Couldn't reach Plex");
-      return null;
+    try {
+      const response = await this.getStatus();
+      if (response.machineIdentifier) {
+        this.machineId = response.machineIdentifier;
+        return response.machineIdentifier;
+      } else {
+        this.logger.error("Couldn't reach Plex");
+        return null;
+      }
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
     }
   }
 }

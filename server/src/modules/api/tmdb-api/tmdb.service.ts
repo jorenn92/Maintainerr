@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { warn } from 'console';
 import { sortBy } from 'lodash';
 import { ExternalApiService } from '../external-api/external-api.service';
 import {
@@ -85,7 +86,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch person details: ${e.message}`);
+      warn(`[TMDb] Failed to fetch person details: ${e.message}`);
     }
   };
 
@@ -106,9 +107,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(
-        `[TMDb] Failed to fetch person combined credits: ${e.message}`,
-      );
+      warn(`[TMDb] Failed to fetch person combined credits: ${e.message}`);
     }
   };
 
@@ -134,7 +133,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch movie details: ${e.message}`);
+      warn(`[TMDb] Failed to fetch movie details: ${e.message}`);
     }
   };
 
@@ -160,7 +159,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch TV show details: ${e.message}`);
+      warn(`[TMDb] Failed to fetch TV show details: ${e.message}`);
     }
   };
 
@@ -179,7 +178,7 @@ export class TmdbApiService extends ExternalApiService {
         return (await this.getTvShow({ tvId: tmdbId }))?.poster_path;
       }
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch image path: ${e.message}`);
+      warn(`[TMDb] Failed to fetch image path: ${e.message}`);
     }
   };
 
@@ -205,7 +204,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch TV show details: ${e.message}`);
+      warn(`[TMDb] Failed to fetch TV show details: ${e.message}`);
     }
   };
 
@@ -231,7 +230,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch discover movies: ${e.message}`);
+      warn(`[TMDb] Failed to fetch discover movies: ${e.message}`);
     }
   }
 
@@ -257,7 +256,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch discover movies: ${e.message}`);
+      warn(`[TMDb] Failed to fetch discover movies: ${e.message}`);
     }
   }
 
@@ -283,7 +282,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch movies by keyword: ${e.message}`);
+      warn(`[TMDb] Failed to fetch movies by keyword: ${e.message}`);
     }
   }
 
@@ -309,9 +308,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(
-        `[TMDb] Failed to fetch TV recommendations: ${e.message}`,
-      );
+      warn(`[TMDb] Failed to fetch TV recommendations: ${e.message}`);
     }
   }
 
@@ -334,7 +331,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch TV similar: ${e.message}`);
+      warn(`[TMDb] Failed to fetch TV similar: ${e.message}`);
     }
   }
 
@@ -367,7 +364,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch discover movies: ${e.message}`);
+      warn(`[TMDb] Failed to fetch discover movies: ${e.message}`);
     }
   };
 
@@ -400,7 +397,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch discover TV: ${e.message}`);
+      warn(`[TMDb] Failed to fetch discover TV: ${e.message}`);
     }
   };
 
@@ -426,7 +423,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch upcoming movies: ${e.message}`);
+      warn(`[TMDb] Failed to fetch upcoming movies: ${e.message}`);
     }
   };
 
@@ -453,7 +450,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch all trending: ${e.message}`);
+      warn(`[TMDb] Failed to fetch all trending: ${e.message}`);
     }
   };
 
@@ -476,7 +473,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch all trending: ${e.message}`);
+      warn(`[TMDb] Failed to fetch all trending: ${e.message}`);
     }
   };
 
@@ -499,7 +496,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch all trending: ${e.message}`);
+      warn(`[TMDb] Failed to fetch all trending: ${e.message}`);
     }
   };
 
@@ -530,7 +527,7 @@ export class TmdbApiService extends ExternalApiService {
       );
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to find by external ID: ${e.message}`);
+      warn(`[TMDb] Failed to find by external ID: ${e.message}`);
     }
   }
 
@@ -556,13 +553,9 @@ export class TmdbApiService extends ExternalApiService {
         return movie;
       }
 
-      throw new Error(
-        '[TMDb] Failed to find a title with the provided IMDB id',
-      );
+      warn('[TMDb] Failed to find a title with the provided IMDB id');
     } catch (e) {
-      throw new Error(
-        `[TMDb] Failed to get movie by external imdb ID: ${e.message}`,
-      );
+      warn(`[TMDb] Failed to get movie by external imdb ID: ${e.message}`);
     }
   }
 
@@ -588,9 +581,9 @@ export class TmdbApiService extends ExternalApiService {
         return tvshow;
       }
 
-      throw new Error(`No show returned from API for ID ${tvdbId}`);
+      warn(`No show returned from API for ID ${tvdbId}`);
     } catch (e) {
-      throw new Error(
+      warn(
         `[TMDb] Failed to get TV show using the external TVDB ID: ${e.message}`,
       );
     }
@@ -615,7 +608,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch collection: ${e.message}`);
+      warn(`[TMDb] Failed to fetch collection: ${e.message}`);
     }
   }
 
@@ -631,7 +624,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return regions;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch countries: ${e.message}`);
+      warn(`[TMDb] Failed to fetch countries: ${e.message}`);
     }
   }
 
@@ -647,7 +640,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return languages;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch langauges: ${e.message}`);
+      warn(`[TMDb] Failed to fetch langauges: ${e.message}`);
     }
   }
 
@@ -659,7 +652,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch movie studio: ${e.message}`);
+      warn(`[TMDb] Failed to fetch movie studio: ${e.message}`);
     }
   }
 
@@ -669,7 +662,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch TV network: ${e.message}`);
+      warn(`[TMDb] Failed to fetch TV network: ${e.message}`);
     }
   }
 
@@ -720,7 +713,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return movieGenres;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch movie genres: ${e.message}`);
+      warn(`[TMDb] Failed to fetch movie genres: ${e.message}`);
     }
   }
 
@@ -771,7 +764,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return tvGenres;
     } catch (e) {
-      throw new Error(`[TMDb] Failed to fetch TV genres: ${e.message}`);
+      warn(`[TMDb] Failed to fetch TV genres: ${e.message}`);
     }
   }
 }
