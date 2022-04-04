@@ -38,26 +38,34 @@ export class ExternalApiService {
     config?: AxiosRequestConfig,
     ttl?: number,
   ): Promise<T> {
-    const cacheKey = this.serializeCacheKey(endpoint, config?.params);
-    const cachedItem = this.cache?.get<T>(cacheKey);
-    if (cachedItem) {
-      return cachedItem;
-    }
-    const response = await this.axios.get<T>(endpoint, config);
+    try {
+      const cacheKey = this.serializeCacheKey(endpoint, config?.params);
+      const cachedItem = this.cache?.get<T>(cacheKey);
+      if (cachedItem) {
+        return cachedItem;
+      }
+      const response = await this.axios.get<T>(endpoint, config);
 
-    if (this.cache) {
-      this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
-    }
+      if (this.cache) {
+        this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
+      }
 
-    return response.data;
+      return response.data;
+    } catch (err) {
+      return undefined;
+    }
   }
 
   public async delete<T>(
     endpoint: string,
     config?: AxiosRequestConfig,
   ): Promise<T> {
-    const response = await this.axios.delete<T>(endpoint, config);
-    return response.data;
+    try {
+      const response = await this.axios.delete<T>(endpoint, config);
+      return response.data;
+    } catch (err) {
+      return undefined;
+    }
   }
 
   public async put<T>(
@@ -65,8 +73,12 @@ export class ExternalApiService {
     data: string,
     config?: AxiosRequestConfig,
   ): Promise<T> {
-    const response = await this.axios.put<T>(endpoint, data, config);
-    return response.data;
+    try {
+      const response = await this.axios.put<T>(endpoint, data, config);
+      return response.data;
+    } catch (err) {
+      return undefined;
+    }
   }
 
   public async getRolling<T>(
@@ -74,41 +86,49 @@ export class ExternalApiService {
     config?: AxiosRequestConfig,
     ttl?: number,
   ): Promise<T> {
-    const cacheKey = this.serializeCacheKey(endpoint, config?.params);
-    const cachedItem = this.cache?.get<T>(cacheKey);
+    try {
+      const cacheKey = this.serializeCacheKey(endpoint, config?.params);
+      const cachedItem = this.cache?.get<T>(cacheKey);
 
-    if (cachedItem) {
-      const keyTtl = this.cache?.getTtl(cacheKey) ?? 0;
+      if (cachedItem) {
+        const keyTtl = this.cache?.getTtl(cacheKey) ?? 0;
 
-      // If the item has passed our rolling check, fetch again in background
-      if (
-        keyTtl - (ttl ?? DEFAULT_TTL) * 1000 <
-        Date.now() - DEFAULT_ROLLING_BUFFER
-      ) {
-        this.axios.get<T>(endpoint, config).then((response) => {
-          this.cache?.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
-        });
+        // If the item has passed our rolling check, fetch again in background
+        if (
+          keyTtl - (ttl ?? DEFAULT_TTL) * 1000 <
+          Date.now() - DEFAULT_ROLLING_BUFFER
+        ) {
+          this.axios.get<T>(endpoint, config).then((response) => {
+            this.cache?.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
+          });
+        }
+        return cachedItem;
       }
-      return cachedItem;
+
+      const response = await this.axios.get<T>(endpoint, config);
+
+      if (this.cache) {
+        this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
+      }
+
+      return response.data;
+    } catch (err) {
+      return undefined;
     }
-
-    const response = await this.axios.get<T>(endpoint, config);
-
-    if (this.cache) {
-      this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
-    }
-
-    return response.data;
   }
 
   private serializeCacheKey(
     endpoint: string,
     params?: Record<string, unknown>,
   ) {
-    if (!params) {
-      return `${this.baseUrl}${endpoint}`;
-    }
+    try {
+      if (!params) {
+        return `${this.baseUrl}${endpoint}`;
+      }
 
-    return `${this.baseUrl}${endpoint}${JSON.stringify(params)}`;
+      return `${this.baseUrl}${endpoint}${JSON.stringify(params)}`;
+    } catch (err) {
+      return undefined;
+    }
   }
 }

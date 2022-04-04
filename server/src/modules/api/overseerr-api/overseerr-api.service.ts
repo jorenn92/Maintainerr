@@ -115,28 +115,51 @@ export class OverseerrApiService {
   }
 
   public async getMovie(id: string | number): Promise<OverSeerrMediaResponse> {
-    const response: OverSeerrMediaResponse = await this.api.get(`/movie/${id}`);
-    return response;
+    try {
+      const response: OverSeerrMediaResponse = await this.api.get(
+        `/movie/${id}`,
+      );
+      return response;
+    } catch (err) {
+      this.logger.warn(
+        'Overseerr communication failed. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async getShow(
     showId: string | number,
     season?: string,
   ): Promise<OverSeerrMediaResponse> {
-    if (showId) {
-      const response: OverSeerrMediaResponse = season
-        ? await this.api.get(`/tv/${showId}/season/${season}`)
-        : await this.api.get(`/tv/${showId}`);
-      return response;
+    try {
+      if (showId) {
+        const response: OverSeerrMediaResponse = season
+          ? await this.api.get(`/tv/${showId}/season/${season}`)
+          : await this.api.get(`/tv/${showId}`);
+        return response;
+      }
+      return undefined;
+    } catch (err) {
+      this.logger.warn(
+        'Overseerr communication failed. Is the application running?',
+      );
+      return undefined;
     }
-    return undefined;
   }
 
   public async deleteRequest(requestId: string) {
-    const response: OverseerBasicApiResponse = await this.api.delete(
-      `/request/${requestId}`,
-    );
-    return response;
+    try {
+      const response: OverseerBasicApiResponse = await this.api.delete(
+        `/request/${requestId}`,
+      );
+      return response;
+    } catch (err) {
+      this.logger.warn(
+        'Overseerr communication failed. Is the application running?',
+      );
+      return undefined;
+    }
   }
 
   public async deleteMediaItem(mediaId: string | number) {
@@ -156,29 +179,36 @@ export class OverseerrApiService {
   }
 
   public async removeMediaByTmdbId(id: string | number, type: 'movie' | 'tv') {
-    let media: OverSeerrMediaResponse;
-    if (type === 'movie') {
-      media = await this.getMovie(id);
-    } else {
-      media = await this.getShow(id);
-    }
-    if (media && media.mediaInfo) {
-      for (const request of media.mediaInfo.requests) {
-        try {
-          if (request?.media) {
-            this.deleteMediaItem(request.media.id.toString());
+    try {
+      let media: OverSeerrMediaResponse;
+      if (type === 'movie') {
+        media = await this.getMovie(id);
+      } else {
+        media = await this.getShow(id);
+      }
+      if (media && media.mediaInfo) {
+        for (const request of media.mediaInfo.requests) {
+          try {
+            if (request?.media) {
+              this.deleteMediaItem(request.media.id.toString());
+            }
+          } catch (e) {
+            this.logger.log(
+              "Couldn't delete media. Does it exist in Overseerr?",
+              {
+                label: 'Overseerr API',
+                errorMessage: e.message,
+                id,
+              },
+            );
           }
-        } catch (e) {
-          this.logger.log(
-            "Couldn't delete media. Does it exist in Overseerr?",
-            {
-              label: 'Overseerr API',
-              errorMessage: e.message,
-              id,
-            },
-          );
         }
       }
+    } catch (err) {
+      this.logger.warn(
+        'Overseerr communication failed. Is the application running?',
+      );
+      return undefined;
     }
   }
 }
