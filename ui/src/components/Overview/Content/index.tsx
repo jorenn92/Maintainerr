@@ -126,9 +126,11 @@ const OverviewContent = (props: IOverviewContent) => {
               title={el.title}
               userScore={el.audienceRating ? el.audienceRating : 0}
               tmdbid={
-                el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
-                  'tmdb://'
-                )[1]
+                el.Guid
+                  ? el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
+                      'tmdb://'
+                    )[1]
+                  : undefined
               }
             />
           </div>
