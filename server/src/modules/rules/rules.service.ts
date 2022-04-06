@@ -51,30 +51,45 @@ export class RulesService {
     return this.ruleConstants;
   }
   async getRules(ruleGroupId: string): Promise<Rules[]> {
-    return await this.connection
-      .getRepository(Rules)
-      .createQueryBuilder('rules')
-      .where('ruleGroupId = :id', { id: ruleGroupId })
-      .getMany();
+    try {
+      return await this.connection
+        .getRepository(Rules)
+        .createQueryBuilder('rules')
+        .where('ruleGroupId = :id', { id: ruleGroupId })
+        .getMany();
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      return undefined;
+    }
   }
   async getRuleGroups(
     activeOnly = false,
     libraryId?: number,
   ): Promise<RulesDto[]> {
-    const rulegroups = await this.connection
-      // .getRepository(RuleGroup)
-      .createQueryBuilder('rule_group', 'rg')
-      // .select(['id', 'name', 'description', 'isActive'])
-      .leftJoinAndSelect('rg.rules', 'r')
-      .orderBy('r.id')
-      .where(activeOnly ? 'rg.isActive = true' : '')
-      .where(libraryId ? `rg.libraryId = ${libraryId}` : '')
-      .getMany();
-    return rulegroups as RulesDto[];
+    try {
+      const rulegroups = await this.connection
+        // .getRepository(RuleGroup)
+        .createQueryBuilder('rule_group', 'rg')
+        // .select(['id', 'name', 'description', 'isActive'])
+        .leftJoinAndSelect('rg.rules', 'r')
+        .orderBy('r.id')
+        .where(activeOnly ? 'rg.isActive = true' : '')
+        .where(libraryId ? `rg.libraryId = ${libraryId}` : '')
+        .getMany();
+      return rulegroups as RulesDto[];
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      return undefined;
+    }
   }
 
   async getRuleGroupById(ruleGroupId: number): Promise<RuleGroup> {
-    return await this.ruleGroupRepository.findOne(ruleGroupId);
+    try {
+      return await this.ruleGroupRepository.findOne(ruleGroupId);
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      return undefined;
+    }
   }
 
   async deleteRuleGroup(ruleGroupId: number): Promise<ReturnStatus> {
@@ -98,52 +113,57 @@ export class RulesService {
   }
 
   async setRules(params: RulesDto) {
-    let state: ReturnStatus = this.createReturnStatus(true, 'Success');
-    params.rules.forEach((rule) => {
-      if (state.code === 1) {
-        state = this.validateRule(rule);
-      }
-    }, this);
+    try {
+      let state: ReturnStatus = this.createReturnStatus(true, 'Success');
+      params.rules.forEach((rule) => {
+        if (state.code === 1) {
+          state = this.validateRule(rule);
+        }
+      }, this);
 
-    if (state.code === 1) {
-      // create the collection
-      const lib = (await this.plexApi.getLibraries()).find(
-        (el) => +el.key === +params.libraryId,
-      );
-      const collection = (
-        await this.collectionService.createCollection({
-          libraryId: +params.libraryId,
-          type: lib.type === 'movie' ? 1 : 2,
-          title: params.name,
-          description: params.description,
-          arrAction: params.arrAction ? params.arrAction : 0,
-          isActive: params.isActive,
-          visibleOnHome: params.collection?.visibleOnHome,
-          deleteAfterDays: +params.collection?.deleteAfterDays,
-        })
-      ).dbCollection;
-      // create group
-      const groupId = await this.createNewGroup(
-        params.name,
-        params.description,
-        params.libraryId,
-        collection.id,
-        params.isActive !== undefined ? params.isActive : true,
-      );
-      // create rules
-      for (const rule of params.rules) {
-        const ruleJson = JSON.stringify(rule);
-        await this.rulesRepository.save([
-          {
-            ruleJson: ruleJson,
-            ruleGroupId: groupId,
-            section: (rule as RuleDbDto).section,
-          },
-        ]);
+      if (state.code === 1) {
+        // create the collection
+        const lib = (await this.plexApi.getLibraries()).find(
+          (el) => +el.key === +params.libraryId,
+        );
+        const collection = (
+          await this.collectionService.createCollection({
+            libraryId: +params.libraryId,
+            type: lib.type === 'movie' ? 1 : 2,
+            title: params.name,
+            description: params.description,
+            arrAction: params.arrAction ? params.arrAction : 0,
+            isActive: params.isActive,
+            visibleOnHome: params.collection?.visibleOnHome,
+            deleteAfterDays: +params.collection?.deleteAfterDays,
+          })
+        ).dbCollection;
+        // create group
+        const groupId = await this.createNewGroup(
+          params.name,
+          params.description,
+          params.libraryId,
+          collection.id,
+          params.isActive !== undefined ? params.isActive : true,
+        );
+        // create rules
+        for (const rule of params.rules) {
+          const ruleJson = JSON.stringify(rule);
+          await this.rulesRepository.save([
+            {
+              ruleJson: ruleJson,
+              ruleGroupId: groupId,
+              section: (rule as RuleDbDto).section,
+            },
+          ]);
+        }
+        return state;
+      } else {
+        return state;
       }
-      return state;
-    } else {
-      return state;
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      return undefined;
     }
   }
 
@@ -196,19 +216,24 @@ export class RulesService {
     rulegroupId?: number,
     plexId?: number,
   ): Promise<Exclusion[]> {
-    if (rulegroupId || plexId) {
-      const exclusions = await this.exclusionRepo.find(
-        rulegroupId ? { ruleGroupId: rulegroupId } : { plexId: plexId },
-      );
-      return rulegroupId
-        ? exclusions.concat(
-            await this.exclusionRepo.find({
-              ruleGroupId: null,
-            }),
-          )
-        : exclusions;
+    try {
+      if (rulegroupId || plexId) {
+        const exclusions = await this.exclusionRepo.find(
+          rulegroupId ? { ruleGroupId: rulegroupId } : { plexId: plexId },
+        );
+        return rulegroupId
+          ? exclusions.concat(
+              await this.exclusionRepo.find({
+                ruleGroupId: null,
+              }),
+            )
+          : exclusions;
+      }
+      return [];
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      return undefined;
     }
-    return [];
   }
 
   private validateRule(rule: RuleDto): ReturnStatus {
@@ -271,20 +296,25 @@ export class RulesService {
     collectionId: number,
     isActive = true,
   ): Promise<number> {
-    const groupId = await this.connection
-      .createQueryBuilder()
-      .insert()
-      .into(RuleGroup)
-      .values([
-        {
-          name: name,
-          description: description,
-          libraryId: +libraryId,
-          collectionId: +collectionId,
-          isActive: isActive,
-        },
-      ])
-      .execute();
-    return groupId.identifiers[0].id;
+    try {
+      const groupId = await this.connection
+        .createQueryBuilder()
+        .insert()
+        .into(RuleGroup)
+        .values([
+          {
+            name: name,
+            description: description,
+            libraryId: +libraryId,
+            collectionId: +collectionId,
+            isActive: isActive,
+          },
+        ])
+        .execute();
+      return groupId.identifiers[0].id;
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      return undefined;
+    }
   }
 }

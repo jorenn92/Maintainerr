@@ -14,8 +14,13 @@ export class TmdbIdService {
   async getTmdbIdFromPlexRatingKey(
     ratingKey: string,
   ): Promise<{ type: 'movie' | 'tv'; id: number | undefined }> {
-    const libItem: PlexMetadata = await this.plexApi.getMetadata(ratingKey);
-    return this.getTmdbIdFromPlexData(libItem);
+    try {
+      const libItem: PlexMetadata = await this.plexApi.getMetadata(ratingKey);
+      return this.getTmdbIdFromPlexData(libItem);
+    } catch (e) {
+      warn(`[TMDb] Failed to fetch id : ${e.message}`);
+      return undefined;
+    }
   }
 
   async getTmdbIdFromPlexData(
