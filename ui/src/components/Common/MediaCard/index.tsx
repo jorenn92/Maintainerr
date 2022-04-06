@@ -88,10 +88,10 @@ const MediaCard: React.FC<IMediaCard> = ({
         />
       ) : undefined}
       <div
-        className={`relative transform-gpu cursor-default overflow-hidden rounded-xl bg-gray-800 bg-cover outline-none ring-1 transition duration-300 ${
+        className={`relative transform-gpu cursor-default overflow-hidden rounded-xl bg-zinc-800 bg-cover outline-none ring-1 transition duration-300 ${
           showDetail
-            ? 'scale-105 shadow-lg ring-gray-500'
-            : 'scale-100 shadow ring-gray-700'
+            ? 'scale-105 shadow-lg ring-zinc-500'
+            : 'scale-100 shadow ring-zinc-700'
         }`}
         style={{
           paddingBottom: '150%',
@@ -126,7 +126,7 @@ const MediaCard: React.FC<IMediaCard> = ({
           <div className="absolute left-0 right-0 flex items-center justify-between p-2">
             <div
               className={`pointer-events-none z-40 rounded-full shadow ${
-                mediaType === 'movie' ? 'bg-blue-500' : 'bg-purple-600'
+                mediaType === 'movie' ? 'bg-zinc-600' : 'bg-amber-600'
               }`}
             >
               <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-white sm:h-5">
@@ -138,7 +138,7 @@ const MediaCard: React.FC<IMediaCard> = ({
           {hasExclusion ? (
             <div className="absolute right-0 flex items-center justify-between p-2">
               <div
-                className={`pointer-events-none z-40 rounded-full shadow ${'bg-green-500'}`}
+                className={`pointer-events-none z-40 rounded-full shadow ${'bg-amber-900'}`}
               >
                 <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-white sm:h-5">
                   {'EXCL'}
@@ -156,7 +156,7 @@ const MediaCard: React.FC<IMediaCard> = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-gray-800 bg-opacity-75 text-white">
+            <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-zinc-800 bg-opacity-75 text-white">
               <Spinner className="h-10 w-10" />
             </div>
           </Transition>

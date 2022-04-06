@@ -52,7 +52,7 @@ function Button<P extends ElementTypes = 'button'>(
   switch (buttonType) {
     case 'primary':
       buttonStyle.push(
-        'text-white bg-indigo-600 border-indigo-600 hover:bg-indigo-500 hover:border-indigo-500 rounded-md focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 active:border-indigo-700'
+        'text-white bg-amber-600 border-amber-600 hover:bg-amber-500 hover:border-amber-500 rounded-md focus:border-amber-700 focus:ring-amber active:bg-amber-700 active:border-amber-700'
       )
       break
     case 'danger':
@@ -62,32 +62,32 @@ function Button<P extends ElementTypes = 'button'>(
       break
     case 'warning':
       buttonStyle.push(
-        'text-white bg-yellow-500 border-yellow-500 hover:bg-yellow-400 hover:border-yellow-400 focus:border-yellow-700 rounded-md focus:ring-yellow active:bg-yellow-700 active:border-yellow-700'
+        'text-white bg-zinc-800 border-zinc-800 hover:bg-zinc-600 hover:border-zinc-600 focus:border-zinc-700 rounded-md focus:ring-zinc active:bg-zinc-700 active:border-zinc-700'
       )
       break
     case 'success':
       buttonStyle.push(
-        'text-white bg-green-500 border-green-500 hover:bg-green-400 hover:border-green-400 focus:border-green-700 rounded-md focus:ring-green active:bg-green-700 active:border-green-700'
+        'text-white bg-amber-900 border-amber-900 hover:bg-amber-700 hover:border-amber-700 focus:border-amber-700 rounded-md focus:ring-amber active:bg-amber-700 active:border-amber-700'
       )
       break
     case 'ghost':
       buttonStyle.push(
-        'text-white bg-transaprent border-gray-600 hover:border-gray-200 focus:border-gray-100 rounded-md active:border-gray-100'
+        'text-white bg-transaprent border-zinc-600 hover:border-zinc-200 focus:border-zinc-100 rounded-md active:border-zinc-100'
       )
       break
     case 'twin-primary-l':
       buttonStyle.push(
-        'text-white bg-indigo-600 border-indigo-600 hover:bg-indigo-500 hover:border-indigo-500 focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 active:border-indigo-700 rounded-l'
+        'text-white bg-amber-600 border-amber-600 hover:bg-amber-500 hover:border-amber-500 focus:border-amber-700 focus:ring-amber active:bg-amber-700 active:border-amber-700 rounded-l'
       )
       break
       case 'twin-primary-r':
         buttonStyle.push(
-          'text-white bg-indigo-600 border-indigo-600 hover:bg-indigo-500 hover:border-indigo-500 focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 active:border-indigo-700 rounded-r'
+          'text-white bg-amber-600 border-amber-600 hover:bg-amber-500 hover:border-amber-500 focus:border-amber-700 focus:ring-amber active:bg-amber-700 active:border-amber-700 rounded-r'
         )
         break
     default:
       buttonStyle.push(
-        'text-gray-200 bg-gray-600 border-gray-600 hover:text-white hover:bg-gray-500 hover:border-gray-500 group-hover:text-white rounded-md group-hover:bg-gray-500 group-hover:border-gray-500 focus:border-blue-300 focus:ring-blue active:text-gray-200 active:bg-gray-500 active:border-gray-500'
+        'text-zinc-200 bg-zinc-600 border-zinc-600 hover:text-white hover:bg-zinc-500 hover:border-zinc-500 group-hover:text-white rounded-md group-hover:bg-zinc-500 group-hover:border-zinc-500 focus:border-amber-600 focus:ring-amber active:text-zinc-200 active:bg-zinc-500 active:border-zinc-500'
       )
   }
 

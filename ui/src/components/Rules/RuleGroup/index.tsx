@@ -43,7 +43,7 @@ const RuleGroup = (props: {
   }
 
   return (
-    <div className="relative mb-5 flex w-full flex-col overflow-hidden rounded-xl bg-gray-800 bg-cover bg-center p-4 text-gray-400 shadow ring-1 ring-gray-700 sm:flex-row">
+    <div className="relative mb-5 flex w-full flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:flex-row">
       <div className="relative z-10 flex w-full min-w-0 flex-col pr-4 sm:w-5/6 sm:flex-row">
         <div className="mb-3 flex flex-col sm:mb-0 sm:w-5/6 ">
           <div className="flex text-xs font-medium text-white">

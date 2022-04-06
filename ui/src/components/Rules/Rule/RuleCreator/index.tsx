@@ -225,28 +225,28 @@ const RuleCreator = (props: iRuleCreator) => {
       <div className="mt-5 flex">
         <div className="">
           <button
-            className="mr-5 h-10 w-24 rounded-full bg-slate-500 text-gray-200 shadow-lg"
+            className="mr-5 h-10 w-24 rounded-full bg-amber-800 text-amber-100 shadow-lg"
             onClick={addSection}
           >
             <span>+ Section</span>
           </button>
           {ruleAmountArr[0].length > 1 ? (
             <button
-              className="mr-5 h-10 w-24 rounded-full bg-slate-500 text-gray-200 shadow-lg"
+              className="mr-5 h-10 w-24 rounded-full bg-amber-800 text-amber-100 shadow-lg"
               onClick={removeSection}
             >
               <span>- Section </span>
             </button>
           ) : null}
           <button
-            className="mr-5 h-10 w-20 rounded-full bg-slate-500 text-gray-200 shadow-lg"
+            className="mr-5 h-10 w-20 rounded-full bg-amber-800 text-amber-100 shadow-lg"
             onClick={addRule}
           >
             <span>+ Rule</span>
           </button>
           {ruleAmountArr[1][ruleAmount[1].length - 1]?.length > 1 ? (
             <button
-              className="h-10 w-20 rounded-full bg-slate-500 text-gray-200 shadow-lg"
+              className="h-10 w-20 rounded-full bg-amber-800 text-amber-100 shadow-lg"
               onClick={removeRule}
             >
               <span>- Rule</span>

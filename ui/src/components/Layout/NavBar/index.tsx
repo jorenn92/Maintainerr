@@ -57,7 +57,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
               leaveTo="opacity-0"
             >
               <div className="fixed inset-0">
-                <div className="absolute inset-0 bg-gray-900 opacity-90"></div>
+                <div className="absolute inset-0 bg-zinc-900 opacity-90"></div>
               </div>
             </Transition>
             <Transition
@@ -69,10 +69,10 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
               leaveTo="-translate-x-full"
             >
               <>
-                <div className="sidebar relative flex w-full max-w-xs flex-1 flex-col bg-gray-800">
+                <div className="sidebar relative flex w-full max-w-xs flex-1 flex-col bg-zinc-800">
                   <div className="sidebar-close-button absolute top-0 right-0 -mr-14 p-1">
                     <button
-                      className="flex h-12 w-12 items-center justify-center rounded-full focus:bg-gray-600 focus:outline-none"
+                      className="flex h-12 w-12 items-center justify-center rounded-full focus:bg-zinc-600 focus:outline-none"
                       aria-label="Close sidebar"
                       onClick={() => setClosed()}
                     >
@@ -84,7 +84,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                     className="flex h-0 flex-1 flex-col overflow-y-auto pt-8 pb-8 sm:pb-4"
                   >
                     <div className="flex flex-shrink-0 items-center px-2">
-                      <span className="px-4 text-xl text-gray-50">
+                      <span className="px-4 text-xl text-zinc-50">
                         <a href="/">
                           <h2 className="">Maintainerr</h2>
                           {/* <Image src="/logo_full.svg" alt="Logo" /> */}
@@ -128,7 +128,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
           <div className="flex h-0 flex-1 flex-col">
             <div className="flex flex-1 flex-col overflow-y-auto pt-8 pb-4">
               <div className="flex flex-shrink-0 items-center">
-                <span className="px-4 text-2xl text-gray-50">
+                <span className="px-4 text-2xl text-zinc-50">
                   <a href="/">
                     <h2>Maintainerr</h2>
                     {/* <img src="/logo_full.svg" alt="Logo" /> */}

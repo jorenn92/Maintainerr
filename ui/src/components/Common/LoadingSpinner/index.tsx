@@ -2,7 +2,7 @@ import React from 'react';
 
 export const SmallLoadingSpinner: React.FC = () => {
   return (
-    <div className="inset-0 flex h-full w-full items-center justify-center text-gray-200">
+    <div className="inset-0 flex h-full w-full items-center justify-center text-zinc-200">
       <svg
         className="h-10 w-10"
         viewBox="0 0 38 38"
@@ -31,7 +31,7 @@ export const SmallLoadingSpinner: React.FC = () => {
 
 const LoadingSpinner: React.FC = () => {
   return (
-    <div className="inset-0 flex h-64 items-center justify-center text-gray-200">
+    <div className="inset-0 flex h-64 items-center justify-center text-zinc-200">
       <svg
         className="h-16 w-16"
         viewBox="0 0 38 38"

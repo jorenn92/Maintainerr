@@ -1,5 +1,4 @@
-import { prependOnceListener } from 'process'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import LoadingSpinner from '../../Common/LoadingSpinner'
 import MediaCard from '../../Common/MediaCard'
 
