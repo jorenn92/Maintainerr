@@ -1,2 +1,3 @@
 server/data/maintainerr.sqlite
 ui/package-lock.json
+server/package-lock.json

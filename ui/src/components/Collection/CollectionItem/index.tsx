@@ -13,7 +13,7 @@ const CollectionItem = (props: ICollectionItem) => {
 
   return (
     <>
-      <div className="collection relative mb-5 flex h-44 w-full flex-col overflow-hidden rounded-xl bg-gray-800 bg-cover bg-center p-4 text-gray-400 shadow ring-1 ring-gray-700 sm:mb-0 sm:mr-5 sm:h-72 sm:w-96">
+      <div className="collection relative mb-5 flex h-44 w-full flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:mb-0 sm:mr-5 sm:h-72 sm:w-96">
         {props.collection.media && props.collection.media.length > 1 ? (
           <div className="z-1 absolute inset-0 flex flex-row overflow-hidden">
             <Image
@@ -39,7 +39,7 @@ const CollectionItem = (props: ICollectionItem) => {
               <a className="hover:underline">{props.collection.title}</a>
             </Link>
           </div>
-          <div className="text-base sm:max-h-20 max-h-12 text-gray-400 overflow-hidden hover:overflow-y-scroll whitespace-normal sm:text-lg">
+          <div className="text-base sm:max-h-20 max-h-12 text-zinc-400 overflow-hidden hover:overflow-y-scroll whitespace-normal sm:text-lg">
             {props.collection.description}
           </div>
         </div>

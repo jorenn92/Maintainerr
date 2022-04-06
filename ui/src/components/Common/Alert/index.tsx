@@ -12,18 +12,18 @@ import {
   
   const Alert: React.FC<AlertProps> = ({ title, children, type }) => {
     let design = {
-      bgColor: 'bg-yellow-600',
-      titleColor: 'text-yellow-100',
-      textColor: 'text-yellow-300',
+      bgColor: 'bg-zinc-800',
+      titleColor: 'text-zinc-100',
+      textColor: 'text-zinc-300',
       svg: <ExclamationIcon className="h-5 w-5" />,
     };
   
     switch (type) {
       case 'info':
         design = {
-          bgColor: 'bg-indigo-600',
-          titleColor: 'text-indigo-100',
-          textColor: 'text-indigo-300',
+          bgColor: 'bg-zinc-800',
+          titleColor: 'text-zinc-100',
+          textColor: 'text-zinc-300',
           svg: <InformationCircleIcon className="h-5 w-5" />,
         };
         break;

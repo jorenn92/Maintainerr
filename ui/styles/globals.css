@@ -10,11 +10,11 @@
   }
 
   body {
-    @apply bg-gray-900;
+    @apply bg-zinc-900;
   }
 
   code {
-    @apply rounded-md bg-gray-800 px-2 py-1;
+    @apply rounded-md bg-zinc-800 px-2 py-1;
   }
 
   input[type='search']::-webkit-search-cancel-button {
@@ -29,14 +29,15 @@
   }
  
   .sidebar {
-    @apply border-r border-gray-700;
+    @apply border-r border-zinc-700;
     padding-top: env(safe-area-inset-top);
     padding-left: env(safe-area-inset-left);
-    background: linear-gradient(180deg, rgba(31, 41, 55, 1) 0%, #131928 100%);
+    background: linear-gradient(180deg, rgb(43, 43, 49, 1) 0%, #18181b 100%);
+
   }
 
   .collection {
-    @apply border-r border-gray-700;
+    @apply border-r border-zinc-700;
   }
   .collection-backdrop {
     display: block;
@@ -82,39 +83,40 @@
   }
 
   .add-button {
-    background-color: #005c0f;
+    /* background: linear-gradient(90deg, rgba(242, 79, 99, 1) 0%, rgba(196, 100, 76, 1) 100%); */
+    @apply bg-amber-600
   }
 
   .add-button:hover {
-    background: #1f4525;
+    @apply bg-amber-500
   }
 
   .cancel-button {
-    background-color: #520000;
+    background-color: #444444;
   }
 
   .cancel-button:hover {
-    background: #471c1c;
+    background: #4e586E;
   }
 
   .edit-button {
-    background-color: #cc7b19;
+    background-color: #3f3f46;
   }
 
   .edit-button:hover {
-    background: #f19a30;
+    background: #3a3a42;
   }
 
   .delete-button {
-    background-color: #d60d0d;
+    background-color: #18181b;
   }
 
   .delete-button:hover {
-    background: #f03737;
+    background: #202024;
   }
 
   .plex-button {
-    @apply flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white transition duration-150 ease-in-out disabled:opacity-50;
+    @apply flex w-full justify-center rounded-md border border-transparent bg-amber-600 px-4 py-2 text-center text-sm font-medium text-white transition duration-150 ease-in-out disabled:opacity-50;
     background-color: #cc7b19;
   }
 
@@ -140,7 +142,7 @@
   }
 
   .slider-title {
-    @apply inline-flex items-center text-xl font-bold leading-7 text-gray-300 sm:truncate sm:text-2xl sm:leading-9;
+    @apply inline-flex items-center text-xl font-bold leading-7 text-zinc-300 sm:truncate sm:text-2xl sm:leading-9;
   }
 
   a.slider-title {
@@ -187,7 +189,7 @@
   }
 
   .media-attributes {
-    @apply mt-1 flex flex-wrap items-center justify-center space-x-1 text-xs text-gray-300 sm:text-sm xl:mt-0 xl:justify-start xl:text-base;
+    @apply mt-1 flex flex-wrap items-center justify-center space-x-1 text-xs text-zinc-300 sm:text-sm xl:mt-0 xl:justify-start xl:text-base;
   }
 
   .media-attributes a {
@@ -211,15 +213,15 @@
   }
 
   .tagline {
-    @apply mb-4 text-xl italic text-gray-400 lg:text-2xl;
+    @apply mb-4 text-xl italic text-zinc-400 lg:text-2xl;
   }
 
   .media-overview h2 {
-    @apply text-xl font-bold text-gray-300 sm:text-2xl;
+    @apply text-xl font-bold text-zinc-300 sm:text-2xl;
   }
 
   .media-overview p {
-    @apply pt-2 text-sm text-gray-400 sm:text-base;
+    @apply pt-2 text-sm text-zinc-400 sm:text-base;
   }
 
   ul.media-crew {
@@ -227,13 +229,13 @@
   }
 
   ul.media-crew > li {
-    @apply col-span-1 flex flex-col font-bold text-gray-300;
+    @apply col-span-1 flex flex-col font-bold text-zinc-300;
   }
 
   a.crew-name,
   .media-fact-value a,
   .media-fact-value button {
-    @apply font-normal text-gray-400 transition duration-300 hover:text-gray-100 hover:underline;
+    @apply font-normal text-zinc-400 transition duration-300 hover:text-zinc-100 hover:underline;
   }
 
   .media-overview-right {
@@ -241,19 +243,19 @@
   }
 
   .media-facts {
-    @apply rounded-lg border border-gray-700 bg-gray-900 text-sm font-bold text-gray-300 shadow;
+    @apply rounded-lg border border-zinc-700 bg-zinc-900 text-sm font-bold text-zinc-300 shadow;
   }
 
   .media-fact {
-    @apply flex justify-between border-b border-gray-700 px-4 py-2 last:border-b-0;
+    @apply flex justify-between border-b border-zinc-700 px-4 py-2 last:border-b-0;
   }
 
   .media-fact-value {
-    @apply ml-2 text-right text-sm font-normal text-gray-400;
+    @apply ml-2 text-right text-sm font-normal text-zinc-400;
   }
 
   .media-ratings {
-    @apply flex items-center justify-center border-b border-gray-700 px-4 py-2 font-medium last:border-b-0;
+    @apply flex items-center justify-center border-b border-zinc-700 px-4 py-2 font-medium last:border-b-0;
   }
 
   .media-rating {
@@ -261,23 +263,23 @@
   }
 
   .error-message {
-    @apply relative top-0 bottom-0 left-0 right-0 flex h-screen flex-col items-center justify-center text-center text-gray-300;
+    @apply relative top-0 bottom-0 left-0 right-0 flex h-screen flex-col items-center justify-center text-center text-zinc-300;
   }
 
   .heading {
-    @apply text-2xl font-bold leading-8 text-gray-100;
+    @apply text-2xl font-bold leading-8 text-zinc-100;
   }
 
   .sm-heading {
-    @apply text-lg font-bold leading-8 text-gray-100;
+    @apply text-lg font-bold leading-8 text-zinc-100;
   }
 
   .description {
-    @apply mt-1 max-w-4xl text-sm leading-5 text-gray-400;
+    @apply mt-1 max-w-4xl text-sm leading-5 text-zinc-400;
   }
 
   .sm-description {
-    @apply mt-1 max-w-4xl text-xs leading-5 text-gray-400;
+    @apply mt-1 max-w-4xl text-xs leading-5 text-zinc-400;
   }
 
   img.avatar-sm {
@@ -313,12 +315,12 @@
   }
 
   .actions {
-    @apply mt-8 border-t border-gray-700 pt-5 text-white;
+    @apply mt-8 border-t border-zinc-700 pt-5 text-white;
   }
 
   label,
   .group-label {
-    @apply mb-1 block text-sm font-bold leading-5 text-gray-400;
+    @apply mb-1 block text-sm font-bold leading-5 text-zinc-400;
   }
 
   label.checkbox-label {
@@ -330,7 +332,7 @@
   }
 
   label a {
-    @apply text-gray-100 transition duration-300 hover:text-white hover:underline;
+    @apply text-zinc-100 transition duration-300 hover:text-white hover:underline;
   }
 
   .label-required {
@@ -338,7 +340,7 @@
   }
 
   .label-tip {
-    @apply block font-medium text-gray-500;
+    @apply block font-medium text-zinc-500;
   }
 
   button,
@@ -349,7 +351,7 @@
   }
 
   input[type='checkbox'] {
-    @apply h-6 w-6 rounded-md text-indigo-600 transition duration-150 ease-in-out;
+    @apply h-6 w-6 rounded-md text-amber-600 default:ring-amber-600 checked:ring-amber-800 transition duration-150 ease-in-out;
   }
 
   input[type='text'],
@@ -358,7 +360,7 @@
   input[type='date'],
   select,
   textarea {
-    @apply block w-full min-w-0 flex-1 rounded-md border border-gray-500 bg-gray-700 text-white transition duration-150 ease-in-out sm:text-sm sm:leading-5;
+    @apply block w-full min-w-0 flex-1 rounded-md border border-zinc-500 bg-zinc-700 text-white transition duration-150 ease-in-out sm:text-sm sm:leading-5;
   }
 
   input.rounded-l-only,
@@ -386,7 +388,7 @@
   }
 
   button.input-action {
-    @apply relative -ml-px inline-flex items-center border border-gray-500 bg-indigo-600 px-3 py-2 text-sm font-medium leading-5 text-white transition duration-150 ease-in-out last:rounded-r-md hover:bg-indigo-500 active:bg-gray-100 active:text-gray-700 sm:px-3.5;
+    @apply relative -ml-px inline-flex items-center border border-zinc-500 bg-amber-600 px-3 py-2 text-sm font-medium leading-5 text-white transition duration-150 ease-in-out last:rounded-r-md hover:bg-amber-500 active:bg-zinc-100 active:text-zinc-700 sm:px-3.5;
   }
 
   .button-md svg,
@@ -400,7 +402,7 @@
   }
 
   .modal-icon {
-    @apply mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gray-800 text-white ring-1 ring-gray-500 sm:mx-0 sm:h-10 sm:w-10;
+    @apply mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-white ring-1 ring-zinc-500 sm:mx-0 sm:h-10 sm:w-10;
   }
 
   .modal-icon svg {
@@ -416,7 +418,7 @@
   }
 
   .protocol {
-    @apply inline-flex cursor-default items-center rounded-l-md border border-r-0 border-gray-500 bg-gray-600 px-3 text-gray-100 sm:text-sm;
+    @apply inline-flex cursor-default items-center rounded-l-md border border-r-0 border-zinc-500 bg-zinc-600 px-3 text-zinc-100 sm:text-sm;
   }
 
   .error {
@@ -436,51 +438,51 @@
   }
 
   .react-select-container .react-select__control {
-    @apply rounded-md border border-gray-500 bg-gray-700 text-white hover:border-gray-500;
+    @apply rounded-md border border-zinc-500 bg-zinc-700 text-white hover:border-zinc-500;
   }
 
   .react-select-container-dark .react-select__control {
-    @apply border border-gray-700 bg-gray-800;
+    @apply border border-zinc-700 bg-zinc-800;
   }
 
   .react-select-container .react-select__control--is-focused {
-    @apply rounded-md border border-gray-500 bg-gray-700 text-white shadow;
+    @apply rounded-md border border-zinc-500 bg-zinc-700 text-white shadow;
   }
 
   .react-select-container-dark .react-select__control--is-focused {
-    @apply border-gray-600 bg-gray-800;
+    @apply border-zinc-600 bg-zinc-800;
   }
 
   .react-select-container .react-select__menu {
-    @apply bg-gray-700 text-gray-300;
+    @apply bg-zinc-700 text-zinc-300;
   }
 
   .react-select-container-dark .react-select__menu {
-    @apply bg-gray-800;
+    @apply bg-zinc-800;
   }
 
   .react-select-container .react-select__option--is-focused {
-    @apply bg-gray-600 text-white;
+    @apply bg-zinc-600 text-white;
   }
 
   .react-select-container-dark .react-select__option--is-focused {
-    @apply bg-gray-700;
+    @apply bg-zinc-700;
   }
 
   .react-select-container .react-select__indicator-separator {
-    @apply bg-gray-500;
+    @apply bg-zinc-500;
   }
 
   .react-select-container .react-select__indicator {
-    @apply text-gray-500;
+    @apply text-zinc-500;
   }
 
   .react-select-container .react-select__placeholder {
-    @apply text-gray-400;
+    @apply text-zinc-400;
   }
 
   .react-select-container .react-select__multi-value {
-    @apply rounded-md border border-gray-500 bg-gray-800;
+    @apply rounded-md border border-zinc-500 bg-zinc-800;
   }
 
   .react-select-container .react-select__multi-value__label {

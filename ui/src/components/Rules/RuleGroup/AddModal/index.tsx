@@ -269,6 +269,7 @@ const AddModal = (props: AddModal) => {
                   type="checkbox"
                   name="is_active"
                   id="is_active"
+                  className='border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0'
                   defaultChecked={active}
                   onChange={() => {
                     setActive(!active)
@@ -288,6 +289,7 @@ const AddModal = (props: AddModal) => {
                   type="checkbox"
                   name="collection_visible"
                   id="collection_visible"
+                  className='border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0'
                   defaultChecked={showHome}
                   onChange={() => {
                     setShowHome(!showHome)
