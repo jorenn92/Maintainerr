@@ -1,5 +1,6 @@
 // import cacheManager, { AvailableCacheIds } from '../../lib/cache';
 import { AxiosResponse } from 'axios';
+import { warn } from 'console';
 import { ExternalApiService } from 'src/modules/api/external-api/external-api.service';
 import { DVRSettings } from 'src/modules/settings/interfaces/dvr-settings.interface';
 import {
@@ -50,9 +51,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
 
       return response.data;
     } catch (e) {
-      throw new Error(
-        `[${this.apiName}] Failed to retrieve system status: ${e.message}`,
-      );
+      warn(`[${this.apiName}] Failed to retrieve system status: ${e.message}`);
     }
   };
 
@@ -66,9 +65,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(
-        `[${this.apiName}] Failed to retrieve profiles: ${e.message}`,
-      );
+      warn(`[${this.apiName}] Failed to retrieve profiles: ${e.message}`);
     }
   };
 
@@ -82,9 +79,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
 
       return data;
     } catch (e) {
-      throw new Error(
-        `[${this.apiName}] Failed to retrieve root folders: ${e.message}`,
-      );
+      warn(`[${this.apiName}] Failed to retrieve root folders: ${e.message}`);
     }
   };
 
@@ -96,9 +91,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
 
       return response.data.records;
     } catch (e) {
-      throw new Error(
-        `[${this.apiName}] Failed to retrieve queue: ${e.message}`,
-      );
+      warn(`[${this.apiName}] Failed to retrieve queue: ${e.message}`);
     }
   };
 
@@ -108,9 +101,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
 
       return response.data;
     } catch (e) {
-      throw new Error(
-        `[${this.apiName}] Failed to retrieve tags: ${e.message}`,
-      );
+      warn(`[${this.apiName}] Failed to retrieve tags: ${e.message}`);
     }
   };
 
@@ -122,7 +113,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
 
       return response.data;
     } catch (e) {
-      throw new Error(`[${this.apiName}] Failed to create tag: ${e.message}`);
+      warn(`[${this.apiName}] Failed to create tag: ${e.message}`);
     }
   };
 
@@ -136,7 +127,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
         ...options,
       });
     } catch (e) {
-      throw new Error(`[${this.apiName}] Failed to run command: ${e.message}`);
+      warn(`[${this.apiName}] Failed to run command: ${e.message}`);
     }
   }
 
@@ -144,7 +135,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     try {
       await this.delete(`/${command}`);
     } catch (e) {
-      throw new Error(`[${this.apiName}] Failed to run DELETE: ${e.message}`);
+      warn(`[${this.apiName}] Failed to run DELETE: ${e.message}`);
     }
   }
 
@@ -152,7 +143,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     try {
       await this.put(`/${command}`, body);
     } catch (e) {
-      throw new Error(`[${this.apiName}] Failed to run PUT: ${e.message}`);
+      warn(`[${this.apiName}] Failed to run PUT: ${e.message}`);
     }
   }
 }
