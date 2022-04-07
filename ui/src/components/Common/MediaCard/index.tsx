@@ -126,7 +126,7 @@ const MediaCard: React.FC<IMediaCard> = ({
           <div className="absolute left-0 right-0 flex items-center justify-between p-2">
             <div
               className={`pointer-events-none z-40 rounded-full shadow ${
-                mediaType === 'movie' ? 'bg-zinc-600' : 'bg-amber-600'
+                mediaType === 'movie' ? 'bg-zinc-900' : 'bg-amber-900'
               }`}
             >
               <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-white sm:h-5">
