@@ -1,4 +1,43 @@
-# Maintainerr
+<b>Maintainerr</b>'s goal is to make managing the removal of your media easy. Create custom rules with parameters across different services, show the matching media on a Plex collection for a given amount of time and handle the deletion.
 
-Maintainerr moet het makkelijk maken om series en films uit Plex, sonarr, radarr en overseer te verwijderen.
-Er worden automatische collecties op de home page van elke gebruiker gemaakt met films die verwijderd gaan worden
+# Features
+
+> Maintainerr is early alpha software, expect bugs.
+
+By default, Maintainerr will remove media files, remove/unmonitor media in Radarr/Sonarr and clear all Overseerr requests.\
+Manually adding specific media that doesn't apply to the specified rule(s) is also supported. As is excluding media.
+
+# Support
+
+Currently, Maintainerr supports these apps for custom rules : 
+ - Plex
+ - Overseerr
+ - Radarr
+ - Sonarr
+
+# Docker
+
+Automatic builds of the main branch are availabile under the jorenn92/maintainerr:alpha tag.
+Data is saved under /opt/server/data, a volume should be created to make the configuration persistent.
+<br><br>
+Dockerfile: 
+
+    version: '3.7'
+
+    services:
+        maintainerr:
+            image: jorenn92/maintainerr:alpha
+            container_name: maintainerr
+            volumes:
+              - ./data:/opt/server/data
+        environment:
+          - TZ=Europe/Brussels
+        ports:
+          - 8154:80
+        restart: unless-stopped
+
+
+# Shoutout
+Maintainerr is heavily inspired by Overseerr. Some parts of Maintainerr's code are plain copies. Big thanks to the Overseerr team for creating and maintaining such an amazing app!
+
+Please support them at https://github.com/sct/overseerr
