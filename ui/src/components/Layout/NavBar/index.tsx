@@ -1,35 +1,40 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import Transition from '../../Transition'
 
 interface NavBarLink {
   key: string
   href: string
+  selected: boolean
   //   svgIcon: ReactNode
   name: string
 }
 
-const navBarItems: NavBarLink[] = [
+let navBarItems: NavBarLink[] = [
   {
     key: '0',
     href: '/overview',
+    selected: false,
     name: 'Overview',
   },
   {
     key: '1',
     href: '/rules',
+    selected: false,
     name: 'Rules',
   },
   {
     key: '2',
     href: '/collections',
+    selected: false,
     name: 'Collections',
   },
   {
     key: '3',
     href: '/settings',
+    selected: false,
     name: 'Settings',
   },
 ]
@@ -42,6 +47,21 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
   const navRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+
+  useEffect(() => {
+    setHighlight(window.location.href)
+  }, [])
+
+  const setHighlight = (href: string, closed = false) => {
+    navBarItems = navBarItems.map((el) => {
+      el.selected = href.includes(el.href)
+      return el
+    })
+
+    if (closed) {
+      setClosed()
+    }
+  }
 
   return (
     <div>
@@ -72,7 +92,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                 <div className="sidebar relative flex w-full max-w-xs flex-1 flex-col bg-zinc-800">
                   <div className="sidebar-close-button absolute top-0 right-0 -mr-14 p-1">
                     <button
-                      className="flex h-12 w-12 text-white items-center justify-center rounded-full focus:bg-zinc-600 focus:outline-none"
+                      className="flex h-12 w-12 items-center justify-center rounded-full text-white focus:bg-zinc-600 focus:outline-none"
                       aria-label="Close sidebar"
                       onClick={() => setClosed()}
                     >
@@ -96,15 +116,20 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                         return (
                           <Link key={link.key} href={link.href}>
                             <a
-                              onClick={() => setClosed()}
+                              onClick={() => setHighlight(link.href, true)}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                  setClosed()
+                                  setHighlight(link.href, true)
                                 }
                               }}
                               role="button"
                               tabIndex={0}
-                              className={`flex items-center rounded-md px-2 py-2 text-base font-medium leading-6 text-white transition duration-150 ease-in-out focus:outline-none`}
+                              className={`flex items-center rounded-md px-2 py-2 text-base font-medium leading-6 text-white transition duration-150 ease-in-out focus:outline-none
+                              ${
+                                link.selected
+                                  ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'
+                                  : 'hover:bg-zinc-700'
+                              }`}
                             >
                               {link.name}
                             </a>
@@ -143,7 +168,15 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                       href={navBarLink.href}
                     >
                       <a
-                        className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium leading-6 text-white transition duration-150 ease-in-out focus:outline-none`}
+                        onClick={() => setHighlight(navBarLink.href)}
+                        // className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium leading-6 text-white transition duration-150 ease-in-out focus:outline-none`}
+                        className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium leading-6 text-white transition duration-150 ease-in-out ${
+                          navBarLink.selected
+                            ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'
+                            : 'hover:bg-zinc-700'
+                        }
+                        focus:bg-amber-800 focus:outline-none
+                      `}
                       >
                         {navBarLink.name}
                       </a>
