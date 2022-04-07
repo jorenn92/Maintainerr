@@ -37,7 +37,7 @@ Dockerfile:
         restart: unless-stopped
 
 
-# Shoutout
+# Credits
 Maintainerr is heavily inspired by Overseerr. Some parts of Maintainerr's code are plain copies. Big thanks to the Overseerr team for creating and maintaining such an amazing app!
 
 Please support them at https://github.com/sct/overseerr
