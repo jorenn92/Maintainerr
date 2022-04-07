@@ -72,7 +72,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                 <div className="sidebar relative flex w-full max-w-xs flex-1 flex-col bg-zinc-800">
                   <div className="sidebar-close-button absolute top-0 right-0 -mr-14 p-1">
                     <button
-                      className="flex h-12 w-12 items-center justify-center rounded-full focus:bg-zinc-600 focus:outline-none"
+                      className="flex h-12 w-12 text-white items-center justify-center rounded-full focus:bg-zinc-600 focus:outline-none"
                       aria-label="Close sidebar"
                       onClick={() => setClosed()}
                     >

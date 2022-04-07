@@ -1,3 +1,4 @@
+import { ArrowLeftIcon, MenuAlt2Icon } from '@heroicons/react/solid'
 import Head from 'next/head'
 import router from 'next/router'
 import { useContext, useState } from 'react'
@@ -43,7 +44,7 @@ const Layout: React.FC = (props) => {
             aria-label="Open sidebar"
             onClick={() => setNavBarOpen(true)}
           >
-            {/* <MenuAlt2Icon className="h-6 w-6" /> */}
+            <MenuAlt2Icon className="h-6 w-6" />
           </button>
           <div className="flex flex-1 items-center justify-between pr-4 md:pr-4 md:pl-4">
             <button
@@ -52,7 +53,7 @@ const Layout: React.FC = (props) => {
               } pwa-only transition duration-300 hover:text-white focus:text-white focus:outline-none`}
               onClick={() => router.back()}
             >
-              {/* <ArrowLeftIcon className="w-7" /> */}
+              <ArrowLeftIcon className="w-7" />
             </button>
             <SearchBar
               onSearch={(text: string) => {

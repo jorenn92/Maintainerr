@@ -100,11 +100,15 @@
   }
 
   .edit-button {
-    background-color: #3f3f46;
+    @apply bg-amber-900
+
+    /* background-color: #3f3f46; */
   }
 
   .edit-button:hover {
-    background: #3a3a42;
+    @apply bg-amber-800
+
+    /* background: #3a3a42; */
   }
 
   .delete-button {
