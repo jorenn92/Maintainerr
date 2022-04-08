@@ -34,6 +34,10 @@ const Collection = () => {
   const [library, setLibrary] = useState<ILibrary>()
   const [collections, setCollections] = useState<ICollection[]>()
 
+  useEffect(() => {
+    document.title = 'Maintainerr - Collections'
+  }, [])
+
   const onSwitchLibrary = (id: number) => {
     const lib = LibrariesCtx.libraries.find((el) => +el.key === id)
     lib ? setLibrary(lib) : setLibrary(undefined)

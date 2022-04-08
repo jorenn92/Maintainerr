@@ -15,6 +15,10 @@ const SonarrSettings = () => {
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
 
+  useEffect(() => {
+    document.title = 'Maintainerr - Settings - Sonarr'
+  }, [])
+
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (

@@ -5,6 +5,7 @@ const SettingsLander = () => {
   const router = useRouter()
 
   useEffect(() => {
+    document.title = "Maintainerr - Settings"
     router.push('/settings/main')
   }, [])
 

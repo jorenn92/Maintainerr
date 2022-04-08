@@ -5,8 +5,6 @@ import GetApiHandler, {
 } from '../../utils/ApiHandler'
 import Alert from '../Common/Alert'
 import Modal from '../Common/Modal'
-import { IPlexMetadata } from '../Overview/Content'
-import { IRuleGroup } from '../Rules/RuleGroup'
 
 interface IAddModal {
   onCancel: () => void
@@ -58,6 +56,7 @@ const AddModal = (props: IAddModal) => {
   }
 
   useEffect(() => {
+    document.title = 'Maintainerr - Overview'
     GetApiHandler(`/collections?libraryId=${props.libraryId}`).then((resp) =>
       setOptions([...options, ...resp])
     )

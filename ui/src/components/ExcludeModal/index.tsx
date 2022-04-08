@@ -69,6 +69,7 @@ const ExcludeModal = (props: IExcludeModal) => {
   }
 
   useEffect(() => {
+    document.title = 'Maintainerr - Overview'
     GetApiHandler(`/rules?libraryId=${props.libraryId}`).then((resp) =>
       setOptions([...options, ...resp])
     )

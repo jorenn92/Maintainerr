@@ -18,6 +18,10 @@ const PlexSettings = () => {
   const [tokenValid, setTokenValid] = useState<Boolean>(false)
   const [clearTokenClicked, setClearTokenClicked] = useState<Boolean>(false)
 
+  useEffect(() => {
+    document.title = 'Maintainerr - Settings - Plex'
+  }, [])
+
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (

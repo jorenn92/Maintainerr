@@ -26,6 +26,7 @@ const Overview = () => {
   const fetchAmount = 30
 
   useEffect(() => {
+    document.title = "Maintainerr - Overview"
     if (SearchCtx.text !== '') {
       GetApiHandler(`/plex/library/search?term=${SearchCtx.text}`).then(
         (resp) => {

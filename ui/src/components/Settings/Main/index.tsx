@@ -1,5 +1,5 @@
 import { RefreshIcon, SaveIcon } from '@heroicons/react/solid'
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
@@ -11,6 +11,10 @@ const MainSettings = () => {
   const apiKeyRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
+
+  useEffect(() => {
+    document.title = 'Maintainerr - Settings - General'
+  }, [])
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

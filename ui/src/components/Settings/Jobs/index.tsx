@@ -1,5 +1,5 @@
 import { SaveIcon } from '@heroicons/react/solid'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
@@ -12,13 +12,17 @@ const JobSettings = () => {
   const [error, setError] = useState<boolean>(true)
   const [changed, setChanged] = useState<boolean>()
 
+  useEffect(() => {
+    document.title = 'Maintainerr - Settings - Jobs'
+  }, [])
+
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (
       rulehander &&
       collectionHandler &&
-      false 
-// forced false..
+      false
+      // forced false..
     ) {
       const payload = {
         collection_handler_job_cron: rulehander,
@@ -48,9 +52,7 @@ const JobSettings = () => {
   const ruleHanlderOptions: JobOption[] = []
   const collectionHandlerOptions: JobOption[] = []
 
-  const possibilities: JobOption[] = [
-
-  ]
+  const possibilities: JobOption[] = []
 
   return (
     <div className="h-full w-full">
@@ -64,7 +66,7 @@ const JobSettings = () => {
       ) : changed ? (
         <Alert type="info" title="Settings succesfully updated" />
       ) : undefined}
-      
+
       <div className="section">
         <form onSubmit={submit}>
           <div className="form-row">
