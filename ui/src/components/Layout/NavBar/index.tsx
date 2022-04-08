@@ -1,7 +1,11 @@
-import { ArchiveIcon, ClipboardCheckIcon, CogIcon, EyeIcon } from '@heroicons/react/outline'
-import Image from 'next/image'
+import {
+  ArchiveIcon,
+  ClipboardCheckIcon,
+  CogIcon,
+  EyeIcon,
+  XIcon,
+} from '@heroicons/react/outline'
 import Link from 'next/link'
-import Logo from '../../../assets/logo.svg'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useRef } from 'react'
 import Transition from '../../Transition'
@@ -56,10 +60,8 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
 
   useEffect(() => {
     console.log(window.location.pathname)
-    if (window.location.pathname !== '/')
-      setHighlight(window.location.pathname)
-    else
-      setHighlight(`/overview`)
+    if (window.location.pathname !== '/') setHighlight(window.location.pathname)
+    else setHighlight(`/overview`)
   }, [])
 
   const setHighlight = (href: string, closed = false) => {
@@ -106,18 +108,17 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                       aria-label="Close sidebar"
                       onClick={() => setClosed()}
                     >
-                      <p>X</p>
+                        <XIcon className="h-6 w-6 text-white" />
                     </button>
                   </div>
                   <div
                     ref={navRef}
-                    className="flex h-0 flex-1 flex-col overflow-y-auto pt-8 pb-8 sm:pb-4"
+                    className="flex h-0 flex-1 flex-col overflow-y-auto pt-4 pb-8 sm:pb-4"
                   >
                     <div className="flex flex-shrink-0 items-center px-2">
                       <span className="px-4 text-xl text-zinc-50">
                         <a href="/">
-                          {/* <h2 className="text-3xl font-medium flex text-center">maintainerr</h2> */}
-                          <img src='/logo.svg' alt="Logo" />
+                          <img src="/logo.svg" alt="Logo" />
                         </a>
                       </span>
                     </div>
@@ -162,12 +163,11 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
       <div className="fixed top-0 bottom-0 left-0 z-30 hidden lg:flex lg:flex-shrink-0">
         <div className="sidebar flex w-64 flex-col">
           <div className="flex h-0 flex-1 flex-col">
-            <div className="flex flex-1 flex-col overflow-y-auto pt-8 pb-4">
+            <div className="flex flex-1 flex-col overflow-y-auto pt-4 pb-4">
               <div className="flex flex-shrink-0 items-center">
                 <span className="px-4 text-2xl text-zinc-50">
                   <a href="/">
-                    {/* <h2>Maintainerr</h2> */}
-                    <img src='/logo.svg' alt="Logo" />
+                    <img src="/logo.svg" alt="Logo" />
                   </a>
                 </span>
               </div>
