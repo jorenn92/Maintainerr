@@ -1,14 +1,16 @@
+import { ArchiveIcon, ClipboardCheckIcon, CogIcon, EyeIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
 import Link from 'next/link'
+import Logo from '../../../assets/logo.svg'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
+import { ReactNode, useEffect, useRef } from 'react'
 import Transition from '../../Transition'
 
 interface NavBarLink {
   key: string
   href: string
   selected: boolean
-  //   svgIcon: ReactNode
+  svgIcon: ReactNode
   name: string
 }
 
@@ -17,24 +19,28 @@ let navBarItems: NavBarLink[] = [
     key: '0',
     href: '/overview',
     selected: false,
+    svgIcon: <EyeIcon className="mr-3 h-6 w-6" />,
     name: 'Overview',
   },
   {
     key: '1',
     href: '/rules',
     selected: false,
+    svgIcon: <ClipboardCheckIcon className="mr-3 h-6 w-6" />,
     name: 'Rules',
   },
   {
     key: '2',
     href: '/collections',
     selected: false,
+    svgIcon: <ArchiveIcon className="mr-3 h-6 w-6" />,
     name: 'Collections',
   },
   {
     key: '3',
     href: '/settings',
     selected: false,
+    svgIcon: <CogIcon className="mr-3 h-6 w-6" />,
     name: 'Settings',
   },
 ]
@@ -49,7 +55,11 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
   const router = useRouter()
 
   useEffect(() => {
-    setHighlight(window.location.href)
+    console.log(window.location.pathname)
+    if (window.location.pathname !== '/')
+      setHighlight(window.location.pathname)
+    else
+      setHighlight(`/overview`)
   }, [])
 
   const setHighlight = (href: string, closed = false) => {
@@ -106,12 +116,12 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                     <div className="flex flex-shrink-0 items-center px-2">
                       <span className="px-4 text-xl text-zinc-50">
                         <a href="/">
-                          <h2 className="">Maintainerr</h2>
-                          {/* <Image src="/logo_full.svg" alt="Logo" /> */}
+                          {/* <h2 className="text-3xl font-medium flex text-center">maintainerr</h2> */}
+                          <img src='/logo.svg' alt="Logo" />
                         </a>
                       </span>
                     </div>
-                    <nav className="mt-16 flex-1 space-y-4 px-4">
+                    <nav className="mt-12 flex-1 space-y-4 px-4">
                       {navBarItems.map((link) => {
                         return (
                           <Link key={link.key} href={link.href}>
@@ -131,6 +141,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                                   : 'hover:bg-zinc-700'
                               }`}
                             >
+                              {link.svgIcon}
                               {link.name}
                             </a>
                           </Link>
@@ -155,12 +166,12 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
               <div className="flex flex-shrink-0 items-center">
                 <span className="px-4 text-2xl text-zinc-50">
                   <a href="/">
-                    <h2>Maintainerr</h2>
-                    {/* <img src="/logo_full.svg" alt="Logo" /> */}
+                    {/* <h2>Maintainerr</h2> */}
+                    <img src='/logo.svg' alt="Logo" />
                   </a>
                 </span>
               </div>
-              <nav className="mt-16 flex-1 space-y-4 px-4">
+              <nav className="mt-12 flex-1 space-y-4 px-4">
                 {navBarItems.map((navBarLink) => {
                   return (
                     <Link
@@ -169,7 +180,6 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                     >
                       <a
                         onClick={() => setHighlight(navBarLink.href)}
-                        // className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium leading-6 text-white transition duration-150 ease-in-out focus:outline-none`}
                         className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium leading-6 text-white transition duration-150 ease-in-out ${
                           navBarLink.selected
                             ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'
@@ -178,6 +188,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                         focus:bg-amber-800 focus:outline-none
                       `}
                       >
+                        {navBarLink.svgIcon}
                         {navBarLink.name}
                       </a>
                     </Link>
