@@ -1,4 +1,8 @@
-<b>Maintainerr</b>'s goal is to make managing the removal of your media easy. Create custom rules with parameters across different services, show the matching media on a Plex collection for a given amount of time and handle the deletion.
+<p align="center">
+  <img src="ui/public/logo_black.svg?raw=true" alt="Sublime's custom image"/>
+</p>
+
+<b>Maintainerr</b> aims to make managing the removal of your media easy. Create custom rules with parameters across different services, show the matching media on a Plex collection for a given amount of time and handle the deletion.
 
 # Features
 
