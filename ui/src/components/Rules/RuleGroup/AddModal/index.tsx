@@ -301,7 +301,7 @@ const AddModal = (props: AddModal) => {
 
           <div className="form-row">
             <label htmlFor="collection_deleteDays" className="text-label">
-              Items deleted after *
+              Media deleted after days*
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -335,7 +335,7 @@ const AddModal = (props: AddModal) => {
 
           <div className="mt-5 flex h-full w-full">
             {/* <AddButton text="Create" onClick={create} /> */}
-            <div className="m-auto">
+            <div className="m-auto xl:m-0">
               <button
                 className="add-button h-10 w-20 rounded-full text-white shadow-md"
                 type="submit"
@@ -344,7 +344,7 @@ const AddModal = (props: AddModal) => {
                 Save
               </button>
               <button
-                className="cancel-button ml-5 h-10 w-20 rounded-full text-white shadow-md"
+                className="cancel-button ml-3 h-10 w-20 rounded-full text-white shadow-md"
                 type="reset"
                 onClick={cancel}
               >

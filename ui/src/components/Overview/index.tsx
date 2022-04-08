@@ -23,7 +23,7 @@ const Overview = () => {
   const pageData = useRef<number>(0)
   const LibrariesCtx = useContext(LibrariesContext)
 
-  const fetchAmount = 20
+  const fetchAmount = 30
 
   useEffect(() => {
     if (SearchCtx.text !== '') {
