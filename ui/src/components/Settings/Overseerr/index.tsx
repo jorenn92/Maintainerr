@@ -16,6 +16,10 @@ const OverseerrSettings = () => {
   const [changed, setChanged] = useState<boolean>()
 
   useEffect(() => {
+    document.title = 'Maintainerr - Settings - Overseerr'
+  }, [])
+
+  useEffect(() => {
     const url = settingsCtx.settings.overseerr_url?.split(':')
     if (url) setHostname(`${url[0]}:${url[1]}`)
   }, [settingsCtx])

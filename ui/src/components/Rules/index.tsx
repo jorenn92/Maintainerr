@@ -23,6 +23,7 @@ const Rules: React.FC = () => {
   }
 
   useEffect(() => {
+    document.title = "Maintainerr - Rules"
     fetchData().then((resp) => {
       setData(resp)
       setIsLoading(false)

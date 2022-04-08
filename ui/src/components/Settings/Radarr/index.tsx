@@ -15,6 +15,10 @@ const RadarrSettings = () => {
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
 
+  useEffect(() => {
+    document.title = 'Maintainerr - Settings - Radarr'
+  }, [])
+
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (
