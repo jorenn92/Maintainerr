@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import NodePlexAPI from 'plex-api';
-import { PlexSettings } from 'src/modules/settings/interfaces/plex-settings.interface';
-import { SettingsService } from 'src/modules/settings/settings.service';
+import { PlexSettings } from '../../../modules/settings/interfaces/plex-settings.interface';
+import { SettingsService } from '../../..//modules/settings/settings.service';
 import { BasicResponseDto } from './dto/basic-response.dto';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
 import {

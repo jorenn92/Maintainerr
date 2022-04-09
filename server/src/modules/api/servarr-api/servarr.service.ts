@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { SettingsService } from 'src/modules/settings/settings.service';
+import { SettingsService } from '../../../modules/settings/settings.service';
 import { RadarrApi } from './helpers/radarr.helper';
 import { SonarrApi } from './helpers/sonarr.helper';
 

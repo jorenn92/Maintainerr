@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { warn } from 'console';
-import { PlexLibraryItem } from 'src/modules/api/plex-api/interfaces/library.interfaces';
-import { RadarrApi } from 'src/modules/api/servarr-api/helpers/radarr.helper';
-import { ServarrService } from 'src/modules/api/servarr-api/servarr.service';
-import { TmdbIdService } from 'src/modules/api/tmdb-api/tmdb-id.service';
+import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
+import { RadarrApi } from '../../../modules/api/servarr-api/helpers/radarr.helper';
+import { ServarrService } from '../../../modules/api/servarr-api/servarr.service';
+import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
 import {
   Application,
   Property,

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { warn } from 'console';
-import { PlexLibraryItem } from 'src/modules/api/plex-api/interfaces/library.interfaces';
-import { SonarrApi } from 'src/modules/api/servarr-api/helpers/sonarr.helper';
-import { ServarrService } from 'src/modules/api/servarr-api/servarr.service';
+import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
+import { SonarrApi } from '../../../modules/api/servarr-api/helpers/sonarr.helper';
+import { ServarrService } from '../../../modules/api/servarr-api/servarr.service';
 import {
   Application,
   Property,

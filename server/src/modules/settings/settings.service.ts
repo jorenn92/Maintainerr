@@ -103,7 +103,7 @@ export class SettingsService implements SettingDto {
       this.logger.error(
         'Something went wrong while getting settings. Is the database file locked?',
       );
-      return { status: 'NOK', code: 0, message: err };
+      return { status: 'NOK', code: 0, message: err } as BasicResponseDto;
     }
   }
 

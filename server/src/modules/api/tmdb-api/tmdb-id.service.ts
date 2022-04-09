@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { warn } from 'console';
-import { PlexMetadata } from 'src/modules/api/plex-api/interfaces/media.interface';
-import { PlexApiService } from 'src/modules/api/plex-api/plex-api.service';
-import { TmdbApiService } from 'src/modules/api/tmdb-api/tmdb.service';
+import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
+import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
+import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
 import { PlexLibraryItem } from '../plex-api/interfaces/library.interfaces';
 
 @Injectable()
