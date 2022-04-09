@@ -2,7 +2,7 @@
   <img src="ui/public/logo_black.svg?raw=true" alt="Sublime's custom image"/>
 </p>
 
-<b>Maintainerr</b> makes the management of your media easy. Create custom rules with parameters across different services, show the matching media on a Plex collection for a given amount of days and handle the deletion.
+<b>Maintainerr</b> makes managing your media easy. Create custom rules with parameters across different services, show the matching media on a Plex collection for a given amount of days and handle the deletion.
 
 # Features
 

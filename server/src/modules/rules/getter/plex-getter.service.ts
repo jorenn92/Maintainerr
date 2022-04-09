@@ -3,8 +3,8 @@ import { warn } from 'console';
 import {
   PlexLibraryItem,
   PlexSeenBy,
-} from 'src/modules/api/plex-api/interfaces/library.interfaces';
-import { PlexApiService } from 'src/modules/api/plex-api/plex-api.service';
+} from '../../..//modules/api/plex-api/interfaces/library.interfaces';
+import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import {
   Application,
   Property,

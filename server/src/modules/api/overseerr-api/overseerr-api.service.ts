@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { SettingsService } from 'src/modules/settings/settings.service';
+import { SettingsService } from '../../../modules/settings/settings.service';
 import { OverseerrApi } from './helpers/overseerr-api.helper';
 
 export interface OverSeerrMediaResponse {

@@ -1,8 +1,8 @@
 // import cacheManager, { AvailableCacheIds } from '../../lib/cache';
 import { AxiosResponse } from 'axios';
 import { warn } from 'console';
-import { ExternalApiService } from 'src/modules/api/external-api/external-api.service';
-import { DVRSettings } from 'src/modules/settings/interfaces/dvr-settings.interface';
+import { ExternalApiService } from '../../../../modules/api/external-api/external-api.service';
+import { DVRSettings } from '../../../../modules/settings/interfaces/dvr-settings.interface';
 import {
   QualityProfile,
   QueueItem,

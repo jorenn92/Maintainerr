@@ -4,14 +4,14 @@ import {
   OverseerrApiService,
   OverSeerrMediaResponse,
   OverseerrMediaStatus,
-} from 'src/modules/api/overseerr-api/overseerr-api.service';
+} from '../../../modules/api/overseerr-api/overseerr-api.service';
 import {
   PlexLibraryItem,
   PlexUser,
-} from 'src/modules/api/plex-api/interfaces/library.interfaces';
-import { PlexApiService } from 'src/modules/api/plex-api/plex-api.service';
-import { TmdbIdService } from 'src/modules/api/tmdb-api/tmdb-id.service';
-import { TmdbApiService } from 'src/modules/api/tmdb-api/tmdb.service';
+} from '../../../modules/api/plex-api/interfaces/library.interfaces';
+import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
+import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
+import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
 import {
   Application,
   Property,

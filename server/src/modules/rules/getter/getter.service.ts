@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PlexLibraryItem } from 'src/modules/api/plex-api/interfaces/library.interfaces';
+import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
 import { Application } from '../constants/rules.constants';
 import { OverseerrGetterService } from './overseerr-getter.service';
 import { PlexGetterService } from './plex-getter.service';
