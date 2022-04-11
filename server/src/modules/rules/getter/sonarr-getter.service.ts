@@ -36,17 +36,21 @@ export class SonarrGetterService {
             return showResponse.added ? showResponse.added : null;
           }
           case 'diskSizeEntireShow': {
+            console.log(showResponse);
             return showResponse.statistics.sizeOnDisk
               ? +showResponse.statistics.sizeOnDisk
               : null;
           }
           case 'tags': {
-            return showResponse.tags ? +showResponse.tags : null;
+            const tagIds = showResponse.tags;
+            return (await this.servarrService.SonarrApi.getTags())
+              .filter((el) => tagIds.includes(el.id))
+              .map((el) => el.label);
           }
           case 'qualityProfileId': {
-            return showResponse.qualityProfileId
-              ? +showResponse.qualityProfileId
-              : null;
+            return (await this.servarrService.SonarrApi.getProfiles())
+              .filter((el) => el.id === showResponse.qualityProfileId)
+              .map((el) => el.name);
           }
           case 'firstAirDate': {
             return showResponse.firstAired ? showResponse.firstAired : null;
@@ -60,10 +64,18 @@ export class SonarrGetterService {
             return showResponse.status ? showResponse.status : null;
           }
           case 'ended': {
-            return showResponse.ended ? showResponse.ended : null;
+            return showResponse.ended !== undefined
+              ? showResponse.ended
+                ? 1
+                : 0
+              : null;
           }
           case 'monitored': {
-            return showResponse.monitored ? showResponse.monitored : null;
+            return showResponse.monitored !== undefined
+              ? showResponse.monitored
+                ? 1
+                : 0
+              : null;
           }
         }
       } else return null;

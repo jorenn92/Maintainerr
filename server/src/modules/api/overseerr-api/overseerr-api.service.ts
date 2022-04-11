@@ -7,6 +7,7 @@ export interface OverSeerrMediaResponse {
   imdbid: string;
   collection: OverseerCollection;
   mediaInfo: OverseerrMediaInfo;
+  releaseDate: Date;
 }
 interface OverseerCollection {
   id: number;

@@ -312,6 +312,8 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   private doRuleAction<T>(val1: T, val2: T, action: RulePossibility): boolean {
+    console.log(`comparing ${val1} to ${val2}`);
+
     if (action === RulePossibility.BIGGER) {
       return val1 > val2;
     }

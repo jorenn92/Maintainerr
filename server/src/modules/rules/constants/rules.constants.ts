@@ -136,7 +136,7 @@ export class RuleConstants {
         {
           id: 6,
           name: 'collections',
-          humanName: 'Amount of collections',
+          humanName: 'Present in amount of collections',
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
         } as Property,
@@ -150,7 +150,7 @@ export class RuleConstants {
         {
           id: 8,
           name: 'fileVideoResolution',
-          humanName: 'Media file resolution',
+          humanName: 'Media file resolution (4k, 1080,..)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
         } as Property,
@@ -171,7 +171,7 @@ export class RuleConstants {
         {
           id: 11,
           name: 'genre',
-          humanName: 'List of genres',
+          humanName: 'List of genres (Action, Adventure,..)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT, // return text[]
         } as Property,
@@ -262,7 +262,7 @@ export class RuleConstants {
         {
           id: 5,
           name: 'monitored',
-          humanName: 'is monitored',
+          humanName: 'is monitored (1 or 0)',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
         } as Property,
@@ -290,7 +290,7 @@ export class RuleConstants {
         {
           id: 9,
           name: 'fileQuality',
-          humanName: 'File - quality',
+          humanName: 'File - quality (2160, 1080,..)',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
         } as Property,
@@ -299,7 +299,7 @@ export class RuleConstants {
           name: 'fileDate',
           humanName: 'File - download date',
           mediaType: MediaType.MOVIE,
-          type: RuleType.NUMBER,
+          type: RuleType.DATE,
         } as Property,
         {
           id: 11,
@@ -325,9 +325,10 @@ export class RuleConstants {
         {
           id: 1,
           name: 'diskSizeEntireShow',
-          humanName: 'Files - Disk size all episodes in MB',
+          humanName:
+            'Files - Disk size all episodes in MB (Currently Broken in Sonarr)',
           mediaType: MediaType.SHOW,
-          type: RuleType.DATE,
+          type: RuleType.NUMBER,
         } as Property,
         {
           id: 2,
@@ -359,7 +360,7 @@ export class RuleConstants {
         } as Property,
         {
           id: 6,
-          name: 'status',
+          name: 'status (continuing, ended)',
           humanName: 'Status',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT,
@@ -367,7 +368,7 @@ export class RuleConstants {
         {
           id: 7,
           name: 'ended',
-          humanName: 'Show ended',
+          humanName: 'Show ended (1 or 0)',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
         } as Property,
@@ -388,10 +389,10 @@ export class RuleConstants {
         {
           id: 0,
           name: 'addUser',
-          humanName: 'Requested by user',
+          humanName: 'Requested by user (username)',
           mediaType: MediaType.BOTH,
-          type: RuleType.NUMBER,
-        } as Property, //  returns id[]
+          type: RuleType.TEXT,
+        } as Property, //  returns username[]
         {
           id: 1,
           name: 'requestDate',
