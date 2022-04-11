@@ -31,6 +31,7 @@ export interface RadarrMovie {
   physicalRelease: string;
   digitalRelease: string;
   inCinemas: string;
+  tags: number[];
 }
 
 export interface RadarrMediaInfo {
@@ -55,7 +56,7 @@ export interface RadarrMovieFile {
   dateAdded: string;
   quality: RadarrQualityContainer;
   size: number;
-  mediainfo: RadarrMediaInfo;
+  mediaInfo: RadarrMediaInfo;
 }
 
 export interface RadarrQualityContainer {

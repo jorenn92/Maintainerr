@@ -31,6 +31,7 @@ enum CustomParams {
   CUSTOM_NUMBER = 'custom_number',
   CUSTOM_DAYS = 'custom_days',
   CUSTOM_DATE = 'custom_date',
+  CUSTOM_TEXT = 'custom_text',
 }
 
 interface IRuleInput {
@@ -67,7 +68,10 @@ const RuleInput = (props: IRuleInput) => {
         switch (props.editData.rule.customVal.ruleTypeId) {
           case 0:
             // TODO: improve this.. Currently this is a hack to determine if param is amount of days or really a number
-            if (props.editData.rule.customVal.value as number % 86400 === 0 && props.editData.rule.customVal.value as number != 0) { 
+            if (
+              (props.editData.rule.customVal.value as number) % 86400 === 0 &&
+              (props.editData.rule.customVal.value as number) != 0
+            ) {
               setSecondVal(CustomParams.CUSTOM_DAYS)
               setRuleType(0)
             } else {
@@ -80,6 +84,7 @@ const RuleInput = (props: IRuleInput) => {
             setRuleType(1)
             break
           case 2:
+            setSecondVal(CustomParams.CUSTOM_TEXT)
             setRuleType(2)
         }
         setCustomVal(props.editData.rule.customVal.value.toString())
@@ -125,7 +130,8 @@ const RuleInput = (props: IRuleInput) => {
       ((secondVal &&
         secondVal !== 'custom_date' &&
         secondVal !== 'custom_days' &&
-        secondVal !== 'custom_number') ||
+        secondVal !== 'custom_number' &&
+        secondVal !== 'custom_text') ||
         customVal)
     ) {
       const ruleValues = {
@@ -142,8 +148,10 @@ const RuleInput = (props: IRuleInput) => {
                 ? customValType
                 : customValType === RuleType.NUMBER
                 ? customValType
-                : customValType === RuleType.TEXT
+                : customValType === RuleType.TEXT && secondVal === 'custom_days'
                 ? RuleType.NUMBER
+                : customValType === RuleType.TEXT
+                ? customValType
                 : +ruleType
               : +ruleType,
             value: customVal,
@@ -185,6 +193,9 @@ const RuleInput = (props: IRuleInput) => {
         setCustomValActive(true)
         setCustomValType(RuleType.DATE)
       } else if (secondVal === 'custom_days') {
+        setCustomValActive(true)
+        setCustomValType(RuleType.TEXT)
+      } else if (secondVal === 'custom_text') {
         setCustomValActive(true)
         setCustomValType(RuleType.TEXT)
       } else {
@@ -349,7 +360,12 @@ const RuleInput = (props: IRuleInput) => {
                     <option value="custom_date">Specific date.. </option>
                   </>
                 ) : undefined}
-                <option value="custom_number">Custom number.. </option>
+                {ruleType === RuleType.NUMBER ? (
+                  <option value="custom_number">Custom number.. </option>
+                ) : undefined}
+                {ruleType === RuleType.TEXT ? (
+                  <option value="custom_text">Custom text.. </option>
+                ) : undefined}
               </optgroup>
               {/* <option value="custom_calc">Custom calculation.. </option> */}
               {ConstantsCtx.constants.applications?.map((app) => {
@@ -382,7 +398,8 @@ const RuleInput = (props: IRuleInput) => {
           </label>
           <div className="form-input">
             <div className="form-input-field">
-              {customValType === RuleType.TEXT ? (
+              {customValType === RuleType.TEXT &&
+              secondVal === 'custom_days' ? (
                 <input
                   type="number"
                   name="custom_val"
@@ -390,6 +407,16 @@ const RuleInput = (props: IRuleInput) => {
                   onChange={updateCustomValue}
                   value={customVal ? +customVal / 86400 : undefined}
                   placeholder="Amount of days"
+                ></input>
+              ) : customValType === RuleType.TEXT &&
+                secondVal === 'custom_text' ? (
+                <input
+                  type="text"
+                  name="custom_val"
+                  id="custom_val"
+                  onChange={updateCustomValue}
+                  value={customVal}
+                  placeholder="Text"
                 ></input>
               ) : customValType === RuleType.DATE ? (
                 <input

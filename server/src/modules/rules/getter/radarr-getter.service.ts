@@ -48,27 +48,46 @@ export class RadarrGetterService {
         }
         case 'fileQuality': {
           return movieResponse?.movieFile.quality.quality.resolution
-            ? new Date(movieResponse.movieFile.quality.quality.resolution)
+            ? movieResponse.movieFile.quality.quality.resolution
             : null;
         }
         case 'fileAudioChannels': {
-          return movieResponse?.movieFile.mediainfo.audioChannels
-            ? new Date(movieResponse.movieFile[0].mediainfo.audioChannels)
+          return movieResponse?.movieFile
+            ? movieResponse.movieFile.mediaInfo?.audioChannels
             : null;
         }
         case 'runTime': {
-          return movieResponse?.movieFile.mediainfo.runTime
-            ? new Date(movieResponse.movieFile[0].mediainfo.runTime)
-            : null;
+          if (movieResponse?.movieFile.mediaInfo.runTime) {
+            const hms = movieResponse.movieFile.mediaInfo.runTime;
+            const splitted = hms.split(':');
+            return +splitted[0] * 60 + +splitted[1];
+          }
+          return null;
         }
         case 'monitored': {
-          return movieResponse?.monitored ? movieResponse.monitored : null;
+          return movieResponse?.monitored
+            ? movieResponse.monitored
+              ? 1
+              : 0
+            : null;
         }
         case 'tags': {
-          return await this.servarrService.RadarrApi.getTags();
+          const movieTags = movieResponse?.tags;
+          return (await this.servarrService.RadarrApi.getTags())
+            ?.filter((el) => movieTags.includes(el.id))
+            .map((el) => el.label);
+        }
+        case 'profile': {
+          const movieProfile = movieResponse?.qualityProfileId;
+
+          return (await this.servarrService.RadarrApi.getProfiles())?.find(
+            (el) => el.id === movieProfile,
+          ).name;
         }
         case 'fileSize': {
-          return movieResponse?.sizeOnDisk ? movieResponse.sizeOnDisk : null;
+          return movieResponse?.sizeOnDisk
+            ? Math.round(movieResponse.sizeOnDisk / 1048576)
+            : null;
         }
         case 'releaseDate': {
           return movieResponse?.physicalRelease && movieResponse?.digitalRelease

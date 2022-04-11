@@ -45,7 +45,7 @@ export class PlexGetterService {
             : null;
         }
         case 'rating': {
-          return libItem.rating ? +libItem.rating : 0;
+          return libItem.audienceRating ? +libItem.audienceRating : 0;
         }
         case 'people': {
           return libItem.Role ? libItem.Role.map((el) => el.tag) : null;
@@ -55,7 +55,7 @@ export class PlexGetterService {
           return count ? count.length : 0;
         }
         case 'collections': {
-          return null; // TODO
+          return libItem.Collection ? libItem.Collection.length : null;
         }
         case 'lastViewedAt': {
           return await this.plexApi
@@ -90,7 +90,7 @@ export class PlexGetterService {
             : null;
         }
         case 'genre': {
-          return libItem.genre ? libItem.genre.map((el) => el.tag) : null;
+          return libItem.Genre ? libItem.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {
           const seasons = await this.plexApi.getChildrenMetadata(

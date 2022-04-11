@@ -55,20 +55,20 @@ export class OverseerrGetterService {
               const plexUsers = (await this.plexApi.getUsers()).map((el) => {
                 return { plexId: el.id, username: el.name } as PlexUser;
               });
-              const usersIds: number[] = [];
+              const userNames: string[] = [];
               if (
                 mediaResponse &&
                 mediaResponse.mediaInfo &&
                 mediaResponse.mediaInfo.requests
               ) {
                 for (const request of mediaResponse.mediaInfo.requests) {
-                  usersIds.push(
+                  userNames.push(
                     plexUsers.find(
                       (u) => u.username === request.requestedBy?.plexUsername,
-                    )?.plexId,
+                    )?.username,
                   );
                 }
-                return usersIds;
+                return userNames;
               }
               return [];
             } catch (e) {
@@ -82,7 +82,14 @@ export class OverseerrGetterService {
             return mediaResponse?.mediaInfo.requests.length;
           }
           case 'requestDate': {
-            return new Date(mediaResponse?.mediaInfo?.requests[0]?.createdAt);
+            return mediaResponse?.mediaInfo?.requests[0]?.createdAt
+              ? new Date(mediaResponse?.mediaInfo?.requests[0]?.createdAt)
+              : null;
+          }
+          case 'releaseDate': {
+            return mediaResponse?.releaseDate
+              ? new Date(mediaResponse?.releaseDate)
+              : null;
           }
           case 'approvalDate': {
             return mediaResponse?.mediaInfo.status >=

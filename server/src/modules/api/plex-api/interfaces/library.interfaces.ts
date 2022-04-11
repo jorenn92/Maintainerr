@@ -26,11 +26,13 @@ export interface PlexLibraryItem {
   year: number;
   duration: number;
   originallyAvailableAt: string;
-  rating: number;
-  genre?: PlexGenre[];
+  rating?: number;
+  audienceRating?: number;
+  Genre?: PlexGenre[];
   Role?: PlexActor[];
   leafCount?: number;
   viewedLeafCount?: number;
+  Collection?: { tag: string }[];
 }
 
 export interface PlexLibraryResponse {
