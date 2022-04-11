@@ -3,6 +3,7 @@ import { warn } from 'console';
 import {
   PlexLibraryItem,
   PlexSeenBy,
+  PlexUser,
 } from '../../..//modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import {
@@ -29,15 +30,22 @@ export class PlexGetterService {
           return libItem.addedAt ? new Date(+libItem.addedAt * 1000) : null;
         }
         case 'seenBy': {
-          // const plexUsers = (await this.plexApi.getUsers()).map((el) => {
-          //   return { plexId: el.id, username: el.name } as PlexUser;
-          // });
+          const plexUsers = (await this.plexApi.getUsers()).map((el) => {
+            return { plexId: el.id, username: el.name } as PlexUser;
+          });
           const viewers: PlexSeenBy[] = await this.plexApi
             .getWatchHistory(libItem.ratingKey)
             .catch((_err) => {
               return null;
             });
-          return viewers ? viewers.map((el) => +el.accountID) : [];
+          if (viewers) {
+            const viewerIds = viewers.map((el) => +el.accountID);
+            return plexUsers
+              .filter((el) => viewerIds.includes(el.plexId))
+              .map((el) => el.username);
+          } else {
+            return [];
+          }
         }
         case 'releaseDate': {
           return new Date(libItem.originallyAvailableAt)
@@ -93,6 +101,9 @@ export class PlexGetterService {
           return libItem.Genre ? libItem.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {
+          const plexUsers = (await this.plexApi.getUsers()).map((el) => {
+            return { plexId: el.id, username: el.name } as PlexUser;
+          });
           const seasons = await this.plexApi.getChildrenMetadata(
             libItem.ratingKey,
           );
@@ -135,9 +146,14 @@ export class PlexGetterService {
             }
           }
 
-          return allViewers && allViewers.length > 0
-            ? allViewers.map((el) => el.accountID)
-            : null;
+          if (allViewers && allViewers.length > 0) {
+            const viewerIds = allViewers.map((el) => +el.accountID);
+            return plexUsers
+              .filter((el) => viewerIds.includes(el.plexId))
+              .map((el) => el.username);
+          }
+
+          return [];
         }
         case 'sw_lastWatched': {
           const watchHistory = await this.plexApi.getWatchHistory(

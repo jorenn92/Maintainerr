@@ -102,7 +102,7 @@ export class RuleConstants {
           name: 'seenBy',
           humanName: 'Viewed by (list of users)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.NUMBER, // returns id[]
+          type: RuleType.TEXT, // returns id[]
         } as Property,
         {
           id: 2,
@@ -178,9 +178,9 @@ export class RuleConstants {
         {
           id: 12,
           name: 'sw_allEpisodesSeenBy',
-          humanName: 'List of people that saw all available episodes',
+          humanName: 'Users that saw all available episodes',
           mediaType: MediaType.SHOW,
-          type: RuleType.NUMBER, // return id's []
+          type: RuleType.TEXT, // return usernames []
         } as Property,
         {
           id: 13,
