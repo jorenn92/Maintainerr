@@ -11,7 +11,10 @@
 
   body {
     @apply bg-zinc-900;
-    font-family: Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+      BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans,
+      sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol,
+      Noto Color Emoji;
   }
 
   code {
@@ -28,13 +31,21 @@
     padding-top: env(safe-area-inset-top);
     height: calc(4rem + env(safe-area-inset-top));
   }
- 
+
   .sidebar {
     @apply border-r border-zinc-700;
     padding-top: env(safe-area-inset-top);
     padding-left: env(safe-area-inset-left);
     background: linear-gradient(180deg, rgb(43, 43, 49, 1) 0%, #18181b 100%);
+  }
 
+  .rules-button-text {
+    padding-top: 0.17rem;
+    margin-left: 0.4rem;
+    margin-right: 0.75rem;
+    --tw-text-opacity: 1;
+    color: rgb(228 228 231 / var(--tw-text-opacity));
+    display: inline-block;
   }
 
   .collection {
@@ -85,11 +96,11 @@
 
   .add-button {
     /* background: linear-gradient(90deg, rgba(242, 79, 99, 1) 0%, rgba(196, 100, 76, 1) 100%); */
-    @apply bg-amber-600
+    @apply bg-amber-600;
   }
 
   .add-button:hover {
-    @apply bg-amber-500
+    @apply bg-amber-500;
   }
 
   .cancel-button {
@@ -97,19 +108,19 @@
   }
 
   .cancel-button:hover {
-    background: #4e586E;
+    background: #4e586e;
   }
 
   .edit-button {
-    @apply bg-amber-900
+    @apply /*
 
-    /* background-color: #3f3f46; */
+    background-color: #3f3f46; */ bg-amber-900;
   }
 
   .edit-button:hover {
-    @apply bg-amber-800
+    @apply /*
 
-    /* background: #3a3a42; */
+    background: #3a3a42; */ bg-amber-800;
   }
 
   .delete-button {
@@ -356,7 +367,7 @@
   }
 
   input[type='checkbox'] {
-    @apply h-6 w-6 rounded-md text-amber-600 default:ring-amber-600 checked:ring-amber-800 transition duration-150 ease-in-out;
+    @apply h-6 w-6 rounded-md text-amber-600 transition duration-150 ease-in-out default:ring-amber-600 checked:ring-amber-800;
   }
 
   input[type='text'],

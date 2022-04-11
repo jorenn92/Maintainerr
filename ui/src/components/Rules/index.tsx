@@ -1,8 +1,11 @@
+import { RefreshIcon } from '@heroicons/react/outline'
+import { PlayIcon } from '@heroicons/react/solid'
 import Image from 'next/image'
 import React, { useContext, useEffect, useState } from 'react'
 import LibrariesContext from '../../contexts/libraries-context'
-import GetApiHandler from '../../utils/ApiHandler'
+import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
 import AddButton from '../Common/AddButton'
+import ExecuteButton from '../Common/ExecuteButton'
 import LibrarySwitcher from '../Common/LibrarySwitcher'
 import LoadingSpinner from '../Common/LoadingSpinner'
 import RuleGroup, { IRuleGroup } from './RuleGroup'
@@ -23,7 +26,7 @@ const Rules: React.FC = () => {
   }
 
   useEffect(() => {
-    document.title = "Maintainerr - Rules"
+    document.title = 'Maintainerr - Rules'
     fetchData().then((resp) => {
       setData(resp)
       setIsLoading(false)
@@ -51,6 +54,10 @@ const Rules: React.FC = () => {
   const editHandler = (group: IRuleGroup): void => {
     setEditData(group)
     setEditModal(true)
+  }
+
+  const sync = () => {
+    PostApiHandler(`/rules/execute`, {})
   }
 
   if (!data || isLoading) {
@@ -89,6 +96,15 @@ const Rules: React.FC = () => {
       <div className="w-full">
         <LibrarySwitcher onSwitch={onSwitchLibrary} />
 
+        <div className="mb-5 flex w-full">
+          <div className="h-8">
+            <AddButton onClick={showAddModal} text="New rule" />
+          </div>
+          <div className="ml-2 h-8">
+            <ExecuteButton onClick={sync} text="Force exec" />
+          </div>
+        </div>
+
         <div>
           {(data as IRuleGroup[]).map((el) => (
             <RuleGroup
@@ -98,9 +114,6 @@ const Rules: React.FC = () => {
               group={el as IRuleGroup}
             />
           ))}
-        </div>
-        <div className="m-auto h-10 w-10">
-          <AddButton onClick={showAddModal} text="+" />
         </div>
       </div>
     </>
