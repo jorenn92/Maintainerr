@@ -32,6 +32,14 @@
     height: calc(4rem + env(safe-area-inset-top));
   }
 
+  .max-width-form {
+    max-width: 60rem;
+  }
+  .max-width-form-head {
+    max-width: 61rem;
+  }
+
+
   .sidebar {
     @apply border-r border-zinc-700;
     padding-top: env(safe-area-inset-top);

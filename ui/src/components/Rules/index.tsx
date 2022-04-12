@@ -101,7 +101,7 @@ const Rules: React.FC = () => {
             <AddButton onClick={showAddModal} text="New rule" />
           </div>
           <div className="ml-2 h-8">
-            <ExecuteButton onClick={sync} text="Force exec" />
+            <ExecuteButton onClick={sync} text="Run rules" />
           </div>
         </div>
 

@@ -33,19 +33,18 @@ interface iRuleCreator {
 const RuleCreator = (props: iRuleCreator) => {
   const [isLoading, setIsLoading] = useState(true)
   const [editSections, setEditSections] = useState<number>()
-  const [ruleAmount, setRuleAmount] = useState<[number, number[]]>(
-    // editSections ? [editSections, sectionAmounts] : [1, [1]]
-    [1, [1]]
-  )
+  const [ruleAmount, setRuleAmount] = useState<[number, number[]]>([1, [1]])
   const [totalRules, setTotalRules] = useState<number>(0)
   const [editData, setEditData] = useState<{ rules: IRule[] }>()
   const [createdRules, setCreatedRules] = useState<IRulesToCreate[]>([])
-  const rulesCreated = useRef<IRulesToCreate[]>([]);
+  const rulesCreated = useRef<IRulesToCreate[]>([])
   const ConstantsCtx = useContext(ConstantsContext)
   const [ruleAmountArr, setRuleAmountArr] = useState<[number[], [number[]]]>([
     [1],
     [[1]],
   ])
+  const deleted = useRef<number>(0)
+  const added = useRef<number[]>([])
 
   useEffect(() => {
     setIsLoading(true)
@@ -86,9 +85,13 @@ const RuleCreator = (props: iRuleCreator) => {
   const ruleCommited = (id: number, rule: IRule) => {
     if (rulesCreated) {
       const rules = rulesCreated.current.filter((el) => el.id !== id)
-      rulesCreated.current = [...rules, { id: id, rule: rule }];
-      setCreatedRules([...rules, { id: id, rule: rule }])
+      const toCommit = [...rules, { id: id, rule: rule }].sort(
+        (a, b) => a.id - b.id
+      )
+      rulesCreated.current = toCommit
+      setCreatedRules(toCommit)
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
+      added.current = added.current.filter((e) => e !== id)
     }
   }
 
@@ -101,33 +104,59 @@ const RuleCreator = (props: iRuleCreator) => {
     }
   }
 
-  const addRule = (e: any) => {
-    e.preventDefault()
+  const ruleDeleted = (section = 0, id: number) => {
+    if (rulesCreated.current.length > 0) {
+      let rules = rulesCreated.current?.filter((el) => el.id !== id)
+      rules = rules.map((e) => {
+        e.id = e.id > id ? e.id - 1 : e.id
+        return e
+      })
+      rulesCreated.current = [...rules]
+      setCreatedRules([...rules])
+      props.onUpdate(rulesCreated.current.map((el) => el.rule))
+    }
+
+    const rules = [...ruleAmount[1]]
+    rules[section - 1] = rules[section - 1] - 1
+
+    if (rulesCreated.current.length > 0) {
+      setEditSections(ruleAmount[0] - rules.filter((e) => e <= 0).length)
+      setEditData({ rules: rulesCreated.current.map((el) => el.rule) })
+    }
+
+    const nonEmptySections = rules.filter((e) => !(e <= 0))
+    setRuleAmount([
+      ruleAmount[0] - rules.filter((e) => e <= 0).length,
+      nonEmptySections.length > 0 ? nonEmptySections : [1],
+    ])
+
+    deleted.current = deleted.current + 1
+  }
+
+  const RuleAdded = (section: number) => {
+    console.log(`adding to ${section}`)
+    console.log(createdRules)
+    console.log(ruleAmountArr)
+    console.log(ruleAmount)
+    console.log(rulesCreated.current)
+
+    const ruleId =
+      ruleAmount[1].reduce((prev, cur, idx) =>
+        idx + 1 <= section ? prev + cur : prev
+      ) + 1
+    console.log(`Giving rule ID ${ruleId}`)
+
+    const newRulesCr = rulesCreated.current.map((e) => {
+      e.id >= ruleId ? (e.id = e.id + 1) : e.id
+      return e
+    })
+
     let rules = [...ruleAmount[1]]
-    rules[rules.length - 1] = rules[rules.length - 1] + 1
+    rules[section - 1] = rules[section - 1] + 1
+
     setRuleAmount([ruleAmount[0], rules])
-  }
-
-  const removeRule = (e: any) => {
-    e.preventDefault()
-    ruleOmitted(ruleAmount[1][ruleAmount[1].length - 1])
-    const rules = [...ruleAmount[1]]
-    rules[rules.length - 1] = rules[rules.length - 1] - 1
-    setRuleAmount([ruleAmount[0], rules])
-  }
-
-  const addSection = (e: any) => {
-    e.preventDefault()
-    const rules = [...ruleAmount[1]]
-    rules.push(1)
-    setRuleAmount([ruleAmount[0] + 1, rules])
-  }
-
-  const removeSection = (e: any) => {
-    e.preventDefault()
-    const rules = _.cloneDeep(ruleAmount[1])
-    rules.pop()
-    setRuleAmount([ruleAmount[0] - 1, rules])
+    added.current = [...added.current, ruleId]
+    console.log([ruleAmount[0], rules])
   }
 
   useEffect(() => {
@@ -154,7 +183,6 @@ const RuleCreator = (props: iRuleCreator) => {
       counter = counter + ruleAmount[1][sid - 1]
     })
     setTotalRules(counter)
-
   }, [ruleAmountArr])
 
   if (isLoading) {
@@ -167,17 +195,18 @@ const RuleCreator = (props: iRuleCreator) => {
 
   return (
     <div className="h-full w-full">
-      {rulesCreated.current.length !== ruleAmount[1].reduce((pv, cv) => pv + cv ) ? (
+      {rulesCreated.current.length !==
+      ruleAmount[1].reduce((pv, cv) => pv + cv) ? (
         <Alert>{`Some incomplete rules won't get saved`} </Alert>
       ) : undefined}
       {ruleAmountArr[0].map((sid) => {
         return (
-          <div key={sid - 1}>
-            <SectionHeading id={sid} name={'Section'} />
+          <div key={`${sid}-${deleted.current}`}>
+            <SectionHeading id={sid} name={'Section'} onAdd={RuleAdded} />
             <div className="ml-5">
               {ruleAmountArr[1][sid - 1].map((id) => (
                 <RuleInput
-                  key={sid + id - 1}
+                  key={`${sid}-${id}`}
                   id={
                     ruleAmount[1].length > 1
                       ? ruleAmount[1].reduce((pv, cv, idx) =>
@@ -212,48 +241,17 @@ const RuleCreator = (props: iRuleCreator) => {
                       : undefined
                   }
                   section={sid}
+                  newlyAdded={added.current.includes(id)}
                   mediaType={props.mediaType}
                   onCommit={ruleCommited}
                   onIncomplete={ruleOmitted}
+                  onDelete={ruleDeleted}
                 />
               ))}
             </div>
           </div>
         )
       })}
-
-      <div className="mt-5 flex w-full">
-        <div className="m-auto xl:m-0">
-          <button
-            className="mr-3 h-10 w-24 rounded-full bg-amber-800 text-amber-100 shadow-lg"
-            onClick={addSection}
-          >
-            <span>+ Section</span>
-          </button>
-          {ruleAmountArr[0].length > 1 ? (
-            <button
-              className="mr-3 mt-3 h-10 w-24 rounded-full bg-amber-800 text-amber-100 shadow-lg"
-              onClick={removeSection}
-            >
-              <span>- Section </span>
-            </button>
-          ) : null}
-          <button
-            className="mr-3 mt-3 h-10 w-20 rounded-full bg-amber-800 text-amber-100 shadow-lg"
-            onClick={addRule}
-          >
-            <span>+ Rule</span>
-          </button>
-          {ruleAmountArr[1][ruleAmount[1].length - 1]?.length > 1 ? (
-            <button
-              className="h-10 mt-3 w-20 rounded-full bg-amber-800 text-amber-100 shadow-lg"
-              onClick={removeRule}
-            >
-              <span>- Rule</span>
-            </button>
-          ) : null}
-        </div>
-      </div>
     </div>
   )
 }

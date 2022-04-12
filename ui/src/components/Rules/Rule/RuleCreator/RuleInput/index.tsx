@@ -1,3 +1,4 @@
+import { XCircleIcon } from '@heroicons/react/solid'
 import { FormEvent, useContext, useEffect, useState } from 'react'
 import { IRule } from '../'
 import ConstantsContext, {
@@ -39,9 +40,11 @@ interface IRuleInput {
   tagId?: number
   mediaType?: MediaType
   section?: number
+  newlyAdded?: boolean
   editData?: { rule: IRule }
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
+  onDelete: (section: number, id: number) => void
 }
 
 const RuleInput = (props: IRuleInput) => {
@@ -91,6 +94,13 @@ const RuleInput = (props: IRuleInput) => {
       } else {
         setSecondVal(JSON.stringify(props.editData.rule.lastVal))
       }
+      if (props.newlyAdded) {
+        setOperator(undefined)
+        setFirstVal(undefined)
+        setAction(undefined)
+        setSecondVal(undefined)
+        setCustomVal(undefined)
+      }
     }
   }, [])
 
@@ -117,6 +127,11 @@ const RuleInput = (props: IRuleInput) => {
 
   const updateOperator = (event: { target: { value: string } }) => {
     setOperator(event.target.value)
+  }
+
+  const onDelete = (e: FormEvent | null) => {
+    e?.preventDefault()
+    props.onDelete(props.section ? props.section : 0, props.id ? props.id : 0)
   }
 
   const submit = (e: FormEvent | null) => {
@@ -224,12 +239,22 @@ const RuleInput = (props: IRuleInput) => {
   return (
     <div className="mt-10 h-full w-full" onSubmit={submit}>
       <div className="section h-full w-full">
-        <h3 className="sm-heading">
-          {props.tagId
-            ? `Rule #${props.tagId}`
-            : props.id
-            ? `Rule #${props.id}`
-            : `Rule #1`}
+        <h3 className="sm-heading max-width-form flex">
+          <div>
+            {props.tagId
+              ? `Rule #${props.tagId}`
+              : props.id
+              ? `Rule #${props.id}`
+              : `Rule #1`}
+          </div>
+
+          {props.id && props.id > 1 ? (
+            <div className="ml-auto text-amber-900">
+              <button onClick={onDelete} title='Remove this rule'>
+                <XCircleIcon className="h-6 w-6" />
+              </button>
+            </div>
+          ) : undefined}
         </h3>
       </div>
       {props.id !== 1 ? (
