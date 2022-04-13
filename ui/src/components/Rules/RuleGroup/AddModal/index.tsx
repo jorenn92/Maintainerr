@@ -132,7 +132,6 @@ const AddModal = (props: AddModal) => {
             setError(true)
           })
       } else {
-        console.log(`updating ${props.editData.id}`)
         PutApiHandler('/rules', {id: props.editData.id, ...creationObj})
         .then((resp) => {
           if (resp.code === 1) props.onSuccess()

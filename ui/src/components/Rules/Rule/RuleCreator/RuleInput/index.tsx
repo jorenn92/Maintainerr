@@ -102,8 +102,6 @@ const RuleInput = (props: IRuleInput) => {
         setCustomVal(undefined)
       }
     }
-
-    console.log(`Rule ID ${props.id} with newlyAdded: ${props.newlyAdded}`)
   }, [])
 
   const updateFirstValue = (event: { target: { value: string } }) => {
