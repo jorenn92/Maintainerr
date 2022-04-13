@@ -79,7 +79,7 @@ const RuleCreator = (props: iRuleCreator) => {
               : (sectionAmounts[0] = 1)
           )
         : undefined
-      setRuleAmount([editSections, sectionAmounts])
+      setRuleAmount([editSections, sectionAmounts.filter(el => el !== undefined && el !== null)])
     }
   }, [editSections])
 
@@ -93,7 +93,6 @@ const RuleCreator = (props: iRuleCreator) => {
       setCreatedRules(toCommit)
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
       added.current = added.current.filter((e) => e !== id)
-      console.log(`After ruleCommited:  ${added.current}`)
     }
   }
 
@@ -123,11 +122,12 @@ const RuleCreator = (props: iRuleCreator) => {
     rules[section - 1] = rules[section - 1] - 1
 
     if (rulesCreated.current.length > 0) {
-      setEditSections(ruleAmount[0] - rules.filter((e) => e <= 0).length)
       setEditData({ rules: rulesCreated.current.map((el) => el.rule) })
+      setEditSections(ruleAmount[0] - rules.filter((e) => e <= 0).length)
     }
 
-    const nonEmptySections = rules.filter((e) => !(e <= 0))
+    const nonEmptySections = rules.filter((e) => e > 0)
+
     setRuleAmount([
       ruleAmount[0] - rules.filter((e) => e <= 0).length,
       nonEmptySections.length > 0 ? nonEmptySections : [1],
@@ -137,14 +137,13 @@ const RuleCreator = (props: iRuleCreator) => {
   }
 
   const RuleAdded = (section: number) => {
+
     const ruleId =
       ruleAmount[1].reduce((prev, cur, idx) =>
         idx + 1 <= section ? prev + cur : prev
       ) + 1
 
     added.current = [...added.current, ruleId]
-
-    console.log(`After addRule:  ${added.current}`)
 
     rulesCreated.current.map((e) => {
       e.id >= ruleId ? (e.id = e.id + 1) : e.id
@@ -273,7 +272,7 @@ const RuleCreator = (props: iRuleCreator) => {
               onClick={addSection}
               title={`Add a new section`}
             >
-              {<ClipboardListIcon className="m-auto h-5 ml-5" />}
+              {<ClipboardListIcon className="m-auto ml-5 h-5" />}
               <p className="button-text m-auto mr-5 ml-1  text-zinc-200">
                 New section
               </p>
