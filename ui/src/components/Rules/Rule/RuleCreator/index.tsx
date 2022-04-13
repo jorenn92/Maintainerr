@@ -8,6 +8,7 @@ import RuleInput from './RuleInput'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
 import SectionHeading from '../../../Common/SectionHeading'
 import _ from 'lodash'
+import { ClipboardListIcon, PlusSmIcon } from '@heroicons/react/solid'
 
 interface IRulesToCreate {
   id: number
@@ -92,6 +93,7 @@ const RuleCreator = (props: iRuleCreator) => {
       setCreatedRules(toCommit)
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
       added.current = added.current.filter((e) => e !== id)
+      console.log(`After ruleCommited:  ${added.current}`)
     }
   }
 
@@ -116,6 +118,7 @@ const RuleCreator = (props: iRuleCreator) => {
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
     }
 
+    added.current = added.current.filter((e) => e !== id)
     const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] - 1
 
@@ -134,19 +137,16 @@ const RuleCreator = (props: iRuleCreator) => {
   }
 
   const RuleAdded = (section: number) => {
-    console.log(`adding to ${section}`)
-    console.log(createdRules)
-    console.log(ruleAmountArr)
-    console.log(ruleAmount)
-    console.log(rulesCreated.current)
-
     const ruleId =
       ruleAmount[1].reduce((prev, cur, idx) =>
         idx + 1 <= section ? prev + cur : prev
       ) + 1
-    console.log(`Giving rule ID ${ruleId}`)
 
-    const newRulesCr = rulesCreated.current.map((e) => {
+    added.current = [...added.current, ruleId]
+
+    console.log(`After addRule:  ${added.current}`)
+
+    rulesCreated.current.map((e) => {
       e.id >= ruleId ? (e.id = e.id + 1) : e.id
       return e
     })
@@ -155,8 +155,20 @@ const RuleCreator = (props: iRuleCreator) => {
     rules[section - 1] = rules[section - 1] + 1
 
     setRuleAmount([ruleAmount[0], rules])
+  }
+
+  const addSection = (e: any) => {
+    e.preventDefault()
+    const rules = [...ruleAmount[1]]
+    rules.push(1)
+
+    const ruleId =
+      ruleAmount[1].reduce((prev, cur, idx) =>
+        idx + 1 <= ruleAmount[0] + 1 ? prev + cur : prev
+      ) + 1
     added.current = [...added.current, ruleId]
-    console.log([ruleAmount[0], rules])
+
+    setRuleAmount([ruleAmount[0] + 1, rules])
   }
 
   useEffect(() => {
@@ -195,14 +207,15 @@ const RuleCreator = (props: iRuleCreator) => {
 
   return (
     <div className="h-full w-full">
-      {rulesCreated.current.length !==
-      ruleAmount[1].reduce((pv, cv) => pv + cv) ? (
-        <Alert>{`Some incomplete rules won't get saved`} </Alert>
-      ) : undefined}
       {ruleAmountArr[0].map((sid) => {
         return (
           <div key={`${sid}-${deleted.current}`}>
-            <SectionHeading id={sid} name={'Section'} onAdd={RuleAdded} />
+            <SectionHeading
+              id={sid}
+              name={'Section'}
+              onAdd={RuleAdded}
+              addAvailable={added.current.length <= 0}
+            />
             <div className="ml-5">
               {ruleAmountArr[1][sid - 1].map((id) => (
                 <RuleInput
@@ -241,7 +254,7 @@ const RuleCreator = (props: iRuleCreator) => {
                       : undefined
                   }
                   section={sid}
-                  newlyAdded={added.current.includes(id)}
+                  newlyAdded={added.current}
                   mediaType={props.mediaType}
                   onCommit={ruleCommited}
                   onIncomplete={ruleOmitted}
@@ -252,6 +265,29 @@ const RuleCreator = (props: iRuleCreator) => {
           </div>
         )
       })}
+      {added.current.length <= 0 ? (
+        <div className="mt-5 flex w-full">
+          <div className="m-auto xl:m-0">
+            <button
+              className="ml-auto flex h-8 rounded bg-amber-600 text-zinc-200 shadow-md hover:bg-amber-500"
+              onClick={addSection}
+              title={`Add a new section`}
+            >
+              {<ClipboardListIcon className="m-auto h-5 ml-5" />}
+              <p className="button-text m-auto mr-5 ml-1  text-zinc-200">
+                New section
+              </p>
+            </button>
+          </div>
+        </div>
+      ) : undefined}
+
+      {rulesCreated.current.length !==
+      ruleAmount[1].reduce((pv, cv) => pv + cv) ? (
+        <div className="max-width-form-head mt-5">
+          <Alert>{`Some incomplete rules won't be saved`} </Alert>
+        </div>
+      ) : undefined}
     </div>
   )
 }

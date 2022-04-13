@@ -4,6 +4,7 @@ import { IRuleJson } from '../Rule'
 import { useContext, useState } from 'react'
 import { DeleteApiHandler } from '../../../utils/ApiHandler'
 import LibrariesContext from '../../../contexts/libraries-context'
+import { PencilIcon, TrashIcon } from '@heroicons/react/solid'
 
 export interface IRuleGroup {
   id: number
@@ -85,13 +86,21 @@ const RuleGroup = (props: {
 
       <div className="m-auto w-full sm:w-1/6">
         <div className="mb-2 flex h-auto ">
-          <EditButton onClick={onEdit} text="Edit" />
+          <EditButton
+            onClick={onEdit}
+            text="Edit"
+            svgIcon={<PencilIcon className="h-5 m-auto text-zinc-200" />}
+          />
         </div>
         <div>
           {showsureDelete ? (
             <DeleteButton onClick={confirmedDelete} text="Are you sure?" />
           ) : (
-            <DeleteButton onClick={onRemove} text="Delete" />
+            <DeleteButton
+              onClick={onRemove}
+              text="Delete"
+              svgIcon={<TrashIcon className="h-5 m-auto text-zinc-200" />}
+            />
           )}
         </div>
       </div>

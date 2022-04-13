@@ -1,4 +1,4 @@
-import { XCircleIcon } from '@heroicons/react/solid'
+import { TrashIcon } from '@heroicons/react/solid'
 import { FormEvent, useContext, useEffect, useState } from 'react'
 import { IRule } from '../'
 import ConstantsContext, {
@@ -40,7 +40,7 @@ interface IRuleInput {
   tagId?: number
   mediaType?: MediaType
   section?: number
-  newlyAdded?: boolean
+  newlyAdded?: number[]
   editData?: { rule: IRule }
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
@@ -94,7 +94,7 @@ const RuleInput = (props: IRuleInput) => {
       } else {
         setSecondVal(JSON.stringify(props.editData.rule.lastVal))
       }
-      if (props.newlyAdded) {
+      if (props.id && props.newlyAdded && props.newlyAdded?.includes(props.id)) {
         setOperator(undefined)
         setFirstVal(undefined)
         setAction(undefined)
@@ -102,6 +102,8 @@ const RuleInput = (props: IRuleInput) => {
         setCustomVal(undefined)
       }
     }
+
+    console.log(`Rule ID ${props.id} with newlyAdded: ${props.newlyAdded}`)
   }, [])
 
   const updateFirstValue = (event: { target: { value: string } }) => {
@@ -249,11 +251,14 @@ const RuleInput = (props: IRuleInput) => {
           </div>
 
           {props.id && props.id > 1 ? (
-            <div className="ml-auto text-amber-900">
-              <button onClick={onDelete} title='Remove this rule'>
-                <XCircleIcon className="h-6 w-6" />
-              </button>
-            </div>
+            <button
+              className="ml-auto flex h-8 rounded bg-amber-900 hover:bg-amber-800 text-zinc-200 shadow-md"
+              onClick={onDelete}
+              title={`Remove rule ${props.tagId}, section ${props.section}`}
+            >
+              {<TrashIcon className="m-auto h-5 ml-5" />}
+              <p className="m-auto ml-1 mr-5 text-zinc-100 button-text">Delete</p>
+            </button>
           ) : undefined}
         </h3>
       </div>
