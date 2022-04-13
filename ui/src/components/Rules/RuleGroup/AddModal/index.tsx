@@ -10,6 +10,7 @@ import Alert from '../../../Common/Alert'
 import ArrAction from './ArrAction'
 import { IRuleGroup } from '..'
 import { ICollection } from '../../../Collection'
+import { BanIcon, SaveIcon } from '@heroicons/react/solid'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -168,7 +169,7 @@ const AddModal = (props: AddModal) => {
       ) : undefined}
       {formIncomplete ? (
         <Alert>
-          Not all required (*) fields contain values and atleast 1 valid rule is
+          Not all required (*) fields contain values and at least 1 valid rule is
           required
         </Alert>
       ) : undefined}
@@ -335,20 +336,21 @@ const AddModal = (props: AddModal) => {
 
           <div className="mt-5 flex h-full w-full">
             {/* <AddButton text="Create" onClick={create} /> */}
-            <div className="m-auto xl:m-0">
+            <div className="m-auto flex xl:m-0">
               <button
-                className="add-button h-10 w-20 rounded-full text-white shadow-md"
-                type="submit"
+                className="ml-auto mr-3 flex h-10 rounded bg-amber-600 shadow-md hover:bg-amber-500 text-zinc-900"
                 onClick={create}
               >
-                Save
+                {<SaveIcon className="m-auto ml-5 h-6 w-6 text-zinc-200" />}
+                <p className="m-auto mr-5 ml-1 text-zinc-100 button-text">Save</p>
               </button>
+
               <button
-                className="cancel-button ml-3 h-10 w-20 rounded-full text-white shadow-md"
-                type="reset"
+                className="ml-auto flex h-10 rounded bg-amber-900 shadow-md hover:bg-amber-800 text-zinc-900"
                 onClick={cancel}
               >
-                Cancel
+                {<BanIcon className="m-auto ml-5 h-6 w-6 text-zinc-200" />}
+                <p className="m-auto mr-5 ml-1 text-zinc-100 button-text">Cancel</p>
               </button>
             </div>
           </div>

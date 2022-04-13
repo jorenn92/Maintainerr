@@ -48,7 +48,7 @@ import {
               </div>
             )}
             {children && (
-              <div className={`mt-2 text-sm first:mt-0 ${design.textColor}`}>
+              <div className={`mt-2 text-sm first:mt-0 button-text ${design.textColor}`}>
                 {children}
               </div>
             )}

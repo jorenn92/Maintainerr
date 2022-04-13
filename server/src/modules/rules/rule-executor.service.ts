@@ -312,8 +312,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   private doRuleAction<T>(val1: T, val2: T, action: RulePossibility): boolean {
-    console.log(`comparing ${val1} to ${val2}`);
-
     if (action === RulePossibility.BIGGER) {
       return val1 > val2;
     }
@@ -351,7 +349,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       }
     }
     if (action === RulePossibility.CONTAINS) {
-      // console.log(`${val1} vs ${val2}`);
       try {
         if (!Array.isArray(val2)) {
           return (val1 as unknown as T[]).includes(val2);
@@ -370,8 +367,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       }
     }
     if (action === RulePossibility.BEFORE) {
-      // console.log(`comparing ${val1} to ${val2}`);
-      // console.log(val1 && val2 ? val1 <= val2 : false);
       return val1 && val2 ? val1 <= val2 : false;
     }
     if (action === RulePossibility.AFTER) {

@@ -8,13 +8,11 @@ interface IExecuteButton {
 const ExecuteButton = (props: IExecuteButton) => {
   return (
     <button
-      className="edit-button rounded-full text-zinc-900 shadow-md"
+      className="edit-button flex m-auto rounded h-9 text-zinc-200 shadow-md"
       onClick={props.onClick}
     >
-      <div className="w-full">
-        {<PlayIcon className="float-left h-8 w-8" />}{' '}
-        <p className="rules-button-text">{props.text}</p>
-      </div>
+        {<PlayIcon className="m-auto h-5 ml-5" />}{' '}
+        <p className="m-auto rules-button-text ml-1 mr-5">{props.text}</p>
     </button>
   )
 }

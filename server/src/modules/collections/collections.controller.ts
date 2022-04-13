@@ -93,7 +93,6 @@ export class CollectionsController {
   }
   @Delete('/media')
   deleteMediaFromCollection(@Query('mediaId') mediaId: number) {
-    console.log(mediaId);
     return this.collectionService.removeFromAllCollections([
       { plexId: mediaId },
     ]);

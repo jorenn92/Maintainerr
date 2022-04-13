@@ -110,7 +110,6 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
       // get the tvdb id
       const tvdbId = await this.tvdbidFinder(media);
 
-      console.log(tvdbId);
       if (tvdbId) {
         const sonarrMedia = await this.servarrApi.SonarrApi.getSeriesByTvdbId(
           tvdbId,

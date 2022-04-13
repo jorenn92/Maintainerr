@@ -96,12 +96,12 @@ const Rules: React.FC = () => {
       <div className="w-full">
         <LibrarySwitcher onSwitch={onSwitchLibrary} />
 
-        <div className="mb-5 flex w-full">
-          <div className="h-8">
+        <div className="mb-5 flex m-auto ">
+          <div className="ml-auto sm:ml-0">
             <AddButton onClick={showAddModal} text="New rule" />
           </div>
-          <div className="ml-2 h-8">
-            <ExecuteButton onClick={sync} text="Force exec" />
+          <div className="ml-2 mr-auto sm:mr-0 ">
+            <ExecuteButton onClick={sync} text="Run rules" />
           </div>
         </div>
 

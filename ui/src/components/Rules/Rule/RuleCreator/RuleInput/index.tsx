@@ -1,3 +1,4 @@
+import { TrashIcon } from '@heroicons/react/solid'
 import { FormEvent, useContext, useEffect, useState } from 'react'
 import { IRule } from '../'
 import ConstantsContext, {
@@ -39,9 +40,11 @@ interface IRuleInput {
   tagId?: number
   mediaType?: MediaType
   section?: number
+  newlyAdded?: number[]
   editData?: { rule: IRule }
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
+  onDelete: (section: number, id: number) => void
 }
 
 const RuleInput = (props: IRuleInput) => {
@@ -91,7 +94,16 @@ const RuleInput = (props: IRuleInput) => {
       } else {
         setSecondVal(JSON.stringify(props.editData.rule.lastVal))
       }
+      if (props.id && props.newlyAdded && props.newlyAdded?.includes(props.id)) {
+        setOperator(undefined)
+        setFirstVal(undefined)
+        setAction(undefined)
+        setSecondVal(undefined)
+        setCustomVal(undefined)
+      }
     }
+
+    console.log(`Rule ID ${props.id} with newlyAdded: ${props.newlyAdded}`)
   }, [])
 
   const updateFirstValue = (event: { target: { value: string } }) => {
@@ -117,6 +129,11 @@ const RuleInput = (props: IRuleInput) => {
 
   const updateOperator = (event: { target: { value: string } }) => {
     setOperator(event.target.value)
+  }
+
+  const onDelete = (e: FormEvent | null) => {
+    e?.preventDefault()
+    props.onDelete(props.section ? props.section : 0, props.id ? props.id : 0)
   }
 
   const submit = (e: FormEvent | null) => {
@@ -224,12 +241,25 @@ const RuleInput = (props: IRuleInput) => {
   return (
     <div className="mt-10 h-full w-full" onSubmit={submit}>
       <div className="section h-full w-full">
-        <h3 className="sm-heading">
-          {props.tagId
-            ? `Rule #${props.tagId}`
-            : props.id
-            ? `Rule #${props.id}`
-            : `Rule #1`}
+        <h3 className="sm-heading max-width-form flex">
+          <div>
+            {props.tagId
+              ? `Rule #${props.tagId}`
+              : props.id
+              ? `Rule #${props.id}`
+              : `Rule #1`}
+          </div>
+
+          {props.id && props.id > 1 ? (
+            <button
+              className="ml-auto flex h-8 rounded bg-amber-900 hover:bg-amber-800 text-zinc-200 shadow-md"
+              onClick={onDelete}
+              title={`Remove rule ${props.tagId}, section ${props.section}`}
+            >
+              {<TrashIcon className="m-auto h-5 ml-5" />}
+              <p className="m-auto ml-1 mr-5 text-zinc-100 button-text">Delete</p>
+            </button>
+          ) : undefined}
         </h3>
       </div>
       {props.id !== 1 ? (

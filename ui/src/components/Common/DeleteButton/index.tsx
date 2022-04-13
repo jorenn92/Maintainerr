@@ -1,11 +1,23 @@
+import { ReactNode } from 'react'
+
 interface IDeleteButton {
-    text: string
-    onClick: () => void
-  }
-  
-  const DeleteButton = (props: IDeleteButton) => {
-    return <button className="w-full h-8 m-auto shadow-md text-white rounded right-5 delete-button" onClick={props.onClick}>{props.text}</button>
-  }
-  
-  export default DeleteButton
-  
+  text: string
+  svgIcon?: ReactNode
+  onClick: () => void
+}
+
+const DeleteButton = (props: IDeleteButton) => {
+  return (
+    <button
+      className="right-5 m-auto flex h-8 w-full rounded bg-amber-900 text-white shadow-md hover:bg-amber-800"
+      onClick={props.onClick}
+    >
+      <div className="m-auto ml-auto flex">
+        {props.svgIcon ? props.svgIcon : undefined}
+        <p className="button-text m-auto ml-1 text-zinc-200">{props.text}</p>
+      </div>
+    </button>
+  )
+}
+
+export default DeleteButton

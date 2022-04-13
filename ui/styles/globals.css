@@ -32,6 +32,17 @@
     height: calc(4rem + env(safe-area-inset-top));
   }
 
+  .max-width-form {
+    max-width: 60rem;
+  }
+  .max-width-form-head {
+    max-width: 61rem;
+  }
+
+  .button-text {
+    font-weight: 600;
+  }
+
   .sidebar {
     @apply border-r border-zinc-700;
     padding-top: env(safe-area-inset-top);
@@ -40,12 +51,12 @@
   }
 
   .rules-button-text {
-    padding-top: 0.17rem;
-    margin-left: 0.4rem;
-    margin-right: 0.75rem;
+    /* padding-top: 0.17rem;
+    margin-left: 0.25rem;
+    margin-right: 0.75rem; */
     --tw-text-opacity: 1;
     color: rgb(228 228 231 / var(--tw-text-opacity));
-    display: inline-block;
+    font-weight: 600;
   }
 
   .collection {
@@ -94,14 +105,6 @@
     top: env(safe-area-inset-top);
   }
 
-  .add-button {
-    /* background: linear-gradient(90deg, rgba(242, 79, 99, 1) 0%, rgba(196, 100, 76, 1) 100%); */
-    @apply bg-amber-600;
-  }
-
-  .add-button:hover {
-    @apply bg-amber-500;
-  }
 
   .cancel-button {
     background-color: #444444;

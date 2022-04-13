@@ -36,7 +36,6 @@ export class SonarrGetterService {
             return showResponse.added ? showResponse.added : null;
           }
           case 'diskSizeEntireShow': {
-            console.log(showResponse);
             return showResponse.statistics.sizeOnDisk
               ? +showResponse.statistics.sizeOnDisk
               : null;
