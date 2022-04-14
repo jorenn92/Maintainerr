@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { warn } from 'console';
 import { sortBy } from 'lodash';
 import { ExternalApiService } from '../external-api/external-api.service';
+import cacheManager from '../lib/cache';
 import {
   DiscoverMovieOptions,
   DiscoverTvOptions,
@@ -43,7 +44,7 @@ export class TmdbApiService extends ExternalApiService {
         api_key: 'db55323b8d3e4154498498a75642b381',
       },
       {
-        // nodeCache: cacheManager.getCache('tmdb').data,
+        nodeCache: cacheManager.getCache('tmdb').data,
       },
     );
     this.region = region;
