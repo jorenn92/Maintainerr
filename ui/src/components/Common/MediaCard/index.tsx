@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import Spinner from '../../../assets/spinner.svg'
 import Transition from '../Transition'
 import { useIsTouch } from '../../../hooks/useIsTouch'
@@ -7,6 +7,10 @@ import GetApiHandler from '../../../utils/ApiHandler'
 import Button from '../Button'
 import ExcludeModal from '../../ExcludeModal'
 import AddModal from '../../AddModal'
+import {
+  DocumentAddIcon,
+  DocumentRemoveIcon,
+} from '@heroicons/react/solid'
 
 interface IMediaCard {
   id: number
@@ -218,12 +222,13 @@ const MediaCard: React.FC<IMediaCard> = ({
                       <Button
                         buttonType="twin-primary-l"
                         buttonSize="md"
-                        className="mt-2 h-6 w-1/2"
+                        className="mt-2 mb-1  h-6 w-1/2 text-zinc-200 shadow-md"
                         onClick={() => {
                           setAddModal(true)
                         }}
                       >
-                        {'Add'}
+                        {<DocumentAddIcon className="m-auto ml-3 h-3" />}{' '}
+                        <p className="rules-button-text m-auto mr-2">{'Add'}</p>
                       </Button>
                       <Button
                         buttonSize="md"
@@ -233,7 +238,10 @@ const MediaCard: React.FC<IMediaCard> = ({
                           setExcludeModal(true)
                         }}
                       >
-                        {'Exclude'}
+                        {<DocumentRemoveIcon className="m-auto ml-3 h-3" />}{' '}
+                        <p className="rules-button-text m-auto mr-2">
+                          {'Excl'}
+                        </p>
                       </Button>
                     </div>
                   </div>
