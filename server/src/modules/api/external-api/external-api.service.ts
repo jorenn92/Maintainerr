@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { warn } from 'console';
 import NodeCache from 'node-cache';
 
 // 5 minute default TTL (in seconds)
