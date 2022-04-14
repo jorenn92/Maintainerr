@@ -1,5 +1,6 @@
 import { RefreshIcon } from '@heroicons/react/outline'
 import { PlayIcon } from '@heroicons/react/solid'
+import { debounce } from 'lodash'
 import Image from 'next/image'
 import React, { useContext, useEffect, useState } from 'react'
 import LibrariesContext from '../../contexts/libraries-context'
@@ -96,12 +97,12 @@ const Rules: React.FC = () => {
       <div className="w-full">
         <LibrarySwitcher onSwitch={onSwitchLibrary} />
 
-        <div className="mb-5 flex m-auto ">
+        <div className="m-auto mb-5 flex ">
           <div className="ml-auto sm:ml-0">
             <AddButton onClick={showAddModal} text="New rule" />
           </div>
           <div className="ml-2 mr-auto sm:mr-0 ">
-            <ExecuteButton onClick={sync} text="Run rules" />
+            <ExecuteButton onClick={debounce(sync, 5000)} text="Run rules" />
           </div>
         </div>
 
