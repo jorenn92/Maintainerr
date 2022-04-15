@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ServarrApi } from '../common/servarr-api.service';
 import {
+  RadarrInfo,
   RadarrMovie,
   RadarrMovieFile,
   RadarrMovieOptions,
@@ -176,6 +177,16 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       }
     } catch (e) {
       this.logger.warn("Couldn't unmonitor movie. Does it exist in radarr?");
+    }
+  }
+
+  public async info(): Promise<RadarrInfo> {
+    try {
+      const info: RadarrInfo = await this.get(`system/status`);
+      return info ? info : null;
+    } catch (e) {
+      this.logger.warn("Couldn't fetch Radarr info.. Is Radarr up?");
+      return null;
     }
   }
 }

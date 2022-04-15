@@ -4,6 +4,7 @@ import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
+import TestButton from '../../Common/TestButton'
 
 const SonarrSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -14,6 +15,10 @@ const SonarrSettings = () => {
   const [port, setPort] = useState<string>()
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
+  const [testBanner, setTestbanner] = useState<{
+    status: Boolean
+    version: string
+  }>({ status: false, version: '0' })
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Sonarr'
@@ -73,6 +78,11 @@ const SonarrSettings = () => {
     if (url) setPort(`${url}`)
   }, [settingsCtx])
 
+  const appTest = (result: { status: boolean; version: string }) => {
+    console.log(result);
+    setTestbanner({ status: result.status, version: result.version })
+  }
+
   return (
     <div className="h-full w-full">
       <div className="section h-full w-full">
@@ -84,6 +94,20 @@ const SonarrSettings = () => {
         <Alert type="warning" title="Not all fields contain values" />
       ) : changed ? (
         <Alert type="info" title="Settings succesfully updated" />
+      ) : undefined}
+
+{testBanner.version !== '0' ? (
+        testBanner.status ? (
+          <Alert
+            type="warning"
+            title={`Succesfully connected to Sonarr (${testBanner.version})`}
+          />
+        ) : (
+          <Alert
+            type="error"
+            title="Connection failed! Please check and save your settings"
+          />
+        )
       ) : undefined}
 
       <div className="section">
@@ -141,6 +165,8 @@ const SonarrSettings = () => {
 
           <div className="actions mt-5 w-full">
             <div className="flex justify-end">
+              <TestButton onClick={appTest} testUrl="/settings/test/sonarr" />
+
               <span className="ml-3 inline-flex rounded-md shadow-sm">
                 <Button
                   buttonType="primary"

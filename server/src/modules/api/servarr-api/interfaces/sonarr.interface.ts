@@ -10,6 +10,24 @@ export interface SonarrSeason {
     percentOfEpisodes: number;
   };
 }
+export interface SonarrInfo {
+  version: string;
+  buildTime: string;
+  isDebug: boolean;
+  isProduction: boolean;
+  isAdmin: boolean;
+  isUserInteractive: boolean;
+  startupPath: string;
+  appData: string;
+  osVersion: string;
+  isMono: boolean;
+  isLinux: boolean;
+  isWindows: boolean;
+  branch: string;
+  authentication: boolean;
+  startOfWeek: number;
+  urlBase: string;
+}
 
 export interface SonarrEpisode {
   seriesId: number;
