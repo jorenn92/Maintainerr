@@ -232,9 +232,13 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         size: size,
       },
     );
-    this.plexData.data = response.items;
+    if (response) {
+      this.plexData.data = response.items ? response.items : [];
 
-    if ((+this.plexData.page + 1) * size >= response.totalSize) {
+      if ((+this.plexData.page + 1) * size >= response.totalSize) {
+        this.plexData.finished = true;
+      }
+    } else {
       this.plexData.finished = true;
     }
     this.plexData.page++;
