@@ -6,6 +6,7 @@ import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import PlexLoginButton from '../../Login/Plex'
 import axios from 'axios'
+import TestButton from '../../Common/TestButton'
 
 const PlexSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -17,6 +18,10 @@ const PlexSettings = () => {
   const [changed, setChanged] = useState<boolean>()
   const [tokenValid, setTokenValid] = useState<Boolean>(false)
   const [clearTokenClicked, setClearTokenClicked] = useState<Boolean>(false)
+  const [testBanner, setTestbanner] = useState<{
+    status: Boolean
+    version: string
+  }>({ status: false, version: '0' })
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Plex'
@@ -116,6 +121,11 @@ const PlexSettings = () => {
     if (settingsCtx.settings.plex_auth_token) verifyToken()
   }, [])
 
+  const appTest = (result: { status: boolean; version: string }) => {
+    console.log(result)
+    setTestbanner({ status: result.status, version: result.version })
+  }
+
   return (
     <div className="h-full w-full">
       <div className="section h-full w-full">
@@ -127,6 +137,20 @@ const PlexSettings = () => {
         <Alert type="warning" title="Not all fields contain values" />
       ) : changed ? (
         <Alert type="info" title="Settings succesfully updated" />
+      ) : undefined}
+
+      {testBanner.version !== '0' ? (
+        testBanner.status ? (
+          <Alert
+            type="warning"
+            title={`Succesfully connected to Plex (${testBanner.version})`}
+          />
+        ) : (
+          <Alert
+            type="error"
+            title="Connection failed! Please check and save your settings"
+          />
+        )
       ) : undefined}
 
       <div className="section">
@@ -182,7 +206,7 @@ const PlexSettings = () => {
             </div>
           </div>
 
-          <div className="form-row">
+          {/* <div className="form-row">
             <label htmlFor="ssl" className="text-label">
               SSL
             </label>
@@ -197,7 +221,7 @@ const PlexSettings = () => {
                 ></input>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="form-row">
             <label htmlFor="ssl" className="text-label">
@@ -243,6 +267,8 @@ const PlexSettings = () => {
 
           <div className="actions mt-5 w-full">
             <div className="flex justify-end">
+              <TestButton onClick={appTest} testUrl="/settings/test/plex" />
+
               <span className="ml-3 inline-flex rounded-md shadow-sm">
                 <Button
                   buttonType="primary"
