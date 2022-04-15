@@ -32,14 +32,14 @@ const PlexSettings = () => {
     if (
       hostnameRef.current?.value &&
       nameRef.current?.value &&
-      portRef.current?.value &&
-      sslRef.current?.value
+      portRef.current?.value 
+      // sslRef.current?.value
     ) {
       const payload = {
         plex_hostname: hostnameRef.current.value,
         plex_port: +portRef.current.value,
         plex_name: nameRef.current.value,
-        plex_ssl: sslRef.current.checked ? 1 : 0,
+        plex_ssl: 0, //sslRef.current.checked ? 1 : 0,
       }
       console.log(payload)
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
