@@ -23,4 +23,20 @@ export class SettingsController {
   updateSettings(@Body() payload: SettingDto) {
     return this.settingsService.updateSettings(payload);
   }
+  @Get('/test/overseerr')
+  testOverseerr() {
+    return this.settingsService.testOverseerr();
+  }
+  @Get('/test/radarr')
+  testRadarr() {
+    return this.settingsService.testRadarr();
+  }
+  @Get('/test/sonarr')
+  testSonarr() {
+    return this.settingsService.testSonarr();
+  }
+  @Get('/test/plex')
+  testPlex() {
+    return this.settingsService.testPlex();
+  }
 }

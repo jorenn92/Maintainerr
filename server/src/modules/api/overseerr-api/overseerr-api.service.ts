@@ -58,6 +58,13 @@ interface OverseerrUser {
   requestCount: number;
 }
 
+interface OverseerrStatus {
+  version: string;
+  commitTag: string;
+  updateAvailable: boolean;
+  commitsBehind: number;
+}
+
 export enum OverseerrMediaStatus {
   UNKNOWN = 1,
   PENDING,
@@ -210,6 +217,19 @@ export class OverseerrApiService {
         'Overseerr communication failed. Is the application running?',
       );
       return undefined;
+    }
+  }
+
+  public async status(): Promise<OverseerrStatus> {
+    try {
+      const response: OverseerrStatus = await this.api.get(`/status`);
+      return response;
+    } catch (e) {
+      this.logger.log("Couldn't fetch Overseerr status!", {
+        label: 'Overseerr API',
+        errorMessage: e.message,
+      });
+      return null;
     }
   }
 }

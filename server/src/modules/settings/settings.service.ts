@@ -141,4 +141,48 @@ export class SettingsService implements SettingDto {
   public generateApiKey(): string {
     return Buffer.from(`${Date.now()}${randomUUID()})`).toString('base64');
   }
+
+  public async testOverseerr(): Promise<BasicResponseDto> {
+    try {
+      const resp = await this.overseerr.status();
+      return resp !== null
+        ? { status: 'OK', code: 1, message: resp.version }
+        : { status: 'NOK', code: 0, message: 'Failure' };
+    } catch {
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async testRadarr(): Promise<BasicResponseDto> {
+    try {
+      const resp = await this.servarr.RadarrApi.info();
+      return resp !== null
+        ? { status: 'OK', code: 1, message: resp.version }
+        : { status: 'NOK', code: 0, message: 'Failure' };
+    } catch {
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async testSonarr(): Promise<BasicResponseDto> {
+    try {
+      const resp = await this.servarr.SonarrApi.info();
+      return resp !== null
+        ? { status: 'OK', code: 1, message: resp.version }
+        : { status: 'NOK', code: 0, message: 'Failure' };
+    } catch {
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async testPlex(): Promise<any> {
+    try {
+      const resp = await this.plexApi.getStatus();
+      return resp !== null
+        ? { status: 'OK', code: 1, message: resp.version }
+        : { status: 'NOK', code: 0, message: 'Failure' };
+    } catch {
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
 }

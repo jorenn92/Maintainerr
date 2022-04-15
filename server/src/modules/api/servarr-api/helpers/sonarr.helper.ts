@@ -4,6 +4,7 @@ import {
   AddSeriesOptions,
   LanguageProfile,
   SonarrEpisode,
+  SonarrInfo,
   SonarrSeason,
   SonarrSeries,
 } from '../interfaces/sonarr.interface';
@@ -288,5 +289,15 @@ export class SonarrApi extends ServarrApi<{
     );
 
     return newSeasons;
+  }
+
+  public async info(): Promise<SonarrInfo> {
+    try {
+      const info: SonarrInfo = await this.get(`system/status`);
+      return info ? info : null;
+    } catch (e) {
+      this.logger.warn("Couldn't fetch Sonarr info.. Is Sonarr up?");
+      return null;
+    }
   }
 }
