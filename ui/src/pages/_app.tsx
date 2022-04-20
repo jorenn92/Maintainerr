@@ -9,15 +9,15 @@ import { SearchContextProvider } from '../contexts/search-context'
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 function CoreApp({ Component, pageProps }: AppProps) {
   return (
-    <Layout>
-      <LibrariesContextProvider>
-        <SettingsContextProvider>
-          <SearchContextProvider>
+    <SearchContextProvider>
+      <Layout>
+        <LibrariesContextProvider>
+          <SettingsContextProvider>
             <Component {...pageProps} />
-          </SearchContextProvider>
-        </SettingsContextProvider>
-      </LibrariesContextProvider>
-    </Layout>
+          </SettingsContextProvider>
+        </LibrariesContextProvider>
+      </Layout>
+    </SearchContextProvider>
   )
 }
 

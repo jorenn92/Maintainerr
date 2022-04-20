@@ -85,7 +85,7 @@ const OverviewContent = (props: IOverviewContent) => {
   }, [])
 
   useEffect(() => {
-    if (props.data.length < 20) {
+    if (props.data && props.data.length < 20) {
       if (document.body.scrollHeight >= document.body.clientHeight) {
         props.fetchData()
       }

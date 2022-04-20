@@ -14,6 +14,7 @@ export interface PlexMetadata {
   index: number;
   parentIndex?: number;
   leafCount: number;
+  grandparentRatingKey?: number;
   viewedLeafCount: number;
   addedAt: number;
   updatedAt: number;
