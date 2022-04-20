@@ -19,25 +19,50 @@ const Overview = () => {
   const selectedLibraryRef = useRef<number>()
   const [searchUsed, setsearchUsed] = useState<Boolean>(false)
 
-  const SearchCtx = useContext(SearchContext)
   const pageData = useRef<number>(0)
+  const SearchCtx = useContext(SearchContext)
   const LibrariesCtx = useContext(LibrariesContext)
 
   const fetchAmount = 30
 
   useEffect(() => {
-    document.title = "Maintainerr - Overview"
-    if (SearchCtx.text !== '') {
-      GetApiHandler(`/plex/library/search?term=${SearchCtx.text}`).then(
-        (resp) => {
+    document.title = 'Maintainerr - Overview'
+    setTimeout(() => {
+      if (
+        !isLoading &&
+        data.length === 0 &&
+        SearchCtx.search.text === '' &&
+        LibrariesCtx.libraries.length > 0
+      ) {
+        switchLib(
+          selectedLibrary ? selectedLibrary : +LibrariesCtx.libraries[0].key
+        )
+      }
+    }, 300)
+  }, [])
+
+  useEffect(() => {
+    if (SearchCtx.search.text !== '') {
+      GetApiHandler(`/plex/search/${SearchCtx.search.text}`).then(
+        (resp: IPlexMetadata[]) => {
+          console.log(`git items: ${resp}`)
           setsearchUsed(true)
-          setData(resp.items)
+          setTotalSize(resp.length)
+          pageData.current = resp.length * 50
+          setData(resp ? resp : [])
           setIsLoading(false)
         }
       )
+      setSelectedLibrary(+LibrariesCtx.libraries[0]?.key)
+    } else {
+      setsearchUsed(false)
+      setData([])
+      setTotalSize(999)
+      pageData.current = 0
+      setIsLoading(true)
+      fetchData()
     }
-    setSelectedLibrary(+LibrariesCtx.libraries[0]?.key)
-  }, [])
+  }, [SearchCtx.search.text])
 
   useEffect(() => {
     selectedLibraryRef.current = selectedLibrary
@@ -67,6 +92,7 @@ const Overview = () => {
     // This function didn't work with normal state. Used a state/ref hack as a result.
     if (
       selectedLibraryRef.current &&
+      SearchCtx.search.text === '' &&
       totalSizeRef.current >= pageData.current * fetchAmount
     ) {
       const resp: { totalSize: number; items: IPlexMetadata[] } =

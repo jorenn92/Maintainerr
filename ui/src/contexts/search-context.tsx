@@ -6,9 +6,13 @@ import {
   useState,
 } from 'react'
 
+export interface ISearch {
+  text: String
+}
+
 const SearchContext = createContext({
-  text: {} as string,
-  addText: (text: string) => {},
+  search: {} as ISearch,
+  addText: (input: string) => {},
   removeText: () => {},
 })
 
@@ -21,25 +25,25 @@ export function SearchContextProvider(props: {
     | null
     | undefined
 }) {
-  const [text, setText] = useState<string>('')
+  const [searchText, setSearch] = useState<ISearch>({ text: '' } as ISearch)
 
-  function addSearchHandler(text: string) {
-    setText(() => {
-      return text
+  function addSearchHandler(input: string) {
+    setSearch(() => {
+      return { text: input } as ISearch
     })
   }
   function removeSearchHandler() {
-    setText(() => {
-      return '' as string
+    setSearch(() => {
+      return { text: '' } as ISearch
     })
   }
 
   const context: {
-    text: string
-    addText: (text: string) => void
+    search: ISearch
+    addText: (input: string) => void
     removeText: () => void
   } = {
-    text: text,
+    search: searchText,
     addText: addSearchHandler,
     removeText: removeSearchHandler,
   }

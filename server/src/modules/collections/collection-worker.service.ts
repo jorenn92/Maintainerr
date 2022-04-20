@@ -168,9 +168,6 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
   }
 
   private infoLogger(message: string) {
-    // this.loggerService.logger.info(message, {
-    //   label: 'Collection Handler',
-    // });
     this.logger.log(message);
   }
 }

@@ -89,6 +89,10 @@ export class PlexApiController {
       await this.plexApiService.getCollectionChildren(collectionId.toString());
     return collection;
   }
+  @Get('/search/:input')
+  async searchLibrary(@Param('input') input: string) {
+    return await this.plexApiService.searchContent(input);
+  }
   @Put('library/collection/:collectionId/child/:childId')
   async addChildToCollection(
     @Param('collectionId', new ParseIntPipe()) collectionId: number,

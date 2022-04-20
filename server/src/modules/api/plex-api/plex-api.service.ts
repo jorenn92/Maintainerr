@@ -112,6 +112,37 @@ export class PlexApiService {
     }
   }
 
+  public async searchContent(input: string) {
+    try {
+      const response = await this.plexClient.query(
+        `/search?query=${input}&includeGuids=1`,
+      );
+      const results = response.MediaContainer.Metadata
+        ? Promise.all(
+            response.MediaContainer.Metadata.map(async (el: PlexMetadata) => {
+              return el.grandparentRatingKey
+                ? await this.getMetadata(el.grandparentRatingKey.toString())
+                : el;
+            }),
+          )
+        : [];
+      const fileteredResults: PlexMetadata[] = [];
+      (await results).forEach((el: PlexMetadata) => {
+        fileteredResults.find(
+          (e: PlexMetadata) => e.ratingKey === el.ratingKey,
+        ) === undefined
+          ? fileteredResults.push(el)
+          : undefined;
+      });
+      return fileteredResults;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
+  }
+
   public async getUsers(): Promise<PlexUserAccount[]> {
     try {
       const response = await this.plexClient.query('/accounts');

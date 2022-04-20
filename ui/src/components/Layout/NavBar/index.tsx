@@ -7,7 +7,8 @@ import {
 } from '@heroicons/react/outline'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ReactNode, useEffect, useRef } from 'react'
+import { ReactNode, useContext, useEffect, useRef } from 'react'
+import SearchContext from '../../../contexts/search-context'
 import Transition from '../../Transition'
 
 interface NavBarLink {
@@ -57,12 +58,18 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
   const navRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const SearchCtx = useContext(SearchContext)
 
   useEffect(() => {
-    console.log(window.location.pathname)
     if (window.location.pathname !== '/') setHighlight(window.location.pathname)
     else setHighlight(`/overview`)
   }, [])
+
+  useEffect(() => {
+    if (SearchCtx.search.text !== '') {
+      setHighlight('/overview', true)
+    }
+  }, [SearchCtx.search.text])
 
   const setHighlight = (href: string, closed = false) => {
     navBarItems = navBarItems.map((el) => {
@@ -108,7 +115,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                       aria-label="Close sidebar"
                       onClick={() => setClosed()}
                     >
-                        <XIcon className="h-6 w-6 text-white" />
+                      <XIcon className="h-6 w-6 text-white" />
                     </button>
                   </div>
                   <div
@@ -127,7 +134,12 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                         return (
                           <Link key={link.key} href={link.href}>
                             <a
-                              onClick={() => setHighlight(link.href, true)}
+                              onClick={() => {
+                                if (link.href === '/overview') {
+                                  SearchCtx.removeText()
+                                }
+                                setHighlight(link.href, true)
+                              }}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                   setHighlight(link.href, true)
@@ -179,7 +191,13 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                       href={navBarLink.href}
                     >
                       <a
-                        onClick={() => setHighlight(navBarLink.href)}
+                        onClick={() => {
+                          if (navBarLink.href === '/overview') {
+                            SearchCtx.removeText()
+                          }
+
+                          setHighlight(navBarLink.href)
+                        }}
                         className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium leading-6 text-white transition duration-150 ease-in-out ${
                           navBarLink.selected
                             ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'

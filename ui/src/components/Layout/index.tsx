@@ -1,4 +1,5 @@
 import { ArrowLeftIcon, MenuAlt2Icon } from '@heroicons/react/solid'
+import { debounce } from 'lodash'
 import Head from 'next/head'
 import router from 'next/router'
 import { useContext, useState } from 'react'
@@ -56,10 +57,10 @@ const Layout: React.FC = (props) => {
               <ArrowLeftIcon className="w-7" />
             </button>
             <SearchBar
-              onSearch={(text: string) => {
+              onSearch={debounce((text: string) => {
                 SearchCtx.addText(text)
                 router.push('/overview')
-              }}
+              }, 1000)}
             />
             {/* <div className="flex items-center"><UserDropdown /></div> */}
           </div>

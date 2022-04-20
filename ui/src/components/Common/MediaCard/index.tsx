@@ -34,7 +34,6 @@ const MediaCard: React.FC<IMediaCard> = ({
   title,
   libraryId,
   tmdbid = undefined,
-  inProgress = false,
   canExpand = false,
 }) => {
   const isTouch = useIsTouch()
@@ -122,7 +121,7 @@ const MediaCard: React.FC<IMediaCard> = ({
             src={
               image
                 ? `https://image.tmdb.org/t/p/w300_and_h450_face${image}`
-                : `/images/overseerr_poster_not_found_logo_top.png`
+                : `/images/maintainerr_poster_not_found_logo_top.png`
             }
             layout="fill"
             objectFit="cover"
