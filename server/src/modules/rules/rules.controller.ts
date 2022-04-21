@@ -33,10 +33,13 @@ export class RulesController {
     return this.rulesService.getRules(id);
   }
   @Get()
-  getRuleGroups(@Query() query: { activeOnly: boolean; libraryId?: number }) {
+  getRuleGroups(
+    @Query() query: { activeOnly: boolean; libraryId?: number; typeId: number },
+  ) {
     return this.rulesService.getRuleGroups(
       query.activeOnly !== undefined ? query.activeOnly : false,
       query.libraryId ? query.libraryId : undefined,
+      query.typeId ? query.typeId : undefined,
     );
   }
   @Delete('/:id')

@@ -1,4 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { RulesDto } from 'src/modules/rules/dtos/rules.dto';
+import { RuleGroup } from 'src/modules/rules/entities/rule-group.entities';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { CollectionMedia } from './collection_media.entities';
 
 @Entity()
@@ -32,6 +41,9 @@ export class Collection {
 
   @Column({ nullable: false, default: 1 })
   type: 1 | 2;
+
+  @OneToOne(() => RuleGroup, (rg) => rg.collection)
+  ruleGroup: RulesDto;
 
   @OneToMany(
     (type) => CollectionMedia,
