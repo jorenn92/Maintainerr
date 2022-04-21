@@ -12,7 +12,9 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
   const [sure, setSure] = useState<boolean>(false)
 
   const handle = () => {
-    DeleteApiHandler(`/collections/media?mediaId=${props.plexId}`)
+    DeleteApiHandler(
+      `/collections/media?mediaId=${props.plexId}&collectionId=${props.collectionId}`
+    )
     PostApiHandler('/rules/exclusion', {
       plexId: props.plexId,
       collectionId: props.collectionId,

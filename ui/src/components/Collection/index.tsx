@@ -71,6 +71,12 @@ const Collection = () => {
   const openDetail = (collection: ICollection) => {
     setDetail({ open: true, collection: collection })
   }
+  const closeDetail = () => {
+    setIsLoading(true)
+    setDetail({ open: false, collection: undefined })
+    getCollections()
+    setIsLoading(false)
+  }
 
   return (
     <div className="w-full">
@@ -79,7 +85,7 @@ const Collection = () => {
           libraryId={detail.collection ? detail.collection.libraryId : 0}
           title={detail.collection ? detail.collection.title : ''}
           collection={detail.collection!}
-          onBack={() => setDetail({ open: false, collection: undefined })}
+          onBack={closeDetail}
         />
       ) : (
         <CollectionOverview

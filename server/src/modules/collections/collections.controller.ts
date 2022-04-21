@@ -98,10 +98,21 @@ export class CollectionsController {
     );
   }
   @Delete('/media')
-  deleteMediaFromCollection(@Query('mediaId') mediaId: number) {
-    return this.collectionService.removeFromAllCollections([
-      { plexId: mediaId },
-    ]);
+  deleteMediaFromCollection(
+    @Query('mediaId') mediaId: number,
+    @Query('collectionId') collectionId: number,
+  ) {
+    if (!collectionId) {
+      return this.collectionService.removeFromAllCollections([
+        { plexId: mediaId },
+      ]);
+    } else {
+      return this.collectionService.removeFromCollection(collectionId, [
+        {
+          plexId: mediaId,
+        },
+      ]);
+    }
   }
   @Get('/media')
   getMediaInCollection(@Query('collectionId') collectionId: number) {
