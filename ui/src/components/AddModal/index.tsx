@@ -58,12 +58,12 @@ const AddModal = (props: IAddModal) => {
 
   useEffect(() => {
     document.title = 'Maintainerr - Overview'
-    if (props.libraryId) {
-      GetApiHandler(`/collections?libraryId=${props.libraryId}`).then((resp) =>
+    if (props.type) {
+      GetApiHandler(`/collections?typeId=${props.type}`).then((resp) =>
         setOptions([...options, ...resp])
       )
-    } else if (props.type) {
-      GetApiHandler(`/collections?typeId=${props.type}`).then((resp) =>
+    } else if (props.libraryId) {
+      GetApiHandler(`/collections?libraryId=${props.libraryId}`).then((resp) =>
         setOptions([...options, ...resp])
       )
     }

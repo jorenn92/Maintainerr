@@ -1,3 +1,4 @@
+import { ICollection } from 'src/modules/collections/interfaces/collection.interface';
 import { RuleDto } from './rule.dto';
 import { RuleDbDto } from './ruleDb.dto';
 
@@ -8,9 +9,6 @@ export class RulesDto {
   description: string;
   isActive?: boolean;
   arrAction?: number;
-  collection?: {
-    visibleOnHome: boolean;
-    deleteAfterDays: number | null;
-  };
+  collection?: ICollection;
   rules: RuleDto[] | RuleDbDto[];
 }

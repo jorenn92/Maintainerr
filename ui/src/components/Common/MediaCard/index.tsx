@@ -27,7 +27,7 @@ interface IMediaCard {
   inProgress?: boolean
   tmdbid?: string
   libraryId?: number
-  type?: number
+  type?: 1 | 2
   collectionPage: boolean
   daysLeft?: number
   collectionId?: number
@@ -85,7 +85,8 @@ const MediaCard: React.FC<IMediaCard> = ({
       {excludeModal ? (
         <ExcludeModal
           plexId={id}
-          libraryId={libraryId!}
+          {...(libraryId ? { libraryId: libraryId } : {})}
+          {...(type ? { type: type } : {})}
           onSubmit={() => {
             setExcludeModal(false)
             setTimeout(() => {

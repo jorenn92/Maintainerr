@@ -11,7 +11,8 @@ import { IRuleGroup } from '../Rules/RuleGroup'
 interface IExcludeModal {
   onCancel: () => void
   onSubmit: () => void
-  libraryId: number
+  libraryId?: number
+  type?: 1 | 2
   plexId: number
 }
 
@@ -70,9 +71,15 @@ const ExcludeModal = (props: IExcludeModal) => {
 
   useEffect(() => {
     document.title = 'Maintainerr - Overview'
-    GetApiHandler(`/rules?libraryId=${props.libraryId}`).then((resp) =>
-      setOptions([...options, ...resp])
-    )
+    if (props.type) {
+      GetApiHandler(`/rules?typeId=${props.type}`).then((resp) =>
+        setOptions([...options, ...resp])
+      )
+    } else if (props.libraryId) {
+      GetApiHandler(`/rules?libraryId=${props.libraryId}`).then((resp) =>
+        setOptions([...options, ...resp])
+      )
+    }
   }, [])
 
   return (

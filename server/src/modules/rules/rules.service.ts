@@ -65,6 +65,7 @@ export class RulesService {
   async getRuleGroups(
     activeOnly = false,
     libraryId?: number,
+    typeId?: number,
   ): Promise<RulesDto[]> {
     try {
       const rulegroups = await this.connection
@@ -72,10 +73,13 @@ export class RulesService {
         .createQueryBuilder('rule_group', 'rg')
         // .select(['id', 'name', 'description', 'isActive'])
         .leftJoinAndSelect('rg.rules', 'r')
+        .leftJoinAndSelect('rg.collection', 'c')
         .orderBy('r.id')
         .where(activeOnly ? 'rg.isActive = true' : '')
         .where(libraryId ? `rg.libraryId = ${libraryId}` : '')
+        .where(typeId ? `c.type = ${typeId}` : '')
         .getMany();
+
       return rulegroups as RulesDto[];
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
