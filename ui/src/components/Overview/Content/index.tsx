@@ -112,7 +112,7 @@ const OverviewContent = (props: IOverviewContent) => {
     return (
       <div className="flex w-full flex-wrap overflow-auto">
         {props.data.map((el) => (
-          <div className="mb-5 mr-5" key={+el.ratingKey}>
+          <div className="m-auto sm:m-2 mb-2 mt-2" key={+el.ratingKey}>
             <MediaCard
               id={+el.ratingKey}
               libraryId={props.libraryId}
