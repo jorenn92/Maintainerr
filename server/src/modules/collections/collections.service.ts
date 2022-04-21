@@ -64,10 +64,14 @@ export class CollectionsService {
     }
   }
 
-  async getCollections(libraryId?: number) {
+  async getCollections(libraryId?: number, typeId?: 1 | 2) {
     try {
       const collections = await this.collectionRepo.find(
-        libraryId ? { libraryId: libraryId } : null,
+        libraryId
+          ? { libraryId: libraryId }
+          : typeId
+          ? { type: typeId }
+          : undefined,
       );
 
       return await Promise.all(

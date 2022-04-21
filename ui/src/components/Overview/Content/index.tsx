@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { ICollection, ICollectionMedia } from '../../Collection'
 import LoadingSpinner from '../../Common/LoadingSpinner'
 import MediaCard from '../../Common/MediaCard'
 
@@ -7,7 +8,10 @@ interface IOverviewContent {
   dataFinished: Boolean
   loading: Boolean
   fetchData: () => void
+  onRemove?: () => void
   libraryId: number
+  collectionPage?: boolean
+  collectionInfo?: ICollectionMedia[]
 }
 
 export interface IPlexMetadata {
@@ -104,6 +108,26 @@ const OverviewContent = (props: IOverviewContent) => {
     )
   }
 
+  const getDaysLeft = (plexId: number) => {
+    if (props.collectionInfo) {
+      const collectionData = props.collectionInfo.find(
+        (colEl) => colEl.plexId === +plexId
+      )
+      if (collectionData && collectionData.collection) {
+        const date = new Date(collectionData.addDate)
+        const today = new Date()
+
+        date.setDate(
+          date.getDate() + collectionData.collection.deleteAfterDays!
+        )
+
+        const diffTime = Math.abs(date.getTime() - today.getTime())
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+        return diffDays
+      }
+    }
+  }
+
   if (props.loading) {
     return <LoadingSpinner />
   }
@@ -112,10 +136,11 @@ const OverviewContent = (props: IOverviewContent) => {
     return (
       <div className="flex w-full flex-wrap overflow-auto">
         {props.data.map((el) => (
-          <div className="m-auto sm:m-2 mb-2 mt-2" key={+el.ratingKey}>
+          <div className="m-auto mb-2 mt-2 sm:m-2" key={+el.ratingKey}>
             <MediaCard
               id={+el.ratingKey}
               libraryId={props.libraryId}
+              type={el.type === 'movie' ? 1 : 2}
               image={''}
               summary={el.summary}
               year={el.year.toString()}
@@ -131,6 +156,18 @@ const OverviewContent = (props: IOverviewContent) => {
                     )[1]
                   : undefined
               }
+              collectionPage={
+                props.collectionPage ? props.collectionPage : false
+              }
+              onRemove={props.onRemove}
+              {...(props.collectionInfo
+                ? {
+                    daysLeft: getDaysLeft(+el.ratingKey),
+                    collectionId: props.collectionInfo.find(
+                      (colEl) => colEl.plexId === +el.ratingKey
+                    )?.collectionId,
+                  }
+                : {})}
             />
           </div>
         ))}

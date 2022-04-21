@@ -9,7 +9,8 @@ import Modal from '../Common/Modal'
 interface IAddModal {
   onCancel: () => void
   onSubmit: () => void
-  libraryId: number
+  libraryId?: number
+  type?: number
   plexId: number
 }
 
@@ -57,9 +58,15 @@ const AddModal = (props: IAddModal) => {
 
   useEffect(() => {
     document.title = 'Maintainerr - Overview'
-    GetApiHandler(`/collections?libraryId=${props.libraryId}`).then((resp) =>
-      setOptions([...options, ...resp])
-    )
+    if (props.libraryId) {
+      GetApiHandler(`/collections?libraryId=${props.libraryId}`).then((resp) =>
+        setOptions([...options, ...resp])
+      )
+    } else if (props.type) {
+      GetApiHandler(`/collections?typeId=${props.type}`).then((resp) =>
+        setOptions([...options, ...resp])
+      )
+    }
   }, [])
 
   return (

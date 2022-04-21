@@ -111,7 +111,9 @@ const Overview = () => {
 
   return (
     <div className="w-full">
-      <LibrarySwitcher allPossible={false} onSwitch={switchLib} />
+      {!searchUsed ? (
+        <LibrarySwitcher allPossible={false} onSwitch={switchLib} />
+      ) : undefined}
       {selectedLibrary ? (
         <OverviewContent
           dataFinished={!(totalSize >= pageData.current * fetchAmount)}

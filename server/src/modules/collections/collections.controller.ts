@@ -68,12 +68,18 @@ export class CollectionsController {
   activate(@Param('id') id: number) {
     return this.collectionService.activateCollection(id);
   }
-
   @Get()
-  getCollections(@Query('libraryId') libraryId: number) {
-    return this.collectionService.getCollections(
-      libraryId ? libraryId : undefined,
-    );
+  getCollections(
+    @Query('libraryId') libraryId: number,
+    @Query('typeId') typeId: 1 | 2,
+  ) {
+    if (libraryId) {
+      return this.collectionService.getCollections(libraryId, undefined);
+    } else if (typeId) {
+      return this.collectionService.getCollections(undefined, typeId);
+    } else {
+      return this.collectionService.getCollections(undefined, undefined);
+    }
   }
   @Get('/collection/:id')
   getCollection(@Param('id') collectionId: number) {
@@ -96,5 +102,9 @@ export class CollectionsController {
     return this.collectionService.removeFromAllCollections([
       { plexId: mediaId },
     ]);
+  }
+  @Get('/media')
+  getMediaInCollection(@Query('collectionId') collectionId: number) {
+    return this.collectionService.getCollectionMedia(collectionId);
   }
 }
