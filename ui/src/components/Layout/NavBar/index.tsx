@@ -77,7 +77,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
       return el
     })
 
-    if (closed) {
+    if (closed && open) {
       setClosed()
     }
   }

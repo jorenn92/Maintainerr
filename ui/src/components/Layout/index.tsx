@@ -59,7 +59,10 @@ const Layout: React.FC = (props) => {
             <SearchBar
               onSearch={debounce((text: string) => {
                 SearchCtx.addText(text)
-                router.push('/overview')
+
+                if (text !== '') {
+                  router.push('/overview')
+                }
               }, 1000)}
             />
             {/* <div className="flex items-center"><UserDropdown /></div> */}

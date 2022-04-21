@@ -10,7 +10,10 @@ import AddModal from '../../AddModal'
 import {
   DocumentAddIcon,
   DocumentRemoveIcon,
+  TrashIcon,
 } from '@heroicons/react/solid'
+import RemoveFromCollectionBtn from '../../Collection/CollectionDetail/RemoveFromCollectionBtn'
+import Collection from '../../Collection'
 
 interface IMediaCard {
   id: number
@@ -23,7 +26,12 @@ interface IMediaCard {
   canExpand?: boolean
   inProgress?: boolean
   tmdbid?: string
-  libraryId: number
+  libraryId?: number
+  type?: number
+  collectionPage: boolean
+  daysLeft?: number
+  collectionId?: number
+  onRemove?: () => void
 }
 
 const MediaCard: React.FC<IMediaCard> = ({
@@ -33,8 +41,13 @@ const MediaCard: React.FC<IMediaCard> = ({
   mediaType,
   title,
   libraryId,
+  type,
+  daysLeft = 999,
+  collectionId = 0,
   tmdbid = undefined,
   canExpand = false,
+  collectionPage = false,
+  onRemove = () => {},
 }) => {
   const isTouch = useIsTouch()
   const [isUpdating, setIsUpdating] = useState(false)
@@ -55,9 +68,11 @@ const MediaCard: React.FC<IMediaCard> = ({
   }, [])
 
   const getExclusions = () => {
-    GetApiHandler(`/rules/exclusion?plexId=${id}`).then((resp: []) =>
-      resp.length > 0 ? setHasExclusion(true) : setHasExclusion(false)
-    )
+    if (!collectionPage) {
+      GetApiHandler(`/rules/exclusion?plexId=${id}`).then((resp: []) =>
+        resp.length > 0 ? setHasExclusion(true) : setHasExclusion(false)
+      )
+    }
   }
 
   // Just to get the year from the date
@@ -70,7 +85,7 @@ const MediaCard: React.FC<IMediaCard> = ({
       {excludeModal ? (
         <ExcludeModal
           plexId={id}
-          libraryId={libraryId}
+          libraryId={libraryId!}
           onSubmit={() => {
             setExcludeModal(false)
             setTimeout(() => {
@@ -83,7 +98,8 @@ const MediaCard: React.FC<IMediaCard> = ({
       {addModal ? (
         <AddModal
           plexId={id}
-          libraryId={libraryId}
+          {...(libraryId ? { libraryId: libraryId } : {})}
+          {...(type ? { type: type } : {})}
           onSubmit={() => {
             setAddModal(false)
           }}
@@ -132,19 +148,31 @@ const MediaCard: React.FC<IMediaCard> = ({
                 mediaType === 'movie' ? 'bg-zinc-900' : 'bg-amber-900'
               }`}
             >
-              <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-white sm:h-5">
+              <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
                 {mediaType}
               </div>
             </div>
           </div>
 
-          {hasExclusion ? (
+          {hasExclusion && !collectionPage ? (
             <div className="absolute right-0 flex items-center justify-between p-2">
               <div
-                className={`pointer-events-none z-40 rounded-full shadow ${'bg-amber-900'}`}
+                className={`pointer-events-none z-40 rounded-full shadow ${'bg-amber-700'}`}
               >
-                <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-white sm:h-5">
+                <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
                   {'EXCL'}
+                </div>
+              </div>
+            </div>
+          ) : undefined}
+
+          {collectionPage && daysLeft !== 999 ? (
+            <div className="absolute right-0 flex items-center justify-between p-2">
+              <div
+                className={`pointer-events-none z-40 rounded-full shadow ${'bg-amber-700'}`}
+              >
+                <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
+                  {daysLeft > 0 ? daysLeft : 0}
                 </div>
               </div>
             </div>
@@ -159,7 +187,7 @@ const MediaCard: React.FC<IMediaCard> = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-zinc-800 bg-opacity-75 text-white">
+            <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-zinc-800 bg-opacity-75 text-zinc-200">
               <Spinner className="h-10 w-10" />
             </div>
           </Transition>
@@ -190,7 +218,7 @@ const MediaCard: React.FC<IMediaCard> = ({
                 }}
               >
                 <div className="flex h-full w-full items-end">
-                  <div className={`px-2 pb-1 text-white`}>
+                  <div className={`px-2 pb-1 text-zinc-200`}>
                     {year && <div className="text-sm font-medium">{year}</div>}
 
                     <h1
@@ -217,32 +245,43 @@ const MediaCard: React.FC<IMediaCard> = ({
                     >
                       {summary}
                     </div>
-                    <div>
-                      <Button
-                        buttonType="twin-primary-l"
-                        buttonSize="md"
-                        className="mt-2 mb-1  h-6 w-1/2 text-zinc-200 shadow-md"
-                        onClick={() => {
-                          setAddModal(true)
-                        }}
-                      >
-                        {<DocumentAddIcon className="m-auto ml-3 h-3" />}{' '}
-                        <p className="rules-button-text m-auto mr-2">{'Add'}</p>
-                      </Button>
-                      <Button
-                        buttonSize="md"
-                        buttonType="twin-primary-r"
-                        className="mt-2 h-6 w-1/2"
-                        onClick={() => {
-                          setExcludeModal(true)
-                        }}
-                      >
-                        {<DocumentRemoveIcon className="m-auto ml-3 h-3" />}{' '}
-                        <p className="rules-button-text m-auto mr-2">
-                          {'Excl'}
-                        </p>
-                      </Button>
-                    </div>
+
+                    {!collectionPage ? (
+                      <div>
+                        <Button
+                          buttonType="twin-primary-l"
+                          buttonSize="md"
+                          className="mt-2 mb-1  h-6 w-1/2 text-zinc-200 shadow-md"
+                          onClick={() => {
+                            setAddModal(true)
+                          }}
+                        >
+                          {<DocumentAddIcon className="m-auto ml-3 h-3" />}{' '}
+                          <p className="rules-button-text m-auto mr-2">
+                            {'Add'}
+                          </p>
+                        </Button>
+                        <Button
+                          buttonSize="md"
+                          buttonType="twin-primary-r"
+                          className="mt-2 h-6 w-1/2"
+                          onClick={() => {
+                            setExcludeModal(true)
+                          }}
+                        >
+                          {<DocumentRemoveIcon className="m-auto ml-3 h-3" />}{' '}
+                          <p className="rules-button-text m-auto mr-2">
+                            {'Excl'}
+                          </p>
+                        </Button>
+                      </div>
+                    ) : (
+                      <RemoveFromCollectionBtn
+                        plexId={id}
+                        onRemove={onRemove}
+                        collectionId={collectionId}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

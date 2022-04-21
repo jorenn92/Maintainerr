@@ -1,4 +1,5 @@
 export class ExclusionDto {
   plexId: number;
-  ruleGroupId: number;
+  ruleGroupId?: number;
+  collectionId?: number;
 }

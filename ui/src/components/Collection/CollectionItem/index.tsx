@@ -6,6 +6,7 @@ import LibrariesContext from '../../../contexts/libraries-context'
 
 interface ICollectionItem {
   collection: ICollection
+  onClick?: (collection: ICollection) => void
 }
 
 const CollectionItem = (props: ICollectionItem) => {
@@ -35,11 +36,17 @@ const CollectionItem = (props: ICollectionItem) => {
         ) : undefined}
         <div className="inset-0 z-0 h-fit p-3 ">
           <div className="overflow-ellipsis whitespace-nowrap text-base font-bold text-white sm:text-lg">
-            <Link href={'/rules'}>
-              <a className="hover:underline">{props.collection.title}</a>
-            </Link>
+            <a
+              className="hover:underline hover:cursor-pointer"
+              // onClick={() => props.onClick(props.collection)}
+              {...(props.onClick
+                ? { onClick: () => props.onClick!(props.collection) }
+                : {})}
+            >
+              {props.collection.title}
+            </a>
           </div>
-          <div className="text-base sm:max-h-20 max-h-12 text-zinc-400 overflow-hidden hover:overflow-y-scroll whitespace-normal sm:text-lg">
+          <div className="max-h-12 overflow-hidden whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll sm:max-h-20 sm:text-lg">
             {props.collection.description}
           </div>
         </div>

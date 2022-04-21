@@ -168,6 +168,12 @@ export class RulesService {
   }
 
   async setExclusion(data: ExclusionDto) {
+    if (data.collectionId) {
+      const group = await this.ruleGroupRepository.findOne({
+        collectionId: data.collectionId,
+      });
+      data = { plexId: data.plexId, ruleGroupId: group.id };
+    }
     try {
       const old = await this.exclusionRepo.findOne({
         ...data,

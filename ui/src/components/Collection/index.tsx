@@ -4,7 +4,9 @@ import LibrariesContext, { ILibrary } from '../../contexts/libraries-context'
 import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
 import ExecuteButton from '../Common/ExecuteButton'
 import LibrarySwitcher from '../Common/LibrarySwitcher'
+import CollectionDetail from './CollectionDetail'
 import CollectionItem from './CollectionItem'
+import CollectionOverview from './CollectionOverview'
 
 export interface ICollection {
   id?: number
@@ -28,11 +30,17 @@ export interface ICollectionMedia {
   tvdbid: number
   addDate: Date
   image_path: string
+  isManual: boolean
+  collection: ICollection
 }
 
 const Collection = () => {
   const LibrariesCtx = useContext(LibrariesContext)
   const [isLoading, setIsLoading] = useState(true)
+  const [detail, setDetail] = useState<{
+    open: boolean
+    collection: ICollection | undefined
+  }>({ open: false, collection: undefined })
   const [library, setLibrary] = useState<ILibrary>()
   const [collections, setCollections] = useState<ICollection[]>()
 
@@ -60,33 +68,27 @@ const Collection = () => {
     PostApiHandler('/collections/handle', {})
   }
 
+  const openDetail = (collection: ICollection) => {
+    setDetail({ open: true, collection: collection })
+  }
+
   return (
     <div className="w-full">
-      <LibrarySwitcher onSwitch={onSwitchLibrary} />
-
-      <div className="m-auto mb-3 flex ">
-        <div className="m-auto sm:m-0 ">
-          <ExecuteButton
-            onClick={debounce(doActions, 5000)}
-            text="Handle collections"
-          />
-        </div>
-      </div>
-
-      <div className="w-full">
-        <div className="m-auto mb-3 flex">
-        <h1 className="m-auto sm:m-0 text-lg font-bold text-zinc-200 xl:m-0">
-          {'Automatic collections'}
-        </h1>
-        </div>
-
-
-        <div className="flex flex-col sm:flex-row">
-          {collections?.map((col) => (
-            <CollectionItem key={col.id} collection={col} />
-          ))}
-        </div>
-      </div>
+      {detail.open ? (
+        <CollectionDetail
+          libraryId={detail.collection ? detail.collection.libraryId : 0}
+          title={detail.collection ? detail.collection.title : ''}
+          collection={detail.collection!}
+          onBack={() => setDetail({ open: false, collection: undefined })}
+        />
+      ) : (
+        <CollectionOverview
+          onSwitchLibrary={onSwitchLibrary}
+          collections={collections}
+          doActions={doActions}
+          openDetail={openDetail}
+        />
+      )}
     </div>
   )
 }
