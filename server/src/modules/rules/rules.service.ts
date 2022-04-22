@@ -69,16 +69,23 @@ export class RulesService {
   ): Promise<RulesDto[]> {
     try {
       const rulegroups = await this.connection
-        // .getRepository(RuleGroup)
         .createQueryBuilder('rule_group', 'rg')
-        // .select(['id', 'name', 'description', 'isActive'])
-        .leftJoinAndSelect('rg.rules', 'r')
-        .leftJoinAndSelect('rg.collection', 'c')
+        .innerJoinAndSelect('rg.rules', 'r')
         .orderBy('r.id')
-        .where(activeOnly ? 'rg.isActive = true' : '')
-        .where(libraryId ? `rg.libraryId = ${libraryId}` : '')
-        .where(typeId ? `c.type = ${typeId}` : '')
+        .innerJoinAndSelect('rg.collection', 'c')
+        .where(
+          activeOnly ? 'rg.isActive = true' : 'rg.isActive in (true, false)',
+        )
+        .andWhere(
+          libraryId !== undefined
+            ? `rg.libraryId = ${libraryId}`
+            : typeId !== undefined
+            ? `c.type = ${typeId}`
+            : 'rg.libraryId != -1',
+        )
+        // .where(typeId !== undefined ? `c.type = ${typeId}` : '')
         .getMany();
+      console.log(rulegroups);
 
       return rulegroups as RulesDto[];
     } catch (e) {
