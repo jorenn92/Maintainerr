@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { ExclusionDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
-import { Exclusion } from './entities/exclusion.entities';
 import { RuleExecutorService } from './rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
 
@@ -34,7 +33,12 @@ export class RulesController {
   }
   @Get()
   getRuleGroups(
-    @Query() query: { activeOnly: boolean; libraryId?: number; typeId: number },
+    @Query()
+    query: {
+      activeOnly?: boolean;
+      libraryId?: number;
+      typeId?: number;
+    },
   ) {
     return this.rulesService.getRuleGroups(
       query.activeOnly !== undefined ? query.activeOnly : false,
