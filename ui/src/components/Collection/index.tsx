@@ -1,11 +1,8 @@
-import { debounce } from 'lodash'
 import { useContext, useEffect, useState } from 'react'
 import LibrariesContext, { ILibrary } from '../../contexts/libraries-context'
 import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
-import ExecuteButton from '../Common/ExecuteButton'
-import LibrarySwitcher from '../Common/LibrarySwitcher'
+import LoadingSpinner from '../Common/LoadingSpinner'
 import CollectionDetail from './CollectionDetail'
-import CollectionItem from './CollectionItem'
 import CollectionOverview from './CollectionOverview'
 
 export interface ICollection {
@@ -58,10 +55,12 @@ const Collection = () => {
   }, [library])
 
   const getCollections = async () => {
+    setIsLoading(true)
     const colls: ICollection[] = library
       ? await GetApiHandler(`/collections?libraryId=${library.key}`)
       : await GetApiHandler('/collections')
     setCollections(colls)
+    setIsLoading(false)
   }
 
   const doActions = () => {
@@ -71,11 +70,16 @@ const Collection = () => {
   const openDetail = (collection: ICollection) => {
     setDetail({ open: true, collection: collection })
   }
+
   const closeDetail = () => {
     setIsLoading(true)
     setDetail({ open: false, collection: undefined })
     getCollections()
     setIsLoading(false)
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />
   }
 
   return (

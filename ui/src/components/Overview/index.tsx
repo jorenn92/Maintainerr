@@ -1,13 +1,15 @@
-import { debounce } from 'lodash'
+import { clone, debounce } from 'lodash'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import LibrariesContext from '../../contexts/libraries-context'
 import SearchContext from '../../contexts/search-context'
 import GetApiHandler from '../../utils/ApiHandler'
 import LibrarySwitcher from '../Common/LibrarySwitcher'
+import LoadingSpinner, { SmallLoadingSpinner } from '../Common/LoadingSpinner'
 import OverviewContent, { IPlexMetadata } from './Content'
 
 const Overview = () => {
   const [isLoading, setIsLoading] = useState<Boolean>(false)
+  const [loadingExtra, setLoadingExtra] = useState<Boolean>(false)
 
   const [data, setData] = useState<IPlexMetadata[]>([])
   const dataRef = useRef<IPlexMetadata[]>([])
@@ -95,6 +97,8 @@ const Overview = () => {
       SearchCtx.search.text === '' &&
       totalSizeRef.current >= pageData.current * fetchAmount
     ) {
+      const askedLib = clone(selectedLibraryRef.current)
+
       const resp: { totalSize: number; items: IPlexMetadata[] } =
         await GetApiHandler(
           `/plex/library/${selectedLibraryRef.current}/content/${
@@ -102,10 +106,14 @@ const Overview = () => {
           }?amount=${fetchAmount}`
         )
 
-      setTotalSize(resp.totalSize)
-      pageData.current = pageData.current + 1
-      setData([...dataRef.current, ...resp.items])
-      setIsLoading(false)
+      if (askedLib === selectedLibraryRef.current) {
+        // check lib again, we don't want to change array when lib was changed
+        setTotalSize(resp.totalSize)
+        pageData.current = pageData.current + 1
+        setData([...dataRef.current, ...resp.items])
+        setIsLoading(false)
+      }
+      setLoadingExtra(false)
     }
   }
 
@@ -117,12 +125,16 @@ const Overview = () => {
       {selectedLibrary ? (
         <OverviewContent
           dataFinished={!(totalSize >= pageData.current * fetchAmount)}
-          fetchData={debounce(() => fetchData(), 100)}
+          fetchData={debounce(() => {
+            setLoadingExtra(true)
+            fetchData()
+          }, 100)}
           loading={isLoading}
           data={data}
           libraryId={selectedLibrary}
         />
       ) : undefined}
+      {loadingExtra && !isLoading && (totalSize >= pageData.current * fetchAmount) ? <SmallLoadingSpinner /> : undefined}
     </div>
   )
 }
