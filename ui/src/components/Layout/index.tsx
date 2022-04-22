@@ -76,12 +76,11 @@ const Layout: React.FC = (props) => {
                 }
               }, 1000)}
             />
-            {/* <div className="flex items-center"><UserDropdown /></div> */}
           </div>
         </div>
 
         <main
-          className="relative top-16 z-0 w-full focus:outline-none"
+          className="relative mt-2 top-16 z-0 w-full focus:outline-none"
           tabIndex={0}
         >
           <div className="mb-6">
