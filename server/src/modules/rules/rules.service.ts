@@ -85,8 +85,6 @@ export class RulesService {
         )
         // .where(typeId !== undefined ? `c.type = ${typeId}` : '')
         .getMany();
-      console.log(rulegroups);
-
       return rulegroups as RulesDto[];
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
