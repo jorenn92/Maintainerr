@@ -52,26 +52,34 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
   }
 
   public async handle() {
-    // loop over all active collections
-    const collections = await this.collectionRepo.find({ isActive: true });
-    for (const collection of collections) {
-      this.infoLogger(`Handling collection '${collection.title}'`);
+    const appStatus = await this.settings.testConnections();
+    this.logger.log('Start handling all collections.');
+    if (appStatus) {
+      // loop over all active collections
+      const collections = await this.collectionRepo.find({ isActive: true });
+      for (const collection of collections) {
+        this.infoLogger(`Handling collection '${collection.title}'`);
 
-      const collectionMedia = await this.collectionMediaRepo.find({
-        collectionId: collection.id,
-      });
+        const collectionMedia = await this.collectionMediaRepo.find({
+          collectionId: collection.id,
+        });
 
-      const dangerDate = new Date(
-        new Date().getTime() - +collection.deleteAfterDays * 86400000,
-      );
+        const dangerDate = new Date(
+          new Date().getTime() - +collection.deleteAfterDays * 86400000,
+        );
 
-      for (const media of collectionMedia) {
-        // delete media addate <= due date
-        if (new Date(media.addDate) <= dangerDate) {
-          this.deleteMedia(collection, media);
+        for (const media of collectionMedia) {
+          // delete media addate <= due date
+          if (new Date(media.addDate) <= dangerDate) {
+            this.deleteMedia(collection, media);
+          }
         }
+        this.infoLogger(`Handling collection '${collection.title}' done`);
       }
-      this.infoLogger(`Handling collection '${collection.title}' done`);
+    } else {
+      this.logger.log(
+        'Not all applications are reachable.. Skipped collection handling.',
+      );
     }
   }
 
