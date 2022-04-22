@@ -26,7 +26,7 @@ const SearchBar = (props: ISearchBar) => {
 
   return (
     <div className="relative flex w-full items-center text-white focus-within:text-zinc-200">
-      <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
+      <div className="pointer-events-none absolute  left-4 flex items-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
@@ -45,7 +45,7 @@ const SearchBar = (props: ISearchBar) => {
         onChange={(e) => inputHandler(e)}
         placeholder={props.placeholder ? props.placeholder : 'Search'}
         value={text}
-        className="mb-2 block w-full rounded-full border border-zinc-600 bg-zinc-900 bg-opacity-80 py-2 pl-10 text-white placeholder-zinc-300 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0 sm:text-base"
+        className="block w-full rounded-full border border-zinc-600 bg-zinc-900 bg-opacity-80 py-2 pl-10 text-white placeholder-zinc-300 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0 sm:text-base"
       />
     </div>
   )
