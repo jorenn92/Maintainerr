@@ -2,8 +2,10 @@ import { ArrowLeftIcon, MenuAlt2Icon } from '@heroicons/react/solid'
 import { debounce } from 'lodash'
 import Head from 'next/head'
 import router from 'next/router'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import SearchContext from '../../contexts/search-context'
+import SettingsContext from '../../contexts/settings-context'
+import GetApiHandler from '../../utils/ApiHandler'
 import SearchBar from '../Common/SearchBar'
 import NavBar from './NavBar'
 
@@ -12,10 +14,19 @@ const Layout: React.FC = (props) => {
 
   const [navBarOpen, setNavBarOpen] = useState(true)
   const SearchCtx = useContext(SearchContext)
+  const SettingsCtx = useContext(SettingsContext)
 
   const navbarClosed = () => {
     setNavBarOpen(!navBarOpen)
   }
+
+  useEffect(() => {
+    GetApiHandler('/settings/test/setup').then((setupDone) => {
+      if (!setupDone) {
+        router.push('/settings/plex')
+      }
+    })
+  }, [])
 
   return (
     <section>

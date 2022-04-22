@@ -10,10 +10,8 @@ import AddModal from '../../AddModal'
 import {
   DocumentAddIcon,
   DocumentRemoveIcon,
-  TrashIcon,
 } from '@heroicons/react/solid'
 import RemoveFromCollectionBtn from '../../Collection/CollectionDetail/RemoveFromCollectionBtn'
-import Collection from '../../Collection'
 
 interface IMediaCard {
   id: number

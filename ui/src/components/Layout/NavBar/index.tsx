@@ -6,7 +6,6 @@ import {
   XIcon,
 } from '@heroicons/react/outline'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ReactNode, useContext, useEffect, useRef } from 'react'
 import SearchContext from '../../../contexts/search-context'
 import Transition from '../../Transition'
@@ -57,12 +56,14 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
   const navRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
   const SearchCtx = useContext(SearchContext)
 
   useEffect(() => {
-    if (window.location.pathname !== '/') setHighlight(window.location.pathname)
-    else setHighlight(`/overview`)
+    setTimeout(() => {
+      if (window.location.pathname !== '/')
+        setHighlight(window.location.pathname)
+      else setHighlight(`/overview`)
+    }, 100)
   }, [])
 
   useEffect(() => {

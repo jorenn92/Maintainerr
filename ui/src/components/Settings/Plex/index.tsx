@@ -32,7 +32,7 @@ const PlexSettings = () => {
     if (
       hostnameRef.current?.value &&
       nameRef.current?.value &&
-      portRef.current?.value 
+      portRef.current?.value
       // sslRef.current?.value
     ) {
       const payload = {
@@ -41,7 +41,6 @@ const PlexSettings = () => {
         plex_name: nameRef.current.value,
         plex_ssl: 0, //sslRef.current.checked ? 1 : 0,
       }
-      console.log(payload)
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
         '/settings',
         {
@@ -138,6 +137,15 @@ const PlexSettings = () => {
       ) : changed ? (
         <Alert type="info" title="Settings succesfully updated" />
       ) : undefined}
+
+      {tokenValid ? (
+        ''
+      ) : (
+        <Alert
+          type="info"
+          title="Plex configuration is required for Maintainerr to function."
+        />
+      )}
 
       {testBanner.version !== '0' ? (
         testBanner.status ? (
