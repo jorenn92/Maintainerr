@@ -23,6 +23,10 @@ export class SettingsController {
   updateSettings(@Body() payload: SettingDto) {
     return this.settingsService.updateSettings(payload);
   }
+  @Get('/test/setup')
+  testSetup() {
+    return this.settingsService.testSetup();
+  }
   @Get('/test/overseerr')
   testOverseerr() {
     return this.settingsService.testOverseerr();

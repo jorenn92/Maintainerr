@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
-import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
 import { Collection } from '../collections/entities/collection.entities';

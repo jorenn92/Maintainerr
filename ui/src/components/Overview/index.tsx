@@ -4,7 +4,7 @@ import LibrariesContext from '../../contexts/libraries-context'
 import SearchContext from '../../contexts/search-context'
 import GetApiHandler from '../../utils/ApiHandler'
 import LibrarySwitcher from '../Common/LibrarySwitcher'
-import LoadingSpinner, { SmallLoadingSpinner } from '../Common/LoadingSpinner'
+import { SmallLoadingSpinner } from '../Common/LoadingSpinner'
 import OverviewContent, { IPlexMetadata } from './Content'
 
 const Overview = () => {

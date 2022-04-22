@@ -185,4 +185,50 @@ export class SettingsService implements SettingDto {
       return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
+
+  // Test if all configured applications are reachable. Plex is required.
+  public async testConnections(): Promise<boolean> {
+    try {
+      const plexState = (await this.testPlex()).status === 'OK';
+      let radarrState = true;
+      let sonarrState = true;
+      let overseerrState = true;
+      if (this.radarr_url && this.radarr_api_key) {
+        radarrState = (await this.testRadarr()).status === 'OK';
+      }
+
+      if (this.sonarr_url && this.sonarr_api_key) {
+        sonarrState = (await this.testSonarr()).status === 'OK';
+      }
+
+      if (this.overseerr_url && this.overseerr_api_key) {
+        overseerrState = (await this.testOverseerr()).status === 'OK';
+      }
+
+      if (plexState && radarrState && sonarrState && overseerrState) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch {
+      return false;
+    }
+  }
+
+  // Test if all required settings are set.
+  public async testSetup(): Promise<boolean> {
+    try {
+      if (
+        this.plex_hostname &&
+        this.plex_name &&
+        this.plex_port &&
+        this.plex_auth_token
+      ) {
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
 }

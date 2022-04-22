@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import _ from 'lodash';
+import _, { over } from 'lodash';
 import { isNull } from 'lodash';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
@@ -78,47 +78,55 @@ export class RuleExecutorService implements OnApplicationBootstrap {
 
   public async executeAllRules() {
     this.logger.log('Starting Execution of all active rules.');
-    const ruleGroups = await this.getAllActiveRuleGroups();
-    if (ruleGroups) {
-      for (const rulegroup of ruleGroups) {
-        this.logger.log(`Executing ${rulegroup.name}`);
+    const appStatus = await this.settings.testConnections();
 
-        this.workerData = [];
-        this.resultData = [];
+    if (appStatus) {
+      const ruleGroups = await this.getAllActiveRuleGroups();
+      if (ruleGroups) {
+        for (const rulegroup of ruleGroups) {
+          this.logger.log(`Executing ${rulegroup.name}`);
 
-        this.plexData = { page: 0, finished: false, data: [] };
-        while (!this.plexData.finished) {
-          await this.getPlexData(rulegroup.libraryId);
-          let currentSection = 0;
-          let sectionActionAnd = false;
+          this.workerData = [];
+          this.resultData = [];
 
-          for (const rule of rulegroup.rules) {
-            const parsedRule = JSON.parse(
-              (rule as RuleDbDto).ruleJson,
-            ) as RuleDto;
-            if (currentSection === (rule as RuleDbDto).section) {
-              // if section didn't change
-              // execute and store in work array
-              await this.executeRule(parsedRule);
-            } else {
-              // handle section action
-              this.handleSectionAction(sectionActionAnd);
-              // save new section action
-              sectionActionAnd = +parsedRule.operator === 0;
-              // reset first operator of new section
-              parsedRule.operator = null;
-              // Execute the rule and set the new section
-              await this.executeRule(parsedRule);
-              currentSection = (rule as RuleDbDto).section;
+          this.plexData = { page: 0, finished: false, data: [] };
+          while (!this.plexData.finished) {
+            await this.getPlexData(rulegroup.libraryId);
+            let currentSection = 0;
+            let sectionActionAnd = false;
+
+            for (const rule of rulegroup.rules) {
+              const parsedRule = JSON.parse(
+                (rule as RuleDbDto).ruleJson,
+              ) as RuleDto;
+              if (currentSection === (rule as RuleDbDto).section) {
+                // if section didn't change
+                // execute and store in work array
+                await this.executeRule(parsedRule);
+              } else {
+                // handle section action
+                this.handleSectionAction(sectionActionAnd);
+                // save new section action
+                sectionActionAnd = +parsedRule.operator === 0;
+                // reset first operator of new section
+                parsedRule.operator = null;
+                // Execute the rule and set the new section
+                await this.executeRule(parsedRule);
+                currentSection = (rule as RuleDbDto).section;
+              }
             }
+            this.handleSectionAction(sectionActionAnd); // Handle last section
           }
-          this.handleSectionAction(sectionActionAnd); // Handle last section
+          await this.handleCollection(
+            await this.rulesService.getRuleGroupById(rulegroup.id),
+          );
+          this.logger.log(`Execution of rule ${rulegroup.name} done.`);
         }
-        await this.handleCollection(
-          await this.rulesService.getRuleGroupById(rulegroup.id),
-        );
-        this.logger.log(`Execution of rule ${rulegroup.name} done.`);
       }
+    } else {
+      this.logger.log(
+        'Not all applications are reachable.. Skipped rule execution.',
+      );
     }
   }
 
