@@ -1,5 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import GetApiHandler, { PostApiHandler, PutApiHandler } from '../../../../utils/ApiHandler'
+import GetApiHandler, {
+  PostApiHandler,
+  PutApiHandler,
+} from '../../../../utils/ApiHandler'
 import Image from 'next/image'
 import RuleCreator, { IRule } from '../../Rule/RuleCreator'
 import { ConstantsContextProvider } from '../../../../contexts/constants-context'
@@ -11,6 +14,7 @@ import ArrAction from './ArrAction'
 import { IRuleGroup } from '..'
 import { ICollection } from '../../../Collection'
 import { BanIcon, SaveIcon } from '@heroicons/react/solid'
+import Router from 'next/router'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -89,7 +93,7 @@ const AddModal = (props: AddModal) => {
     if (props.editData) {
       GetApiHandler(
         `/collections/collection/${props.editData.collectionId}`
-      ).then((resp : ICollection ) => {
+      ).then((resp: ICollection) => {
         resp ? setCollection(resp) : undefined
         resp ? setShowHome(resp.visibleOnHome!) : undefined
         resp ? setArrOption(resp.arrAction) : undefined
@@ -97,6 +101,20 @@ const AddModal = (props: AddModal) => {
       })
     } else {
       setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    // trapping next router before-pop-state to manipulate router change on browser back button
+    Router.beforePopState(() => {
+      props.onCancel()
+      window.history.forward()
+      return false
+    })
+    return () => {
+      Router.beforePopState(() => {
+        return true
+      })
     }
   }, [])
 
@@ -132,14 +150,14 @@ const AddModal = (props: AddModal) => {
             setError(true)
           })
       } else {
-        PutApiHandler('/rules', {id: props.editData.id, ...creationObj})
-        .then((resp) => {
-          if (resp.code === 1) props.onSuccess()
-          else setError(true)
-        })
-        .catch((err) => {
-          setError(true)
-        })
+        PutApiHandler('/rules', { id: props.editData.id, ...creationObj })
+          .then((resp) => {
+            if (resp.code === 1) props.onSuccess()
+            else setError(true)
+          })
+          .catch((err) => {
+            setError(true)
+          })
       }
     } else {
       setFormIncomplete(true)
@@ -168,8 +186,8 @@ const AddModal = (props: AddModal) => {
       ) : undefined}
       {formIncomplete ? (
         <Alert>
-          Not all required (*) fields contain values and at least 1 valid rule is
-          required
+          Not all required (*) fields contain values and at least 1 valid rule
+          is required
         </Alert>
       ) : undefined}
       <div className="section">
@@ -269,7 +287,7 @@ const AddModal = (props: AddModal) => {
                   type="checkbox"
                   name="is_active"
                   id="is_active"
-                  className='border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0'
+                  className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
                   defaultChecked={active}
                   onChange={() => {
                     setActive(!active)
@@ -289,7 +307,7 @@ const AddModal = (props: AddModal) => {
                   type="checkbox"
                   name="collection_visible"
                   id="collection_visible"
-                  className='border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0'
+                  className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
                   defaultChecked={showHome}
                   onChange={() => {
                     setShowHome(!showHome)
@@ -337,19 +355,23 @@ const AddModal = (props: AddModal) => {
             {/* <AddButton text="Create" onClick={create} /> */}
             <div className="m-auto flex xl:m-0">
               <button
-                className="ml-auto mr-3 flex h-10 rounded bg-amber-600 shadow-md hover:bg-amber-500 text-zinc-900"
+                className="ml-auto mr-3 flex h-10 rounded bg-amber-600 text-zinc-900 shadow-md hover:bg-amber-500"
                 onClick={create}
               >
                 {<SaveIcon className="m-auto ml-5 h-6 w-6 text-zinc-200" />}
-                <p className="m-auto mr-5 ml-1 text-zinc-100 button-text">Save</p>
+                <p className="button-text m-auto mr-5 ml-1 text-zinc-100">
+                  Save
+                </p>
               </button>
 
               <button
-                className="ml-auto flex h-10 rounded bg-amber-900 shadow-md hover:bg-amber-800 text-zinc-900"
+                className="ml-auto flex h-10 rounded bg-amber-900 text-zinc-900 shadow-md hover:bg-amber-800"
                 onClick={cancel}
               >
                 {<BanIcon className="m-auto ml-5 h-6 w-6 text-zinc-200" />}
-                <p className="m-auto mr-5 ml-1 text-zinc-100 button-text">Cancel</p>
+                <p className="button-text m-auto mr-5 ml-1 text-zinc-100">
+                  Cancel
+                </p>
               </button>
             </div>
           </div>
