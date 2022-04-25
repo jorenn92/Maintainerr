@@ -34,11 +34,11 @@ const SettingsWrapper: React.FC = ({ children }) => {
       route: '/settings/sonarr',
       regex: /^\/settings(\/sonarr)?$/,
     },
-    {
-      text: 'Jobs',
-      route: '/settings/jobs',
-      regex: /^\/settings(\/jobs)?$/,
-    },
+    // {
+    //   text: 'Jobs',
+    //   route: '/settings/jobs',
+    //   regex: /^\/settings(\/jobs)?$/,
+    // },
   ]
 
   useEffect(() => {

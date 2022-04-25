@@ -139,7 +139,9 @@ export class SettingsService implements SettingDto {
   }
 
   public generateApiKey(): string {
-    return Buffer.from(`${Date.now()}${randomUUID()})`).toString('base64');
+    return Buffer.from(`Maintainerr${Date.now()}${randomUUID()})`).toString(
+      'base64',
+    );
   }
 
   public async testOverseerr(): Promise<BasicResponseDto> {
