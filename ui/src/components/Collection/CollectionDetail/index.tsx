@@ -1,6 +1,7 @@
-import { BackspaceIcon, RewindIcon } from '@heroicons/react/solid'
+import { RewindIcon } from '@heroicons/react/solid'
+import Router from 'next/router'
 import { useEffect, useState } from 'react'
-import Collection, { ICollection, ICollectionMedia } from '..'
+import { ICollection, ICollectionMedia } from '..'
 import GetApiHandler from '../../../utils/ApiHandler'
 import OverviewContent, { IPlexMetadata } from '../../Overview/Content'
 
@@ -37,11 +38,30 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
     getData()
   }, [])
 
+  useEffect(() => {
+    // trapping next router before-pop-state to manipulate router change on browser back button
+    Router.beforePopState(() => {
+      props.onBack()
+      window.history.forward()
+      return false
+    })
+    return () => {
+      Router.beforePopState(() => {
+        return true
+      })
+    }
+  }, [])
+
   return (
     <div className="w-full">
       <div className="m-auto mb-3 flex">
-        <h1 className="m-auto text-lg font-bold text-zinc-200 sm:m-0 xl:m-0 flex">
-          <span className='w-6 m-auto mr-2 hover:cursor-pointer text-amber-700' onClick={props.onBack}>{<RewindIcon />}</span>{' '}
+        <h1 className="m-auto flex text-lg font-bold text-zinc-200 sm:m-0 xl:m-0">
+          <span
+            className="m-auto mr-2 w-6 text-amber-700 hover:cursor-pointer"
+            onClick={props.onBack}
+          >
+            {<RewindIcon />}
+          </span>{' '}
           {`${props.title}`}
         </h1>
       </div>
