@@ -1,4 +1,5 @@
-import { RefreshIcon, SaveIcon } from '@heroicons/react/solid'
+import { DocumentTextIcon, RefreshIcon, SaveIcon } from '@heroicons/react/solid'
+import Link from 'next/link'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
@@ -115,10 +116,19 @@ const MainSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex justify-end">
               <span className="ml-3 inline-flex rounded-md shadow-sm">
+                <Link href={`/docs/index.html`} passHref={true}>
+                  <a target="_blank" rel="noopener noreferrer">
+                    <Button buttonType="default" type="button">
+                      <DocumentTextIcon />
+                      <span>Open Docs</span>
+                    </Button>
+                  </a>
+                </Link>
+              </span>
+              <span className="ml-3 inline-flex rounded-md shadow-sm">
                 <Button
                   buttonType="primary"
                   type="submit"
-                  // disabled={isSubmitting || !isValid}
                 >
                   <SaveIcon />
                   <span>Save Changes</span>
