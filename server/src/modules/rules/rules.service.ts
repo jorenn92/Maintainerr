@@ -103,13 +103,14 @@ export class RulesService {
   async deleteRuleGroup(ruleGroupId: number): Promise<ReturnStatus> {
     try {
       const group = await this.ruleGroupRepository.findOne(ruleGroupId);
-      if (group.collectionId) {
-        await this.collectionService.deleteCollection(group.collectionId);
-      }
 
-      await this.rulesRepository.delete({ ruleGroupId: ruleGroupId });
       await this.exclusionRepo.delete({ ruleGroupId: ruleGroupId });
       await this.ruleGroupRepository.delete(ruleGroupId);
+
+      if (group.collectionId) {
+        // DB cascade doesn't work.. So do it manually
+        await this.collectionService.deleteCollection(group.collectionId);
+      }
       this.logger.log(
         `Removed rulegroup with id ${ruleGroupId} from the database`,
       );

@@ -31,10 +31,15 @@ export class RuleGroup {
   @Column({ nullable: true })
   collectionId: number;
 
-  @OneToMany((type) => Rules, (rules) => rules.ruleGroup)
+  @OneToMany((type) => Rules, (rules) => rules.ruleGroup, {
+    onDelete: 'CASCADE',
+  })
   rules: Rules[];
 
-  @OneToOne(() => Collection, (c) => c.ruleGroup)
+  @OneToOne(() => Collection, (c) => c.ruleGroup, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   collection: ICollection;
 }

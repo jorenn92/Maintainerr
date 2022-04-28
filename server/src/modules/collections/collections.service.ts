@@ -492,16 +492,7 @@ export class CollectionsService {
       try {
         await this.CollectionMediaRepo.delete({ collectionId: collection.id });
         await this.collectionRepo.delete(collection.id);
-        // await this.connection
-        //   .createQueryBuilder()
-        //   .delete()
-        //   .from(Collection)
-        //   .where([
-        //     {
-        //       id: collection.id,
-        //     },
-        //   ])
-        //   .execute();
+
         return { status: 'OK', code: 1, message: 'Success' };
       } catch (_err) {
         this.infoLogger(
