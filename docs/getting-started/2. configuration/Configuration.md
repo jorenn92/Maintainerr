@@ -17,7 +17,7 @@ This is the only **required** configuration. Without a valid Plex connection Mai
 | Name          | The name of your server |
 | Hostname or IP| The domain name or local IP of the host your server runs on |
 | Port          | The port Plex runs on, default is 32400 |
-| Authentication| Authenticate with your plex server with a **admin** account |
+| Authentication| Authenticate with your Plex server using a **admin** account |
 
 
 # Overseerr
