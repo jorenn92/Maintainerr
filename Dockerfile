@@ -5,11 +5,19 @@ EXPOSE 80
 
 COPY server/ /opt/server/
 COPY ui/ /opt/ui/
+COPY docs/ /opt/docs/
 COPY start.sh /opt/start.sh
 
 RUN mkdir /opt/server/data
 
 VOLUME [ "/opt/server/data" ]
+
+WORKDIR /opt/
+
+RUN npm install -g jsdoc http-server && \ 
+    jsdoc -d ./docs/output/ -u ./docs .\server\dist\ && \
+    find -maxdepth 1 ! -name output ./docs/ -exec rm -rv {} \; && \
+    npm uninstall -g jsdoc
 
 WORKDIR /opt/server/
 
