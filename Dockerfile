@@ -12,13 +12,6 @@ RUN mkdir /opt/server/data
 
 VOLUME [ "/opt/server/data" ]
 
-WORKDIR /opt/
-
-RUN npm install -g jsdoc http-server && \ 
-    jsdoc -d ./docs/output/ -u ./docs .\server\dist\ && \
-    find -maxdepth 1 ! -name output ./docs/ -exec rm -rv {} \; && \
-    npm uninstall -g jsdoc
-
 WORKDIR /opt/server/
 
 RUN chmod +x /opt/start.sh && \
@@ -33,6 +26,8 @@ WORKDIR /opt/ui/
 
 RUN npm install && \ 
     npm install --save sharp && \ 
+    npm run docs-generate && \
+    rm -rf ../docs && \
     npm run build && \
     rm -rf node_modules && \
     rm -f package-lock.json
