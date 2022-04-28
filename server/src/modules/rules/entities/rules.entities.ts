@@ -18,6 +18,8 @@ export class Rules {
   @Column({ default: true })
   isActive: boolean;
 
-  @ManyToOne((type) => RuleGroup, (ruleGroup) => ruleGroup.rules)
+  @ManyToOne((type) => RuleGroup, (ruleGroup) => ruleGroup.rules, {
+    onDelete: 'CASCADE',
+  })
   ruleGroup: RuleGroup;
 }
