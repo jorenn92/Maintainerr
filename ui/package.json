@@ -6,7 +6,7 @@
     "build": "next build",
     "start": "next start -p 80",
     "lint": "next lint",
-    "docs-generate": "jsdoc -c jsdoc.json ../server/dist/",
+    "docs-generate": "jsdoc -c jsdoc.json --readme ../docs/1-home/Home.md ../server/dist/",
     "docs-serve": "http-server ../docs-output/ --cors"
   },
   "dependencies": {

@@ -116,7 +116,7 @@ const MainSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex justify-end">
               <span className="ml-3 inline-flex rounded-md shadow-sm">
-                <Link href={`/docs/index.html`} passHref={true}>
+                <Link href={`/docs/tutorial-Home.html`} passHref={true}>
                   <a target="_blank" rel="noopener noreferrer">
                     <Button buttonType="default" type="button">
                       <DocumentTextIcon />

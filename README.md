@@ -2,26 +2,29 @@
   <img src="ui/public/logo_black.svg?raw=true" alt="Sublime's custom image"/>
 </p>
 
-<b>Maintainerr</b> makes managing your media easy. Create custom rules with parameters across different services, show the matching media on a Plex collection for a given amount of days and handle the deletion.
-
-# Features
+<b>Maintainerr</b> makes managing your media easy. Create custom rules with parameters across different services, show the matching media on the Plex home screen for a given amount of days and handle the deletion.
 
 > Maintainerr is early alpha software, expect bugs.
 
-By default, Maintainerr will remove media files, remove/unmonitor media in Radarr/Sonarr and clear all Overseerr requests.\
-Manually adding specific media that doesn't apply to the specified rule(s) is also supported. As is excluding media.
+# Features
+- Configure rules specific to your needs
+- Manually add media to a collection, in case it's not included in your rules
+- Exclude  media for some or all rules
+- Show a plex collection, containing selected media, on the Plex home screen for a specific duration
+- Remove or unmonitor media from Radarr
+- Remove or unmonitor media from Sonarr
+- Clear requests from Overseerr
 
-# Support
+Currently, Maintainerr supports rules across these apps :
 
-Currently, Maintainerr supports these apps for custom rules : 
- - Plex
- - Overseerr
- - Radarr
- - Sonarr
+- Plex
+- Overseerr
+- Radarr
+- Sonarr
 
 # Docker
 
-Automatic builds of the main branch are availabile under the jorenn92/maintainerr:alpha tag.
+Automatic builds of the main branch are availabile under the jorenn92/maintainerr:latest tag.
 Data is saved under /opt/server/data, a volume should be created to make the configuration persistent.
 <br><br>
 Dockerfile: 
@@ -30,7 +33,7 @@ Dockerfile:
 
     services:
         maintainerr:
-            image: jorenn92/maintainerr:alpha
+            image: jorenn92/maintainerr:latest
             container_name: maintainerr
             volumes:
               - ./data:/opt/server/data

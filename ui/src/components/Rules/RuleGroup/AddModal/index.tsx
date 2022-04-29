@@ -13,8 +13,15 @@ import Alert from '../../../Common/Alert'
 import ArrAction from './ArrAction'
 import { IRuleGroup } from '..'
 import { ICollection } from '../../../Collection'
-import { BanIcon, SaveIcon } from '@heroicons/react/solid'
+import {
+  BanIcon,
+  DocumentTextIcon,
+  QuestionMarkCircleIcon,
+  SaveIcon,
+} from '@heroicons/react/solid'
 import Router from 'next/router'
+import Link from 'next/link'
+import Button from '../../../Common/Button'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -174,10 +181,25 @@ const AddModal = (props: AddModal) => {
 
   return (
     <div className="h-full w-full">
-      <div className="section h-full w-full">
-        <h3 className="heading">Add Rule Group</h3>
-        <p className="description">Add a new rule group</p>
+      <div className="flex max-width-form-head">
+        <div className="ml-0">
+          <h3 className="heading">General </h3>
+          <p className="description">
+            General information about this group of rules
+          </p>
+        </div>
+        <div className='ml-auto'>
+          <Link href={`/docs/tutorial-Rules.html`} passHref={true}>
+            <a target="_blank" rel="noopener noreferrer">
+              <Button className="ml-3" buttonType="default" type="button">
+                <QuestionMarkCircleIcon />
+                <span>Help</span>
+              </Button>
+            </a>
+          </Link>
+        </div>
       </div>
+
       {error ? (
         <Alert>
           Something went wrong saving the group.. Please verify that all values
