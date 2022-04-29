@@ -24,3 +24,7 @@ Currently, Maintainerr supports rules across these apps :
 I've been sharing my Plex Server with family and friends for a while now. They quickly started to request everything they could think of through Overseerr, while not watching most of it. Since I use a modest server with limited capacity, I had to spend some time cleaning up after them.
 
 With Maintainerr, i no longer have to keep an eye on their usage. And it has the added benefit of announcing media that's about to be deleted on the Plex home screen.
+
+# Ran into a problem?
+
+Feel free to submit an issue on the [Github page](https://github.com/jorenn92/Maintainerr/issues). All help is welcome!
