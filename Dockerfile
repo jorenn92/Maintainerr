@@ -24,7 +24,7 @@ RUN chmod +x /opt/start.sh && \
 
 WORKDIR /opt/ui/
 
-RUN npm install && \ 
+RUN npm install --force && \ 
     npm install --save sharp && \ 
     npm run docs-generate && \
     rm -rf ../docs && \
