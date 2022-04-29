@@ -391,7 +391,12 @@ const RuleInput = (props: IRuleInput) => {
                 {ruleType === RuleType.DATE ? (
                   <>
                     <option value="custom_days">Amount of days.. </option>
-                    <option value="custom_date">Specific date.. </option>
+                    {action &&
+                    +action !== +RulePossibility.IN_LAST &&
+                    action &&
+                    +action !== +RulePossibility.IN_NEXT ? (
+                      <option value="custom_date">Specific date.. </option>
+                    ) : undefined}
                   </>
                 ) : undefined}
                 {ruleType === RuleType.NUMBER ? (
@@ -404,8 +409,10 @@ const RuleInput = (props: IRuleInput) => {
               {ConstantsCtx.constants.applications?.map((app) => {
                 return (app.mediaType === MediaType.BOTH ||
                   props.mediaType === app.mediaType) &&
-                  action && +action !== +RulePossibility.IN_LAST &&
-                  action && +action !== +RulePossibility.IN_NEXT ? (
+                  action &&
+                  +action !== +RulePossibility.IN_LAST &&
+                  action &&
+                  +action !== +RulePossibility.IN_NEXT ? (
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
                       if (+prop.type.key === ruleType) {
