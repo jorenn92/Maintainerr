@@ -94,7 +94,11 @@ const RuleInput = (props: IRuleInput) => {
       } else {
         setSecondVal(JSON.stringify(props.editData.rule.lastVal))
       }
-      if (props.id && props.newlyAdded && props.newlyAdded?.includes(props.id)) {
+      if (
+        props.id &&
+        props.newlyAdded &&
+        props.newlyAdded?.includes(props.id)
+      ) {
         setOperator(undefined)
         setFirstVal(undefined)
         setAction(undefined)
@@ -250,12 +254,14 @@ const RuleInput = (props: IRuleInput) => {
 
           {props.id && props.id > 1 ? (
             <button
-              className="ml-auto flex h-8 rounded bg-amber-900 hover:bg-amber-800 text-zinc-200 shadow-md"
+              className="ml-auto flex h-8 rounded bg-amber-900 text-zinc-200 shadow-md hover:bg-amber-800"
               onClick={onDelete}
               title={`Remove rule ${props.tagId}, section ${props.section}`}
             >
-              {<TrashIcon className="m-auto h-5 ml-5" />}
-              <p className="m-auto ml-1 mr-5 text-zinc-100 button-text">Delete</p>
+              {<TrashIcon className="m-auto ml-5 h-5" />}
+              <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
+                Delete
+              </p>
             </button>
           ) : undefined}
         </h3>
@@ -395,10 +401,11 @@ const RuleInput = (props: IRuleInput) => {
                   <option value="custom_text">Custom text.. </option>
                 ) : undefined}
               </optgroup>
-              {/* <option value="custom_calc">Custom calculation.. </option> */}
               {ConstantsCtx.constants.applications?.map((app) => {
-                return app.mediaType === MediaType.BOTH ||
-                  props.mediaType === app.mediaType ? (
+                return (app.mediaType === MediaType.BOTH ||
+                  props.mediaType === app.mediaType) &&
+                  action && +action !== +RulePossibility.IN_LAST &&
+                  action && +action !== +RulePossibility.IN_NEXT ? (
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
                       if (+prop.type.key === ruleType) {

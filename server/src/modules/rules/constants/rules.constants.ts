@@ -8,7 +8,6 @@ export const enum RulePossibility {
   AFTER,
   IN_LAST,
   IN_NEXT,
-  //NOT_CONTAINS TODO
 }
 
 export const enum RuleOperators {
@@ -44,15 +43,12 @@ export class RuleType {
     RulePossibility.CONTAINS,
   ]);
   static readonly DATE = new RuleType('1', [
-    RulePossibility.BIGGER,
-    RulePossibility.SMALLER,
     RulePossibility.EQUALS,
     RulePossibility.NOT_EQUALS,
     RulePossibility.BEFORE,
     RulePossibility.AFTER,
     RulePossibility.IN_LAST,
     RulePossibility.IN_NEXT,
-    RulePossibility.CONTAINS,
   ]);
   static readonly TEXT = new RuleType('2', [
     RulePossibility.EQUALS,
