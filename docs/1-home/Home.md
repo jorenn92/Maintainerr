@@ -10,6 +10,7 @@
 - Remove or unmonitor media from Radarr
 - Remove or unmonitor media from Sonarr
 - Clear requests from Overseerr
+- Remove media from disk
 
 Currently, Maintainerr supports rules across these apps :
 
@@ -20,6 +21,6 @@ Currently, Maintainerr supports rules across these apps :
 
 # Motivation
 
-I've been sharing my Plex Server with family and friends for a while now. They quickly started to request everything they could think of through Overseerr, while not watching most of it. Since I only use a modest server with limited capacity, I had to spend time cleaning up after them.
+I've been sharing my Plex Server with family and friends for a while now. They quickly started to request everything they could think of through Overseerr, while not watching most of it. Since I use a modest server with limited capacity, I had to spend some time cleaning up after them.
 
-With Maintainerr, i no longer have to keep an eye on their usage.
+With Maintainerr, i no longer have to keep an eye on their usage. And it has the added benefit of announcing media that's about to be deleted on the Plex home screen.

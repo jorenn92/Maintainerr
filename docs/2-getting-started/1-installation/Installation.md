@@ -31,7 +31,7 @@ docker pull jorenn92/maintainerr
 
 Finally, run the container with the same parameters originally used to create the container.
 
-You may alternatively use a third-party updating mechanism, such as Watchtower or Ouroboros, to keep Overseerr up-to-date automatically.
+You may alternatively use a third-party updating mechanism, such as Watchtower or Ouroboros, to keep Maintainerr up-to-date automatically.
 
 # Compose
 
