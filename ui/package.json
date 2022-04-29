@@ -87,7 +87,7 @@
       ]
     ],
     "branches": [
-      "Feature/semantic-release"
+      "origin/Feature/semantic-release"
     ],
     "npmPublish": false,
     "publish": [
