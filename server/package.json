@@ -1,10 +1,11 @@
 {
   "name": "maintainerr-server",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
   "private": true,
-  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jorenn92/Maintainerr.git"
+  },
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
