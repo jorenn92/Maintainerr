@@ -1,6 +1,12 @@
 {
   "name": "maintainerr",
+  "version": "0.1.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jorenn92/Maintainerr.git"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -32,6 +38,10 @@
     "@types/react": "17.0.38",
     "@types/react-dom": "^17.0.14",
     "@types/react-transition-group": "^4.4.4",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "autoprefixer": "^10.4.2",
     "babel-plugin-react-intl": "^8.2.25",
     "babel-plugin-react-intl-auto": "^3.3.0",
@@ -42,7 +52,60 @@
     "postcss": "^8.4.5",
     "prettier": "^2.5.1",
     "prettier-plugin-tailwindcss": "^0.1.4",
+    "semantic-release": "^19.0.2",
+    "semantic-release-docker-buildx": "^1.0.1",
     "tailwindcss": "^3.0.18",
     "typescript": "4.5.5"
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "CHANGELOG.md"
+        }
+      ],
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json",
+            "CHANGELOG.md"
+          ],
+          "message": "chore(release): ${nextRelease.version}"
+        }
+      ],
+      "semantic-release-docker-buildx",
+      [
+        "@semantic-release/github",
+        {
+          "addReleases": "bottom"
+        }
+      ]
+    ],
+    "branches": [
+      "main"
+    ],
+    "npmPublish": false,
+    "publish": [
+      {
+        "path": "semantic-release-docker-buildx",
+        "buildArgs": {
+          "COMMIT_TAG": "$GITHUB_SHA"
+        },
+        "imageNames": [
+          "jorenn92/maintainerr"
+        ],
+        "platforms": [
+          "linux/amd64",
+          "linux/arm64",
+          "linux/arm/v7"
+        ]
+      },
+      "@semantic-release/github"
+    ]
   }
 }
