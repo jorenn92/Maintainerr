@@ -89,6 +89,23 @@
     "branches": [
       "main"
     ],
-    "npmPublish": false
+    "npmPublish": false,
+    "publish": [
+      {
+        "path": "semantic-release-docker-buildx",
+        "buildArgs": {
+          "COMMIT_TAG": "$GITHUB_SHA"
+        },
+        "imageNames": [
+          "jorenn92/maintainerr"
+        ],
+        "platforms": [
+          "linux/amd64",
+          "linux/arm64",
+          "linux/arm/v7"
+        ]
+      },
+      "@semantic-release/github"
+    ]
   }
 }
