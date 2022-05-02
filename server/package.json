@@ -28,7 +28,7 @@
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/schedule": "^1.0.2",
     "@nestjs/typeorm": "^8.0.3",
-    "axios": "^0.24.0",
+    "axios": "^0.27.2",
     "crypto": "^1.0.1",
     "fs": "^0.0.1-security",
     "lodash": "^4.17.21",
