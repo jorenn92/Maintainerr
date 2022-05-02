@@ -20,7 +20,8 @@ RUN \
     ;; \
     esac
 
-RUN chmod +x /opt/start.sh && \
+RUN rm -f package-lock.json && \
+    chmod +x /opt/start.sh && \
     npm i -g @nestjs/cli && \
     npm install --python=/usr/bin/python3 && \ 
     npm run build && \
@@ -35,7 +36,8 @@ RUN \
     ;; \
     esac
 
-RUN npm install --force && \
+RUN rm -f package-lock.json && \
+    npm install --force && \
     npm run docs-generate && \
     rm -rf ../docs && \
     npm run build && \
@@ -47,7 +49,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /opt/server/
 
-RUN npm install --only=prod --force
+RUN npm install --only=prod
 
 WORKDIR /opt/ui/
 
