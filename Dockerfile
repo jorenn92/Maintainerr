@@ -37,10 +37,10 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /opt/server/
 
-RUN  npm install --only=production
+RUN  npm install --only=prod --force
 
 WORKDIR /opt/ui/
 
-RUN  npm install --only=production
+RUN  npm install --only=prod --force
 
 ENTRYPOINT ["/opt/start.sh"]
