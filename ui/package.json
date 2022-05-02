@@ -93,9 +93,6 @@
     "publish": [
       {
         "path": "semantic-release-docker-buildx",
-        "buildArgs": {
-          "COMMIT_TAG": "$GITHUB_SHA"
-        },
         "imageNames": [
           "jorenn92/maintainerr"
         ],

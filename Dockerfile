@@ -30,12 +30,6 @@ RUN rm -f package-lock.json && \
 
 WORKDIR /opt/ui/
 
-RUN \
-    case "${TARGETPLATFORM}" in ('linux/arm/v7') \
-    npm install --force -D @swc/cli @swc/core \
-    ;; \
-    esac
-
 RUN rm -f package-lock.json && \
     npm install --force && \
     npm run docs-generate && \
