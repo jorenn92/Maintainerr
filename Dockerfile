@@ -31,7 +31,7 @@ WORKDIR /opt/ui/
 
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm/v7') \
-    npm install -D @swc/cli @swc/core \
+    npm install --force -D @swc/cli @swc/core \
     ;; \
     esac
 
@@ -69,7 +69,7 @@ COPY --from=BUILDER /opt ./
 
 RUN  rm -rf /tmp/* && \
     mkdir /opt/server/data
-    
+
 VOLUME [ "/opt/server/data" ]
 
 WORKDIR /opt/ui
