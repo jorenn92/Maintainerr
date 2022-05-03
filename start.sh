@@ -2,8 +2,8 @@
 
 cd /opt/server
 npx typeorm migration:run
-node dist/main &
 
-cd /opt/ui
+cd /opt/
 npm run docs-serve &
-npm run start
+npm run start:server &
+npm run start:ui
