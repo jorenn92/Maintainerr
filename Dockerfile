@@ -10,6 +10,7 @@ COPY server/ /opt/server/
 COPY ui/ /opt/ui/
 COPY docs/ /opt/docs/
 COPY package.json /opt/package.json
+COPY jsdoc.json /opt/jsdoc.json
 COPY start.sh /opt/start.sh
 
 WORKDIR /opt/
