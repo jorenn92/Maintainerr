@@ -9,9 +9,11 @@ ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
 COPY server/ /opt/server/
 COPY ui/ /opt/ui/
 COPY docs/ /opt/docs/
+COPY package.json /opt/package.json
+COPY jsdoc.json /opt/jsdoc.json
 COPY start.sh /opt/start.sh
 
-WORKDIR /opt/server/
+WORKDIR /opt/
 
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm/v7') \
@@ -20,34 +22,25 @@ RUN \
     ;; \
     esac
 
-RUN rm -f package-lock.json && \
-    chmod +x /opt/start.sh && \
-    npm i -g @nestjs/cli && \
-    npm install --python=/usr/bin/python3 && \ 
-    npm run build && \
-    rm -rf node_modules && \
-    rm -f package-lock.json
+RUN chmod +x /opt/start.sh
 
-WORKDIR /opt/ui/
+RUN npm i -g @nestjs/cli && \
+    npm install --python=/usr/bin/python3
 
-RUN rm -f package-lock.json && \
-    npm install --force && \
-    npm run docs-generate && \
-    rm -rf ../docs && \
-    npm run build && \
-    rm -rf node_modules && \
+RUN npm run build:server
+
+RUN npm run build:ui
+
+RUN npm run docs-generate && \
+    rm -rf ./docs
+
+RUN rm -rf node_modules && \
     rm -f package-lock.json
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /opt/server/
-
 RUN npm install --only=prod
-
-WORKDIR /opt/ui/
-
-RUN npm install --only=prod --force
 
 FROM node:lts-alpine
 
@@ -67,8 +60,6 @@ RUN  rm -rf /tmp/* && \
     mkdir /opt/server/data
 
 VOLUME [ "/opt/server/data" ]
-
-WORKDIR /opt/ui
 
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
