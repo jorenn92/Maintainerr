@@ -34,13 +34,7 @@ RUN npm run build:ui
 RUN npm run docs-generate && \
     rm -rf ./docs
 
-RUN rm -rf node_modules && \
-    rm -f package-lock.json
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
-RUN npm install --only=prod
+RUN npm prune --production
 
 FROM node:lts-alpine
 
@@ -56,7 +50,7 @@ WORKDIR /opt
 
 COPY --from=BUILDER /opt ./
 
-RUN  rm -rf /tmp/* && \
+RUN rm -rf /tmp/* && \
     mkdir /opt/server/data
 
 VOLUME [ "/opt/server/data" ]
