@@ -5,8 +5,8 @@
             "theme": "light"
         },
         "encoding": "utf8",
-        "destination": "../docs-output/",
+        "destination": "./docs-output/",
         "recurse": true,
-        "tutorials": "../docs"
+        "tutorials": "./docs"
     }
 }
