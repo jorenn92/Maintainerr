@@ -59,7 +59,7 @@ VOLUME [ "/opt/data" ]
 
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-    yarn --save --frozen-lockfile sharp  \
+    yarn add --save --frozen-lockfile sharp  \
     ;; \
     esac
 
