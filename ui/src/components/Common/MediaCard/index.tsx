@@ -7,10 +7,7 @@ import GetApiHandler from '../../../utils/ApiHandler'
 import Button from '../Button'
 import ExcludeModal from '../../ExcludeModal'
 import AddModal from '../../AddModal'
-import {
-  DocumentAddIcon,
-  DocumentRemoveIcon,
-} from '@heroicons/react/solid'
+import { DocumentAddIcon, DocumentRemoveIcon } from '@heroicons/react/solid'
 import RemoveFromCollectionBtn from '../../Collection/CollectionDetail/RemoveFromCollectionBtn'
 
 interface IMediaCard {
@@ -130,17 +127,15 @@ const MediaCard: React.FC<IMediaCard> = ({
         tabIndex={0}
       >
         <div className="absolute inset-0 h-full w-full overflow-hidden">
-          <CachedImage
-            className="absolute inset-0 h-full w-full"
-            alt=""
-            src={
-              image
-                ? `https://image.tmdb.org/t/p/w300_and_h450_face${image}`
-                : `/images/maintainerr_poster_not_found_logo_top.png`
-            }
-            layout="fill"
-            objectFit="cover"
-          />
+          {image ? (
+            <CachedImage
+              className="absolute inset-0 h-full w-full"
+              alt=""
+              src={`https://image.tmdb.org/t/p/w300_and_h450_face${image}`}
+              layout="fill"
+              objectFit="cover"
+            />
+          ) : undefined}
           <div className="absolute left-0 right-0 flex items-center justify-between p-2">
             <div
               className={`pointer-events-none z-40 rounded-full shadow ${
