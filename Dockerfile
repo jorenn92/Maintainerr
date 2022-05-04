@@ -36,6 +36,12 @@ RUN yarn run build:ui
 RUN yarn run docs-generate && \
     rm -rf ./docs
 
+RUN \
+case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
+yarn add --save --network-timeout 99999999 sharp  \
+;; \
+esac
+
 RUN yarn --production --ignore-scripts --prefer-offline --frozen-lockfile --network-timeout 99999999
 
 FROM node:lts-alpine
@@ -56,11 +62,5 @@ RUN rm -rf /tmp/* && \
     mkdir /opt/data
 
 VOLUME [ "/opt/data" ]
-
-RUN \
-    case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-    yarn add --save --network-timeout 99999999 sharp  \
-    ;; \
-    esac
 
 ENTRYPOINT ["/opt/start.sh"]
