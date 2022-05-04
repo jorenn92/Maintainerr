@@ -25,9 +25,9 @@ RUN \
 
 RUN chmod +x /opt/start.sh
 
-RUN yarn global add @nestjs/cli && \
+RUN yarn global add @nestjs/cli --network-timeout 99999999  && \
     yarn config set python /usr/bin/python3 && \
-    yarn --frozen-lockfile
+    yarn --frozen-lockfile --network-timeout 99999999
 
 RUN yarn run build:server
 
@@ -36,7 +36,7 @@ RUN yarn run build:ui
 RUN yarn run docs-generate && \
     rm -rf ./docs
 
-RUN yarn install --production --ignore-scripts --prefer-offline --frozen-lockfile
+RUN yarn --production --ignore-scripts --prefer-offline --frozen-lockfile --network-timeout 99999999
 
 FROM node:lts-alpine
 
@@ -59,7 +59,7 @@ VOLUME [ "/opt/data" ]
 
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-    yarn add --save --frozen-lockfile sharp  \
+    yarn add --save --network-timeout 99999999 sharp  \
     ;; \
     esac
 
