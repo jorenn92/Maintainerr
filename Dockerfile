@@ -10,6 +10,7 @@ COPY server/ /opt/server/
 COPY ui/ /opt/ui/
 COPY docs/ /opt/docs/
 COPY package.json /opt/package.json
+COPY yarn.lock /opt/yarn.lock 
 COPY jsdoc.json /opt/jsdoc.json
 COPY start.sh /opt/start.sh
 
@@ -24,17 +25,18 @@ RUN \
 
 RUN chmod +x /opt/start.sh
 
-RUN npm i -g @nestjs/cli && \
-    npm install --python=/usr/bin/python3
+RUN yarn global add @nestjs/cli && \
+    yarn config set python /usr/bin/python3 && \
+    yarn --frozen-lockfile
 
-RUN npm run build:server
+RUN yarn run build:server
 
-RUN npm run build:ui
+RUN yarn run build:ui
 
-RUN npm run docs-generate && \
+RUN yarn run docs-generate && \
     rm -rf ./docs
 
-RUN npm prune --production
+RUN yarn install --production --ignore-scripts --prefer-offline --frozen-lockfile
 
 FROM node:lts-alpine
 
@@ -51,13 +53,13 @@ WORKDIR /opt
 COPY --from=BUILDER /opt ./
 
 RUN rm -rf /tmp/* && \
-    mkdir /opt/server/data
+    mkdir /opt/data
 
-VOLUME [ "/opt/server/data" ]
+VOLUME [ "/opt/data" ]
 
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-    npm install --save sharp \
+    yarn --save --frozen-lockfile sharp  \
     ;; \
     esac
 

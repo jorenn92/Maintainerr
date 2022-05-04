@@ -7,9 +7,9 @@
     "synchronize": true,
     "migrationsTableName": "migrations",
     "migrations": [
-        "dist/database/migrations/*.js"
+        "server/dist/database/migrations/*.js"
     ],
     "cli": {
-        "migrationsDir": "src/database/migrations"
+        "migrationsDir": "server/src/database/migrations"
     }
 }
