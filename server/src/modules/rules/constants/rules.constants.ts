@@ -424,6 +424,13 @@ export class RuleConstants {
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
         } as Property,
+        {
+          id: 6,
+          name: 'isRequested',
+          humanName: 'Requested in Overseerr (1 or 0)',
+          mediaType: MediaType.BOTH,
+          type: RuleType.NUMBER,
+        } as Property,
       ],
     },
   ];
