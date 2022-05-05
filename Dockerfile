@@ -27,9 +27,10 @@ RUN \
 RUN chmod +x /opt/start.sh
 
 RUN yarn global add @nestjs/cli --network-timeout 99999999  && \
-    yarn config set python /usr/bin/python3
+    yarn config set python /usr/bin/python3 && \
+    yarn --force --non-interactive --frozen-lockfile --network-timeout 99999999 && \
+    yarn add --force next@12.1 --network-timeout 99999999
 
-RUN yarn --non-interactive --frozen-lockfile --network-timeout 99999999
 
 RUN yarn run build:server
 
