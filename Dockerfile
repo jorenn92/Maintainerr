@@ -31,7 +31,6 @@ RUN yarn global add @nestjs/cli --network-timeout 99999999  && \
 
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm/v7') \
-        yarn add --optional @next/swc-linux-arm-musleabihf --network-timeout 99999999 && \
         yarn add --optional @next/swc-linux-arm-gnueabihf --network-timeout 99999999 \
     ;; \
     esac
