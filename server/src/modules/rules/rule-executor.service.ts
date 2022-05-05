@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import _, { over } from 'lodash';
+import _ from 'lodash';
 import { isNull } from 'lodash';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
@@ -276,7 +276,8 @@ export class RuleExecutorService implements OnApplicationBootstrap {
               : new Date(+rule.customVal.value * 1000)
             : rule.customVal.ruleTypeId === +RuleType.TEXT
             ? rule.customVal.value
-            : rule.customVal.ruleTypeId === +RuleType.NUMBER
+            : rule.customVal.ruleTypeId === +RuleType.NUMBER ||
+              rule.customVal.ruleTypeId === +RuleType.BOOL
             ? +rule.customVal.value
             : null;
         if (

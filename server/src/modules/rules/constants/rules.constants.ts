@@ -55,6 +55,10 @@ export class RuleType {
     RulePossibility.NOT_EQUALS,
     RulePossibility.CONTAINS,
   ]);
+  static readonly BOOL = new RuleType('3', [
+    RulePossibility.EQUALS,
+    RulePossibility.NOT_EQUALS,
+  ]);
   private constructor(
     private readonly key: string,
     public readonly possibilities: number[],
@@ -96,7 +100,7 @@ export class RuleConstants {
         {
           id: 1,
           name: 'seenBy',
-          humanName: 'Viewed by (list of users)',
+          humanName: 'Viewed by (list of usernames)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT, // returns id[]
         } as Property,
@@ -258,9 +262,9 @@ export class RuleConstants {
         {
           id: 5,
           name: 'monitored',
-          humanName: 'is monitored (1 or 0)',
+          humanName: 'is monitored',
           mediaType: MediaType.MOVIE,
-          type: RuleType.NUMBER,
+          type: RuleType.BOOL,
         } as Property,
         {
           id: 6,
@@ -364,9 +368,9 @@ export class RuleConstants {
         {
           id: 7,
           name: 'ended',
-          humanName: 'Show ended (1 or 0)',
+          humanName: 'Show ended',
           mediaType: MediaType.SHOW,
-          type: RuleType.NUMBER,
+          type: RuleType.BOOL,
         } as Property,
         {
           id: 8,
@@ -427,9 +431,9 @@ export class RuleConstants {
         {
           id: 6,
           name: 'isRequested',
-          humanName: 'Requested in Overseerr (1 or 0)',
+          humanName: 'Requested in Overseerr',
           mediaType: MediaType.BOTH,
-          type: RuleType.NUMBER,
+          type: RuleType.BOOL,
         } as Property,
       ],
     },
