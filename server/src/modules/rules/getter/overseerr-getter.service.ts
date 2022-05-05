@@ -20,7 +20,7 @@ import {
 
 @Injectable()
 export class OverseerrGetterService {
-  plexProperties: Property[];
+  appProperties: Property[];
   private readonly logger = new Logger(OverseerrGetterService.name);
 
   constructor(
@@ -30,14 +30,14 @@ export class OverseerrGetterService {
     private readonly tmdbIdHelper: TmdbIdService,
   ) {
     const ruleConstanst = new RuleConstants();
-    this.plexProperties = ruleConstanst.applications.find(
+    this.appProperties = ruleConstanst.applications.find(
       (el) => el.id === Application.OVERSEERR,
     ).props;
   }
 
   async get(id: number, libItem: PlexLibraryItem) {
     try {
-      const prop = this.plexProperties.find((el) => el.id === id);
+      const prop = this.appProperties.find((el) => el.id === id);
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
 
       let mediaResponse: OverSeerrMediaResponse;
@@ -102,6 +102,9 @@ export class OverseerrGetterService {
               OverseerrMediaStatus.PARTIALLY_AVAILABLE
               ? new Date(mediaResponse?.mediaInfo?.mediaAddedAt)
               : null;
+          }
+          case 'isRequested': {
+            return mediaResponse?.mediaInfo.requests.length > 0 ? 1 : 0;
           }
           default: {
             return null;

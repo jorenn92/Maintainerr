@@ -22,6 +22,7 @@ enum RuleType {
   NUMBER,
   DATE,
   TEXT,
+  BOOL,
 }
 enum RuleOperators {
   AND,
@@ -33,6 +34,7 @@ enum CustomParams {
   CUSTOM_DAYS = 'custom_days',
   CUSTOM_DATE = 'custom_date',
   CUSTOM_TEXT = 'custom_text',
+  CUSTOM_BOOLEAN = 'custom_boolean',
 }
 
 interface IRuleInput {
@@ -76,19 +78,24 @@ const RuleInput = (props: IRuleInput) => {
               (props.editData.rule.customVal.value as number) != 0
             ) {
               setSecondVal(CustomParams.CUSTOM_DAYS)
-              setRuleType(0)
+              setRuleType(RuleType.NUMBER)
             } else {
               setSecondVal(CustomParams.CUSTOM_NUMBER)
-              setRuleType(0)
+              setRuleType(RuleType.NUMBER)
             }
             break
           case 1:
             setSecondVal(CustomParams.CUSTOM_DATE)
-            setRuleType(1)
+            setRuleType(RuleType.DATE)
             break
           case 2:
             setSecondVal(CustomParams.CUSTOM_TEXT)
-            setRuleType(2)
+            setRuleType(RuleType.TEXT)
+            break
+          case 3:
+            setSecondVal(CustomParams.CUSTOM_BOOLEAN)
+            setRuleType(RuleType.BOOL)
+            break
         }
         setCustomVal(props.editData.rule.customVal.value.toString())
       } else {
@@ -118,7 +125,7 @@ const RuleInput = (props: IRuleInput) => {
   }
 
   const updateCustomValue = (event: { target: { value: string } }) => {
-    if (secondVal === 'custom_days') {
+    if (secondVal === CustomParams.CUSTOM_DAYS) {
       setCustomVal((+event.target.value * 86400).toString())
     } else {
       setCustomVal(event.target.value)
@@ -147,10 +154,11 @@ const RuleInput = (props: IRuleInput) => {
       firstval &&
       action &&
       ((secondVal &&
-        secondVal !== 'custom_date' &&
-        secondVal !== 'custom_days' &&
-        secondVal !== 'custom_number' &&
-        secondVal !== 'custom_text') ||
+        secondVal !== CustomParams.CUSTOM_DATE &&
+        secondVal !== CustomParams.CUSTOM_DAYS &&
+        secondVal !== CustomParams.CUSTOM_NUMBER &&
+        secondVal !== CustomParams.CUSTOM_TEXT &&
+        secondVal !== CustomParams.CUSTOM_BOOLEAN) ||
         customVal)
     ) {
       const ruleValues = {
@@ -167,9 +175,12 @@ const RuleInput = (props: IRuleInput) => {
                 ? customValType
                 : customValType === RuleType.NUMBER
                 ? customValType
-                : customValType === RuleType.TEXT && secondVal === 'custom_days'
+                : customValType === RuleType.TEXT &&
+                  secondVal === CustomParams.CUSTOM_DAYS
                 ? RuleType.NUMBER
                 : customValType === RuleType.TEXT
+                ? customValType
+                : customValType === RuleType.BOOL
                 ? customValType
                 : +ruleType
               : +ruleType,
@@ -205,18 +216,21 @@ const RuleInput = (props: IRuleInput) => {
 
   useEffect(() => {
     if (secondVal) {
-      if (secondVal === 'custom_number') {
+      if (secondVal === CustomParams.CUSTOM_NUMBER) {
         setCustomValActive(true)
         setCustomValType(RuleType.NUMBER)
-      } else if (secondVal === 'custom_date') {
+      } else if (secondVal === CustomParams.CUSTOM_DATE) {
         setCustomValActive(true)
         setCustomValType(RuleType.DATE)
-      } else if (secondVal === 'custom_days') {
+      } else if (secondVal === CustomParams.CUSTOM_DAYS) {
         setCustomValActive(true)
         setCustomValType(RuleType.TEXT)
-      } else if (secondVal === 'custom_text') {
+      } else if (secondVal === CustomParams.CUSTOM_TEXT) {
         setCustomValActive(true)
         setCustomValType(RuleType.TEXT)
+      } else if (secondVal === CustomParams.CUSTOM_BOOLEAN) {
+        setCustomValActive(true)
+        setCustomValType(RuleType.BOOL)
       } else {
         setCustomValActive(false)
         setCustomVal(undefined)
@@ -390,20 +404,27 @@ const RuleInput = (props: IRuleInput) => {
               <optgroup label={`Custom value's`}>
                 {ruleType === RuleType.DATE ? (
                   <>
-                    <option value="custom_days">Amount of days.. </option>
+                    <option value={CustomParams.CUSTOM_DAYS}>
+                      Amount of days
+                    </option>
                     {action &&
                     +action !== +RulePossibility.IN_LAST &&
                     action &&
                     +action !== +RulePossibility.IN_NEXT ? (
-                      <option value="custom_date">Specific date.. </option>
+                      <option value={CustomParams.CUSTOM_DATE}>
+                        Specific date
+                      </option>
                     ) : undefined}
                   </>
                 ) : undefined}
                 {ruleType === RuleType.NUMBER ? (
-                  <option value="custom_number">Custom number.. </option>
+                  <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
+                ) : undefined}
+                {ruleType === RuleType.BOOL ? (
+                  <option value={CustomParams.CUSTOM_BOOLEAN}>Boolean</option>
                 ) : undefined}
                 {ruleType === RuleType.TEXT ? (
-                  <option value="custom_text">Custom text.. </option>
+                  <option value={CustomParams.CUSTOM_TEXT}>Text</option>
                 ) : undefined}
               </optgroup>
               {ConstantsCtx.constants.applications?.map((app) => {
@@ -469,6 +490,18 @@ const RuleInput = (props: IRuleInput) => {
                   value={customVal}
                   placeholder="Date"
                 ></input>
+              ) : customValType === RuleType.BOOL ? (
+                <select
+                  name="custom_val"
+                  id="custom_val"
+                  onChange={updateCustomValue}
+                  value={customVal}
+                >
+                  <option defaultChecked value={1}>
+                    True
+                  </option>
+                  <option value={0}>False</option>
+                </select>
               ) : (
                 <input
                   type="number"
