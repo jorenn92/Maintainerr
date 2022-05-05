@@ -29,6 +29,7 @@ interface ModalProps {
   iconSvg?: ReactNode
   loading?: boolean
   backdrop?: string
+  children: React.ReactNode
 }
 
 const Modal: React.FC<ModalProps> = ({

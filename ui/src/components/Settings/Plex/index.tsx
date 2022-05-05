@@ -29,7 +29,7 @@ const PlexSettings = () => {
 
   const submit = async (
     e: React.FormEvent<HTMLFormElement> | undefined,
-    plex_token: { plex_auth_token: string } | undefined
+    plex_token?: { plex_auth_token: string } | undefined
   ) => {
     e ? e.preventDefault() : undefined
     if (

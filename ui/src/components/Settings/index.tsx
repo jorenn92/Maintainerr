@@ -1,10 +1,12 @@
-import { useContext, useEffect, useState } from 'react'
+import { ReactNode, useContext, useEffect, useState } from 'react'
 import SettingsContext from '../../contexts/settings-context'
 import GetApiHandler from '../../utils/ApiHandler'
 import LoadingSpinner from '../Common/LoadingSpinner'
 import SettingsTabs, { SettingsRoute } from './Tabs'
 
-const SettingsWrapper: React.FC = ({ children }) => {
+const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
+  children?: ReactNode
+}) => {
   const settingsCtx = useContext(SettingsContext)
   const [loaded, setLoaded] = useState(false)
 
@@ -58,7 +60,7 @@ const SettingsWrapper: React.FC = ({ children }) => {
         <div className="mt-6">
           <SettingsTabs settingsRoutes={settingsRoutes} />
         </div>
-        <div className="mt-10 text-white">{children}</div>
+        <div className="mt-10 text-white">{props.children}</div>
       </>
     )
   } else {
