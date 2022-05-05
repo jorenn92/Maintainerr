@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 export interface SettingsRoute {
   text: string
@@ -8,17 +8,19 @@ export interface SettingsRoute {
   route: string
   regex: RegExp
 }
-
-const SettingsLink: React.FC<{
+export interface ISettingsLink {
   tabType: 'default' | 'button'
   currentPath: string
   route: string
   regex: RegExp
   hidden?: boolean
   isMobile?: boolean
-}> = ({ children, tabType, currentPath, route, regex, isMobile = false }) => {
-  if (isMobile) {
-    return <option value={route}>{children}</option>
+  children?: ReactNode
+}
+
+const SettingsLink: React.FC<ISettingsLink> = (props: ISettingsLink) => {
+  if (props.isMobile) {
+    return <option value={props.route}>{props.children}</option>
   }
 
   let linkClasses =
@@ -27,7 +29,7 @@ const SettingsLink: React.FC<{
   let inactiveLinkColor =
     'text-zinc-500 border-transparent hover:text-zinc-300 hover:border-zinc-400 focus:text-zinc-300 focus:border-zinc-400'
 
-  if (tabType === 'button') {
+  if (props.tabType === 'button') {
     linkClasses =
       'px-3 py-2 text-sm font-medium transition duration-300 rounded-md whitespace-nowrap mx-2 my-1'
     activeLinkColor = 'bg-amber-700'
@@ -35,14 +37,16 @@ const SettingsLink: React.FC<{
   }
 
   return (
-    <Link href={route}>
+    <Link href={props.route}>
       <a
         className={`${linkClasses} ${
-          currentPath.match(regex) ? activeLinkColor : inactiveLinkColor
+          props.currentPath.match(props.regex)
+            ? activeLinkColor
+            : inactiveLinkColor
         }`}
         aria-current="page"
       >
-        {children}
+        {props.children}
       </a>
     </Link>
   )
@@ -106,18 +110,17 @@ const SettingsTabs: React.FC<{
       ) : (
         <div className="hide-scrollbar hidden overflow-x-scroll border-b border-zinc-600 sm:block">
           <nav className="flex">
-            {settingsRoutes
-              .map((route, index) => (
-                <SettingsLink
-                  tabType={tabType}
-                  currentPath={router.pathname}
-                  route={route.route}
-                  regex={route.regex}
-                  key={`standard-settings-link-${index}`}
-                >
-                  {route.text}
-                </SettingsLink>
-              ))}
+            {settingsRoutes.map((route, index) => (
+              <SettingsLink
+                tabType={tabType}
+                currentPath={router.pathname}
+                route={route.route}
+                regex={route.regex}
+                key={`standard-settings-link-${index}`}
+              >
+                {route.text}
+              </SettingsLink>
+            ))}
           </nav>
         </div>
       )}
