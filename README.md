@@ -22,11 +22,14 @@ Currently, Maintainerr supports rules across these apps :
 - Radarr
 - Sonarr
 
-# Docker
+# Installation
 
-Automatic builds of the main branch are availabile under the jorenn92/maintainerr:latest tag.
-Data is saved under /opt/server/data, a volume should be created to make the configuration persistent.
-<br><br>
+Docker images for amd64, arm64 & armv7 are availabile under jorenn92/maintainerr. <br />
+Data is saved under /opt/data, a volume should be created to make the configuration persistent.
+
+For more information visit the [installation guide](docs/2-getting-started/1-installation/Installation.md) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your Maintainerr container.
+
+
 Dockerfile: 
 
     version: '3.7'
@@ -36,7 +39,7 @@ Dockerfile:
             image: jorenn92/maintainerr:latest
             container_name: maintainerr
             volumes:
-              - ./data:/opt/server/data
+              - ./data:/opt/data
         environment:
           - TZ=Europe/Brussels
         ports:

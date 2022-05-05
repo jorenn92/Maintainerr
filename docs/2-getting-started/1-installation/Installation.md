@@ -1,7 +1,7 @@
 The easiest way to start Maintainerr is with Docker.
 
-Automatic builds of the main branch are availabile under the 'latest' tag.
-Data is saved under /opt/server/data, a volume should be created to make the configuration persistent.
+images for amd64, arm64 & armv7 are availabile under jorenn92/maintainerr.
+Data is saved under /opt/data, a volume should be created to persist the configuration.
 
 # Run
 
@@ -20,7 +20,7 @@ jorenn92/maintainerr
 Stop and remove the existing container:
 
 ```bash
-docker stop maintainerr && docker rm maintainerr
+docker rm -f maintainerr
 ```
 
 Pull the latest image:
@@ -45,7 +45,7 @@ Define the Maintainerr service in your docker-compose.yml as follows:
             image: jorenn92/maintainerr:latest
             container_name: maintainerr
             volumes:
-              - ./data:/opt/server/data
+              - ./data:/opt/data
         environment:
           - TZ=Europe/Brussels
         ports:
