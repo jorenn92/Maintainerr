@@ -27,8 +27,16 @@ RUN \
 RUN chmod +x /opt/start.sh
 
 RUN yarn global add @nestjs/cli --network-timeout 99999999  && \
-    yarn config set python /usr/bin/python3 && \
-    yarn --frozen-lockfile --network-timeout 99999999
+    yarn config set python /usr/bin/python3
+
+RUN \
+    case "${TARGETPLATFORM}" in ('linux/arm/v7') \
+        yarn add --optional @next/swc-linux-arm-musleabihf --network-timeout 99999999 && \
+        yarn add --optional @next/swc-linux-arm-gnueabihf --network-timeout 99999999 \
+    ;; \
+    esac
+
+RUN yarn --frozen-lockfile --network-timeout 99999999
 
 RUN yarn run build:server
 
