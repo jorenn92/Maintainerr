@@ -27,20 +27,37 @@ const PlexSettings = () => {
     document.title = 'Maintainerr - Settings - Plex'
   }, [])
 
-  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const submit = async (
+    e: React.FormEvent<HTMLFormElement> | undefined,
+    plex_token: { plex_auth_token: string } | undefined
+  ) => {
+    e ? e.preventDefault() : undefined
     if (
       hostnameRef.current?.value &&
       nameRef.current?.value &&
       portRef.current?.value
       // sslRef.current?.value
     ) {
-      const payload = {
+      let payload: {
+        plex_hostname: string
+        plex_port: number
+        plex_name: string
+        plex_ssl: number
+        plex_auth_token?: string
+      } = {
         plex_hostname: hostnameRef.current.value,
         plex_port: +portRef.current.value,
         plex_name: nameRef.current.value,
         plex_ssl: 0, //sslRef.current.checked ? 1 : 0,
       }
+
+      if (plex_token) {
+        payload = {
+          ...payload,
+          plex_auth_token: plex_token.plex_auth_token,
+        }
+      }
+
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
         '/settings',
         {
@@ -62,16 +79,8 @@ const PlexSettings = () => {
   }
 
   const authsuccess = (token: string) => {
-    PostApiHandler('/settings', {
-      ...settingsCtx.settings,
-      plex_auth_token: token,
-    }).then(() => {
-      settingsCtx.addSettings({
-        ...settingsCtx.settings,
-        plex_auth_token: token,
-      })
-      verifyToken(token)
-    })
+    verifyToken(token)
+    submit(undefined, { plex_auth_token: token })
   }
 
   const authFailed = () => {
