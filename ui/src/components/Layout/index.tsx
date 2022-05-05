@@ -2,14 +2,16 @@ import { ArrowLeftIcon, MenuAlt2Icon } from '@heroicons/react/solid'
 import { debounce } from 'lodash'
 import Head from 'next/head'
 import router from 'next/router'
-import { useContext, useEffect, useState } from 'react'
+import { ReactNode, useContext, useEffect, useState } from 'react'
 import SearchContext from '../../contexts/search-context'
 import SettingsContext from '../../contexts/settings-context'
 import GetApiHandler from '../../utils/ApiHandler'
 import SearchBar from '../Common/SearchBar'
 import NavBar from './NavBar'
 
-const Layout: React.FC = (props) => {
+const Layout: React.FC<{ children?: ReactNode }> = (props: {
+  children?: ReactNode
+}) => {
   const [isScrolled, setIsScrolled] = useState(false)
 
   const [navBarOpen, setNavBarOpen] = useState(true)
@@ -80,7 +82,7 @@ const Layout: React.FC = (props) => {
         </div>
 
         <main
-          className="relative mt-2 top-16 z-0 w-full focus:outline-none"
+          className="relative top-16 z-0 mt-2 w-full focus:outline-none"
           tabIndex={0}
         >
           <div className="mb-6">

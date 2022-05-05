@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import useInteraction from '../hooks/useInteraction'
 
 interface InteractionContextProps {
@@ -9,12 +9,18 @@ export const InteractionContext = React.createContext<InteractionContextProps>({
   isTouch: false,
 })
 
-export const InteractionProvider: React.FC = ({ children }) => {
+interface IInteractionProvider {
+  children?: ReactNode
+}
+
+export const InteractionProvider: React.FC<IInteractionProvider> = (
+  props: IInteractionProvider
+) => {
   const isTouch = useInteraction()
 
   return (
     <InteractionContext.Provider value={{ isTouch }}>
-      {children}
+      {props.children}
     </InteractionContext.Provider>
   )
 }
