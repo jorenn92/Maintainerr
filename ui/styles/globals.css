@@ -326,7 +326,7 @@
   }
 
   .form-input {
-    @apply text-sm text-white sm:col-span-2;
+    @apply text-sm text-white sm:col-span-2 border-0 bg-inherit ;
   }
 
   .form-input-field {
