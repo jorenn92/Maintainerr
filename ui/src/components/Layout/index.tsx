@@ -14,11 +14,11 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
 }) => {
   const [isScrolled, setIsScrolled] = useState(false)
 
-  const [navBarOpen, setNavBarOpen] = useState(true)
+  const [navBarOpen, setNavBarOpen] = useState(false)
   const SearchCtx = useContext(SearchContext)
   const SettingsCtx = useContext(SettingsContext)
 
-  const navbarClosed = () => {
+  const handleNavbar = () => {
     setNavBarOpen(!navBarOpen)
   }
 
@@ -40,7 +40,7 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
         <div className="absolute top-0 h-64 w-full bg-gradient-to-bl from-zinc-800 to-zinc-900">
           <div className="relative inset-0 h-full w-full bg-gradient-to-t from-zinc-900 to-transparent" />
         </div>
-        <NavBar open={navBarOpen} setClosed={navbarClosed}></NavBar>
+        <NavBar open={navBarOpen} setClosed={handleNavbar}></NavBar>
         <div className="relative mb-16 flex w-0 min-w-0 flex-1 flex-col lg:ml-64"></div>
         <div
           className={`searchbar fixed left-0 right-0 top-0 z-10 flex flex-shrink-0 bg-opacity-80 transition duration-300 ${
