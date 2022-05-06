@@ -2,7 +2,7 @@
   <img src="ui/public/logo_black.svg?raw=true" alt="Sublime's custom image"/>
 </p>
 
-<b>Maintainerr</b> makes managing your media easy. Create custom rules with parameters across different services, show the matching media on the Plex home screen for a given amount of days and handle the deletion.
+<b>Maintainerr</b> makes managing your media easy. Create custom rules with parameters across different services, show matching media on the Plex home screen for a given amount of days and handle the deletion.
 
 > Maintainerr is early alpha software, expect bugs.
 
@@ -14,6 +14,7 @@
 - Remove or unmonitor media from Radarr
 - Remove or unmonitor media from Sonarr
 - Clear requests from Overseerr
+- Delete files from disk
 
 Currently, Maintainerr supports rules across these apps :
 
@@ -29,6 +30,7 @@ Data is saved under /opt/data, a volume should be created to make the configurat
 
 For more information visit the [installation guide](docs/2-getting-started/1-installation/Installation.md) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your Maintainerr container.
 
+> Armv7 builds are temporarily disabled due to a problem with NextJS. If you want to use this architecture, you'll have to stick with version 1.1.2 for now.
 
 Dockerfile: 
 
