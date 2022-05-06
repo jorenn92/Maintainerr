@@ -43,7 +43,7 @@ RUN \
         rm yarn.lock && \
         rm package.json && \
         mv package-armv7.json package.json && \
-        RUN yarn --force --non-interactive --network-timeout 99999999 \
+        yarn --force --non-interactive --network-timeout 99999999 \
     ;; \
     esac
 
