@@ -14,7 +14,7 @@ const CollectionItem = (props: ICollectionItem) => {
 
   return (
     <>
-      <div className="collection relative mb-5 flex h-44 w-full flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:mb-0 sm:mr-5 sm:h-72 sm:w-96">
+      <div className="collection relative mb-5 flex h-fit w-full flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:mb-0 sm:mr-5 sm:w-96">
         {props.collection.media && props.collection.media.length > 1 ? (
           <div className="z-1 absolute inset-0 flex flex-row overflow-hidden">
             <Image
@@ -51,7 +51,7 @@ const CollectionItem = (props: ICollectionItem) => {
           </div>
         </div>
 
-        <div className="inset-0 z-0 flex h-full flex-row p-3 text-base sm:flex-row">
+        <div className="inset-0 z-0 flex h-fit flex-row p-3 text-base sm:flex-row">
           <div className="mr-5 flex flex-row sm:mr-0 sm:mt-auto sm:flex-col">
             <div className="mb-5 mr-5 sm:mr-0">
               <p className="font-bold">Library</p>
@@ -71,7 +71,7 @@ const CollectionItem = (props: ICollectionItem) => {
                 {' '}
                 {`${
                   props.collection.media ? props.collection.media.length : 0
-                } items`}
+                }`}
               </p>
             </div>
           </div>
