@@ -7,6 +7,7 @@ import Button from '../../Common/Button'
 import PlexLoginButton from '../../Login/Plex'
 import axios from 'axios'
 import TestButton from '../../Common/TestButton'
+import DocsButton from '../../Common/DocsButton'
 
 const PlexSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -283,19 +284,24 @@ const PlexSettings = () => {
           </div>
 
           <div className="actions mt-5 w-full">
-            <div className="flex justify-end">
-              <TestButton onClick={appTest} testUrl="/settings/test/plex" />
-
-              <span className="ml-3 inline-flex rounded-md shadow-sm">
-                <Button
-                  buttonType="primary"
-                  type="submit"
-                  // disabled={isSubmitting || !isValid}
-                >
-                  <SaveIcon />
-                  <span>Save Changes</span>
-                </Button>
+            <div className="flex flex-wrap sm:flex-nowrap w-full">
+              <span className="m-auto sm:mr-auto sm:ml-3 mb-3 sm:mb-0 rounded-md shadow-sm">
+                <DocsButton page='tutorial-Configuration' />
               </span>
+              <div className="flex sm:justify-end m-auto sm:m-0">
+                <TestButton onClick={appTest} testUrl="/settings/test/plex" />
+
+                <span className="ml-3 inline-flex rounded-md shadow-sm">
+                  <Button
+                    buttonType="primary"
+                    type="submit"
+                    // disabled={isSubmitting || !isValid}
+                  >
+                    <SaveIcon />
+                    <span>Save Changes</span>
+                  </Button>
+                </span>
+              </div>
             </div>
           </div>
         </form>

@@ -4,6 +4,7 @@ import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
+import DocsButton from '../../Common/DocsButton'
 import TestButton from '../../Common/TestButton'
 
 const SonarrSettings = () => {
@@ -79,7 +80,7 @@ const SonarrSettings = () => {
   }, [settingsCtx])
 
   const appTest = (result: { status: boolean; version: string }) => {
-    console.log(result);
+    console.log(result)
     setTestbanner({ status: result.status, version: result.version })
   }
 
@@ -96,7 +97,7 @@ const SonarrSettings = () => {
         <Alert type="info" title="Settings succesfully updated" />
       ) : undefined}
 
-{testBanner.version !== '0' ? (
+      {testBanner.version !== '0' ? (
         testBanner.status ? (
           <Alert
             type="warning"
@@ -164,19 +165,24 @@ const SonarrSettings = () => {
           </div>
 
           <div className="actions mt-5 w-full">
-            <div className="flex justify-end">
-              <TestButton onClick={appTest} testUrl="/settings/test/sonarr" />
-
-              <span className="ml-3 inline-flex rounded-md shadow-sm">
-                <Button
-                  buttonType="primary"
-                  type="submit"
-                  // disabled={isSubmitting || !isValid}
-                >
-                  <SaveIcon />
-                  <span>Save Changes</span>
-                </Button>
+            <div className="flex w-full flex-wrap sm:flex-nowrap">
+              <span className="m-auto mb-3 rounded-md shadow-sm sm:mr-auto sm:ml-3 sm:mb-0">
+                <DocsButton page='tutorial-Configuration' />
               </span>
+              <div className="m-auto flex sm:m-0 sm:justify-end">
+                <TestButton onClick={appTest} testUrl="/settings/test/sonarr" />
+
+                <span className="ml-3 inline-flex rounded-md shadow-sm">
+                  <Button
+                    buttonType="primary"
+                    type="submit"
+                    // disabled={isSubmitting || !isValid}
+                  >
+                    <SaveIcon />
+                    <span>Save Changes</span>
+                  </Button>
+                </span>
+              </div>
             </div>
           </div>
         </form>
