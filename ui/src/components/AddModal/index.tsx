@@ -76,7 +76,7 @@ const AddModal = (props: IAddModal) => {
       onCancel={handleCancel}
       onOk={handleOk}
       okDisabled={false}
-      title={'Add media to a collection'}
+      title={'Add Media'}
       okText={'Add'}
       okButtonType={'primary'}
       iconSvg={''}
@@ -84,7 +84,7 @@ const AddModal = (props: IAddModal) => {
     >
       <div className="mt-6">
         <Alert
-          title={`Media will be added to the selected collection`}
+          title={`Manually add media to the selected collection(s)`}
           type="info"
         />
 

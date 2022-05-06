@@ -89,7 +89,7 @@ const ExcludeModal = (props: IExcludeModal) => {
       onCancel={handleCancel}
       onOk={handleOk}
       okDisabled={false}
-      title={'Exclude media from rules'}
+      title={'Exclude Media'}
       okText={'Exclude'}
       okButtonType={'primary'}
       iconSvg={''}
@@ -97,7 +97,7 @@ const ExcludeModal = (props: IExcludeModal) => {
     >
       <div className="mt-6">
         <Alert
-          title={`Media will be excluded from the selected collection`}
+          title={`Exclude media, so it won't be automatically added to the selected collection(s)`}
           type="info"
         />
 
