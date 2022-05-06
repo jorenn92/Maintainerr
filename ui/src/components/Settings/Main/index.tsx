@@ -1,10 +1,10 @@
-import { DocumentTextIcon, RefreshIcon, SaveIcon } from '@heroicons/react/solid'
-import Link from 'next/link'
+import { RefreshIcon, SaveIcon } from '@heroicons/react/solid'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
+import DocsButton from '../../Common/DocsButton'
 
 const MainSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -115,25 +115,17 @@ const MainSettings = () => {
 
           <div className="actions mt-5 w-full">
             <div className="flex justify-end">
-              <span className="ml-3 inline-flex rounded-md shadow-sm">
-                <Link href={`/docs/tutorial-Home.html`} passHref={true}>
-                  <a target="_blank" rel="noopener noreferrer">
-                    <Button buttonType="default" type="button">
-                      <DocumentTextIcon />
-                      <span>Open Docs</span>
-                    </Button>
-                  </a>
-                </Link>
-              </span>
-              <span className="ml-3 inline-flex rounded-md shadow-sm">
-                <Button
-                  buttonType="primary"
-                  type="submit"
-                >
-                  <SaveIcon />
-                  <span>Save Changes</span>
-                </Button>
-              </span>
+              <div className='w-full flex'>
+                <span className="mr-auto flex  rounded-md shadow-sm">
+                  <DocsButton />
+                </span>
+                <span className="ml-auto flex rounded-md shadow-sm">
+                  <Button buttonType="primary" type="submit">
+                    <SaveIcon />
+                    <span>Save Changes</span>
+                  </Button>
+                </span>
+              </div>
             </div>
           </div>
         </form>
