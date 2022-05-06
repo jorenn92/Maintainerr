@@ -27,22 +27,8 @@ RUN \
 RUN chmod +x /opt/start.sh
 
 RUN yarn global add @nestjs/cli --network-timeout 99999999  && \
-    yarn config set python /usr/bin/python3
-    
-RUN \
-    case "${TARGETPLATFORM}" in ('linux/arm/v7') \
-        #  Remove lockfile for armv7.. Otherwise build failure due to SWC, even though it's disabled.. 
-        # TODO: Fix this so we can also use lockfile for armv7 arch
-        rm yarn.lock && \
-        yarn --force --non-interactive --network-timeout 99999999 \
-    ;; \
-    esac
-
-RUN \
-    case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-        yarn --force --non-interactive --frozen-lockfile --network-timeout 99999999 \
-    ;; \
-    esac
+    yarn config set python /usr/bin/python3 && \
+    yarn --force --non-interactive --frozen-lockfile --network-timeout 99999999 
 
 RUN yarn run build:server
 
