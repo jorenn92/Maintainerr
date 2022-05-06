@@ -15,10 +15,6 @@ COPY ormconfig.json /opt/ormconfig.json
 COPY jsdoc.json /opt/jsdoc.json
 COPY start.sh /opt/start.sh
 
-# TODO: Remove this when armv7 SWC bug is fixed
-COPY package-armv7.json /opt/package-armv7.json 
-
-
 WORKDIR /opt/
 
 RUN \
@@ -31,28 +27,8 @@ RUN \
 RUN chmod +x /opt/start.sh
 
 RUN yarn global add @nestjs/cli --network-timeout 99999999  && \
-    yarn config set python /usr/bin/python3
-    # yarn --force --non-interactive --frozen-lockfile --network-timeout 99999999 \
-
-
-# Temporary case for armv7 SWC bug.
-# TODO: check if builds succeed with latest next & deps. Then remove this block, remove package-armv7.json & re activate yarn install above
-# START REMOVE THIS
-RUN \
-    case "${TARGETPLATFORM}" in ('linux/arm/v7') \
-        rm yarn.lock && \
-        rm package.json && \
-        mv package-armv7.json package.json && \
-        yarn --force --non-interactive --network-timeout 99999999 \
-    ;; \
-    esac
-
-RUN \
-case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-    yarn --force --non-interactive --frozen-lockfile --network-timeout 99999999 \
-;; \
-esac
-# END REMOVE THIS
+    yarn config set python /usr/bin/python3 && \
+    yarn --force --non-interactive --frozen-lockfile --network-timeout 99999999
 
 RUN yarn run build:server
 
