@@ -31,7 +31,9 @@ RUN yarn global add @nestjs/cli --network-timeout 99999999  && \
     
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm/v7') \
-        #  No frozen lockfile for armv7.. Otherwise build failure due to SWC, even though it's disabled..
+        #  Remove lockfile for armv7.. Otherwise build failure due to SWC, even though it's disabled.. 
+        # TODO: Fix this so we can also use lockfile for armv7 arch
+        rm yarn.lock && \
         yarn --force --non-interactive --network-timeout 99999999 \
     ;; \
     esac
