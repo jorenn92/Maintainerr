@@ -30,6 +30,7 @@ Data is saved under /opt/data, a volume should be created to make the configurat
 
 For more information visit the [installation guide](docs/2-getting-started/1-installation/Installation.md) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your Maintainerr container.
 
+> Armv7 builds are temporarily disabled due to a problem with NextJS. If you want to use this architecture, you'll have to stick with version 1.1.2 for now.
 
 Dockerfile: 
 

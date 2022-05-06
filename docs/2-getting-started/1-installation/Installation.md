@@ -3,6 +3,8 @@ The easiest way to start Maintainerr is with Docker.
 images for amd64, arm64 & armv7 are availabile under jorenn92/maintainerr.
 Data is saved under /opt/data, a volume should be created to persist the configuration.
 
+> Armv7 builds are temporarily disabled due to a problem with NextJS. If you want to use this architecture, you'll have to stick with version 1.1.2 for now.
+> 
 # Run
 
 ```bash
