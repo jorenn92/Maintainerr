@@ -9,7 +9,7 @@ Data is saved under /opt/data, a volume should be created to persist the configu
 docker run -d \
 --name maintainerr \
 -e TZ=Europe/Brussels \
--v ./data:/opt/server/data \
+-v ./data:/opt/data \
 -p 8154:80 \
 --restart unless-stopped \
 jorenn92/maintainerr
