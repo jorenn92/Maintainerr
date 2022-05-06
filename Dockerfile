@@ -15,6 +15,10 @@ COPY ormconfig.json /opt/ormconfig.json
 COPY jsdoc.json /opt/jsdoc.json
 COPY start.sh /opt/start.sh
 
+# TODO: Remove this when armv7 SWC bug is fixed
+COPY package-armv7.json /opt/package-armv7.json 
+
+
 WORKDIR /opt/
 
 RUN \
