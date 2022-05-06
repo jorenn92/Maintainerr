@@ -12,6 +12,9 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
       },
+      screens: {
+        xs: '440px',
+      },
       typography: (theme) => ({
         DEFAULT: {
           css: {
@@ -22,7 +25,6 @@ module.exports = {
                 color: theme('colors.indigo.400'),
               },
             },
-
             h1: {
               color: theme('colors.gray.300'),
             },

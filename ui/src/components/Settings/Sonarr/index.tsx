@@ -166,10 +166,10 @@ const SonarrSettings = () => {
 
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
-              <span className="m-auto mb-3 rounded-md shadow-sm sm:mr-auto sm:ml-3 sm:mb-0">
+              <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
                 <DocsButton page='tutorial-Configuration' />
               </span>
-              <div className="m-auto flex sm:m-0 sm:justify-end">
+              <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/sonarr" />
 
                 <span className="ml-3 inline-flex rounded-md shadow-sm">
