@@ -19,8 +19,8 @@ WORKDIR /opt/
 
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm/v7') \
-    apk --update --no-cache add python3 make g++ && \
-    ln -s /usr/bin/python3 /usr/bin/python \
+        apk --update --no-cache add python3 make g++ && \
+        ln -s /usr/bin/python3 /usr/bin/python \
     ;; \
     esac
 
@@ -28,9 +28,7 @@ RUN chmod +x /opt/start.sh
 
 RUN yarn global add @nestjs/cli --network-timeout 99999999  && \
     yarn config set python /usr/bin/python3 && \
-    yarn --force --non-interactive --frozen-lockfile --network-timeout 99999999 && \
-    yarn add --force next@12.1 --network-timeout 99999999
-
+    yarn --force --non-interactive --frozen-lockfile --network-timeout 99999999
 
 RUN yarn run build:server
 
@@ -41,7 +39,7 @@ RUN yarn run docs-generate && \
 
 RUN \
 case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-yarn add --save --network-timeout 99999999 sharp  \
+    yarn add --save --network-timeout 99999999 sharp  \
 ;; \
 esac
 
