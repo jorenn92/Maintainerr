@@ -231,6 +231,7 @@ const RuleInput = (props: IRuleInput) => {
       } else if (secondVal === CustomParams.CUSTOM_BOOLEAN) {
         setCustomValActive(true)
         setCustomValType(RuleType.BOOL)
+        setCustomVal('1')
       } else {
         setCustomValActive(false)
         setCustomVal(undefined)
