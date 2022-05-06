@@ -1,4 +1,1 @@
-server/node_modules
-server/package-lock.json
-ui/node_modules
-ui/package-lock.json
+node_modules
