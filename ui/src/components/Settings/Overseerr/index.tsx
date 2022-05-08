@@ -154,7 +154,7 @@ const OverseerrSettings = () => {
                 <input
                   name="apikey"
                   id="apikey"
-                  type="text"
+                  type="password"
                   ref={apiKeyRef}
                   defaultValue={settingsCtx.settings.overseerr_api_key}
                 ></input>

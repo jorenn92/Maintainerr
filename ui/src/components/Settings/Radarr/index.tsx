@@ -156,7 +156,7 @@ const RadarrSettings = () => {
                 <input
                   name="apikey"
                   id="apikey"
-                  type="text"
+                  type="password"
                   ref={apiKeyRef}
                   defaultValue={settingsCtx.settings.radarr_api_key}
                 ></input>
