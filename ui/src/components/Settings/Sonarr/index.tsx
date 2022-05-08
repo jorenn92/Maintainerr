@@ -156,7 +156,7 @@ const SonarrSettings = () => {
                 <input
                   name="apikey"
                   id="apikey"
-                  type="text"
+                  type="password"
                   ref={apiKeyRef}
                   defaultValue={settingsCtx.settings.sonarr_api_key}
                 ></input>
