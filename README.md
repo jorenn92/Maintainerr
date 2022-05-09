@@ -4,7 +4,7 @@
 
 <b>Maintainerr</b> makes managing your media easy. Create custom rules with parameters across different services, show matching media on the Plex home screen for a given amount of days and handle the deletion.
 
-> Maintainerr is early alpha software, expect bugs.
+> Maintainerr is beta software, please report any bugs and issues.
 
 # Features
 - Configure rules specific to your needs
