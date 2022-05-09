@@ -17,12 +17,8 @@ COPY start.sh /opt/start.sh
 
 WORKDIR /opt/
 
-RUN \
-    case "${TARGETPLATFORM}" in ('linux/arm/v7') \
-        apk --update --no-cache add python3 make g++ && \
-        ln -s /usr/bin/python3 /usr/bin/python \
-    ;; \
-    esac
+RUN apk --update --no-cache add python3 make g++ && \
+    ln -s /usr/bin/python3 /usr/bin/python
 
 RUN chmod +x /opt/start.sh
 
