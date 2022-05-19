@@ -57,7 +57,7 @@
   "devDependencies": {
     "@babel/cli": "^7.16.8",
     "@babel/core": "^7.17.12",
-    "@nestjs/cli": "^8.0.0",
+    "@nestjs/cli": "^8.2.6",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.4.5",
     "@semantic-release/changelog": "^6.0.1",
