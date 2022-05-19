@@ -2,6 +2,8 @@
   <img src="ui/public/logo_black.svg?raw=true" alt="Sublime's custom image"/>
 </p>
 
+[![Build Status](https://ci.cyntek.be/buildStatus/icon?job=Maintainerr%2FMaintainerr-dev-build)](https://ci.cyntek.be/job/Maintainerr/job/Maintainerr-dev-build/)
+
 <b>Maintainerr</b> makes managing your media easy. Create custom rules with parameters across different services, show matching media on the Plex home screen for a given amount of days and handle the deletion.
 
 > Maintainerr is beta software, please report any bugs and issues.
