@@ -84,7 +84,7 @@
     "babel-plugin-react-intl": "^8.2.25",
     "babel-plugin-react-intl-auto": "^3.3.0",
     "clean-jsdoc-theme": "^3.3.4",
-    "eslint": "^8.16.0",
+    "eslint": "^8.17.0",
     "eslint-config-next": "12.1.6",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
