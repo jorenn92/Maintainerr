@@ -1413,10 +1413,10 @@
     tslib "2.4.0"
     uuid "8.3.2"
 
-"@nestjs/core@^8.4.5":
-  version "8.4.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-8.4.5.tgz#a419259f074a9a1b889540ce2ab46a87b85e9fbf"
-  integrity sha512-mT4MV2pEILu+Xy/deIvhb4JkIWaUU+yxssQqMScj8pWvAQ4+6sN52Sxl5NwLb6FTyZ8t5m8Qgr4yZPTmS+Y1Ig==
+"@nestjs/core@^8.4.6":
+  version "8.4.6"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-8.4.6.tgz#db1afa3202cddffa308c6f321e2e07ebcc05d513"
+  integrity sha512-5zHpxTYV7HT3lfF7l/x0EWBfmuyuDOnGRcALf88tzDGs/7Q/VC6l65d6eFwDwI37NLtScqnmEkT9of8E3fT3mA==
   dependencies:
     "@nuxtjs/opencollective" "0.3.2"
     fast-safe-stringify "2.1.1"
@@ -1426,10 +1426,10 @@
     tslib "2.4.0"
     uuid "8.3.2"
 
-"@nestjs/platform-express@^8.4.5":
-  version "8.4.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-8.4.5.tgz#5683da37b4e5463a4f26e78cb5fb1ba75e94440c"
-  integrity sha512-36yGMrcb2MBhwOq9l0/fip3gWAae5OadsAQxfHJbxgm8D5bDisTdIvvO7KRWYuKFGerGg9kBm53mZ7Rs3fmfPQ==
+"@nestjs/platform-express@^8.4.6":
+  version "8.4.6"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-8.4.6.tgz#517f503391248e7a88c51365cedd8ad9a9c6cb9d"
+  integrity sha512-OserZ+RwjMyECFAL0/12Bztf63EnFhlFUEJ4/a502RQ0eZogt4M3ROauaW4bpt2Q3YH4hy0eT+4eqkVOMzjtPQ==
   dependencies:
     body-parser "1.20.0"
     cors "2.8.5"
