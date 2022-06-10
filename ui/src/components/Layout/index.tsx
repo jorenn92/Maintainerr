@@ -45,7 +45,7 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
         <div
           className={`searchbar fixed left-0 right-0 top-0 z-10 flex flex-shrink-0 bg-opacity-80 transition duration-300 ${
             isScrolled ? 'bg-zinc-700' : 'bg-transparent'
-          } lg:left-64`}
+          } lg:ml-64`}
           style={{
             backdropFilter: isScrolled ? 'blur(5px)' : undefined,
             WebkitBackdropFilter: isScrolled ? 'blur(5px)' : undefined,
