@@ -1456,10 +1456,10 @@
     jsonc-parser "3.0.0"
     pluralize "8.0.0"
 
-"@nestjs/testing@^8.4.6":
-  version "8.4.6"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-8.4.6.tgz#4e80368090bb71d775d14d99efa96803b96312d0"
-  integrity sha512-uGRNQ0iWIHqjz5CLxQCTtQ3dB1KyPfkHXnko5mBwKk/iBTiACmll61rVt89Wh8RM+w0bmvCHp9sacNI7IynESg==
+"@nestjs/testing@^8.4.7":
+  version "8.4.7"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-8.4.7.tgz#fe4f356c0e081e25fe8c899a65e91dd88947fd13"
+  integrity sha512-aedpeJFicTBeiTCvJWUG45WMMS53f5eu8t2fXsfjsU1t+WdDJqYcZyrlCzA4dL1B7MfbqaTURdvuVVHTmJO8ag==
   dependencies:
     tslib "2.4.0"
 
@@ -9923,10 +9923,10 @@ typescript@4.6.4:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.4.tgz#caa78bbc3a59e6a5c510d35703f6a09877ce45e9"
   integrity sha512-9ia/jWHIEbo49HfjrLGfKbZSuWo9iTMwXO+Ca3pRsSpbsMbc7/IU8NKdCZVRRBafVPGnoJeFL76ZOAA84I9fEg==
 
-typescript@^4.0, typescript@^4.7.3:
-  version "4.7.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.3.tgz#8364b502d5257b540f9de4c40be84c98e23a129d"
-  integrity sha512-WOkT3XYvrpXx4vMMqlD+8R8R37fZkjyLGlxavMc4iB8lrl8L0DeTcHbYgw/v0N/z9wAFsgBhcsF0ruoySS22mA==
+typescript@^4.0, typescript@^4.7.4:
+  version "4.7.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
+  integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"
