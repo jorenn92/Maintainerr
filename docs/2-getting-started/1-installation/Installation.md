@@ -38,19 +38,19 @@ You may alternatively use a third-party updating mechanism, such as Watchtower o
 Define the Maintainerr service in your docker-compose.yml as follows:
 
 ```Dockerfile
-    version: '3'
+version: '3'
 
-    services:
-        maintainerr:
-            image: jorenn92/maintainerr:latest
-            container_name: maintainerr
-            volumes:
-              - ./data:/opt/data
-        environment:
-          - TZ=Europe/Brussels
-        ports:
-          - 8154:80
-        restart: unless-stopped
+services:
+  maintainerr:
+    image: jorenn92/maintainerr:latest
+    container_name: maintainerr
+    volumes:
+      - ./data:/opt/data
+    environment:
+      - TZ=Europe/Brussels
+    ports:
+      - 8154:80
+    restart: unless-stopped
 ```
 
 Then, start all services defined in your Compose file:

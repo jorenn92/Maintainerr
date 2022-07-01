@@ -38,14 +38,14 @@ For more information visit the [installation guide](docs/2-getting-started/1-ins
 
 Dockerfile: 
 
-    version: '3.7'
+    version: '3'
 
     services:
-        maintainerr:
-            image: jorenn92/maintainerr:latest
-            container_name: maintainerr
-            volumes:
-              - ./data:/opt/data
+      maintainerr:
+        image: jorenn92/maintainerr:latest
+        container_name: maintainerr
+        volumes:
+          - ./data:/opt/data
         environment:
           - TZ=Europe/Brussels
         ports:
