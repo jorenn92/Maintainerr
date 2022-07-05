@@ -36,22 +36,22 @@ Data is saved under /opt/data, a volume should be created to make the configurat
 
 For more information visit the [installation guide](docs/2-getting-started/1-installation/Installation.md) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your Maintainerr container.
 
-Dockerfile: 
+Docker-compose: 
+```Yaml
+version: '3'
 
-    version: '3'
-
-    services:
-      maintainerr:
-        image: jorenn92/maintainerr:latest
-        container_name: maintainerr
-        volumes:
-          - ./data:/opt/data
-        environment:
-          - TZ=Europe/Brussels
-        ports:
-          - 8154:80
-        restart: unless-stopped
-
+services:
+  maintainerr:
+    image: jorenn92/maintainerr:latest
+    container_name: maintainerr
+    volumes:
+      - ./data:/opt/data
+    environment:
+      - TZ=Europe/Brussels
+    ports:
+      - 8154:80
+    restart: unless-stopped
+```
 
 # Credits
 Maintainerr is heavily inspired by Overseerr. Some parts of Maintainerr's code are plain copies. Big thanks to the Overseerr team for creating and maintaining such an amazing app!

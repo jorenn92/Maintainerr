@@ -37,7 +37,7 @@ You may alternatively use a third-party updating mechanism, such as Watchtower o
 
 Define the Maintainerr service in your docker-compose.yml as follows:
 
-```Dockerfile
+```Yaml
 version: '3'
 
 services:
