@@ -92,7 +92,7 @@
     "jsdoc": "^3.6.10",
     "postcss": "^8.4.14",
     "prettier": "^2.7.1",
-    "prettier-plugin-tailwindcss": "^0.1.11",
+    "prettier-plugin-tailwindcss": "^0.1.12",
     "semantic-release": "^19.0.3",
     "source-map-support": "^0.5.20",
     "supertest": "^6.1.3",
