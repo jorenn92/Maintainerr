@@ -49,7 +49,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "sqlite3": "^5.0.8",
+    "sqlite3": "^5.0.10",
     "swr": "^1.2.0",
     "typeorm": "^0.2.45",
     "web-push": "^3.4.5"
@@ -73,7 +73,7 @@
     "@types/jest": "27.5.0",
     "@types/lodash": "^4.14.178",
     "@types/node": "^18.0.0",
-    "@types/react": "^18.0.14",
+    "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@types/react-transition-group": "^4.4.5",
     "@types/supertest": "^2.0.11",
