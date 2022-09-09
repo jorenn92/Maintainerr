@@ -27,12 +27,12 @@
     "docs-serve": "http-server ./docs-output/ --cors"
   },
   "dependencies": {
-    "@heroicons/react": "^2.0.10",
+    "@heroicons/react": "^1.0.5",
     "@nestjs/core": "^8.4.7",
     "@nestjs/platform-express": "^8.4.7",
     "@nestjs/common": "^8.4.7",
     "@nestjs/schedule": "^2.0.1",
-    "@nestjs/typeorm": "^9.0.1",
+    "@nestjs/typeorm": "^8.0.4",
     "axios": "^0.27.2",
     "bowser": "^2.11.0",
     "crypto": "^1.0.1",
@@ -51,7 +51,7 @@
     "rxjs": "^7.2.0",
     "sqlite3": "^5.0.8",
     "swr": "^1.2.0",
-    "typeorm": "^0.3.9",
+    "typeorm": "^0.2.45",
     "web-push": "^3.4.5"
   },
   "devDependencies": {
