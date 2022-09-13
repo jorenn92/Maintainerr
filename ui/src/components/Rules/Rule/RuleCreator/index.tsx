@@ -24,6 +24,11 @@ export interface IRule {
   action: number
 }
 
+export interface ILoadedRule {
+  uniqueID: number
+  rules: IRule[]
+}
+
 interface iRuleCreator {
   mediaType?: MediaType
   editData?: { rules: IRule[] }
@@ -49,17 +54,9 @@ const RuleCreator = (props: iRuleCreator) => {
 
   useEffect(() => {
     setIsLoading(true)
-
-    // If we're editing.. initiate edit flow
     if (props.editData) {
-      setEditData(props.editData)
-      const editSec = props.editData
-        ? props.editData.rules[props.editData.rules.length - 1]?.section! + 1
-        : undefined
-
-      editSec !== undefined ? setEditSections(editSec) : undefined
+      loadRules(props.editData)
     }
-
     GetApiHandler('/rules/constants').then((resp) => {
       ConstantsCtx.addConstants(resp)
       setIsLoading(false)
@@ -79,9 +76,23 @@ const RuleCreator = (props: iRuleCreator) => {
               : (sectionAmounts[0] = 1)
           )
         : undefined
-      setRuleAmount([editSections, sectionAmounts.filter(el => el !== undefined && el !== null)])
+      setRuleAmount([
+        editSections,
+        sectionAmounts.filter((el) => el !== undefined && el !== null),
+      ])
     }
   }, [editSections])
+
+  const loadRules = (rules: { rules: IRule[] }) => {
+    console.log('rules passed to function:')
+    console.log(rules.rules)
+    setEditData(rules)
+    const editSec = rules
+      ? rules.rules[rules.rules.length - 1]?.section! + 1
+      : undefined
+
+    editSec !== undefined ? setEditSections(editSec) : undefined
+  }
 
   const ruleCommited = (id: number, rule: IRule) => {
     if (rulesCreated) {
@@ -137,7 +148,6 @@ const RuleCreator = (props: iRuleCreator) => {
   }
 
   const RuleAdded = (section: number) => {
-
     const ruleId =
       ruleAmount[1].reduce((prev, cur, idx) =>
         idx + 1 <= section ? prev + cur : prev

@@ -39,6 +39,10 @@
     max-width: 61rem;
   }
 
+  .w-105 {
+    width: 40rem;
+  }
+
   .button-text {
     font-weight: 600;
   }
