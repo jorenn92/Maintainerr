@@ -10,6 +10,11 @@ export class SettingsController {
   getSettings() {
     return this.settingsService.getSettings();
   }
+  @Get('/version')
+  getVersion() {
+    return this.settingsService.appVersion();
+  }
+
   @Get('/api/generate')
   generateApiKey() {
     return this.settingsService.generateApiKey();

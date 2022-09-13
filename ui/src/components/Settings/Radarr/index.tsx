@@ -41,7 +41,6 @@ const RadarrSettings = () => {
         radarr_url: `${hostnameVal}:${portRef.current.value}`,
         radarr_api_key: apiKeyRef.current.value,
       }
-      console.log(payload)
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
         '/settings',
         {
@@ -80,7 +79,6 @@ const RadarrSettings = () => {
   }, [settingsCtx])
 
   const appTest = (result: { status: boolean; version: string }) => {
-    console.log(result)
     setTestbanner({ status: result.status, version: result.version })
   }
 

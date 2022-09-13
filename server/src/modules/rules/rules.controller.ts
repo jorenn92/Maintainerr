@@ -8,6 +8,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { CommunityRule } from './dtos/communityRule.dto';
 import { ExclusionDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleExecutorService } from './rule-executor.service';
@@ -23,6 +24,17 @@ export class RulesController {
   getRuleConstants() {
     return this.rulesService.getRuleConstants;
   }
+
+  @Get('/community')
+  async getCommunityRules() {
+    return await this.rulesService.getCommunityRules();
+  }
+
+  @Get('/community/karma/history')
+  async getCommunityRuleKarmaHistory() {
+    return await this.rulesService.getCommunityRuleKarmaHistory();
+  }
+
   @Get('/exclusion')
   getExclusion(@Query() query: { rulegroupId?: number; plexId?: number }) {
     return this.rulesService.getExclusions(query.rulegroupId, query.plexId);
@@ -31,6 +43,7 @@ export class RulesController {
   getRules(@Param('id') id: string) {
     return this.rulesService.getRules(id);
   }
+
   @Get()
   getRuleGroups(
     @Query()
@@ -80,5 +93,34 @@ export class RulesController {
   @Post()
   async updateJob(@Body() body: { cron: string }): Promise<ReturnStatus> {
     return await this.ruleExecutorService.updateJob(body.cron);
+  }
+  @Post('/community')
+  async updateCommunityRules(
+    @Body() body: CommunityRule,
+  ): Promise<ReturnStatus> {
+    if (body.name && body.description && body.JsonRules) {
+      return await this.rulesService.addToCommunityRules(body);
+    } else {
+      return {
+        code: 0,
+        result: 'Invalid input',
+      };
+    }
+  }
+  @Post('/community/karma')
+  async updateCommunityRuleKarma(
+    @Body() body: { id: number; karma: number },
+  ): Promise<ReturnStatus> {
+    if (body.id !== undefined && body.karma !== undefined) {
+      return await this.rulesService.updateCommunityRuleKarma(
+        body.id,
+        body.karma,
+      );
+    } else {
+      return {
+        code: 0,
+        result: 'Invalid input',
+      };
+    }
   }
 }

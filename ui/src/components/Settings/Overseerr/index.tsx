@@ -79,7 +79,6 @@ const OverseerrSettings = () => {
   }
 
   const appTest = (result: { status: boolean; version: string }) => {
-    console.log(result)
     setTestbanner({ status: result.status, version: result.version })
   }
 
