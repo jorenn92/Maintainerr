@@ -4,7 +4,7 @@ import GetApiHandler, {
   PutApiHandler,
 } from '../../../../utils/ApiHandler'
 import Image from 'next/image'
-import RuleCreator, { ILoadedRule, IRule } from '../../Rule/RuleCreator'
+import RuleCreator, { IRule } from '../../Rule/RuleCreator'
 import { ConstantsContextProvider } from '../../../../contexts/constants-context'
 import LibrariesContext, {
   ILibrary,
@@ -15,8 +15,6 @@ import { IRuleGroup } from '..'
 import { ICollection } from '../../../Collection'
 import {
   BanIcon,
-  CloudDownloadIcon,
-  DocumentTextIcon,
   DownloadIcon,
   QuestionMarkCircleIcon,
   SaveIcon,
@@ -24,7 +22,6 @@ import {
 import Router from 'next/router'
 import Link from 'next/link'
 import Button from '../../../Common/Button'
-import { IRuleJson } from '../../Rule'
 import CommunityRuleModal from '../../../Common/CommunityRuleModal'
 
 interface AddModal {
@@ -90,14 +87,13 @@ const AddModal = (props: AddModal) => {
     } else {
       setCommunityModal(true)
     }
+  }
 
-    // const rule1: string =
-    //   '{"lastVal":[3,2],"operator":null,"firstVal":[0,2],"action":3,"section":0}'
-
-    // const rule2: string =
-    //   '{"lastVal":[3,2],"operator":0,"firstVal":[0,2],"action":3,"section":1}'
-
-    // loadJsonRules([rule1, rule2])
+  const handleLoadRules = (rules: IRule[]) => {
+    console.log(rules)
+    updateRules(rules)
+    ruleCreatorVersion.current = ruleCreatorVersion.current + 1
+    setCommunityModal(false)
   }
 
   const loadJsonRules = (rules: string[]) => {
@@ -397,15 +393,15 @@ const AddModal = (props: AddModal) => {
                   Specify the rules this group needs to enforce
                 </p>
               </div>
-              <div className="ml-auto">
+              <div className="ml-auto ">
                 <button
-                  className="ml-auto flex h-10 rounded bg-amber-900 text-zinc-900 shadow-md hover:bg-amber-800"
+                  className="ml-auto flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
                   onClick={toggleCommunityRuleModal}
                 >
                   {
-                    <DownloadIcon className="m-auto ml-5 h-6 w-6 text-zinc-200" />
+                    <DownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
                   }
-                  <p className="button-text m-auto mr-5 ml-1 text-zinc-100">
+                  <p className="button-text m-auto mr-4 ml-1 text-zinc-100">
                     Community Rules
                   </p>
                 </button>
@@ -414,9 +410,8 @@ const AddModal = (props: AddModal) => {
           </div>
           {CommunityModal ? (
             <CommunityRuleModal
-              onUpdate={() => {
-                console.log('updated')
-              }}
+              currentRules={rules}
+              onUpdate={handleLoadRules}
               onCancel={() => setCommunityModal(false)}
             />
           ) : undefined}

@@ -12,7 +12,7 @@ const Pagination = (props: IPagination) => {
       <span className="mb-2 text-sm text-zinc-200">
         Showing{' '}
         <span className="font-bold text-zinc-400">
-          {(props.currentPage - 1) * props.pageSize + 1}
+          {(props.totalItems === 0) ? 0 : (props.currentPage - 1) * props.pageSize + 1}
         </span>{' '}
         to{' '}
         <span className="font-bold text-zinc-400">

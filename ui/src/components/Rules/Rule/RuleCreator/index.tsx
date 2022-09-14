@@ -8,7 +8,7 @@ import RuleInput from './RuleInput'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
 import SectionHeading from '../../../Common/SectionHeading'
 import _ from 'lodash'
-import { ClipboardListIcon, PlusSmIcon } from '@heroicons/react/solid'
+import { ClipboardListIcon } from '@heroicons/react/solid'
 
 interface IRulesToCreate {
   id: number
@@ -84,8 +84,6 @@ const RuleCreator = (props: iRuleCreator) => {
   }, [editSections])
 
   const loadRules = (rules: { rules: IRule[] }) => {
-    console.log('rules passed to function:')
-    console.log(rules.rules)
     setEditData(rules)
     const editSec = rules
       ? rules.rules[rules.rules.length - 1]?.section! + 1

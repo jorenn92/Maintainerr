@@ -30,6 +30,11 @@ export class RulesController {
     return await this.rulesService.getCommunityRules();
   }
 
+  @Get('/community/karma/history')
+  async getCommunityRuleKarmaHistory() {
+    return await this.rulesService.getCommunityRuleKarmaHistory();
+  }
+
   @Get('/exclusion')
   getExclusion(@Query() query: { rulegroupId?: number; plexId?: number }) {
     return this.rulesService.getExclusions(query.rulegroupId, query.plexId);

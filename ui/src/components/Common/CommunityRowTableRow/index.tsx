@@ -1,27 +1,70 @@
-import { useEffect, useState } from 'react'
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid'
 import { ICommunityRule } from '../CommunityRuleModal'
 
 interface ICommunityRuleTableRow {
-  onClick: (id: number) => void
+  onClick?: (id: number) => void
+  onThumbsUp?: (id: number) => void
+  onThumbsDown?: (id: number) => void
+  thumbsActive: boolean
   clicked: boolean
   rule: ICommunityRule
 }
 
 const CommunityRuleTableRow = (props: ICommunityRuleTableRow) => {
-  const click = () => {
-    props.onClick(props.rule.id!)
+  const onClick = () => {
+    if (props.onClick) {
+      props.onClick(props.rule.id!)
+    }
+  }
+
+  const onThumbsUp = () => {
+    if (props.onThumbsUp) {
+      props.onThumbsUp(props.rule.id!)
+    }
+  }
+
+  const onThumbsDown = () => {
+    if (props.onThumbsDown) {
+      props.onThumbsDown(props.rule.id!)
+    }
   }
 
   return (
     <tr className={props.clicked ? 'bg-zinc-600' : ''}>
       <td
-        onClick={click}
+        onClick={onClick}
         className="md:w-105 whitespace-wrap inline-block max-h-24 w-60 overflow-hidden overflow-ellipsis px-4 py-4 text-left text-sm leading-5 text-white md:max-h-44"
       >
         {props.rule.name}
       </td>
-      <td className="px-4 py-4 text-left text-sm leading-5 text-white">
-        {props.rule.karma}
+      <td className="px-4 py-4 text-center text-sm leading-5 text-white">
+        <div className="content-left flex" title={props.thumbsActive ? '' : 'You Already submitted karma for this rule'}>
+          <ChevronUpIcon
+            onClick={
+              props.thumbsActive &&
+              props.rule.karma !== undefined &&
+              props.rule.karma < 990
+                ? onThumbsUp
+                : undefined
+            }
+            className={
+              props.thumbsActive &&
+              props.rule.karma !== undefined &&
+              props.rule.karma < 990
+                ? 'w-6 cursor-pointer hover:text-amber-700'
+                : 'w-6 text-zinc-700'
+            }
+          />
+          {props.rule.karma}
+          <ChevronDownIcon
+            onClick={props.thumbsActive ? onThumbsDown : undefined}
+            className={
+              props.thumbsActive
+                ? 'w-6 cursor-pointer hover:text-amber-700'
+                : 'w-6 text-zinc-700'
+            }
+          />
+        </div>
       </td>
     </tr>
   )
