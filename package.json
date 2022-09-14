@@ -80,7 +80,7 @@
     "@types/web-push": "^3.3.2",
     "@typescript-eslint/parser": "^5.30.5",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "autoprefixer": "10.4.8",
+    "autoprefixer": "10.4.11",
     "babel-plugin-react-intl": "^8.2.25",
     "babel-plugin-react-intl-auto": "^3.3.0",
     "clean-jsdoc-theme": "^4.1.6",
