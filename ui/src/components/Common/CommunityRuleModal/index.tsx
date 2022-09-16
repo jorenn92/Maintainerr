@@ -107,9 +107,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
   }
 
   const handleClick = (id: number) => {
-    if (clickedRule === id) {
-      setClickedRule(-1)
-    } else {
+    if (clickedRule !== id) {
       setClickedRule(id)
     }
   }
@@ -234,6 +232,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
                             key={cr.id}
                             clicked={clickedRule === cr.id}
                             onClick={handleClick}
+                            onDoubleClick={handleInfo}
                             thumbsActive={
                               history.find(
                                 (e) => e.community_rule_id === cr.id

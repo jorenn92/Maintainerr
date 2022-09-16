@@ -108,7 +108,7 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
               props.onCancel()
             }}
             cancelText={'Close'}
-            title={'Upload succesfull'}
+            title={'Upload Successful'}
             iconSvg={''}
           >
             <Alert title={`Thank you for contributing <3`} type="info" />

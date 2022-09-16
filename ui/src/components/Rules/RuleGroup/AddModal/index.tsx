@@ -90,7 +90,6 @@ const AddModal = (props: AddModal) => {
   }
 
   const handleLoadRules = (rules: IRule[]) => {
-    console.log(rules)
     updateRules(rules)
     ruleCreatorVersion.current = ruleCreatorVersion.current + 1
     setCommunityModal(false)

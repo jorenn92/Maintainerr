@@ -36,7 +36,7 @@ const RuleGroup = (props: {
     DeleteApiHandler(`/rules/${props.group.id}`)
       .then((resp) => {
         if (resp.code === 1) props.onDelete()
-        else console.log('error!')
+        else console.log('Error while deleting Rulegroup')
       })
       .catch((err) => {
         console.log(err)
