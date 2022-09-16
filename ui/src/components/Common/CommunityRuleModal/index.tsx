@@ -15,6 +15,7 @@ interface ICommunityRuleModal {
   onUpdate: (rules: IRule[]) => void
   onCancel: () => void
   currentRules?: IRule[]
+  type: 'movie' | 'show'
 }
 
 interface ICommunityRuleKarmaHistory {
@@ -25,6 +26,7 @@ interface ICommunityRuleKarmaHistory {
 export interface ICommunityRule {
   id?: number
   karma?: number
+  type: 'movie' | 'show'
   appVersion?: string
   name: string
   description: string
@@ -53,7 +55,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
           resp = resp.filter(
             (e) =>
               e.appVersion!.replaceAll('.', '') <=
-              appVersion.current.replaceAll('.', '')
+                appVersion.current.replaceAll('.', '') && e.type === props.type
           )
           resp = resp.sort((a, b) => b.karma! - a.karma!)
           setCommunityRules(resp)
@@ -302,6 +304,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
           <CommunityRuleUpload
             onCancel={() => setUploadMyRules(false)}
             onSubmit={() => setUploadMyRules(false)}
+            type={props.type}
             rules={props.currentRules ? props.currentRules : []}
           />
         ) : undefined}

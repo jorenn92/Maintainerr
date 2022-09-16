@@ -6,6 +6,7 @@ import Modal from '../../../../Common/Modal'
 
 interface ICommunityRuleUpload {
   rules: IRule[]
+  type: 'movie' | 'show'
   onSubmit: () => void
   onCancel: () => void
 }
@@ -20,6 +21,7 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
     if (nameRef.current.value && descriptionRef.current.value) {
       await PostApiHandler(`/rules/community`, {
         name: nameRef.current.value,
+        type: props.type,
         description: descriptionRef.current.value,
         JsonRules: props.rules,
       })
