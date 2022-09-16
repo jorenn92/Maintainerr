@@ -98,7 +98,7 @@ export class SettingsService implements SettingDto {
 
   public async getSettings() {
     try {
-      return this.settingsRepo.findOne();
+      return this.settingsRepo.findOne({});
     } catch (err) {
       this.logger.error(
         'Something went wrong while getting settings. Is the database file locked?',
@@ -121,7 +121,7 @@ export class SettingsService implements SettingDto {
 
   public async updateSettings(settings: Settings): Promise<BasicResponseDto> {
     try {
-      const settingsDb = await this.settingsRepo.findOne();
+      const settingsDb = await this.settingsRepo.findOne({});
       await this.settingsRepo.save({
         ...settingsDb,
         ...settings,
