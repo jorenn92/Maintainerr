@@ -410,6 +410,7 @@ const AddModal = (props: AddModal) => {
           {CommunityModal ? (
             <CommunityRuleModal
               currentRules={rules}
+              type={selectedLibrary ? selectedLibrary.type : 'movie'}
               onUpdate={handleLoadRules}
               onCancel={() => setCommunityModal(false)}
             />
