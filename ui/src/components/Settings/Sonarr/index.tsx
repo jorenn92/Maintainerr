@@ -41,7 +41,6 @@ const SonarrSettings = () => {
         sonarr_url: `${hostnameVal}:${portRef.current.value}`,
         sonarr_api_key: apiKeyRef.current.value,
       }
-      console.log(payload)
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
         '/settings',
         {
@@ -80,7 +79,6 @@ const SonarrSettings = () => {
   }, [settingsCtx])
 
   const appTest = (result: { status: boolean; version: string }) => {
-    console.log(result)
     setTestbanner({ status: result.status, version: result.version })
   }
 

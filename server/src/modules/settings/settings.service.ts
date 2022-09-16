@@ -233,4 +233,10 @@ export class SettingsService implements SettingDto {
       return false;
     }
   }
+
+  public appVersion(): string {
+    return process.env.npm_package_version
+      ? process.env.npm_package_version
+      : '0.0.0';
+  }
 }

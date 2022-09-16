@@ -8,7 +8,7 @@ import RuleInput from './RuleInput'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
 import SectionHeading from '../../../Common/SectionHeading'
 import _ from 'lodash'
-import { ClipboardListIcon, PlusSmIcon } from '@heroicons/react/solid'
+import { ClipboardListIcon } from '@heroicons/react/solid'
 
 interface IRulesToCreate {
   id: number
@@ -22,6 +22,11 @@ export interface IRule {
   section?: number
   customVal?: { ruleTypeId: number; value: string | number }
   action: number
+}
+
+export interface ILoadedRule {
+  uniqueID: number
+  rules: IRule[]
 }
 
 interface iRuleCreator {
@@ -49,17 +54,9 @@ const RuleCreator = (props: iRuleCreator) => {
 
   useEffect(() => {
     setIsLoading(true)
-
-    // If we're editing.. initiate edit flow
     if (props.editData) {
-      setEditData(props.editData)
-      const editSec = props.editData
-        ? props.editData.rules[props.editData.rules.length - 1]?.section! + 1
-        : undefined
-
-      editSec !== undefined ? setEditSections(editSec) : undefined
+      loadRules(props.editData)
     }
-
     GetApiHandler('/rules/constants').then((resp) => {
       ConstantsCtx.addConstants(resp)
       setIsLoading(false)
@@ -79,9 +76,21 @@ const RuleCreator = (props: iRuleCreator) => {
               : (sectionAmounts[0] = 1)
           )
         : undefined
-      setRuleAmount([editSections, sectionAmounts.filter(el => el !== undefined && el !== null)])
+      setRuleAmount([
+        editSections,
+        sectionAmounts.filter((el) => el !== undefined && el !== null),
+      ])
     }
   }, [editSections])
+
+  const loadRules = (rules: { rules: IRule[] }) => {
+    setEditData(rules)
+    const editSec = rules
+      ? rules.rules[rules.rules.length - 1]?.section! + 1
+      : undefined
+
+    editSec !== undefined ? setEditSections(editSec) : undefined
+  }
 
   const ruleCommited = (id: number, rule: IRule) => {
     if (rulesCreated) {
@@ -137,7 +146,6 @@ const RuleCreator = (props: iRuleCreator) => {
   }
 
   const RuleAdded = (section: number) => {
-
     const ruleId =
       ruleAmount[1].reduce((prev, cur, idx) =>
         idx + 1 <= section ? prev + cur : prev

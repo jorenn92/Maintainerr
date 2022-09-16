@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import axios from 'axios';
 import { Connection, Repository } from 'typeorm';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
@@ -10,10 +11,12 @@ import {
   RuleConstants,
   RulePossibility,
 } from './constants/rules.constants';
+import { CommunityRule } from './dtos/communityRule.dto';
 import { ExclusionDto } from './dtos/exclusion.dto';
 import { RuleDto } from './dtos/rule.dto';
 import { RuleDbDto } from './dtos/ruleDb.dto';
 import { RulesDto } from './dtos/rules.dto';
+import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Exclusion } from './entities/exclusion.entities';
 import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
@@ -27,6 +30,8 @@ export interface ReturnStatus {
 @Injectable()
 export class RulesService {
   private readonly logger = new Logger(RulesService.name);
+  private readonly communityUrl = 'https://jsonbin.org/maintainerr/rules';
+  private readonly key = 'e26bd648-2bb5-4092-b4f1-90d8bc9e3148';
 
   ruleConstants: RuleConstants;
   constructor(
@@ -38,6 +43,8 @@ export class RulesService {
     private readonly collectionRepository: Repository<Collection>,
     @InjectRepository(CollectionMedia)
     private readonly collectionMediaRepository: Repository<CollectionMedia>,
+    @InjectRepository(CommunityRuleKarma)
+    private readonly communityRuleKarmaRepository: Repository<CommunityRuleKarma>,
     @InjectRepository(Exclusion)
     private readonly exclusionRepo: Repository<Exclusion>,
     private readonly collectionService: CollectionsService,
@@ -330,6 +337,162 @@ export class RulesService {
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       return undefined;
+    }
+  }
+
+  async getCommunityRules(): Promise<CommunityRule[] | ReturnStatus> {
+    return await axios
+      .get(this.communityUrl, {
+        headers: {
+          Authorization: 'token ' + this.key,
+        },
+      })
+      .then((response) => {
+        return response.data as CommunityRule[];
+      })
+      .catch((e) => {
+        this.logger.warn(
+          `Rules - Loading community rules failed : ${e.message}`,
+        );
+        return this.createReturnStatus(false, 'Failed');
+      });
+  }
+
+  public async addToCommunityRules(rule: CommunityRule): Promise<ReturnStatus> {
+    const rules = await this.getCommunityRules();
+    const appVersion = process.env.npm_package_version
+      ? process.env.npm_package_version
+      : '0.0.0';
+    if (!('code' in rules)) {
+      // Check if we got a CommunityRule[]
+      if (
+        (rules as CommunityRule[]).find((r) => r.name === rule.name) ===
+        undefined
+      ) {
+        return axios
+          .patch(
+            this.communityUrl,
+            { id: rules.length, karma: 0, appVersion: appVersion, ...rule },
+            {
+              headers: {
+                Authorization: 'token ' + this.key,
+              },
+            },
+          )
+          .then(() => {
+            this.logger.log(`Rules - Succesfully saved community rule`);
+            return this.createReturnStatus(true, 'Succes');
+          })
+          .catch((e) => {
+            if (e.message.includes('422')) {
+              // Due to a bug in jsonbin, it returns the wrong status code
+              this.logger.log(`Rules - Succesfully saved community rule`);
+              return this.createReturnStatus(true, 'Succes');
+            } else {
+              this.logger.warn(
+                `Rules - Saving community rule failed : ${e.message}`,
+              );
+              return this.createReturnStatus(
+                false,
+                'Saving community rule failed',
+              );
+            }
+          });
+      } else {
+        this.logger.log(
+          `Rules - Tried to register a community rule with a name that already exists, this is not allowed`,
+        );
+        return this.createReturnStatus(false, 'Name already exists');
+      }
+    } else {
+      this.logger.warn(
+        `Rules - There was a problem fetching the community rules JSON`,
+      );
+      return this.createReturnStatus(false, 'Connection failed');
+    }
+  }
+
+  public async getCommunityRuleKarmaHistory(): Promise<CommunityRuleKarma[]> {
+    return await this.communityRuleKarmaRepository.find();
+  }
+
+  public async updateCommunityRuleKarma(
+    id: number,
+    karma: number,
+  ): Promise<ReturnStatus> {
+    const rules = await this.getCommunityRules();
+    const history = await this.communityRuleKarmaRepository.find({
+      community_rule_id: id,
+    });
+    if (history.length <= 0) {
+      if (!('code' in rules)) {
+        if (karma <= 990) {
+          if (rules.find((r) => r.id === id) === undefined) {
+            this.logger.log(
+              `Rules - Tried to edit the karma of rule with id ` +
+                id +
+                `, but it doesn't exist`,
+            );
+            return this.createReturnStatus(
+              false,
+              'Rule with given id does not exist',
+            );
+          }
+          rules.map((r) => {
+            if (r.id === id) {
+              r.karma = karma;
+            }
+          });
+          this.communityRuleKarmaRepository.save([
+            {
+              community_rule_id: id,
+            },
+          ]);
+          return axios
+            .post(this.communityUrl, rules, {
+              headers: {
+                Authorization: 'token ' + this.key,
+              },
+            })
+            .then(() => {
+              this.logger.log(
+                `Rules - Succesfully updated community rule karma `,
+              );
+              return this.createReturnStatus(true, 'Succes');
+            })
+            .catch((e) => {
+              if (e.message.includes('422')) {
+                // Due to a bug in jsonbin, it returns the wrong status code
+                this.logger.log(
+                  `Rules - Succesfully updated community rule karma`,
+                );
+                return this.createReturnStatus(true, 'Succes');
+              } else {
+                this.logger.warn(
+                  `Rules - Saving community rule failed : ${e.message}`,
+                );
+                return this.createReturnStatus(
+                  false,
+                  'Saving community rule failed',
+                );
+              }
+            });
+        } else {
+          this.logger.log(`Rules - Max Karma reached for rule with id: ` + id);
+          return this.createReturnStatus(true, 'Succes, but Max Karma reached');
+        }
+      } else {
+        this.logger.warn(
+          `Rules - There was a problem fetching the community rules JSON`,
+        );
+        return this.createReturnStatus(false, 'Connection failed');
+      }
+    } else {
+      this.logger.log(`Rules - You can only update Karma of a rule once`);
+      return this.createReturnStatus(
+        false,
+        'Already updated Karma for this rule',
+      );
     }
   }
 }

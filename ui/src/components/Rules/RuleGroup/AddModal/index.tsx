@@ -15,13 +15,14 @@ import { IRuleGroup } from '..'
 import { ICollection } from '../../../Collection'
 import {
   BanIcon,
-  DocumentTextIcon,
+  DownloadIcon,
   QuestionMarkCircleIcon,
   SaveIcon,
 } from '@heroicons/react/solid'
 import Router from 'next/router'
 import Link from 'next/link'
 import Button from '../../../Common/Button'
+import CommunityRuleModal from '../../../Common/CommunityRuleModal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -49,6 +50,8 @@ const AddModal = (props: AddModal) => {
   const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
   const [collection, setCollection] = useState<ICollection>()
   const [isLoading, setIsLoading] = useState(true)
+  const [CommunityModal, setCommunityModal] = useState(false)
+
   const nameRef = useRef<any>()
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
@@ -65,6 +68,7 @@ const AddModal = (props: AddModal) => {
   )
   const [error, setError] = useState<boolean>(false)
   const [formIncomplete, setFormIncomplete] = useState<boolean>(false)
+  const ruleCreatorVersion = useRef<number>(1)
   const LibrariesCtx = useContext(LibrariesContext)
 
   function setLibraryId(event: { target: { value: string } }) {
@@ -73,6 +77,30 @@ const AddModal = (props: AddModal) => {
 
   function updateRules(rules: IRule[]) {
     setRules(rules)
+  }
+
+  const toggleCommunityRuleModal = (e: any) => {
+    e.preventDefault()
+
+    if (CommunityModal) {
+      setCommunityModal(false)
+    } else {
+      setCommunityModal(true)
+    }
+  }
+
+  const handleLoadRules = (rules: IRule[]) => {
+    updateRules(rules)
+    ruleCreatorVersion.current = ruleCreatorVersion.current + 1
+    setCommunityModal(false)
+  }
+
+  const loadJsonRules = (rules: string[]) => {
+    const transformedRules: IRule[] = rules
+      ? rules.map((r) => JSON.parse(r) as IRule)
+      : []
+    updateRules(transformedRules)
+    ruleCreatorVersion.current = ruleCreatorVersion.current + 1
   }
 
   const cancel = () => {
@@ -181,14 +209,14 @@ const AddModal = (props: AddModal) => {
 
   return (
     <div className="h-full w-full">
-      <div className="flex max-width-form-head">
+      <div className="max-width-form-head flex">
         <div className="ml-0">
           <h3 className="heading">General </h3>
           <p className="description">
             General information about this group of rules
           </p>
         </div>
-        <div className='ml-auto'>
+        <div className="ml-auto">
           <Link href={`/docs/tutorial-Rules.html`} passHref={true}>
             <a target="_blank" rel="noopener noreferrer">
               <Button className="ml-3" buttonType="default" type="button">
@@ -357,13 +385,38 @@ const AddModal = (props: AddModal) => {
           </div>
           <hr className="mt-5" />
           <div className="section">
-            <h3 className="heading">Rules</h3>
-            <p className="description">
-              Specify the rules this group needs to enforce
-            </p>
+            <div className="max-width-form-head flex">
+              <div className="ml-0">
+                <h3 className="heading">Rules</h3>
+                <p className="description">
+                  Specify the rules this group needs to enforce
+                </p>
+              </div>
+              <div className="ml-auto ">
+                <button
+                  className="ml-auto flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
+                  onClick={toggleCommunityRuleModal}
+                >
+                  {
+                    <DownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
+                  }
+                  <p className="button-text m-auto mr-4 ml-1 text-zinc-100">
+                    Community Rules
+                  </p>
+                </button>
+              </div>
+            </div>
           </div>
+          {CommunityModal ? (
+            <CommunityRuleModal
+              currentRules={rules}
+              onUpdate={handleLoadRules}
+              onCancel={() => setCommunityModal(false)}
+            />
+          ) : undefined}
           <ConstantsContextProvider>
             <RuleCreator
+              key={ruleCreatorVersion.current}
               mediaType={
                 selectedLibrary ? (selectedLibrary.type === 'movie' ? 1 : 2) : 0
               }

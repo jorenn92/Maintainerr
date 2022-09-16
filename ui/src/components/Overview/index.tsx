@@ -47,7 +47,6 @@ const Overview = () => {
     if (SearchCtx.search.text !== '') {
       GetApiHandler(`/plex/search/${SearchCtx.search.text}`).then(
         (resp: IPlexMetadata[]) => {
-          console.log(`git items: ${resp}`)
           setsearchUsed(true)
           setTotalSize(resp.length)
           pageData.current = resp.length * 50

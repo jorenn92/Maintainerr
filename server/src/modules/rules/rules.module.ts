@@ -19,6 +19,7 @@ import { TasksModule } from '../tasks/tasks.module';
 import { Collection } from '../collections/entities/collection.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
 import { Exclusion } from './entities/exclusion.entities';
+import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { Exclusion } from './entities/exclusion.entities';
       Collection,
       CollectionMedia,
       Exclusion,
+      CommunityRuleKarma,
     ]),
     OverseerrApiModule,
     TmdbApiModule,
