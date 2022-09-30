@@ -107,7 +107,7 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
             backgroundClickable={false}
             onCancel={() => {
               setThanksModal(false)
-              props.onCancel()
+              props.onSubmit()
             }}
             cancelText={'Close'}
             title={'Upload Successful'}

@@ -108,6 +108,11 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
     props.onCancel()
   }
 
+  const handleUpload = () => {
+    setUploadMyRules(false)
+    props.onCancel()
+  }
+
   const handleClick = (id: number) => {
     if (clickedRule !== id) {
       setClickedRule(id)
@@ -303,7 +308,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         {uploadMyRules ? (
           <CommunityRuleUpload
             onCancel={() => setUploadMyRules(false)}
-            onSubmit={() => setUploadMyRules(false)}
+            onSubmit={handleUpload}
             type={props.type}
             rules={props.currentRules ? props.currentRules : []}
           />
