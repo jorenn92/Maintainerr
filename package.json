@@ -49,7 +49,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "sqlite3": "^5.0.8",
+    "sqlite3": "^5.1.1",
     "swr": "^1.2.0",
     "typeorm": "^0.2.45",
     "web-push": "^3.4.5"
