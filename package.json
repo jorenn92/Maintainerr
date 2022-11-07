@@ -79,7 +79,7 @@
     "@types/supertest": "^2.0.11",
     "@types/web-push": "^3.3.2",
     "@typescript-eslint/parser": "^5.38.1",
-    "@typescript-eslint/eslint-plugin": "^5.39.0",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
     "autoprefixer": "10.4.12",
     "babel-plugin-react-intl": "^8.2.25",
     "babel-plugin-react-intl-auto": "^3.3.0",
