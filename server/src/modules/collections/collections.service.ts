@@ -247,34 +247,33 @@ export class CollectionsService {
     try {
       const collection = await this.collectionRepo.findOne(collectionDbId);
       for (const childMedia of media) {
-        let collectionMedia = await this.CollectionMediaRepo.find({
+        const collectionMedia = await this.CollectionMediaRepo.find({
           collectionId: collectionDbId,
         });
 
         if (collectionMedia.length > 0) {
           if (
-            media.length > 0 &&
             collectionMedia.find((el) => +el.plexId === +childMedia.plexId) !==
-              undefined
+            undefined
           ) {
             await this.removeChildFromCollection(
               { plexId: +collection.plexId, dbId: collection.id },
               childMedia.plexId,
             );
           }
-
-          collectionMedia = await this.CollectionMediaRepo.find({
-            collectionId: collectionDbId,
-          });
-
-          if (collectionMedia.length <= 0) {
-            await this.plexApi.deleteCollection(collection.plexId.toString());
-            await this.collectionRepo.save({
-              ...collection,
-              plexId: null,
-            });
-          }
         }
+      }
+
+      const collectionMedia = await this.CollectionMediaRepo.find({
+        collectionId: collectionDbId,
+      });
+
+      if (collectionMedia.length <= 0) {
+        await this.plexApi.deleteCollection(collection.plexId.toString());
+        await this.collectionRepo.save({
+          ...collection,
+          plexId: null,
+        });
       }
       return collection;
     } catch (err) {
