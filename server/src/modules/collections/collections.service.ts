@@ -246,34 +246,35 @@ export class CollectionsService {
   ) {
     try {
       const collection = await this.collectionRepo.findOne(collectionDbId);
-      for (const childMedia of media) {
-        const collectionMedia = await this.CollectionMediaRepo.find({
-          collectionId: collectionDbId,
-        });
-
-        if (collectionMedia.length > 0) {
-          if (
-            collectionMedia.find((el) => +el.plexId === +childMedia.plexId) !==
-            undefined
-          ) {
-            await this.removeChildFromCollection(
-              { plexId: +collection.plexId, dbId: collection.id },
-              childMedia.plexId,
-            );
-          }
-        }
-      }
-
-      const collectionMedia = await this.CollectionMediaRepo.find({
+      let collectionMedia = await this.CollectionMediaRepo.find({
         collectionId: collectionDbId,
       });
+      if (collectionMedia.length > 0) {
+        for (const childMedia of media) {
+          if (collectionMedia.length > 0) {
+            if (
+              collectionMedia.find(
+                (el) => +el.plexId === +childMedia.plexId,
+              ) !== undefined
+            ) {
+              await this.removeChildFromCollection(
+                { plexId: +collection.plexId, dbId: collection.id },
+                childMedia.plexId,
+              );
+              collectionMedia = collectionMedia.filter(
+                (el) => +el.plexId !== +childMedia.plexId,
+              );
+            }
+          }
+        }
 
-      if (collectionMedia.length <= 0) {
-        await this.plexApi.deleteCollection(collection.plexId.toString());
-        await this.collectionRepo.save({
-          ...collection,
-          plexId: null,
-        });
+        if (collectionMedia.length <= 0) {
+          await this.plexApi.deleteCollection(collection.plexId.toString());
+          await this.collectionRepo.save({
+            ...collection,
+            plexId: null,
+          });
+        }
       }
       return collection;
     } catch (err) {
@@ -281,6 +282,7 @@ export class CollectionsService {
       return undefined;
     }
   }
+
   async removeFromAllCollections(media: AddCollectionMedia[]) {
     try {
       const collection = await this.collectionRepo.find();
