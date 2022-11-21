@@ -369,6 +369,7 @@ export class PlexApiService {
         message: 'Something went wrong while deleting the collection from Plex',
       };
     }
+    this.logger.log('Removed collection from Plex');
     return {
       status: 'OK',
       code: 1,

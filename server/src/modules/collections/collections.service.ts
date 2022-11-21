@@ -415,7 +415,9 @@ export class CollectionsService {
           ])
           .execute();
       } else {
-        this.infoLogger(`Couldn't add media to collection..`);
+        this.infoLogger(
+          `Couldn't add media to collection: ` + responseColl.message,
+        );
       }
     } catch (err) {
       this.logger.warn('An error occured while performing collection actions.');
@@ -448,7 +450,9 @@ export class CollectionsService {
           ])
           .execute();
       } else {
-        this.infoLogger(`Couldn't remove media from collection..`);
+        this.infoLogger(
+          `Couldn't remove media from collection: ` + responseColl.message,
+        );
       }
     } catch (err) {
       this.logger.warn('An error occured while performing collection actions.');
