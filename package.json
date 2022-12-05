@@ -60,7 +60,7 @@
     "@nestjs/cli": "^9.1.5",
     "@nestjs/schematics": "^9.0.1",
     "@nestjs/testing": "^8.4.7",
-    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/changelog": "^6.0.2",
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
