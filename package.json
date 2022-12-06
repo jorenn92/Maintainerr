@@ -51,7 +51,7 @@
     "rxjs": "^7.6.0",
     "sqlite3": "^5.1.2",
     "swr": "^1.2.0",
-    "typeorm": "^0.2.45",
+    "typeorm": "^0.3.11",
     "web-push": "^3.4.5"
   },
   "devDependencies": {
