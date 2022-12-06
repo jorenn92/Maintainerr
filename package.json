@@ -32,7 +32,7 @@
     "@nestjs/platform-express": "^8.4.7",
     "@nestjs/common": "^8.4.7",
     "@nestjs/schedule": "^2.0.1",
-    "@nestjs/typeorm": "^8.0.4",
+    "@nestjs/typeorm": "^9.0.1",
     "axios": "^1.2.1",
     "bowser": "^2.11.0",
     "crypto": "^1.0.1",
