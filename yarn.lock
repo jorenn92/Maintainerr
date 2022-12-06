@@ -1953,14 +1953,14 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.4.tgz#0c8b74c50f29ee44f423f7416829c0bf8bb5eb27"
   integrity sha512-LwzQKA4vzIct1zNZzBmRKI9QuNpLgTQMEjsQLf3BXuGYb3QPTP4Yjf6mkdX+X1mYttZ808QpOwAzZjv28kq7DA==
 
-"@semantic-release/changelog@^6.0.1":
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/@semantic-release/changelog/-/changelog-6.0.1.tgz#8dd0334fd8c7d50cda747d2591e4f18f816b3c9c"
-  integrity sha512-FT+tAGdWHr0RCM3EpWegWnvXJ05LQtBkQUaQRIExONoXjVjLuOILNm4DEKNaV+GAQyJjbLRVs57ti//GypH6PA==
+"@semantic-release/changelog@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@semantic-release/changelog/-/changelog-6.0.2.tgz#fdcdbd368788c8fcc69c4af29bf2064f4afb45f4"
+  integrity sha512-jHqfTkoPbDEOAgAP18mGP53IxeMwxTISN+GwTRy9uLu58UjARoZU8ScCgWGeO2WPkEsm57H8AkyY02W2ntIlIw==
   dependencies:
     "@semantic-release/error" "^3.0.0"
     aggregate-error "^3.0.0"
-    fs-extra "^9.0.0"
+    fs-extra "^11.0.0"
     lodash "^4.17.4"
 
 "@semantic-release/commit-analyzer@^9.0.2":
@@ -3183,11 +3183,6 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
-
-at-least-node@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/at-least-node/-/at-least-node-1.0.0.tgz#602cd4b46e844ad4effc92a8011a3c46e0238dc2"
-  integrity sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==
 
 autoprefixer@10.4.13:
   version "10.4.13"
@@ -5266,12 +5261,11 @@ fs-extra@10.1.0, fs-extra@^10.0.0, fs-extra@^10.1.0:
     jsonfile "^6.0.1"
     universalify "^2.0.0"
 
-fs-extra@^9.0.0:
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.1.0.tgz#5954460c764a8da2094ba3554bf839e6b9a7c86d"
-  integrity sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==
+fs-extra@^11.0.0:
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-11.1.0.tgz#5784b102104433bb0e090f48bfc4a30742c357ed"
+  integrity sha512-0rcTq621PD5jM/e0a3EJoGC/1TC5ZBCERW82LQuwfGnCa1V8w7dpYH1yNu+SLb6E5dkeCBzKEyLGlFrnr+dUyw==
   dependencies:
-    at-least-node "^1.0.0"
     graceful-fs "^4.2.0"
     jsonfile "^6.0.1"
     universalify "^2.0.0"
