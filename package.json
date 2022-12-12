@@ -91,7 +91,7 @@
     "jest": "^27.2.5",
     "jsdoc": "^3.6.10",
     "postcss": "^8.4.19",
-    "prettier": "^2.8.0",
+    "prettier": "^2.8.1",
     "prettier-plugin-tailwindcss": "^0.2.0",
     "semantic-release": "^19.0.3",
     "source-map-support": "^0.5.20",
