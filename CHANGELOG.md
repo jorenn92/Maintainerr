@@ -1,3 +1,16 @@
+## [1.3.2](https://github.com/jorenn92/Maintainerr/compare/v1.3.1...v1.3.2) (2023-01-21)
+
+
+### Bug Fixes
+
+* app doesn't crash anymore on some raddar/sonnarr api errors ([f1a25e1](https://github.com/jorenn92/Maintainerr/commit/f1a25e1de59976bcee6ffc8ec40e69d8d8f01580))
+* **collections:** Add extra add / removal logs in case of failure ([1d2a6e2](https://github.com/jorenn92/Maintainerr/commit/1d2a6e2eb0316e0c64eae3ceec6159f028979391))
+* **collection:** Set machineId when needed if it wasn't set during boot (e.g. Plex wasn't available) ([0189670](https://github.com/jorenn92/Maintainerr/commit/01896707427b44802c63380a04e4877cb5d489bd))
+* **docs:** added the need to disable Overseer's 'Enable CSRF Protection'  setting to the docs ([256bd48](https://github.com/jorenn92/Maintainerr/commit/256bd4811e1d1df8f21e4b8ccee90079fe8489d5))
+* **modal:** fix a problem where a missing image symbol could be shown in some modals ([4738732](https://github.com/jorenn92/Maintainerr/commit/4738732bc98b0cd1316c3373d1e653fc25a56b01))
+* **overseerr:** fix a problem where Overseerr media would only be cleared if a request exists ([b31e68d](https://github.com/jorenn92/Maintainerr/commit/b31e68d3f7aa9c8024409813a344b94deb1155b0))
+* **ui:** collection background images are now correctly shown again ([5b5e182](https://github.com/jorenn92/Maintainerr/commit/5b5e182eb0887ddecac8f5dfcb27e859cf93f7e2))
+
 ## [1.3.1](https://github.com/jorenn92/Maintainerr/compare/v1.3.0...v1.3.1) (2022-11-19)
 
 
