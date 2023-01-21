@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import NodeCache from 'node-cache';
 
 // 5 minute default TTL (in seconds)
@@ -35,7 +35,7 @@ export class ExternalApiService {
   }
   public async get<T>(
     endpoint: string,
-    config?: AxiosRequestConfig,
+    config?: RawAxiosRequestConfig,
     ttl?: number,
   ): Promise<T> {
     try {
@@ -58,7 +58,7 @@ export class ExternalApiService {
 
   public async delete<T>(
     endpoint: string,
-    config?: AxiosRequestConfig,
+    config?: RawAxiosRequestConfig,
   ): Promise<T> {
     try {
       const response = await this.axios.delete<T>(endpoint, config);
@@ -71,7 +71,7 @@ export class ExternalApiService {
   public async put<T>(
     endpoint: string,
     data: string,
-    config?: AxiosRequestConfig,
+    config?: RawAxiosRequestConfig,
   ): Promise<T> {
     try {
       const response = await this.axios.put<T>(endpoint, data, config);
@@ -83,7 +83,7 @@ export class ExternalApiService {
 
   public async getRolling<T>(
     endpoint: string,
-    config?: AxiosRequestConfig,
+    config?: RawAxiosRequestConfig,
     ttl?: number,
   ): Promise<T> {
     try {
