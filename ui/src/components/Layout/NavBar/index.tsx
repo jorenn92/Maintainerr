@@ -133,7 +133,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                     <nav className="mt-12 flex-1 space-y-4 px-4">
                       {navBarItems.map((link) => {
                         return (
-                          <Link key={link.key} href={link.href}>
+                          <Link legacyBehavior key={link.key} href={link.href}>
                             <a
                               onClick={() => {
                                 if (link.href === '/overview') {
@@ -187,7 +187,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
               <nav className="mt-12 flex-1 space-y-4 px-4">
                 {navBarItems.map((navBarLink) => {
                   return (
-                    <Link
+                    <Link legacyBehavior
                       key={`desktop-${navBarLink.key}`}
                       href={navBarLink.href}
                     >

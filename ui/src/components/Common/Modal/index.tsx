@@ -108,25 +108,7 @@ const Modal: React.FC<ModalProps> = ({
             maxHeight: 'calc(100% - env(safe-area-inset-top) * 2)',
           }}
         >
-          {backdrop && (
-            <div className="absolute top-0 left-0 right-0 z-0 h-64 max-h-full w-full">
-              <CachedImage
-                alt=""
-                src={backdrop}
-                layout="fill"
-                objectFit="cover"
-                priority
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  // background: '#18181b'
-                  backgroundImage:
-                    'linear-gradient(90deg, rgba(43, 43, 49, 1) 0%, rgba(63 63 70, 1) 100%)',
-                }}
-              />
-            </div>
-          )}
+
           <div className="relative overflow-x-hidden sm:flex sm:items-center">
             {iconSvg && <div className="modal-icon">{iconSvg}</div>}
             <div

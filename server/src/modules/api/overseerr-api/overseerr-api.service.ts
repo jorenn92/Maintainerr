@@ -195,21 +195,19 @@ export class OverseerrApiService {
         media = await this.getShow(id);
       }
       if (media && media.mediaInfo) {
-        for (const request of media.mediaInfo.requests) {
-          try {
-            if (request?.media) {
-              this.deleteMediaItem(request.media.id.toString());
-            }
-          } catch (e) {
-            this.logger.log(
-              "Couldn't delete media. Does it exist in Overseerr?",
-              {
-                label: 'Overseerr API',
-                errorMessage: e.message,
-                id,
-              },
-            );
+        try {
+          if (media.mediaInfo.id) {
+            this.deleteMediaItem(media.mediaInfo.id.toString());
           }
+        } catch (e) {
+          this.logger.log(
+            "Couldn't delete media. Does it exist in Overseerr?",
+            {
+              label: 'Overseerr API',
+              errorMessage: e.message,
+              id,
+            },
+          );
         }
       }
     } catch (err) {

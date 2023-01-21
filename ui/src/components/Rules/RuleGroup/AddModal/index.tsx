@@ -217,7 +217,7 @@ const AddModal = (props: AddModal) => {
           </p>
         </div>
         <div className="ml-auto">
-          <Link href={`/docs/tutorial-Rules.html`} passHref={true}>
+          <Link legacyBehavior href={`/docs/tutorial-Rules.html`} passHref={true}>
             <a target="_blank" rel="noopener noreferrer">
               <Button className="ml-3" buttonType="default" type="button">
                 <QuestionMarkCircleIcon />
