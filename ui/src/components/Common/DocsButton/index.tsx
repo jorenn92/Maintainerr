@@ -10,7 +10,7 @@ interface IDocsButton {
 const DocsButton = (props: IDocsButton) => {
   return (
     <span className="h-full w-full inline-flex">
-      <Link
+      <Link legacyBehavior
         href={`/docs/${props.page ? props.page : 'tutorial-Home'}.html`}
         passHref={true}
       >

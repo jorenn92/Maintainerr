@@ -37,7 +37,7 @@ const SettingsLink: React.FC<ISettingsLink> = (props: ISettingsLink) => {
   }
 
   return (
-    <Link href={props.route}>
+    <Link legacyBehavior href={props.route}>
       <a
         className={`${linkClasses} ${
           props.currentPath.match(props.regex)
