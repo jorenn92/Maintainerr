@@ -73,31 +73,19 @@
     inset: 0px;
     box-sizing: border-box;
     margin: 0px;
-    /* background-image: linear-gradient(
-      135deg,
-      rgba(17, 24, 39, 0.47) 0%,
-      rgb(17, 24, 39) 60%
-    ); */
   }
   .backdrop-image {
-    position: absolute;
-    inset: 0px;
-    box-sizing: border-box;
     padding: 0px;
     border: none;
     margin: auto;
-    /* width: 0px;
-    height: 0px; */
     min-width: 50%;
     max-width: 50%;
-    min-height: 50%;
-    max-height: 50%;
+    height:100%;
     opacity: 0.08;
     object-fit: cover;
     float: left;
     display: inline-block;
     background-repeat: no-repeat;
-    /* object-position: 50% 50%; */
   }
 
   .slideover {
