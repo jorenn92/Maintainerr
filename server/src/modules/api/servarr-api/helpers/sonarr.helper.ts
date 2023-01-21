@@ -212,10 +212,7 @@ export class SonarrApi extends ServarrApi<{
   }
 
   public async deleteShow(seriesId: number | string, deleteFiles = true) {
-    this.logger.log('Deleting series from Sonarr.', {
-      label: 'Sonarr API',
-      seriesId,
-    });
+    this.logger.log(`Deleting show with ID ${seriesId} from Sonarr.`);
     try {
       await this.runDelete(`series/${seriesId}?deleteFiles=${deleteFiles}`);
     } catch (e) {
