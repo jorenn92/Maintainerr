@@ -17,8 +17,7 @@ COPY start.sh /opt/start.sh
 
 WORKDIR /opt/
 
-RUN apk --update --no-cache add python3 make g++ && \
-    ln -s /usr/bin/python3 /usr/bin/python
+RUN apk --update --no-cache add python3 make g++
 
 RUN chmod +x /opt/start.sh
 
