@@ -25,7 +25,7 @@ export class SonarrApi extends ServarrApi<{
 
       return response.data;
     } catch (e) {
-      throw new Error(`[Sonarr] Failed to retrieve series: ${e.message}`);
+      this.logger.error(`[Sonarr] Failed to retrieve series: ${e.message}`);
     }
   }
 
@@ -38,7 +38,7 @@ export class SonarrApi extends ServarrApi<{
       });
 
       if (!response.data[0]) {
-        throw new Error('No series found');
+        this.logger.error(`Series not found`);
       }
 
       return response.data;
@@ -48,7 +48,7 @@ export class SonarrApi extends ServarrApi<{
         errorMessage: e.message,
         title,
       });
-      throw new Error('No series found');
+      this.logger.error(`Series not found`);
     }
   }
 
@@ -110,7 +110,7 @@ export class SonarrApi extends ServarrApi<{
             label: 'Sonarr',
             options,
           });
-          throw new Error('Failed to update series in Sonarr');
+          this.logger.error(`Failed to update series in Sonarr`);
         }
       }
 
@@ -152,7 +152,7 @@ export class SonarrApi extends ServarrApi<{
           label: 'Sonarr',
           options,
         });
-        throw new Error('Failed to add series to Sonarr');
+        this.logger.error(`Failed to add series to Sonarr`);
       }
 
       return createdSeriesResponse.data;
@@ -166,7 +166,7 @@ export class SonarrApi extends ServarrApi<{
           response: e?.response?.data,
         },
       );
-      throw new Error('Failed to add series');
+      this.logger.error(`Failed to add series`);
     }
   }
 
@@ -187,8 +187,7 @@ export class SonarrApi extends ServarrApi<{
           errorMessage: e.message,
         },
       );
-
-      throw new Error('Failed to get language profiles');
+      this.logger.error(`Failed to get language profiles`);
     }
   }
 

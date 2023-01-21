@@ -44,14 +44,13 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       });
 
       if (!response.data[0]) {
-        throw new Error('Movie not found');
+        this.logger.error(`Movie not found`);
       }
 
       return response.data[0];
     } catch (e) {
       this.logger.error(`Error retrieving movie by TMDb ID ${id}`);
       this.logger.debug(e);
-      throw new Error('Movie not found');
     }
   }
 
@@ -99,7 +98,6 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
           return response.data;
         } else {
           this.logger.error('Failed to update existing movie in Radarr.');
-          throw new Error('Failed to update existing movie in Radarr');
         }
       }
 
