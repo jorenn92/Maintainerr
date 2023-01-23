@@ -1,6 +1,6 @@
 The easiest way to start Maintainerr is with Docker.
 
-images for amd64, arm64 & armv7 are availabile under jorenn92/maintainerr.
+images for amd64, arm64 & armv7 are available under jorenn92/maintainerr.
 Data is saved under /opt/data, a volume should be created to persist the configuration.
 
 # Run
