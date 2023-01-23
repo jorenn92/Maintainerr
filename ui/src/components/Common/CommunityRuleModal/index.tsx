@@ -64,7 +64,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         } else {
           setCommunityRules([])
           console.log(
-            'An error occured fetching community rules. Does Maintainerr have privileges to access the internet?'
+            'An error occurred fetching community rules. Does Maintainerr have privileges to access the internet?'
           )
         }
       } else {

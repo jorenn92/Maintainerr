@@ -84,43 +84,45 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       const ruleGroups = await this.getAllActiveRuleGroups();
       if (ruleGroups) {
         for (const rulegroup of ruleGroups) {
-          this.logger.log(`Executing ${rulegroup.name}`);
+          if (rulegroup.useRules) {
+            this.logger.log(`Executing ${rulegroup.name}`);
 
-          this.workerData = [];
-          this.resultData = [];
+            this.workerData = [];
+            this.resultData = [];
 
-          this.plexData = { page: 0, finished: false, data: [] };
-          while (!this.plexData.finished) {
-            await this.getPlexData(rulegroup.libraryId);
-            let currentSection = 0;
-            let sectionActionAnd = false;
+            this.plexData = { page: 0, finished: false, data: [] };
+            while (!this.plexData.finished) {
+              await this.getPlexData(rulegroup.libraryId);
+              let currentSection = 0;
+              let sectionActionAnd = false;
 
-            for (const rule of rulegroup.rules) {
-              const parsedRule = JSON.parse(
-                (rule as RuleDbDto).ruleJson,
-              ) as RuleDto;
-              if (currentSection === (rule as RuleDbDto).section) {
-                // if section didn't change
-                // execute and store in work array
-                await this.executeRule(parsedRule);
-              } else {
-                // handle section action
-                this.handleSectionAction(sectionActionAnd);
-                // save new section action
-                sectionActionAnd = +parsedRule.operator === 0;
-                // reset first operator of new section
-                parsedRule.operator = null;
-                // Execute the rule and set the new section
-                await this.executeRule(parsedRule);
-                currentSection = (rule as RuleDbDto).section;
+              for (const rule of rulegroup.rules) {
+                const parsedRule = JSON.parse(
+                  (rule as RuleDbDto).ruleJson,
+                ) as RuleDto;
+                if (currentSection === (rule as RuleDbDto).section) {
+                  // if section didn't change
+                  // execute and store in work array
+                  await this.executeRule(parsedRule);
+                } else {
+                  // handle section action
+                  this.handleSectionAction(sectionActionAnd);
+                  // save new section action
+                  sectionActionAnd = +parsedRule.operator === 0;
+                  // reset first operator of new section
+                  parsedRule.operator = null;
+                  // Execute the rule and set the new section
+                  await this.executeRule(parsedRule);
+                  currentSection = (rule as RuleDbDto).section;
+                }
               }
+              this.handleSectionAction(sectionActionAnd); // Handle last section
             }
-            this.handleSectionAction(sectionActionAnd); // Handle last section
+            await this.handleCollection(
+              await this.rulesService.getRuleGroupById(rulegroup.id),
+            );
+            this.logger.log(`Execution of rule ${rulegroup.name} done.`);
           }
-          await this.handleCollection(
-            await this.rulesService.getRuleGroupById(rulegroup.id),
-          );
-          this.logger.log(`Execution of rule ${rulegroup.name} done.`);
         }
       }
     } else {
@@ -202,13 +204,21 @@ export class RuleExecutorService implements OnApplicationBootstrap {
 
       if (dataToRemove.length > 0) {
         this.logInfo(
-          `Removing ${dataToRemove.length} media items from '${collection.title}'.`,
+          `Removing ${dataToRemove.length} media items from '${
+            collection.manualCollection
+              ? collection.manualCollectionName
+              : collection.title
+          }'.`,
         );
       }
 
       if (dataToAdd.length > 0) {
         this.logInfo(
-          `Adding ${dataToAdd.length} media items to '${collection.title}'.`,
+          `Adding ${dataToAdd.length} media items to '${
+            collection.manualCollection
+              ? collection.manualCollectionName
+              : collection.title
+          }'.`,
         );
       }
 

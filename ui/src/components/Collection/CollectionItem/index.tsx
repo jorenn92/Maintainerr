@@ -43,11 +43,11 @@ const CollectionItem = (props: ICollectionItem) => {
                 ? { onClick: () => props.onClick!(props.collection) }
                 : {})}
             >
-              {props.collection.title}
+              {props.collection.manualCollection ? `${props.collection.manualCollectionName} (manual)` :  props.collection.title}
             </a>
           </div>
           <div className="max-h-12 overflow-hidden whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll sm:max-h-20 sm:text-lg">
-            {props.collection.description}
+            {props.collection.manualCollection ? `Handled by rule: '${props.collection.title}'` : props.collection.description}
           </div>
         </div>
 

@@ -11,7 +11,11 @@ export class OptionalManualCollection1674489541784
     );
 
     await queryRunner.query(
-      `ALTER TABLE collection ADD "manualCollectionName" varchar`,
+      `ALTER TABLE collection ADD "manualCollectionName" varchar(255) DEFAULT NULL`,
+    );
+
+    await queryRunner.query(
+      `ALTER TABLE rule_group ADD "useRules" boolean NOT NULL DEFAULT (1)`,
     );
   }
 
@@ -23,5 +27,7 @@ export class OptionalManualCollection1674489541784
     await queryRunner.query(
       `ALTER TABLE collection DROP COLUMN manualCollectionName;`,
     );
+
+    await queryRunner.query(`ALTER TABLE rule_group DROP COLUMN useRules;`);
   }
 }

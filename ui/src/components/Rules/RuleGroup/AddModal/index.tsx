@@ -59,10 +59,13 @@ const AddModal = (props: AddModal) => {
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
   const deleteAfterRef = useRef<any>()
-  const manualCollectionNameRef = useRef<any>()
+  const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showHome, setShowHome] = useState<boolean>(true)
   const [manualCollection, setManualCollection] = useState<boolean>(false)
-  const [useRules, setUseRules] = useState<boolean>(true)
+  const [manualCollectionName, setManualCollectionName] = useState<string>('My custom collection')
+
+  const [useRules, setUseRules] = useState<boolean>(
+    props.editData ? props.editData.useRules : true)
   const [arrOption, setArrOption] = useState<number>()
   const [active, setActive] = useState<boolean>(
     props.editData ? props.editData.isActive : true
@@ -138,6 +141,7 @@ const AddModal = (props: AddModal) => {
         resp ? setCollection(resp) : undefined
         resp ? setShowHome(resp.visibleOnHome!) : undefined
         resp ? setArrOption(resp.arrAction) : undefined
+        resp ? setManualCollection(resp.manualCollection) : undefined
         setIsLoading(false)
       })
     } else {
@@ -211,7 +215,7 @@ const AddModal = (props: AddModal) => {
   if (isLoading) {
     return (
       <span>
-        <Image layout="fill" src="/spinner.svg" alt="Loading..."></Image>
+        <Image fill src="/spinner.svg" alt="Loading..."></Image>
       </span>
     )
   }
@@ -447,7 +451,7 @@ const AddModal = (props: AddModal) => {
                   type="text"
                   name="manual_collection_name"
                   id="manual_collection_name"
-                  defaultValue="my collection name"
+                  defaultValue={collection?.manualCollectionName}
                   ref={manualCollectionNameRef}
                 />
               </div>

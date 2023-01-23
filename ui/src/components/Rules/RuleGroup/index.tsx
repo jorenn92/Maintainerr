@@ -14,6 +14,7 @@ export interface IRuleGroup {
   isActive: boolean
   collectionId: number
   rules: IRuleJson[]
+  useRules: boolean
 }
 
 const RuleGroup = (props: {
@@ -89,7 +90,7 @@ const RuleGroup = (props: {
           <EditButton
             onClick={onEdit}
             text="Edit"
-            svgIcon={<PencilIcon className="h-5 m-auto text-zinc-200" />}
+            svgIcon={<PencilIcon className="m-auto h-5 text-zinc-200" />}
           />
         </div>
         <div>
@@ -99,7 +100,7 @@ const RuleGroup = (props: {
             <DeleteButton
               onClick={onRemove}
               text="Delete"
-              svgIcon={<TrashIcon className="h-5 m-auto text-zinc-200" />}
+              svgIcon={<TrashIcon className="m-auto h-5 text-zinc-200" />}
             />
           )}
         </div>

@@ -25,6 +25,7 @@ interface addCollectionDbResponse {
   isActive: boolean;
   visibleOnHome: boolean;
   deleteAfterDays: number;
+  manualCollection: boolean;
 }
 @Injectable()
 export class CollectionsService {
@@ -50,7 +51,9 @@ export class CollectionsService {
         return await this.collectionRepo.findOne(id);
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -59,7 +62,9 @@ export class CollectionsService {
     try {
       return await this.CollectionMediaRepo.find({ collectionId: id });
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -86,7 +91,9 @@ export class CollectionsService {
         }),
       );
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -127,7 +134,9 @@ export class CollectionsService {
       else
         return { plexCollection: plexCollection, dbCollection: collectionDb };
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -156,7 +165,9 @@ export class CollectionsService {
         dbCollection: addCollectionDbResponse;
       };
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -192,7 +203,9 @@ export class CollectionsService {
 
       return { plexCollection: plexColl, dbCollection: dbResp };
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -207,23 +220,39 @@ export class CollectionsService {
       if (collection) {
         if (media.length > 0) {
           if (!collection.plexId) {
-            const newColl = await this.createPlexCollection({
-              libraryId: collection.libraryId.toString(),
-              type: collection.type,
-              title: collection.title,
-              summary: collection.description,
-            });
-            collection = await this.collectionRepo.save({
-              ...collection,
-              plexId: +newColl.ratingKey,
-            });
-            await this.plexApi.UpdateCollectionSettings({
-              libraryId: collection.libraryId,
-              collectionId: collection.plexId,
-              recommended: false,
-              ownHome: collection.visibleOnHome,
-              sharedHome: collection.visibleOnHome,
-            });
+            let newColl: PlexCollection = undefined;
+            if (collection.manualCollection) {
+              newColl = await this.findPlexCollection(
+                collection.manualCollectionName,
+                +collection.libraryId,
+              );
+            } else {
+              newColl = await this.createPlexCollection({
+                libraryId: collection.libraryId.toString(),
+                type: collection.type,
+                title: collection.title,
+                summary: collection.description,
+              });
+            }
+            if (newColl) {
+              collection = await this.collectionRepo.save({
+                ...collection,
+                plexId: +newColl.ratingKey,
+              });
+              await this.plexApi.UpdateCollectionSettings({
+                libraryId: collection.libraryId,
+                collectionId: collection.plexId,
+                recommended: false,
+                ownHome: collection.visibleOnHome,
+                sharedHome: collection.visibleOnHome,
+              });
+            } else {
+              collection.manualCollection
+                ? this.logger.warn(
+                    `Manual Collection '${collection.manualCollectionName}' doesn't exist in Plex..`,
+                  )
+                : undefined;
+            }
           }
           // add children to collection
           for (const childMedia of media) {
@@ -239,7 +268,9 @@ export class CollectionsService {
         this.logger.warn("Collection doesn't exist.");
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -272,7 +303,7 @@ export class CollectionsService {
           }
         }
 
-        if (collectionMedia.length <= 0) {
+        if (collectionMedia.length <= 0 && !collection.manualCollection) {
           await this.plexApi.deleteCollection(collection.plexId.toString());
           await this.collectionRepo.save({
             ...collection,
@@ -282,7 +313,9 @@ export class CollectionsService {
       }
       return collection;
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -305,7 +338,7 @@ export class CollectionsService {
       const collection = await this.collectionRepo.findOne(collectionDbId);
 
       let status = { code: 1, status: 'OK' };
-      if (collection.plexId) {
+      if (collection.plexId && !collection.manualCollection) {
         status = await this.plexApi.deleteCollection(
           collection.plexId.toString(),
         );
@@ -316,7 +349,9 @@ export class CollectionsService {
         this.logger.warn('An error occurred while deleting the collection.');
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -325,9 +360,11 @@ export class CollectionsService {
     try {
       const collection = await this.collectionRepo.findOne(collectionDbId);
 
-      const status = await this.plexApi.deleteCollection(
-        collection.plexId.toString(),
-      );
+      if (!collection.manualCollection) {
+        const status = await this.plexApi.deleteCollection(
+          collection.plexId.toString(),
+        );
+      }
 
       await this.CollectionMediaRepo.delete({ collectionId: collection.id });
       await this.collectionRepo.save({
@@ -346,7 +383,9 @@ export class CollectionsService {
         });
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -370,7 +409,9 @@ export class CollectionsService {
         });
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -424,7 +465,9 @@ export class CollectionsService {
         );
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        `An error occurred while performing collection actions: ${err}`,
+      );
       return undefined;
     }
   }
@@ -459,7 +502,9 @@ export class CollectionsService {
         );
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -506,7 +551,9 @@ export class CollectionsService {
         );
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -545,7 +592,30 @@ export class CollectionsService {
         return resp[0];
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
+      return undefined;
+    }
+  }
+
+  private async findPlexCollection(
+    name: string,
+    libraryId: number,
+  ): Promise<PlexCollection> {
+    try {
+      const resp = await this.plexApi.getCollections(libraryId.toString());
+      if (resp) {
+        const found = resp.find((coll) => {
+          return coll.title.trim() === name.trim();
+        });
+
+        return found?.ratingKey !== undefined ? found : undefined;
+      }
+    } catch (err) {
+      this.logger.warn(
+        'An error occurred while searching for a specific Plex collection.',
+      );
       return undefined;
     }
   }
