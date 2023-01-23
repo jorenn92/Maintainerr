@@ -100,7 +100,11 @@ export class CollectionsService {
   }> {
     try {
       let plexCollection: PlexCollection;
-      if (!empty) {
+      if (
+        !empty &&
+        (collection.manualCollection == undefined ||
+          !collection.manualCollection)
+      ) {
         const collectionObj: CreateUpdateCollection = {
           libraryId: collection.libraryId.toString(),
           type: collection.type,
@@ -483,6 +487,14 @@ export class CollectionsService {
                 isActive: collection.isActive,
                 visibleOnHome: collection?.visibleOnHome,
                 deleteAfterDays: collection?.deleteAfterDays,
+                manualCollection:
+                  collection?.manualCollection !== undefined
+                    ? collection?.manualCollection
+                    : false,
+                manualCollectionName:
+                  collection?.manualCollectionName !== undefined
+                    ? collection?.manualCollectionName
+                    : '',
               },
             ])
             .execute()

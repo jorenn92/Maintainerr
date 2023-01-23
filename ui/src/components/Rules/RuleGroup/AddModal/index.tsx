@@ -36,9 +36,12 @@ interface ICreateApiObject {
   libraryId: number
   arrAction: number
   isActive: boolean
+  useRules: boolean
   collection: {
     visibleOnHome: boolean
     deleteAfterDays: number
+    manualCollection?: boolean
+    manualCollectionName?:String
   }
   rules: IRule[]
 }
@@ -56,7 +59,10 @@ const AddModal = (props: AddModal) => {
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
   const deleteAfterRef = useRef<any>()
+  const manualCollectionNameRef = useRef<any>()
   const [showHome, setShowHome] = useState<boolean>(true)
+  const [manualCollection, setManualCollection] = useState<boolean>(false)
+  const [useRules, setUseRules] = useState<boolean>(true)
   const [arrOption, setArrOption] = useState<number>()
   const [active, setActive] = useState<boolean>(
     props.editData ? props.editData.isActive : true
@@ -159,7 +165,7 @@ const AddModal = (props: AddModal) => {
       nameRef.current.value &&
       libraryRef.current.value &&
       deleteAfterRef.current.value &&
-      rules.length > 0
+      ((useRules && rules.length > 0 || !useRules))
     ) {
       setFormIncomplete(false)
       const creationObj: ICreateApiObject = {
@@ -168,11 +174,14 @@ const AddModal = (props: AddModal) => {
         libraryId: +libraryRef.current.value,
         arrAction: arrOption ? arrOption : 0,
         isActive: active,
+        useRules: useRules,
         collection: {
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
+          manualCollection: manualCollection,
+          manualCollectionName: manualCollectionNameRef.current.value
         },
-        rules: rules,
+        rules: useRules ? rules : [],
       }
 
       if (!props.editData) {
@@ -217,7 +226,11 @@ const AddModal = (props: AddModal) => {
           </p>
         </div>
         <div className="ml-auto">
-          <Link legacyBehavior href={`/docs/tutorial-Rules.html`} passHref={true}>
+          <Link
+            legacyBehavior
+            href={`/docs/tutorial-Rules.html`}
+            passHref={true}
+          >
             <a target="_blank" rel="noopener noreferrer">
               <Button className="ml-3" buttonType="default" type="button">
                 <QuestionMarkCircleIcon />
@@ -383,49 +396,113 @@ const AddModal = (props: AddModal) => {
               </div>
             </div>
           </div>
-          <hr className="mt-5" />
-          <div className="section">
-            <div className="max-width-form-head flex">
-              <div className="ml-0">
-                <h3 className="heading">Rules</h3>
-                <p className="description">
-                  Specify the rules this group needs to enforce
-                </p>
-              </div>
-              <div className="ml-auto ">
-                <button
-                  className="ml-auto flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
-                  onClick={toggleCommunityRuleModal}
-                >
-                  {
-                    <DownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
-                  }
-                  <p className="button-text m-auto mr-4 ml-1 text-zinc-100">
-                    Community Rules
-                  </p>
-                </button>
+
+          <div className="form-row">
+            <label htmlFor="use_rules" className="text-label">
+              Use rules
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  type="checkbox"
+                  name="use_rules"
+                  id="use_rules"
+                  className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                  defaultChecked={useRules}
+                  onChange={() => {
+                    setUseRules(!useRules)
+                  }}
+                />
               </div>
             </div>
           </div>
-          {CommunityModal ? (
-            <CommunityRuleModal
-              currentRules={rules}
-              type={selectedLibrary ? selectedLibrary.type : 'movie'}
-              onUpdate={handleLoadRules}
-              onCancel={() => setCommunityModal(false)}
-            />
-          ) : undefined}
-          <ConstantsContextProvider>
-            <RuleCreator
-              key={ruleCreatorVersion.current}
-              mediaType={
-                selectedLibrary ? (selectedLibrary.type === 'movie' ? 1 : 2) : 0
-              }
-              editData={{ rules: rules }}
-              onCancel={cancel}
-              onUpdate={updateRules}
-            />
-          </ConstantsContextProvider>
+
+          <div className="form-row">
+            <label htmlFor="manual_collection" className="text-label">
+              Manual collection
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  type="checkbox"
+                  name="manual_collection"
+                  id="manual_collection"
+                  className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                  defaultChecked={manualCollection}
+                  onChange={() => {
+                    setManualCollection(!manualCollection)
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={`form-row ${manualCollection ? `` : `hidden`}`}>
+            <label htmlFor="manual_collection_name" className="text-label">
+              Manual collection name
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  type="text"
+                  name="manual_collection_name"
+                  id="manual_collection_name"
+                  defaultValue="my collection name"
+                  ref={manualCollectionNameRef}
+                />
+              </div>
+            </div>
+          </div>
+
+          <hr className="mt-5" />
+          <div className={`section ${useRules ? `` : `hidden`}`}>
+            <div className="section">
+              <div className="max-width-form-head flex">
+                <div className="ml-0">
+                  <h3 className="heading">Rules</h3>
+                  <p className="description">
+                    Specify the rules this group needs to enforce
+                  </p>
+                </div>
+                <div className="ml-auto ">
+                  <button
+                    className="ml-auto flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
+                    onClick={toggleCommunityRuleModal}
+                  >
+                    {
+                      <DownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
+                    }
+                    <p className="button-text m-auto mr-4 ml-1 text-zinc-100">
+                      Community Rules
+                    </p>
+                  </button>
+                </div>
+              </div>
+            </div>
+            {CommunityModal ? (
+              <CommunityRuleModal
+                currentRules={rules}
+                type={selectedLibrary ? selectedLibrary.type : 'movie'}
+                onUpdate={handleLoadRules}
+                onCancel={() => setCommunityModal(false)}
+              />
+            ) : undefined}
+            <ConstantsContextProvider>
+              <RuleCreator
+                key={ruleCreatorVersion.current}
+                mediaType={
+                  selectedLibrary
+                    ? selectedLibrary.type === 'movie'
+                      ? 1
+                      : 2
+                    : 0
+                }
+                editData={{ rules: rules }}
+                onCancel={cancel}
+                onUpdate={updateRules}
+              />
+            </ConstantsContextProvider>
+          </div>
 
           <div className="mt-5 flex h-full w-full">
             {/* <AddButton text="Create" onClick={create} /> */}
