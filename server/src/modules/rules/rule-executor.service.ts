@@ -4,6 +4,8 @@ import { isNull } from 'lodash';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
+import { Collection } from '../collections/entities/collection.entities';
+import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
 import { SettingsService } from '../settings/settings.service';
 import { TasksService } from '../tasks/tasks.service';
 import {
@@ -85,7 +87,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       if (ruleGroups) {
         for (const rulegroup of ruleGroups) {
           if (rulegroup.useRules) {
-            this.logger.log(`Executing ${rulegroup.name}`);
+            this.logger.log(`Executing rules for ${rulegroup.name}`);
 
             this.workerData = [];
             this.resultData = [];
@@ -119,16 +121,71 @@ export class RuleExecutorService implements OnApplicationBootstrap {
               this.handleSectionAction(sectionActionAnd); // Handle last section
             }
             await this.handleCollection(
-              await this.rulesService.getRuleGroupById(rulegroup.id),
+              await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
             );
-            this.logger.log(`Execution of rule ${rulegroup.name} done.`);
+            this.logger.log(`Execution of rules for ${rulegroup.name} done.`);
           }
+          await this.syncManualPlexMediaToCollectionDB(
+            await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
+          );
         }
       }
     } else {
       this.logger.log(
         'Not all applications are reachable.. Skipped rule execution.',
       );
+    }
+  }
+
+  private async syncManualPlexMediaToCollectionDB(rulegroup: RuleGroup) {
+    if (rulegroup && rulegroup.collectionId) {
+      const collection = await this.collectionService.getCollection(
+        rulegroup.collectionId,
+      );
+
+      if (collection && collection.plexId) {
+        const collectionMedia = await this.collectionService.getCollectionMedia(
+          rulegroup.collectionId,
+        );
+
+        const children = await this.plexApi.getCollectionChildren(
+          collection.plexId.toString(),
+        );
+
+        // Handle manually added
+        children.forEach(async (child) => {
+          if (child && child.ratingKey)
+            if (
+              !collectionMedia.find((e) => {
+                return +e.plexId === +child.ratingKey;
+              })
+            ) {
+              await this.collectionService.addToCollection(
+                collection.id,
+                [{ plexId: +child.ratingKey }] as AddCollectionMedia[],
+                true,
+              );
+            }
+        });
+
+        // Handle manually removed
+        collectionMedia.forEach(async (media) => {
+          if (media && media.plexId) {
+            if (!children.find((e) => +media.plexId === +e.ratingKey)) {
+              await this.collectionService.removeFromCollection(collection.id, [
+                { plexId: +media.plexId },
+              ] as AddCollectionMedia[]);
+            }
+          }
+        });
+        this.logger.log(
+          `Synced collection '${
+            collection.manualCollection
+              ? collection.manualCollectionName
+              : collection.title
+          }' with Plex`,
+        );
+      }
     }
   }
 

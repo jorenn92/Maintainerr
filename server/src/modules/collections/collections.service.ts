@@ -127,15 +127,35 @@ export class CollectionsService {
           sharedHome: collection.visibleOnHome,
         });
       }
+      // in case of manual, just fetch the collection plex ID
+      if (collection.manualCollection) {
+        plexCollection = await this.findPlexCollection(
+          collection.manualCollectionName,
+          collection.libraryId,
+        );
+        await this.plexApi.UpdateCollectionSettings({
+          libraryId: collection.libraryId,
+          collectionId: plexCollection.ratingKey,
+          recommended: false,
+          ownHome: collection.visibleOnHome,
+          sharedHome: collection.visibleOnHome,
+        });
+
+        collection.plexId = +plexCollection.ratingKey;
+      }
       // create collection in db
       const collectionDb: addCollectionDbResponse =
-        await this.addCollectionToDB(collection);
-      if (empty) return { dbCollection: collectionDb };
+        await this.addCollectionToDB(
+          collection,
+          collection.plexId ? collection.plexId : undefined,
+        );
+      if (empty && !collection.manualCollection)
+        return { dbCollection: collectionDb };
       else
         return { plexCollection: plexCollection, dbCollection: collectionDb };
     } catch (err) {
       this.logger.warn(
-        'An error occurred while performing collection actions.',
+        `An error occurred while creating or fetching a collection: ${err}`,
       );
       return undefined;
     }
@@ -477,7 +497,9 @@ export class CollectionsService {
     childPlexId: number,
   ) {
     try {
-      this.infoLogger(`Removing media from collection..`);
+      this.infoLogger(
+        `Removing media with id ${childPlexId} from collection..`,
+      );
 
       const responseColl: BasicResponseDto =
         await this.plexApi.deleteChildFromCollection(
