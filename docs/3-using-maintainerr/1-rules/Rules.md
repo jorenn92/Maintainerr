@@ -26,8 +26,8 @@ General info about the rule. Some of the information specified here will be show
 | Show on home              | Show the rule's collection on the Plex home screen                                                                                |
 | Media deleted after days  | Amount of days media will live in the collection before deletion                                                                  |
 | Use rules                 | Disable the rule engine, in case you want to add media manually                                                                   |
-| Manual collection         | Use a manual collection. Media will sync from Plex to Maintainerr. Maintainerr will never remove this collection from Plex        |
-| Manual collection name    | The name of the manual collection to use                                                                                          |
+| Custom collection         | Use a manual collection. Media will sync from Plex to Maintainerr. Maintainerr will never remove this collection from Plex        |
+| Custom collection name    | The name of the manual collection to use                                                                                          |
 
 ## Disabling rules & manual collections
 
