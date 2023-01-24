@@ -408,7 +408,7 @@ const AddModal = (props: AddModal) => {
             <label htmlFor="use_rules" className="text-label">
               Use rules
               <p className="text-xs font-normal">
-                Toggle Maintainerr's rule system
+                Toggle the rule system
               </p>
             </label>
             <div className="form-input">
@@ -431,7 +431,7 @@ const AddModal = (props: AddModal) => {
             <label htmlFor="manual_collection" className="text-label">
               Custom collection
               <p className="text-xs font-normal">
-                Toggle Maintainerr's collection handling
+                Toggle internal collection system
               </p>
             </label>
             <div className="form-input">
