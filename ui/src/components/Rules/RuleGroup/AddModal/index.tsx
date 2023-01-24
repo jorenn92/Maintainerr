@@ -41,7 +41,7 @@ interface ICreateApiObject {
     visibleOnHome: boolean
     deleteAfterDays: number
     manualCollection?: boolean
-    manualCollectionName?:String
+    manualCollectionName?: String
   }
   rules: IRule[]
 }
@@ -62,10 +62,13 @@ const AddModal = (props: AddModal) => {
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showHome, setShowHome] = useState<boolean>(true)
   const [manualCollection, setManualCollection] = useState<boolean>(false)
-  const [manualCollectionName, setManualCollectionName] = useState<string>('My custom collection')
+  const [manualCollectionName, setManualCollectionName] = useState<string>(
+    'My custom collection'
+  )
 
   const [useRules, setUseRules] = useState<boolean>(
-    props.editData ? props.editData.useRules : true)
+    props.editData ? props.editData.useRules : true
+  )
   const [arrOption, setArrOption] = useState<number>()
   const [active, setActive] = useState<boolean>(
     props.editData ? props.editData.isActive : true
@@ -169,7 +172,7 @@ const AddModal = (props: AddModal) => {
       nameRef.current.value &&
       libraryRef.current.value &&
       deleteAfterRef.current.value &&
-      ((useRules && rules.length > 0 || !useRules))
+      ((useRules && rules.length > 0) || !useRules)
     ) {
       setFormIncomplete(false)
       const creationObj: ICreateApiObject = {
@@ -183,7 +186,7 @@ const AddModal = (props: AddModal) => {
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
           manualCollection: manualCollection,
-          manualCollectionName: manualCollectionNameRef.current.value
+          manualCollectionName: manualCollectionNameRef.current.value,
         },
         rules: useRules ? rules : [],
       }
@@ -404,6 +407,9 @@ const AddModal = (props: AddModal) => {
           <div className="form-row">
             <label htmlFor="use_rules" className="text-label">
               Use rules
+              <p className="text-xs font-normal">
+                Toggle Maintainerr's rule system
+              </p>
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -423,7 +429,10 @@ const AddModal = (props: AddModal) => {
 
           <div className="form-row">
             <label htmlFor="manual_collection" className="text-label">
-              Manual collection
+              Custom collection
+              <p className="text-xs font-normal">
+                Toggle Maintainerr's collection handling
+              </p>
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -443,8 +452,12 @@ const AddModal = (props: AddModal) => {
 
           <div className={`form-row ${manualCollection ? `` : `hidden`}`}>
             <label htmlFor="manual_collection_name" className="text-label">
-              Manual collection name
+              Custom collection name
+              <p className="text-xs font-normal">
+                Collection must exist in Plex
+              </p>
             </label>
+
             <div className="form-input">
               <div className="form-input-field">
                 <input
