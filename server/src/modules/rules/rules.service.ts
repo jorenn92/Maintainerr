@@ -152,6 +152,8 @@ export class RulesService {
             isActive: params.isActive,
             visibleOnHome: params.collection?.visibleOnHome,
             deleteAfterDays: +params.collection?.deleteAfterDays,
+            manualCollection: params.collection?.manualCollection,
+            manualCollectionName: params.collection?.manualCollectionName,
           })
         ).dbCollection;
         // create group
@@ -160,16 +162,28 @@ export class RulesService {
           params.description,
           params.libraryId,
           collection.id,
+          params.useRules !== undefined ? params.useRules : true,
           params.isActive !== undefined ? params.isActive : true,
         );
         // create rules
-        for (const rule of params.rules) {
-          const ruleJson = JSON.stringify(rule);
+        if (params.useRules) {
+          for (const rule of params.rules) {
+            const ruleJson = JSON.stringify(rule);
+            await this.rulesRepository.save([
+              {
+                ruleJson: ruleJson,
+                ruleGroupId: groupId,
+                section: (rule as RuleDbDto).section,
+              },
+            ]);
+          }
+        } else {
+          // empty rule if not using rules
           await this.rulesRepository.save([
             {
-              ruleJson: ruleJson,
+              ruleJson: JSON.stringify(''),
               ruleGroupId: groupId,
-              section: (rule as RuleDbDto).section,
+              section: 0,
             },
           ]);
         }
@@ -316,6 +330,7 @@ export class RulesService {
     description: string,
     libraryId: number,
     collectionId: number,
+    useRules = true,
     isActive = true,
   ): Promise<number> {
     try {
@@ -330,6 +345,7 @@ export class RulesService {
             libraryId: +libraryId,
             collectionId: +collectionId,
             isActive: isActive,
+            useRules: useRules,
           },
         ])
         .execute();

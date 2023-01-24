@@ -12,6 +12,8 @@ export interface ICollection {
   visibleOnHome?: boolean;
   deleteAfterDays?: number; // amount of days after add
   media?: CollectionMedia[];
+  manualCollection?: boolean;
+  manualCollectionName?: string;
 }
 
 export enum ServarrAction {

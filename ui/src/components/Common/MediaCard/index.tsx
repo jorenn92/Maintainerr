@@ -132,8 +132,8 @@ const MediaCard: React.FC<IMediaCard> = ({
               className="absolute inset-0 h-full w-full"
               alt=""
               src={`https://image.tmdb.org/t/p/w300_and_h450_face${image}`}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{objectFit:"cover"}}
             />
           ) : undefined}
           <div className="absolute left-0 right-0 flex items-center justify-between p-2">

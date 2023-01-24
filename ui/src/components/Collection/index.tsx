@@ -17,6 +17,8 @@ export interface ICollection {
   type: number
   arrAction: number
   media: ICollectionMedia[]
+  manualCollection: boolean,
+  manualCollectionName: string,
 }
 
 export interface ICollectionMedia {

@@ -9,6 +9,9 @@ export class RulesDto {
   description: string;
   isActive?: boolean;
   arrAction?: number;
+  useRules?: boolean;
   collection?: ICollection;
   rules: RuleDto[] | RuleDbDto[];
+  manualCollection?: boolean;
+  manualCollectionName?: string;
 }

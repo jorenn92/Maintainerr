@@ -25,6 +25,7 @@ interface addCollectionDbResponse {
   isActive: boolean;
   visibleOnHome: boolean;
   deleteAfterDays: number;
+  manualCollection: boolean;
 }
 @Injectable()
 export class CollectionsService {
@@ -50,7 +51,9 @@ export class CollectionsService {
         return await this.collectionRepo.findOne(id);
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -59,7 +62,9 @@ export class CollectionsService {
     try {
       return await this.CollectionMediaRepo.find({ collectionId: id });
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -86,7 +91,9 @@ export class CollectionsService {
         }),
       );
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -100,7 +107,11 @@ export class CollectionsService {
   }> {
     try {
       let plexCollection: PlexCollection;
-      if (!empty) {
+      if (
+        !empty &&
+        (collection.manualCollection == undefined ||
+          !collection.manualCollection)
+      ) {
         const collectionObj: CreateUpdateCollection = {
           libraryId: collection.libraryId.toString(),
           type: collection.type,
@@ -116,14 +127,43 @@ export class CollectionsService {
           sharedHome: collection.visibleOnHome,
         });
       }
+      // in case of manual, just fetch the collection plex ID
+      if (collection.manualCollection) {
+        plexCollection = await this.findPlexCollection(
+          collection.manualCollectionName,
+          collection.libraryId,
+        );
+        if (plexCollection && plexCollection.ratingKey) {
+          await this.plexApi.UpdateCollectionSettings({
+            libraryId: collection.libraryId,
+            collectionId: plexCollection.ratingKey,
+            recommended: false,
+            ownHome: collection.visibleOnHome,
+            sharedHome: collection.visibleOnHome,
+          });
+
+          collection.plexId = +plexCollection.ratingKey;
+        } else {
+          this.logger.error(
+            `Manual Plex collection not found.. Is the spelling correct? `,
+          );
+          return undefined;
+        }
+      }
       // create collection in db
       const collectionDb: addCollectionDbResponse =
-        await this.addCollectionToDB(collection);
-      if (empty) return { dbCollection: collectionDb };
+        await this.addCollectionToDB(
+          collection,
+          collection.plexId ? collection.plexId : undefined,
+        );
+      if (empty && !collection.manualCollection)
+        return { dbCollection: collectionDb };
       else
         return { plexCollection: plexCollection, dbCollection: collectionDb };
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.error(
+        `An error occurred while creating or fetching a collection: ${err}`,
+      );
       return undefined;
     }
   }
@@ -152,7 +192,9 @@ export class CollectionsService {
         dbCollection: addCollectionDbResponse;
       };
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -188,9 +230,38 @@ export class CollectionsService {
 
       return { plexCollection: plexColl, dbCollection: dbResp };
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
+  }
+
+  public async saveCollection(collection: Collection): Promise<Collection> {
+    return await this.collectionRepo.save({
+      ...collection,
+    });
+  }
+
+  public async relinkManualCollection(
+    collection: Collection,
+  ): Promise<Collection> {
+    // refetch manual collection, in case it's ID changed
+    if (collection.manualCollection) {
+      const plexColl = await this.findPlexCollection(
+        collection.manualCollectionName,
+        +collection.libraryId,
+      );
+      if (plexColl) {
+        collection.plexId = +plexColl.ratingKey;
+        collection = await this.saveCollection(collection);
+      } else {
+        this.logger.error(
+          'Manual Plex collection not found.. Is it still available in Plex?',
+        );
+      }
+    }
+    return collection;
   }
 
   async addToCollection(
@@ -203,23 +274,40 @@ export class CollectionsService {
       if (collection) {
         if (media.length > 0) {
           if (!collection.plexId) {
-            const newColl = await this.createPlexCollection({
-              libraryId: collection.libraryId.toString(),
-              type: collection.type,
-              title: collection.title,
-              summary: collection.description,
-            });
-            collection = await this.collectionRepo.save({
-              ...collection,
-              plexId: +newColl.ratingKey,
-            });
-            await this.plexApi.UpdateCollectionSettings({
-              libraryId: collection.libraryId,
-              collectionId: collection.plexId,
-              recommended: false,
-              ownHome: collection.visibleOnHome,
-              sharedHome: collection.visibleOnHome,
-            });
+            let newColl: PlexCollection = undefined;
+            if (collection.manualCollection) {
+              // Does this need to happen here? We already refetch the correct collection in the rule-executor.service
+              newColl = await this.findPlexCollection(
+                collection.manualCollectionName,
+                +collection.libraryId,
+              );
+            } else {
+              newColl = await this.createPlexCollection({
+                libraryId: collection.libraryId.toString(),
+                type: collection.type,
+                title: collection.title,
+                summary: collection.description,
+              });
+            }
+            if (newColl) {
+              collection = await this.collectionRepo.save({
+                ...collection,
+                plexId: +newColl.ratingKey,
+              });
+              await this.plexApi.UpdateCollectionSettings({
+                libraryId: collection.libraryId,
+                collectionId: collection.plexId,
+                recommended: false,
+                ownHome: collection.visibleOnHome,
+                sharedHome: collection.visibleOnHome,
+              });
+            } else {
+              collection.manualCollection
+                ? this.logger.warn(
+                    `Manual Collection '${collection.manualCollectionName}' doesn't exist in Plex..`,
+                  )
+                : undefined;
+            }
           }
           // add children to collection
           for (const childMedia of media) {
@@ -235,7 +323,9 @@ export class CollectionsService {
         this.logger.warn("Collection doesn't exist.");
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -268,7 +358,7 @@ export class CollectionsService {
           }
         }
 
-        if (collectionMedia.length <= 0) {
+        if (collectionMedia.length <= 0 && !collection.manualCollection) {
           await this.plexApi.deleteCollection(collection.plexId.toString());
           await this.collectionRepo.save({
             ...collection,
@@ -278,7 +368,9 @@ export class CollectionsService {
       }
       return collection;
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -301,7 +393,7 @@ export class CollectionsService {
       const collection = await this.collectionRepo.findOne(collectionDbId);
 
       let status = { code: 1, status: 'OK' };
-      if (collection.plexId) {
+      if (collection.plexId && !collection.manualCollection) {
         status = await this.plexApi.deleteCollection(
           collection.plexId.toString(),
         );
@@ -312,7 +404,9 @@ export class CollectionsService {
         this.logger.warn('An error occurred while deleting the collection.');
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -321,9 +415,11 @@ export class CollectionsService {
     try {
       const collection = await this.collectionRepo.findOne(collectionDbId);
 
-      const status = await this.plexApi.deleteCollection(
-        collection.plexId.toString(),
-      );
+      if (!collection.manualCollection) {
+        const status = await this.plexApi.deleteCollection(
+          collection.plexId.toString(),
+        );
+      }
 
       await this.CollectionMediaRepo.delete({ collectionId: collection.id });
       await this.collectionRepo.save({
@@ -342,7 +438,9 @@ export class CollectionsService {
         });
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -366,7 +464,9 @@ export class CollectionsService {
         });
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -420,7 +520,9 @@ export class CollectionsService {
         );
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        `An error occurred while performing collection actions: ${err}`,
+      );
       return undefined;
     }
   }
@@ -430,7 +532,9 @@ export class CollectionsService {
     childPlexId: number,
   ) {
     try {
-      this.infoLogger(`Removing media from collection..`);
+      this.infoLogger(
+        `Removing media with id ${childPlexId} from collection..`,
+      );
 
       const responseColl: BasicResponseDto =
         await this.plexApi.deleteChildFromCollection(
@@ -455,7 +559,9 @@ export class CollectionsService {
         );
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -483,6 +589,14 @@ export class CollectionsService {
                 isActive: collection.isActive,
                 visibleOnHome: collection?.visibleOnHome,
                 deleteAfterDays: collection?.deleteAfterDays,
+                manualCollection:
+                  collection?.manualCollection !== undefined
+                    ? collection?.manualCollection
+                    : false,
+                manualCollectionName:
+                  collection?.manualCollectionName !== undefined
+                    ? collection?.manualCollectionName
+                    : '',
               },
             ])
             .execute()
@@ -494,7 +608,9 @@ export class CollectionsService {
         );
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
       return undefined;
     }
   }
@@ -533,7 +649,30 @@ export class CollectionsService {
         return resp[0];
       }
     } catch (err) {
-      this.logger.warn('An error occured while performing collection actions.');
+      this.logger.warn(
+        'An error occurred while performing collection actions.',
+      );
+      return undefined;
+    }
+  }
+
+  public async findPlexCollection(
+    name: string,
+    libraryId: number,
+  ): Promise<PlexCollection> {
+    try {
+      const resp = await this.plexApi.getCollections(libraryId.toString());
+      if (resp) {
+        const found = resp.find((coll) => {
+          return coll.title.trim() === name.trim();
+        });
+
+        return found?.ratingKey !== undefined ? found : undefined;
+      }
+    } catch (err) {
+      this.logger.warn(
+        'An error occurred while searching for a specific Plex collection.',
+      );
       return undefined;
     }
   }

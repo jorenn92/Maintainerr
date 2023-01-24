@@ -39,6 +39,12 @@ export class Collection {
   @Column({ nullable: true, default: null })
   deleteAfterDays: number;
 
+  @Column({ nullable: true, default: false })
+  manualCollection: boolean;
+
+  @Column({ nullable: true, default: '' })
+  manualCollectionName: string;
+
   @Column({ nullable: false, default: 1 })
   type: 1 | 2;
 
