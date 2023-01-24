@@ -38,4 +38,8 @@ When media has exclusions, an `Excl` badge will be shown on the top-right side o
 
 # Misc
 
-By clicking on the collection's name you can see all media currently added to the collection. On the top-right side there'll be a number indicating the number of days before removal.
+- By clicking on the collection's name you can see all media currently added to the collection. On the top-right side there'll be a number indicating the number of days before removal.
+
+- Maintainerr will never remove the collection from Plex if you specified a manual collection. 
+
+- You could add media directly to the Plex collection within Plex. Maintainner will sync Media with the Plex collection. (The Plex collection might not always be available in case you're using an automatic collection)

@@ -31,6 +31,7 @@ const ExcludeModal = (props: IExcludeModal) => {
       libraryId: 0,
       isActive: true,
       collectionId: 0,
+      useRules: true,
       rules: [],
     },
     {
@@ -40,6 +41,7 @@ const ExcludeModal = (props: IExcludeModal) => {
       libraryId: 0,
       isActive: true,
       collectionId: 0,
+      useRules: true,
       rules: [],
     },
   ])

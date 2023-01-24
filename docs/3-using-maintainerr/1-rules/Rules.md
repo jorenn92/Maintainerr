@@ -15,16 +15,28 @@ When media existed in the collection for a specified amount of time, they'll be 
 
 General info about the rule. Some of the information specified here will be shown on the generated collection. In here you also specify how to handle the collection.
 
-| Param                     | Description                                                                       |
-| -------------             |-------------                                                                      |
-| Name                      | The Rule and Collection name                                                      |
-| Description               | Description of the Rule. This is also used as the Collection's description        |
-| Library                   | Which Plex library's media to use                                                 |
-| Radarr Action             | Unmonitor or delete movies from Radarr                                            |
-| Sonarr Action             | Unmonitor or delete series from Sonarr                                            |
-| Active                    | If inactive, the rule won't run                                                   |
-| Show on home              | Show the rule's collection on the Plex home screen                                |
-| Media deleted after days  | Amount of days media will live in the collection before deletion                  |
+| Param                     | Description                                                                                                                       |
+| -------------             |-------------                                                                                                                      |
+| Name                      | The Rule and Collection name                                                                                                      |
+| Description               | Description of the Rule. This is also used as the Collection's description                                                        |
+| Library                   | Which Plex library's media to use                                                                                                 |
+| Radarr Action             | Unmonitor or delete movies from Radarr                                                                                            |
+| Sonarr Action             | Unmonitor or delete series from Sonarr                                                                                            |
+| Active                    | If inactive, the rule won't run                                                                                                   |
+| Show on home              | Show the rule's collection on the Plex home screen                                                                                |
+| Media deleted after days  | Amount of days media will live in the collection before deletion                                                                  |
+| Use rules                 | Disable the rule engine, in case you want to add media manually                                                                   |
+| Manual collection         | Use a manual collection. Media will sync from Plex to Maintainerr. Maintainerr will never remove this collection from Plex        |
+| Manual collection name    | The name of the manual collection to use                                                                                          |
+
+## Disabling rules & manual collections
+
+In case you want to manage the collection manually, or with another program, there's the possibility to disable Maintainerr's collection system by specifying a manual collection.
+Maintainerr will sync all media added/removed from the Plex collection into it's internal collection.
+
+Warning: if media is excluded in Maintainerr, but is added manually to the Plex collection, the exclude will be ignored.
+
+You could also disable the rule system by unchecking the 'use rules' checkbox.
 
 ## Sections
 
