@@ -133,15 +133,22 @@ export class CollectionsService {
           collection.manualCollectionName,
           collection.libraryId,
         );
-        await this.plexApi.UpdateCollectionSettings({
-          libraryId: collection.libraryId,
-          collectionId: plexCollection.ratingKey,
-          recommended: false,
-          ownHome: collection.visibleOnHome,
-          sharedHome: collection.visibleOnHome,
-        });
+        if (plexCollection && plexCollection.ratingKey) {
+          await this.plexApi.UpdateCollectionSettings({
+            libraryId: collection.libraryId,
+            collectionId: plexCollection.ratingKey,
+            recommended: false,
+            ownHome: collection.visibleOnHome,
+            sharedHome: collection.visibleOnHome,
+          });
 
-        collection.plexId = +plexCollection.ratingKey;
+          collection.plexId = +plexCollection.ratingKey;
+        } else {
+          this.logger.error(
+            `Manual Plex collection not found.. Is the spelling correct? `,
+          );
+          return undefined;
+        }
       }
       // create collection in db
       const collectionDb: addCollectionDbResponse =
@@ -154,7 +161,7 @@ export class CollectionsService {
       else
         return { plexCollection: plexCollection, dbCollection: collectionDb };
     } catch (err) {
-      this.logger.warn(
+      this.logger.error(
         `An error occurred while creating or fetching a collection: ${err}`,
       );
       return undefined;
@@ -230,6 +237,33 @@ export class CollectionsService {
     }
   }
 
+  public async saveCollection(collection: Collection): Promise<Collection> {
+    return await this.collectionRepo.save({
+      ...collection,
+    });
+  }
+
+  public async relinkManualCollection(
+    collection: Collection,
+  ): Promise<Collection> {
+    // refetch manual collection, in case it's ID changed
+    if (collection.manualCollection) {
+      const plexColl = await this.findPlexCollection(
+        collection.manualCollectionName,
+        +collection.libraryId,
+      );
+      if (plexColl) {
+        collection.plexId = +plexColl.ratingKey;
+        collection = await this.saveCollection(collection);
+      } else {
+        this.logger.error(
+          'Manual Plex collection not found.. Is it still available in Plex?',
+        );
+      }
+    }
+    return collection;
+  }
+
   async addToCollection(
     collectionDbId: number,
     media: AddCollectionMedia[],
@@ -242,6 +276,7 @@ export class CollectionsService {
           if (!collection.plexId) {
             let newColl: PlexCollection = undefined;
             if (collection.manualCollection) {
+              // Does this need to happen here? We already refetch the correct collection in the rule-executor.service
               newColl = await this.findPlexCollection(
                 collection.manualCollectionName,
                 +collection.libraryId,
@@ -621,7 +656,7 @@ export class CollectionsService {
     }
   }
 
-  private async findPlexCollection(
+  public async findPlexCollection(
     name: string,
     libraryId: number,
   ): Promise<PlexCollection> {

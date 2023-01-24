@@ -139,8 +139,12 @@ export class RuleExecutorService implements OnApplicationBootstrap {
 
   private async syncManualPlexMediaToCollectionDB(rulegroup: RuleGroup) {
     if (rulegroup && rulegroup.collectionId) {
-      const collection = await this.collectionService.getCollection(
+      let collection = await this.collectionService.getCollection(
         rulegroup.collectionId,
+      );
+
+      collection = await this.collectionService.relinkManualCollection(
+        collection,
       );
 
       if (collection && collection.plexId) {
@@ -153,31 +157,40 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         );
 
         // Handle manually added
-        children.forEach(async (child) => {
-          if (child && child.ratingKey)
-            if (
-              !collectionMedia.find((e) => {
-                return +e.plexId === +child.ratingKey;
-              })
-            ) {
-              await this.collectionService.addToCollection(
-                collection.id,
-                [{ plexId: +child.ratingKey }] as AddCollectionMedia[],
-                true,
-              );
-            }
-        });
+        if (children && children.length > 0) {
+          children.forEach(async (child) => {
+            if (child && child.ratingKey)
+              if (
+                !collectionMedia.find((e) => {
+                  return +e.plexId === +child.ratingKey;
+                })
+              ) {
+                await this.collectionService.addToCollection(
+                  collection.id,
+                  [{ plexId: +child.ratingKey }] as AddCollectionMedia[],
+                  true,
+                );
+              }
+          });
+        }
 
         // Handle manually removed
-        collectionMedia.forEach(async (media) => {
-          if (media && media.plexId) {
-            if (!children.find((e) => +media.plexId === +e.ratingKey)) {
-              await this.collectionService.removeFromCollection(collection.id, [
-                { plexId: +media.plexId },
-              ] as AddCollectionMedia[]);
+        if (collectionMedia && collectionMedia.length > 0) {
+          collectionMedia.forEach(async (media) => {
+            if (media && media.plexId) {
+              if (
+                !children ||
+                !children.find((e) => +media.plexId === +e.ratingKey)
+              ) {
+                await this.collectionService.removeFromCollection(
+                  collection.id,
+                  [{ plexId: +media.plexId }] as AddCollectionMedia[],
+                );
+              }
             }
-          }
-        });
+          });
+        }
+
         this.logger.log(
           `Synced collection '${
             collection.manualCollection
@@ -278,6 +291,10 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           }'.`,
         );
       }
+
+      collection = await this.collectionService.relinkManualCollection(
+        collection,
+      );
 
       collection = await this.collectionService.addToCollection(
         collection.id,
