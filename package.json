@@ -47,7 +47,7 @@
     "react-dom": "18.2.0",
     "react-transition-group": "^4.4.2",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.1.2",
     "rxjs": "^7.6.0",
     "sqlite3": "^5.1.2",
     "swr": "^1.2.0",
