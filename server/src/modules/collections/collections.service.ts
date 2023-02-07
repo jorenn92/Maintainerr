@@ -264,6 +264,43 @@ export class CollectionsService {
     return collection;
   }
 
+  private async checkAutomaticPlexLink(
+    collection: Collection,
+  ): Promise<Collection> {
+    // checks and fixes automatic collection link
+    if (!collection.manualCollection) {
+      let plexColl: PlexCollection = undefined;
+
+      if (collection.plexId) {
+        plexColl = await this.findPlexCollectionByID(collection.plexId);
+      }
+
+      if (!plexColl) {
+        plexColl = await this.findPlexCollection(
+          collection.title,
+          +collection.libraryId,
+        );
+
+        if (plexColl) {
+          collection.plexId = +plexColl.ratingKey;
+          collection = await this.saveCollection(collection);
+        }
+      }
+
+      // If the collection is empty in Plex, remove it. Otherwise issues when adding media
+      if (plexColl && collection.plexId !== null && +plexColl.childCount <= 0) {
+        await this.plexApi.deleteCollection(plexColl.ratingKey);
+        plexColl = undefined;
+      }
+
+      if (!plexColl) {
+        collection.plexId = null;
+        collection = await this.saveCollection(collection);
+      }
+    }
+    return collection;
+  }
+
   async addToCollection(
     collectionDbId: number,
     media: AddCollectionMedia[],
@@ -272,6 +309,7 @@ export class CollectionsService {
     try {
       let collection = await this.collectionRepo.findOne(collectionDbId);
       if (collection) {
+        collection = await this.checkAutomaticPlexLink(collection);
         if (media.length > 0) {
           if (!collection.plexId) {
             let newColl: PlexCollection = undefined;
@@ -335,7 +373,8 @@ export class CollectionsService {
     media: AddCollectionMedia[],
   ) {
     try {
-      const collection = await this.collectionRepo.findOne(collectionDbId);
+      let collection = await this.collectionRepo.findOne(collectionDbId);
+      collection = await this.checkAutomaticPlexLink(collection);
       let collectionMedia = await this.CollectionMediaRepo.find({
         collectionId: collectionDbId,
       });
@@ -669,6 +708,17 @@ export class CollectionsService {
 
         return found?.ratingKey !== undefined ? found : undefined;
       }
+    } catch (err) {
+      this.logger.warn(
+        'An error occurred while searching for a specific Plex collection.',
+      );
+      return undefined;
+    }
+  }
+
+  public async findPlexCollectionByID(id: number): Promise<PlexCollection> {
+    try {
+      return await this.plexApi.getCollection(id);
     } catch (err) {
       this.logger.warn(
         'An error occurred while searching for a specific Plex collection.',

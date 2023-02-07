@@ -310,9 +310,7 @@ export class PlexApiService {
 
       return collection;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
+      this.logger.warn(`Couldn't find collection with id ${+collectionId}`);
       return undefined;
     }
   }
