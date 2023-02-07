@@ -429,7 +429,8 @@ export class CollectionsService {
 
   async deleteCollection(collectionDbId: number) {
     try {
-      const collection = await this.collectionRepo.findOne(collectionDbId);
+      let collection = await this.collectionRepo.findOne(collectionDbId);
+      collection = await this.checkAutomaticPlexLink(collection);
 
       let status = { code: 1, status: 'OK' };
       if (collection.plexId && !collection.manualCollection) {

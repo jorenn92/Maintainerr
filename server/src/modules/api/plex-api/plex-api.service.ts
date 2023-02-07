@@ -371,6 +371,7 @@ export class PlexApiService {
       message: 'Success',
     };
   }
+  
   public async getCollectionChildren(
     collectionId: string,
   ): Promise<PlexLibraryItem[]> {
