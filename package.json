@@ -78,7 +78,7 @@
     "@types/react-transition-group": "^4.4.5",
     "@types/supertest": "^2.0.11",
     "@types/web-push": "^3.3.2",
-    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.51.0",
     "autoprefixer": "10.4.13",
     "babel-plugin-react-intl": "^8.2.25",
