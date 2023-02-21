@@ -1,3 +1,18 @@
+# [1.4.0](https://github.com/jorenn92/Maintainerr/compare/v1.3.2...v1.4.0) (2023-02-21)
+
+
+### Bug Fixes
+
+* **docs:** fixed some documentation typo's ([331261f](https://github.com/jorenn92/Maintainerr/commit/331261f7e6b83f470586e57ac893a3c2aeebe581))
+* **rules & collections:** improve error handling ([9746045](https://github.com/jorenn92/Maintainerr/commit/9746045579a1de884f0297bec3cf517b9cdb9f1c))
+* **rules:** fix a problem where media couldn't get added anymore when something unexpected had happened to the Plex collection ([f0dcea7](https://github.com/jorenn92/Maintainerr/commit/f0dcea7e444505f2e953624ea439782b5b3cceeb))
+
+
+### Features
+
+* **rules & collections:** Manual Plex collections now auto sync with Maintainerr ([2a52436](https://github.com/jorenn92/Maintainerr/commit/2a52436ab000f31bd5d736617b6e3ad6669a17ab))
+* **rules:** add the possibility to bypass Maintainerr's rule system. ([b037d11](https://github.com/jorenn92/Maintainerr/commit/b037d11aa176a285da6b911eb60179f48bbba5fa))
+
 ## [1.3.2](https://github.com/jorenn92/Maintainerr/compare/v1.3.1...v1.3.2) (2023-01-21)
 
 
