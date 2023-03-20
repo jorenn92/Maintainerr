@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^1.0.5",
-    "@nestjs/common": "^9.3.5",
+    "@nestjs/common": "^9.3.10",
     "@nestjs/core": "^9.3.5",
     "@nestjs/platform-express": "^9.3.5",
     "@nestjs/schedule": "^2.2.0",
