@@ -1420,10 +1420,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@jsdoc/salty@^0.2.1", "@jsdoc/salty@^0.2.2":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@jsdoc/salty/-/salty-0.2.3.tgz#aab70c8756c1b98598bbc30867d3aa7a31b5c7d4"
-  integrity sha512-bbtCxCkxcnWhi50I+4Lj6mdz9w3pOXOgEQrID8TCZ/DF51fW7M9GCQW2y45SpBDdHd1Eirm1X/Cf6CkAAe8HPg==
+"@jsdoc/salty@^0.2.1", "@jsdoc/salty@^0.2.4":
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/@jsdoc/salty/-/salty-0.2.5.tgz#1b2fa5bb8c66485b536d86eee877c263d322f692"
+  integrity sha512-TfRP53RqunNe2HBobVBJ0VLhK1HbfvBYeTC1ahnN64PWvyYyGebmMiPkuwvD9fpw2ZbkoPb8Q7mwy0aR8Z9rvw==
   dependencies:
     lodash "^4.17.21"
 
@@ -3890,12 +3890,12 @@ clean-css@^4.2.1:
   dependencies:
     source-map "~0.6.0"
 
-clean-jsdoc-theme@^4.2.4:
-  version "4.2.5"
-  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.2.5.tgz#ffaa32363122b769a261bbf1859e5199694bdd77"
-  integrity sha512-zIdZd7Xn2xD68fOxvCLuWvtsmCKQR5HUhwoEy1wOvP9udp7EkcS9j2bBBfSlK/sDBOHALLWsSVagGC2O3BD6vQ==
+clean-jsdoc-theme@^4.2.7:
+  version "4.2.7"
+  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.2.7.tgz#dd69e95ee07da938850d2c3798f14343ee121c43"
+  integrity sha512-yLLxwTFw7N9/toUCcFmKkwJmv4LO2pQWYNETcU3Vv+n2al2L2ohb7xWoXLjp5m3OljC9b1m+o4adzY0YH6Ep4A==
   dependencies:
-    "@jsdoc/salty" "^0.2.2"
+    "@jsdoc/salty" "^0.2.4"
     fs-extra "^10.1.0"
     html-minifier "^4.0.0"
     klaw-sync "^6.0.0"
