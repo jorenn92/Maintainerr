@@ -96,7 +96,7 @@
     "semantic-release": "^20.1.0",
     "source-map-support": "^0.5.20",
     "supertest": "^6.3.2",
-    "tailwindcss": "^3.2.4",
+    "tailwindcss": "^3.3.2",
     "ts-jest": "^29.0.3",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",
