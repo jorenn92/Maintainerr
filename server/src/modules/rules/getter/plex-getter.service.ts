@@ -107,47 +107,34 @@ export class PlexGetterService {
           const seasons = await this.plexApi.getChildrenMetadata(
             libItem.ratingKey,
           );
-          let allViewers: PlexSeenBy[] = [];
+          let allViewers = plexUsers.slice();
           for (const season of seasons) {
             const episodes = await this.plexApi.getChildrenMetadata(
               season.ratingKey,
             );
             for (const episode of episodes) {
-              if (season.index === 1 && episode.index === 1) {
-                const viewers: PlexSeenBy[] = await this.plexApi
-                  .getWatchHistory(episode.ratingKey)
-                  .catch((_err) => {
-                    return null;
-                  });
-                allViewers =
-                  viewers && viewers.length > 0
-                    ? allViewers.concat(viewers)
-                    : allViewers;
-              } else {
-                const viewers: PlexSeenBy[] = await this.plexApi
-                  .getWatchHistory(episode.ratingKey)
-                  .catch((_err) => {
-                    return null;
-                  });
+              const viewers: PlexSeenBy[] = await this.plexApi
+                .getWatchHistory(episode.ratingKey)
+                .catch((_err) => {
+                  return null;
+                });
 
-                if (allViewers) {
-                  allViewers.forEach((el, index) => {
-                    if (
-                      !viewers ||
-                      !viewers.find(
-                        (viewEl) => el.accountID === viewEl.accountID,
-                      )
-                    ) {
-                      allViewers.splice(index);
-                    }
-                  });
+              var i = allViewers.length;
+              while (i--) {
+                if (
+                  !viewers ||
+                  !viewers.find(
+                    (viewEl) => allViewers[i].plexId === viewEl.accountID,
+                  )
+                ) {
+                  allViewers.splice(i, 1);
                 }
               }
             }
           }
 
           if (allViewers && allViewers.length > 0) {
-            const viewerIds = allViewers.map((el) => +el.accountID);
+            const viewerIds = allViewers.map((el) => +el.plexId);
             return plexUsers
               .filter((el) => viewerIds.includes(el.plexId))
               .map((el) => el.username);
