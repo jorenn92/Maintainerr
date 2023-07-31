@@ -107,7 +107,7 @@ export class PlexGetterService {
           const seasons = await this.plexApi.getChildrenMetadata(
             libItem.ratingKey,
           );
-          let allViewers = plexUsers.slice();
+          const allViewers = plexUsers.slice();
           for (const season of seasons) {
             const episodes = await this.plexApi.getChildrenMetadata(
               season.ratingKey,
@@ -119,17 +119,14 @@ export class PlexGetterService {
                   return null;
                 });
 
-              var i = allViewers.length;
-              while (i--) {
+              allViewers.forEach((el, idx) => {
                 if (
                   !viewers ||
-                  !viewers.find(
-                    (viewEl) => allViewers[i].plexId === viewEl.accountID,
-                  )
+                  !viewers.find((viewEl) => el.plexId === viewEl.accountID)
                 ) {
-                  allViewers.splice(i, 1);
+                  allViewers.splice(idx, 1);
                 }
-              }
+              });
             }
           }
 
