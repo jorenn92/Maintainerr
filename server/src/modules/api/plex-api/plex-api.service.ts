@@ -115,7 +115,7 @@ export class PlexApiService {
   public async searchContent(input: string) {
     try {
       const response = await this.plexClient.query(
-        `/search?query=${input}&includeGuids=1`,
+        `/search?query=${encodeURIComponent(input)}&includeGuids=1`,
       );
       const results = response.MediaContainer.Metadata
         ? Promise.all(
@@ -318,7 +318,11 @@ export class PlexApiService {
   public async createCollection(params: CreateUpdateCollection) {
     try {
       const response = await this.plexClient.postQuery<PlexLibraryResponse>({
-        uri: `/library/collections?type=${params.type}&title=${params.title}&sectionId=${params.libraryId}`,
+        uri: `/library/collections?type=${
+          params.type
+        }&title=${encodeURIComponent(params.title)}&sectionId=${
+          params.libraryId
+        }`,
       });
       const collection: PlexCollection = response.MediaContainer
         .Metadata[0] as PlexCollection;
@@ -338,7 +342,11 @@ export class PlexApiService {
   public async updateCollection(body: CreateUpdateCollection) {
     try {
       await this.plexClient.putQuery<PlexLibraryResponse>({
-        uri: `/library/sections/${body.libraryId}/all?type=18&id=${body.collectionId}&title.value=${body.title}&summary.value=${body.summary}`,
+        uri: `/library/sections/${body.libraryId}/all?type=18&id=${
+          body.collectionId
+        }&title.value=${encodeURIComponent(
+          body.title,
+        )}&summary.value=${encodeURIComponent(body.summary)}`,
         // &titleSort.value=&summary.value=&contentRating.value=&title.locked=1&titleSort.locked=1&contentRating.locked=1`,
       });
       return await this.getCollection(+body.collectionId);
@@ -371,7 +379,7 @@ export class PlexApiService {
       message: 'Success',
     };
   }
-  
+
   public async getCollectionChildren(
     collectionId: string,
   ): Promise<PlexLibraryItem[]> {
