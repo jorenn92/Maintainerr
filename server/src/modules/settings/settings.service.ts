@@ -122,6 +122,16 @@ export class SettingsService implements SettingDto {
   public async updateSettings(settings: Settings): Promise<BasicResponseDto> {
     try {
       const settingsDb = await this.settingsRepo.findOne({});
+
+      // Plex SSL specifics
+      settings.plex_ssl =
+        settings.plex_hostname.includes('https://') || settings.plex_port == 443
+          ? 1
+          : 0;
+      settings.plex_hostname = settings.plex_hostname
+        .replace('https://', '')
+        .replace('http://', '');
+
       await this.settingsRepo.save({
         ...settingsDb,
         ...settings,
@@ -147,7 +157,7 @@ export class SettingsService implements SettingDto {
   public async testOverseerr(): Promise<BasicResponseDto> {
     try {
       const resp = await this.overseerr.status();
-      return resp !== null
+      return resp !== null && resp.version !== undefined
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
@@ -158,7 +168,7 @@ export class SettingsService implements SettingDto {
   public async testRadarr(): Promise<BasicResponseDto> {
     try {
       const resp = await this.servarr.RadarrApi.info();
-      return resp !== null
+      return resp !== null && resp.version !== undefined
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
@@ -169,7 +179,7 @@ export class SettingsService implements SettingDto {
   public async testSonarr(): Promise<BasicResponseDto> {
     try {
       const resp = await this.servarr.SonarrApi.info();
-      return resp !== null
+      return resp !== null && resp.version !== undefined
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
@@ -180,7 +190,7 @@ export class SettingsService implements SettingDto {
   public async testPlex(): Promise<any> {
     try {
       const resp = await this.plexApi.getStatus();
-      return resp !== null
+      return resp !== null && resp.version !== undefined
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
