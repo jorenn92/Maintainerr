@@ -139,6 +139,25 @@ export class PlexGetterService {
 
           return [];
         }
+        case 'sw_watchers': {
+          const plexUsers = (await this.plexApi.getUsers()).map((el) => {
+            return { plexId: el.id, username: el.name } as PlexUser;
+          });
+
+          const watchHistory = await this.plexApi.getWatchHistory(
+            libItem.ratingKey,
+          );
+
+          const viewers = watchHistory.map((el) => +el.accountID);
+          const uniqueViewers = [...new Set(viewers)];
+
+          if (uniqueViewers && uniqueViewers.length > 0) {
+            return plexUsers
+              .filter((el) => uniqueViewers.includes(+el.plexId))
+              .map((el) => el.username);
+          }
+          return [];
+        }
         case 'sw_lastWatched': {
           const watchHistory = await this.plexApi.getWatchHistory(
             libItem.ratingKey,
