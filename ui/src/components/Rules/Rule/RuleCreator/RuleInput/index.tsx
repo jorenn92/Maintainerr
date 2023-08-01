@@ -12,6 +12,7 @@ enum RulePossibility {
   EQUALS,
   NOT_EQUALS,
   CONTAINS,
+  NOT_CONTAINS,
   BEFORE,
   AFTER,
   IN_LAST,

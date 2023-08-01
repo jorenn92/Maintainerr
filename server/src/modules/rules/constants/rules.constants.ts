@@ -4,6 +4,7 @@ export const enum RulePossibility {
   EQUALS,
   NOT_EQUALS,
   CONTAINS,
+  NOT_CONTAINS,
   BEFORE,
   AFTER,
   IN_LAST,
@@ -41,6 +42,7 @@ export class RuleType {
     RulePossibility.EQUALS,
     RulePossibility.NOT_EQUALS,
     RulePossibility.CONTAINS,
+    RulePossibility.NOT_CONTAINS,
   ]);
   static readonly DATE = new RuleType('1', [
     RulePossibility.EQUALS,
@@ -54,6 +56,7 @@ export class RuleType {
     RulePossibility.EQUALS,
     RulePossibility.NOT_EQUALS,
     RulePossibility.CONTAINS,
+    RulePossibility.NOT_CONTAINS,
   ]);
   static readonly BOOL = new RuleType('3', [
     RulePossibility.EQUALS,
