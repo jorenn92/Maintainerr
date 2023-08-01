@@ -143,7 +143,7 @@ const OverviewContent = (props: IOverviewContent) => {
               type={el.type === 'movie' ? 1 : 2}
               image={''}
               summary={el.summary}
-              year={el.year.toString()}
+              year={el.year?.toString()}
               mediaType={
                 el.type !== 'movie' && el.type !== 'show' ? 'movie' : el.type
               }
