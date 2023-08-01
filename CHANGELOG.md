@@ -1,3 +1,14 @@
+## [1.4.1](https://github.com/jorenn92/Maintainerr/compare/v1.4.0...v1.4.1) (2023-08-01)
+
+
+### Bug Fixes
+
+* **plex-api:** fixed a problem where the initial creation of a Plex collection would fail ([a06f261](https://github.com/jorenn92/Maintainerr/commit/a06f26191d8313826103447372200726feec46f6))
+* **rules:** fix a problem where "all available episodes seen by" not returned correctly when episode 1 of season 1 is not present ([2d890cc](https://github.com/jorenn92/Maintainerr/commit/2d890cc81b16d19dfe33e833cd0d130d5d18872b))
+* **rules:** Fix a problem where booleans would always default to 'true' when editing rules ([bd6a68e](https://github.com/jorenn92/Maintainerr/commit/bd6a68e03b463fed24b3c94e6db8fd9c3d54b29b))
+* **rules:** Fix a problem where the sonarr action would always default to the first option when editing rules ([811ef66](https://github.com/jorenn92/Maintainerr/commit/811ef6693016947f96536d536bd42dfa272ee243))
+* **ui:** fixed an issue where the collection's library picker would behave wrong ([b6c5f83](https://github.com/jorenn92/Maintainerr/commit/b6c5f83786c1084034af5322b0f7a6376a4fd2a6))
+
 # [1.4.0](https://github.com/jorenn92/Maintainerr/compare/v1.3.2...v1.4.0) (2023-02-21)
 
 
