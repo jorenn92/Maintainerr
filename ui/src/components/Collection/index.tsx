@@ -17,8 +17,8 @@ export interface ICollection {
   type: number
   arrAction: number
   media: ICollectionMedia[]
-  manualCollection: boolean,
-  manualCollectionName: string,
+  manualCollection: boolean
+  manualCollectionName: string
 }
 
 export interface ICollectionMedia {
@@ -48,7 +48,10 @@ const Collection = () => {
   }, [])
 
   const onSwitchLibrary = (id: number) => {
-    const lib = LibrariesCtx.libraries.find((el) => +el.key === id)
+    const lib =
+      id != 9999
+        ? LibrariesCtx.libraries.find((el) => +el.key === id)
+        : undefined
     lib ? setLibrary(lib) : setLibrary(undefined)
   }
 
@@ -57,7 +60,6 @@ const Collection = () => {
   }, [library])
 
   const getCollections = async () => {
-    setIsLoading(true)
     const colls: ICollection[] = library
       ? await GetApiHandler(`/collections?libraryId=${library.key}`)
       : await GetApiHandler('/collections')
