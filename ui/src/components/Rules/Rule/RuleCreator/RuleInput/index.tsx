@@ -65,6 +65,10 @@ const RuleInput = (props: IRuleInput) => {
   const [ruleType, setRuleType] = useState<number>(0)
 
   useEffect(() => {
+    console.log(customVal)
+  }, [customVal])
+
+  useEffect(() => {
     if (props.editData?.rule) {
       setOperator(props.editData.rule.operator?.toString())
       setFirstVal(JSON.stringify(props.editData.rule.firstVal))
@@ -232,7 +236,7 @@ const RuleInput = (props: IRuleInput) => {
       } else if (secondVal === CustomParams.CUSTOM_BOOLEAN) {
         setCustomValActive(true)
         setCustomValType(RuleType.BOOL)
-        setCustomVal('1')
+        customVal !== '0' ? setCustomVal('1') : undefined
       } else {
         setCustomValActive(false)
         setCustomVal(undefined)
@@ -499,9 +503,7 @@ const RuleInput = (props: IRuleInput) => {
                   onChange={updateCustomValue}
                   value={customVal}
                 >
-                  <option defaultChecked value={1}>
-                    True
-                  </option>
+                  <option value={1}>True</option>
                   <option value={0}>False</option>
                 </select>
               ) : (
