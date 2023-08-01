@@ -463,6 +463,24 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         return null;
       }
     }
+    if (action === RulePossibility.NOT_CONTAINS) {
+      try {
+        if (!Array.isArray(val2)) {
+          return !(val1 as unknown as T[]).includes(val2);
+        } else {
+          if (val2.length > 0) {
+            const test = val2.every((el) => {
+              return !(val1 as unknown as T[]).includes(el);
+            });
+            return test;
+          } else {
+            return false;
+          }
+        }
+      } catch (_err) {
+        return null;
+      }
+    }
     if (action === RulePossibility.BEFORE) {
       return val1 && val2 ? val1 <= val2 : false;
     }
