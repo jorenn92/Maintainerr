@@ -34,11 +34,11 @@ export enum RulePossibility {
   EQUALS,
   NOT_EQUALS,
   CONTAINS,
-  NOT_CONTAINS,
   BEFORE,
   AFTER,
   IN_LAST,
   IN_NEXT,
+  NOT_CONTAINS,
 }
 
 export const enum MediaType {
