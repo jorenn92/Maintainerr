@@ -217,6 +217,13 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
         } as Property,
+        {
+          id: 18,
+          name: 'sw_watchers',
+          humanName: 'Users that watch the show',
+          mediaType: MediaType.SHOW,
+          type: RuleType.TEXT, // return usernames []
+        } as Property,
       ],
     },
     {
