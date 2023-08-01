@@ -329,6 +329,7 @@ const AddModal = (props: AddModal) => {
           ) : (
             <ArrAction
               title="Sonarr"
+              default={arrOption}
               onUpdate={(e: number) => setArrOption(e)}
               options={[
                 {
