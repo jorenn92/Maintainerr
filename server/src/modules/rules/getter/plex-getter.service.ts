@@ -119,14 +119,18 @@ export class PlexGetterService {
                   return null;
                 });
 
-              allViewers.forEach((el, idx) => {
-                if (
-                  !viewers ||
-                  !viewers.find((viewEl) => el.plexId === viewEl.accountID)
-                ) {
-                  allViewers.splice(idx, 1);
-                }
-              });
+              const arrLength = allViewers.length - 1;
+              allViewers
+                .slice()
+                .reverse()
+                .forEach((el, idx) => {
+                  if (
+                    !viewers ||
+                    !viewers.find((viewEl) => el.plexId === viewEl.accountID)
+                  ) {
+                    allViewers.splice(arrLength - idx, 1);
+                  }
+                });
             }
           }
 
