@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/jorenn92/Maintainerr/compare/v1.4.1...v1.4.2) (2023-08-09)
+
+
+### Bug Fixes
+
+* **rules:** Fixed an issue where 'all episodes seen by' would not always work correctly after PR [#438](https://github.com/jorenn92/Maintainerr/issues/438) ([9862b48](https://github.com/jorenn92/Maintainerr/commit/9862b483128d20ab27119a9550ae61b720a79724))
+
 ## [1.4.1](https://github.com/jorenn92/Maintainerr/compare/v1.4.0...v1.4.1) (2023-08-01)
 
 
