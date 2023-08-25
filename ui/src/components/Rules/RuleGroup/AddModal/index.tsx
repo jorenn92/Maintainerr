@@ -344,6 +344,10 @@ const AddModal = (props: AddModal) => {
                   id: 2,
                   name: 'Delete files & unmonitor existing seasons',
                 },
+                {
+                  id: 3,
+                  name: 'Unmonitor all seasons, but keep files',
+                },
               ]}
             />
           )}

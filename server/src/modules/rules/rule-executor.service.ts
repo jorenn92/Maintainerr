@@ -4,7 +4,6 @@ import { isNull } from 'lodash';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
-import { Collection } from '../collections/entities/collection.entities';
 import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
 import { SettingsService } from '../settings/settings.service';
 import { TasksService } from '../tasks/tasks.service';
