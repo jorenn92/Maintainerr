@@ -25,8 +25,9 @@ export const enum Application {
 
 export const enum ArrAction {
   DELETE,
-  UNMONITOR,
+  UNMONITOR, // this also deletes
   SW_UNMONITOR_EXISTING_SEASONS,
+  UNMONITOR_NO_DELETE,
 }
 
 export const enum MediaType {

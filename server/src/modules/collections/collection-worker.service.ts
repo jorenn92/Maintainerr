@@ -69,9 +69,9 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         );
 
         for (const media of collectionMedia) {
-          // delete media addate <= due date
+          // handle media addate <= due date
           if (new Date(media.addDate) <= dangerDate) {
-            this.deleteMedia(collection, media);
+            this.handleMedia(collection, media);
           }
         }
         this.infoLogger(`Handling collection '${collection.title}' done`);
@@ -83,8 +83,8 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
     }
   }
 
-  private async deleteMedia(collection: Collection, media: CollectionMedia) {
-    this.infoLogger(`Deleting media with tmdbid ${media.tmdbId}`);
+  private async handleMedia(collection: Collection, media: CollectionMedia) {
+    this.infoLogger(`Handling media with tmdbid ${media.tmdbId}`);
 
     const plexLibrary = (await this.plexApi.getLibraries()).find(
       (e) => +e.key === +collection.libraryId,
@@ -104,6 +104,10 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         case ServarrAction.DELETE:
           await this.servarrApi.RadarrApi.deleteMovie(radarrMedia.id);
           this.infoLogger('Removed movie from filesystem & Radarr');
+          break;
+        case ServarrAction.UNMONITOR:
+          await this.servarrApi.RadarrApi.unmonitorMovie(radarrMedia.id, false);
+          this.infoLogger('Unmonitored movie in Radarr');
           break;
         case ServarrAction.DELETE_UNMONITOR_ALL:
           await this.servarrApi.RadarrApi.unmonitorMovie(radarrMedia.id, true);
@@ -128,13 +132,23 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
               await this.servarrApi.SonarrApi.deleteShow(sonarrMedia.id);
               this.infoLogger('Removed show from Sonarr');
               break;
+            case ServarrAction.UNMONITOR:
+              await this.servarrApi.SonarrApi.unmonitorSeasons(
+                sonarrMedia.id,
+                'all',
+                false,
+              );
+              this.infoLogger('Unmonitored show in Sonarr, but kept files');
+              break;
             case ServarrAction.DELETE_UNMONITOR_ALL:
               await this.servarrApi.SonarrApi.unmonitorSeasons(
                 sonarrMedia.id,
                 'all',
                 true,
               );
-              this.infoLogger('Unmonitored show in Sonarr');
+              this.infoLogger(
+                'Unmonitored & removed all episodes from show in Sonarr',
+              );
               break;
             case ServarrAction.DELETE_UNMONITOR_EXISTING:
               await this.servarrApi.SonarrApi.unmonitorSeasons(
@@ -143,15 +157,19 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
                 true,
               );
               this.infoLogger(
-                'Unmonitored existing episodes from show in Sonarr',
+                'Unmonitored & removed existing episodes from show in Sonarr',
               );
               break;
           }
         } else {
-          this.infoLogger(`Couldn't find tvdbid for tmdbid ${media.tmdbId}`);
+          this.infoLogger(
+            `Couldn't find tvdbid. No action taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
+          );
         }
       } else {
-        this.infoLogger(`Couldn't find tvdbid for tmdbid ${media.tmdbId}`);
+        this.infoLogger(
+          `Couldn't find tvdbid. No action taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
+        );
       }
     }
     await this.overseerrApi.removeMediaByTmdbId(

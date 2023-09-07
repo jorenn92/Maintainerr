@@ -24,7 +24,11 @@ const ArrAction = (props: ArrActionProps) => {
         },
         {
           id: 1,
-          name: 'Unmonitor',
+          name: 'Unmonitor and delete files',
+        },
+        {
+          id: 3,
+          name: 'Unmonitor and keep files',
         },
       ]
 

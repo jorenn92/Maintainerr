@@ -20,4 +20,5 @@ export enum ServarrAction {
   DELETE,
   DELETE_UNMONITOR_ALL,
   DELETE_UNMONITOR_EXISTING,
+  UNMONITOR,
 }
