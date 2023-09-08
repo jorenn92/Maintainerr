@@ -19,6 +19,7 @@ import { RulesDto } from './dtos/rules.dto';
 import { RuleGroup } from './entities/rule-group.entities';
 import { ValueGetterService } from './getter/getter.service';
 import { RulesService } from './rules.service';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 
 interface PlexData {
   page: number;
@@ -34,6 +35,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   ruleConstants: RuleConstants;
   userId: string;
   plexData: PlexData;
+  plexDataType: EPlexDataType;
   workerData: PlexLibraryItem[];
   resultData: PlexLibraryItem[];
   constructor(
@@ -92,6 +94,9 @@ export class RuleExecutorService implements OnApplicationBootstrap {
             this.resultData = [];
 
             this.plexData = { page: 0, finished: false, data: [] };
+            this.plexDataType = rulegroup.dataType
+              ? rulegroup.dataType
+              : undefined;
             while (!this.plexData.finished) {
               await this.getPlexData(rulegroup.libraryId);
               let currentSection = 0;
@@ -231,14 +236,16 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     );
     const exclusions = await this.rulesService.getExclusions(rulegroup.id);
 
-    let data = this.resultData.map((e) => {
-      return +e.ratingKey;
-    });
+    // keep a record of parent/child ratingKeys for seasons & episodes
+    const collectionMediaCHildren: [{ parent: number; child: number }] =
+      undefined;
 
-    // Filter exclusions out of resultData
-    data = data.filter(
-      (el) => exclusions.find((e) => +e.plexId === +el) === undefined,
-    );
+    // filter exclusions out of results & get correct ratingKey
+    const data = this.resultData
+      .filter((el) => !exclusions.find((e) => +e.plexId === +el.ratingKey))
+      .map((el) => {
+        return +el.ratingKey;
+      });
 
     if (collection) {
       const collMediaData = await this.collectionService.getCollectionMedia(
@@ -304,6 +311,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         collection.id,
         dataToRemove,
       );
+
       return collection;
     } else {
       this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
@@ -322,6 +330,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         offset: +this.plexData.page * size,
         size: size,
       },
+      this.plexDataType,
     );
     if (response) {
       this.plexData.data = response.items ? response.items : [];
@@ -348,9 +357,17 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     }
     // for (const [index, el] of data.entries()) {
     for (let i = data.length - 1; i >= 0; i--) {
-      firstVal = await this.valueGetter.get(rule.firstVal, data[i]);
+      firstVal = await this.valueGetter.get(
+        rule.firstVal,
+        data[i],
+        this.plexDataType,
+      );
       if (rule.lastVal) {
-        secondVal = await this.valueGetter.get(rule.lastVal, data[i]);
+        secondVal = await this.valueGetter.get(
+          rule.lastVal,
+          data[i],
+          this.plexDataType,
+        );
       } else {
         secondVal =
           rule.customVal.ruleTypeId === +RuleType.DATE

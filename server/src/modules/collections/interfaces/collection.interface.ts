@@ -1,8 +1,9 @@
+import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
 import { CollectionMedia } from '../entities/collection_media.entities';
 
 export interface ICollection {
   id?: number;
-  type: 1 | 2;
+  type: EPlexDataType;
   plexId?: number;
   libraryId: number;
   title: string;

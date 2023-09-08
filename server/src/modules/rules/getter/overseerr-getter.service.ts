@@ -17,6 +17,8 @@ import {
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
+import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+import _ from 'lodash';
 
 @Injectable()
 export class OverseerrGetterService {
@@ -35,8 +37,22 @@ export class OverseerrGetterService {
     ).props;
   }
 
-  async get(id: number, libItem: PlexLibraryItem) {
+  async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
     try {
+      let origLibItem = undefined;
+      let seasonMediaResponse = undefined;
+
+      // get original show in case of season / episode
+      if (
+        dataType === EPlexDataType.SEASONS ||
+        dataType === EPlexDataType.EPISODES
+      ) {
+        origLibItem = _.cloneDeep(libItem);
+        libItem = (await this.plexApi.getMetadata(
+          libItem.parentRatingKey,
+        )) as unknown as PlexLibraryItem;
+      }
+
       const prop = this.appProperties.find((el) => el.id === id);
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
 
@@ -46,6 +62,15 @@ export class OverseerrGetterService {
           mediaResponse = await this.overseerrApi.getMovie(tmdb.id.toString());
         } else {
           mediaResponse = await this.overseerrApi.getShow(tmdb.id.toString());
+          if (
+            dataType === EPlexDataType.SEASONS ||
+            dataType === EPlexDataType.EPISODES
+          ) {
+            seasonMediaResponse = await this.overseerrApi.getShow(
+              tmdb.id.toString(),
+              origLibItem.index,
+            );
+          }
         }
       }
       if (mediaResponse && mediaResponse.mediaInfo) {

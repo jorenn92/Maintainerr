@@ -23,6 +23,7 @@ import {
   PlexMetadataResponse,
 } from './interfaces/media.interface';
 import { PlexStatusResponse } from './interfaces/server.interface';
+import { EPlexDataType } from './enums/plex-data-type-enum';
 
 @Injectable()
 export class PlexApiService {
@@ -173,10 +174,12 @@ export class PlexApiService {
   public async getLibraryContents(
     id: string,
     { offset = 0, size = 50 }: { offset?: number; size?: number } = {},
+    datatype?: EPlexDataType,
   ): Promise<{ totalSize: number; items: PlexLibraryItem[] }> {
     try {
+      const type = datatype ? '&type=' + datatype : '';
       const response = await this.plexClient.query<PlexLibraryResponse>({
-        uri: `/library/sections/${id}/all?includeGuids=1`,
+        uri: `/library/sections/${id}/all?includeGuids=1${type}`,
         extraHeaders: {
           'X-Plex-Container-Start': `${offset}`,
           'X-Plex-Container-Size': `${size}`,

@@ -9,6 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { CollectionMedia } from './collection_media.entities';
+import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
 
 @Entity()
 export class Collection {
@@ -46,7 +47,7 @@ export class Collection {
   manualCollectionName: string;
 
   @Column({ nullable: false, default: 1 })
-  type: 1 | 2;
+  type: EPlexDataType;
 
   @OneToOne(() => RuleGroup, (rg) => rg.collection)
   ruleGroup: RulesDto;

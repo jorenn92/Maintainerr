@@ -20,6 +20,7 @@ import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Exclusion } from './entities/exclusion.entities';
 import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -145,7 +146,12 @@ export class RulesService {
         const collection = (
           await this.collectionService.createCollection({
             libraryId: +params.libraryId,
-            type: lib.type === 'movie' ? 1 : 2,
+            type:
+              lib.type === 'movie'
+                ? EPlexDataType.MOVIES
+                : params.dataType !== undefined
+                ? params.dataType
+                : EPlexDataType.SHOWS,
             title: params.name,
             description: params.description,
             arrAction: params.arrAction ? params.arrAction : 0,
@@ -164,6 +170,7 @@ export class RulesService {
           collection.id,
           params.useRules !== undefined ? params.useRules : true,
           params.isActive !== undefined ? params.isActive : true,
+          params.dataType !== undefined ? params.dataType : undefined,
         );
         // create rules
         if (params.useRules) {
@@ -332,6 +339,7 @@ export class RulesService {
     collectionId: number,
     useRules = true,
     isActive = true,
+    dataType = undefined,
   ): Promise<number> {
     try {
       const groupId = await this.connection
@@ -346,6 +354,7 @@ export class RulesService {
             collectionId: +collectionId,
             isActive: isActive,
             useRules: useRules,
+            dataType: dataType,
           },
         ])
         .execute();

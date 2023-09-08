@@ -728,6 +728,59 @@ export class CollectionsService {
     }
   }
 
+  // TODO: verwijderen als effectief niet nodig
+  // async syncCollectionMediaChildren(
+  //   collectionDbId: number,
+  //   collectionMediaChildren: [{ parent: number; child: number }],
+  // ): Promise<Collection> {
+  //   const collection = await this.collectionRepo.findOne(collectionDbId);
+  //   if (collectionMediaChildren) {
+  //     if (collection) {
+  //       // add missing children
+  //       collectionMediaChildren.forEach((el) => {
+  //         const media = collection.collectionMedia.find(
+  //           (media) => media.plexId === el.parent,
+  //         );
+  //         if (media) {
+  //           if (
+  //             !media.collectionMediaChild.find(
+  //               (child) => child.plexId === el.child,
+  //             )
+  //           ) {
+  //             this.collectionMediaChildRepo.save({
+  //               plexId: el.child,
+  //               collectionMediaId: media.id,
+  //             });
+  //           }
+  //         } else {
+  //           this.infoLogger(
+  //             `Couldn't find media with plexId ${el.parent}, this means the child with plexId ${el.child} could not be synced`,
+  //           );
+  //         }
+  //       });
+
+  //       // remove deleted children
+  //       collection.collectionMedia.forEach((media) => {
+  //         media.collectionMediaChild.forEach((child) => {
+  //           if (
+  //             !collectionMediaChildren.find(
+  //               (el) => el.parent === media.plexId && el.child === child.plexId,
+  //             )
+  //           ) {
+  //             this.collectionMediaChildRepo.delete(child.id);
+  //           }
+  //         });
+  //       });
+
+  //       // update & return collection
+  //       return await this.collectionRepo.findOne(collectionDbId);
+  //     } else {
+  //       this.infoLogger(`Couldn't find collection with id ${collectionDbId}`);
+  //     }
+  //   }
+  //   return collection;
+  // }
+
   private infoLogger(message: string) {
     this.logger.log(message);
   }

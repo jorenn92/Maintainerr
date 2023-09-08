@@ -4,6 +4,7 @@ import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
 import LoadingSpinner from '../Common/LoadingSpinner'
 import CollectionDetail from './CollectionDetail'
 import CollectionOverview from './CollectionOverview'
+import { EPlexDataType } from '../../utils/PlexDataType-enum'
 
 export interface ICollection {
   id?: number
@@ -14,7 +15,7 @@ export interface ICollection {
   isActive: boolean
   visibleOnHome?: boolean
   deleteAfterDays?: number
-  type: number
+  type: EPlexDataType
   arrAction: number
   media: ICollectionMedia[]
   manualCollection: boolean
