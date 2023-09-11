@@ -575,6 +575,7 @@ const AddModal = (props: AddModal) => {
                       : 2
                     : 0
                 }
+                dataType={+selectedType as EPlexDataType}
                 editData={{ rules: rules }}
                 onCancel={cancel}
                 onUpdate={updateRules}

@@ -232,7 +232,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
 
   private async handleCollection(rulegroup: RuleGroup) {
     let collection = await this.collectionService.getCollection(
-      rulegroup.collectionId,
+      rulegroup?.collectionId,
     );
     const exclusions = await this.rulesService.getExclusions(rulegroup.id);
 

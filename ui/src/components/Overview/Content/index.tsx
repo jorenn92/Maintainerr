@@ -18,13 +18,14 @@ export interface IPlexMetadata {
   ratingKey: string
   key: string
   parentRatingKey?: string
+  grandparentRatingKey?: string
   art: string
   audienceRating?: number
   audienceRatingImage?: string
   contentRating?: string
   duration: number
   guid: string
-  type: 'movie' | 'show' | 'season'
+  type: 'movie' | 'show' | 'season' | 'episode'
   title: string
   Guid: {
     id: string
@@ -56,6 +57,12 @@ export interface IPlexMetadata {
   summary: string
   studio: string
   year: number
+  parentTitle?: string
+  grandparentTitle?: string
+  parentData?: IPlexMetadata
+  parentYear?: number
+  grandParentYear?: number
+  index?: number
 }
 
 const OverviewContent = (props: IOverviewContent) => {
@@ -140,17 +147,55 @@ const OverviewContent = (props: IOverviewContent) => {
             <MediaCard
               id={+el.ratingKey}
               libraryId={props.libraryId}
-              type={el.type === 'movie' ? 1 : 2}
-              image={''}
-              summary={el.summary}
-              year={el.year?.toString()}
-              mediaType={
-                el.type !== 'movie' && el.type !== 'show' ? 'movie' : el.type
+              type={
+                el.type === 'movie'
+                  ? 1
+                  : el.type === 'show'
+                  ? 2
+                  : el.type === 'season'
+                  ? 3
+                  : 4
               }
-              title={el.title}
+              image={''}
+              summary={
+                el.type === 'movie' || el.type === 'show'
+                  ? el.summary
+                  : el.type === 'season'
+                  ? el.title
+                  : el.type === 'episode'
+                  ? 'Episode ' + el.index + ' - ' + el.title
+                  : ''
+              }
+              year={
+                el.type === 'episode'
+                  ? el.parentTitle
+                  : el.parentYear
+                  ? el.parentYear.toString()
+                  : el.year?.toString()
+              }
+              mediaType={
+                el.type === 'movie'
+                  ? 'movie'
+                  : el.type === 'show'
+                  ? 'show'
+                  : el.type === 'season'
+                  ? 'season'
+                  : 'episode'
+              }
+              title={
+                el.grandparentTitle
+                  ? el.grandparentTitle
+                  : el.parentTitle
+                  ? el.parentTitle
+                  : el.title
+              }
               userScore={el.audienceRating ? el.audienceRating : 0}
               tmdbid={
-                el.Guid
+                el.parentData
+                  ? el.parentData.Guid.find((e) =>
+                      e.id.includes('tmdb')
+                    )?.id.split('tmdb://')[1]
+                  : el.Guid
                   ? el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
                       'tmdb://'
                     )[1]

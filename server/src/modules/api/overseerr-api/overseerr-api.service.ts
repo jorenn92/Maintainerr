@@ -7,7 +7,8 @@ export interface OverSeerrMediaResponse {
   imdbid: string;
   collection: OverseerCollection;
   mediaInfo: OverseerrMediaInfo;
-  releaseDate: Date;
+  releaseDate?: Date;
+  firstAirDate?: Date;
 }
 interface OverseerCollection {
   id: number;
@@ -30,7 +31,7 @@ interface OverseerrMediaInfo {
   requests?: OverseerrRequest[];
 }
 
-interface OverseerrRequest {
+export interface OverseerrRequest {
   id: number;
   status: number;
   media: OverseerMedia;
@@ -42,6 +43,7 @@ interface OverseerrRequest {
   serverId: number;
   profileId: number;
   rootFolder: string;
+  seasons: OverseerrSeason[];
 }
 
 interface OverseerrUser {
@@ -56,6 +58,14 @@ interface OverseerrUser {
   createdAt: string;
   updatedAt: string;
   requestCount: number;
+}
+
+export interface OverseerrSeason {
+  id: number;
+  name: string;
+  seasonNumber: number;
+  requestedBy: OverseerrUser;
+  // episodes: OverseerrEpisode[];
 }
 
 interface OverseerrStatus {

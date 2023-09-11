@@ -28,6 +28,16 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
 
     for (const el of media) {
       plexData.push(await GetApiHandler(`/plex/meta/${el.plexId}`))
+
+      if (plexData[plexData.length - 1]?.grandparentRatingKey) {
+        plexData[plexData.length - 1].parentData = await GetApiHandler(
+          `/plex/meta/${plexData[plexData.length - 1].grandparentRatingKey}`
+        )
+      } else if (plexData[plexData.length - 1]?.parentRatingKey) {
+        plexData[plexData.length - 1].parentData = await GetApiHandler(
+          `/plex/meta/${plexData[plexData.length - 1].parentRatingKey}`
+        )
+      }
     }
 
     setData(plexData)

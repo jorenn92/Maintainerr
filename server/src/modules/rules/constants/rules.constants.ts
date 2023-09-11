@@ -407,7 +407,7 @@ export class RuleConstants {
           humanName: 'Is monitored',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
-          showType: [EPlexDataType.SHOWS, EPlexDataType.EPISODES],
+          showType: [EPlexDataType.SHOWS],
         } as Property,
       ],
     },
@@ -433,7 +433,7 @@ export class RuleConstants {
         {
           id: 2,
           name: 'releaseDate',
-          humanName: 'Release date',
+          humanName: 'Release/air date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
         } as Property,

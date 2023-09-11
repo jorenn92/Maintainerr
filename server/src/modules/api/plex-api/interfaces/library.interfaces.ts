@@ -34,6 +34,7 @@ export interface PlexLibraryItem {
   leafCount?: number;
   viewedLeafCount?: number;
   index?: number;
+  parentIndex?: number;
   Collection?: { tag: string }[];
 }
 

@@ -4,6 +4,7 @@ import {
   OverseerrApiService,
   OverSeerrMediaResponse,
   OverseerrMediaStatus,
+  OverseerrRequest,
 } from '../../../modules/api/overseerr-api/overseerr-api.service';
 import {
   PlexLibraryItem,
@@ -49,7 +50,9 @@ export class OverseerrGetterService {
       ) {
         origLibItem = _.cloneDeep(libItem);
         libItem = (await this.plexApi.getMetadata(
-          libItem.parentRatingKey,
+          dataType === EPlexDataType.SEASONS
+            ? libItem.parentRatingKey
+            : libItem.grandparentRatingKey,
         )) as unknown as PlexLibraryItem;
       }
 
@@ -68,7 +71,9 @@ export class OverseerrGetterService {
           ) {
             seasonMediaResponse = await this.overseerrApi.getShow(
               tmdb.id.toString(),
-              origLibItem.index,
+              dataType === EPlexDataType.SEASONS
+                ? origLibItem.index
+                : origLibItem.parentIndex,
             );
           }
         }
@@ -87,11 +92,31 @@ export class OverseerrGetterService {
                 mediaResponse.mediaInfo.requests
               ) {
                 for (const request of mediaResponse.mediaInfo.requests) {
-                  userNames.push(
-                    plexUsers.find(
-                      (u) => u.username === request.requestedBy?.plexUsername,
-                    )?.username,
-                  );
+                  // for seasons, only add if user requested the correct season
+                  if (
+                    dataType === EPlexDataType.SEASONS ||
+                    dataType === EPlexDataType.EPISODES
+                  ) {
+                    const includesSeason = this.includesSeason(
+                      request,
+                      seasonMediaResponse.seasonNumber,
+                    );
+                    if (includesSeason) {
+                      userNames.push(
+                        plexUsers.find(
+                          (u) =>
+                            u.username === request.requestedBy?.plexUsername,
+                        )?.username,
+                      );
+                    }
+                    // for shows, add every request user
+                  } else {
+                    userNames.push(
+                      plexUsers.find(
+                        (u) => u.username === request.requestedBy?.plexUsername,
+                      )?.username,
+                    );
+                  }
                 }
                 return userNames;
               }
@@ -104,32 +129,117 @@ export class OverseerrGetterService {
             }
           }
           case 'amountRequested': {
-            return mediaResponse?.mediaInfo.requests.length;
+            return [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
+              dataType,
+            )
+              ? this.getSeasonRequests(origLibItem, mediaResponse).length
+              : mediaResponse?.mediaInfo.requests.length;
           }
           case 'requestDate': {
+            if (
+              [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
+            ) {
+              return this.getSeasonRequests(origLibItem, mediaResponse)[0]
+                ?.createdAt
+                ? new Date(
+                    this.getSeasonRequests(
+                      origLibItem,
+                      mediaResponse,
+                    )[0]?.createdAt,
+                  )
+                : null;
+            }
             return mediaResponse?.mediaInfo?.requests[0]?.createdAt
               ? new Date(mediaResponse?.mediaInfo?.requests[0]?.createdAt)
               : null;
           }
           case 'releaseDate': {
-            return mediaResponse?.releaseDate
-              ? new Date(mediaResponse?.releaseDate)
-              : null;
+            if (libItem.type === 'movie') {
+              return mediaResponse?.releaseDate
+                ? new Date(mediaResponse?.releaseDate)
+                : null;
+            } else {
+              if (EPlexDataType.EPISODES === dataType) {
+                const ep = seasonMediaResponse.episodes?.find(
+                  (el) => el.episodeNumber === origLibItem.index,
+                );
+                return ep?.airDate
+                  ? new Date(ep.airDate)
+                  : ep?.firstAirDate
+                  ? new Date(ep.firstAirDate)
+                  : null;
+              } else if (EPlexDataType.SEASONS === dataType) {
+                return seasonMediaResponse?.airDate
+                  ? new Date(seasonMediaResponse.airDate)
+                  : seasonMediaResponse?.firstAirDate
+                  ? new Date(seasonMediaResponse.firstAirDate)
+                  : null;
+              } else {
+                return mediaResponse?.firstAirDate
+                  ? new Date(mediaResponse.firstAirDate)
+                  : null;
+              }
+            }
           }
           case 'approvalDate': {
-            return mediaResponse?.mediaInfo.status >=
-              OverseerrMediaStatus.PARTIALLY_AVAILABLE
-              ? new Date(mediaResponse?.mediaInfo?.updatedAt)
-              : null;
+            if (
+              [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
+            ) {
+              const season = this.getSeasonRequests(
+                origLibItem,
+                mediaResponse,
+              )[0];
+              if (season && season.media) {
+                if (
+                  season.media.status >=
+                  OverseerrMediaStatus.PARTIALLY_AVAILABLE
+                ) {
+                  return new Date(season.media.updatedAt);
+                }
+              }
+              return null;
+            } else {
+              return mediaResponse?.mediaInfo.status >=
+                OverseerrMediaStatus.PARTIALLY_AVAILABLE
+                ? new Date(mediaResponse?.mediaInfo?.updatedAt)
+                : null;
+            }
           }
           case 'mediaAddedAt': {
-            return mediaResponse?.mediaInfo.status >=
-              OverseerrMediaStatus.PARTIALLY_AVAILABLE
-              ? new Date(mediaResponse?.mediaInfo?.mediaAddedAt)
-              : null;
+            if (
+              [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
+            ) {
+              const season = this.getSeasonRequests(
+                origLibItem,
+                mediaResponse,
+              )[0];
+              if (season && season.media) {
+                if (
+                  season.media.status >=
+                  OverseerrMediaStatus.PARTIALLY_AVAILABLE
+                ) {
+                  return new Date(season.media.mediaAddedAt);
+                }
+              }
+              return null;
+            } else {
+              return mediaResponse?.mediaInfo.status >=
+                OverseerrMediaStatus.PARTIALLY_AVAILABLE
+                ? new Date(mediaResponse?.mediaInfo?.mediaAddedAt)
+                : null;
+            }
           }
           case 'isRequested': {
-            return mediaResponse?.mediaInfo.requests.length > 0 ? 1 : 0;
+            if (
+              [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
+            ) {
+              return this.getSeasonRequests(origLibItem, mediaResponse).length >
+                0
+                ? 1
+                : 0;
+            } else {
+              return mediaResponse?.mediaInfo.requests.length > 0 ? 1 : 0;
+            }
           }
           default: {
             return null;
@@ -142,5 +252,30 @@ export class OverseerrGetterService {
       warn(`Overseerr-Getter - Action failed : ${e.message}`);
       return undefined;
     }
+  }
+
+  private getSeasonRequests(
+    libItem: PlexLibraryItem,
+    mediaResponse: OverSeerrMediaResponse,
+  ) {
+    const seasonRequests: OverseerrRequest[] = [];
+    mediaResponse.mediaInfo?.requests.forEach((el) => {
+      const season = el.seasons.find(
+        (season) =>
+          +season.seasonNumber ===
+          (libItem.type === 'episode' ? +libItem.parentIndex : +libItem.index),
+      );
+      if (season) {
+        seasonRequests.push(el);
+      }
+    });
+    return seasonRequests;
+  }
+
+  private includesSeason(request: OverseerrRequest, seasonNumber: number) {
+    const season = request.seasons.find(
+      (season) => season.seasonNumber === seasonNumber,
+    );
+    return season !== undefined;
   }
 }
