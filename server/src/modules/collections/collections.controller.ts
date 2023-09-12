@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -114,8 +115,22 @@ export class CollectionsController {
       ]);
     }
   }
-  @Get('/media')
+  @Get('/media/')
   getMediaInCollection(@Query('collectionId') collectionId: number) {
     return this.collectionService.getCollectionMedia(collectionId);
+  }
+
+  @Get('/media/:id/content/:page')
+  getLibraryContent(
+    @Param('id') id: number,
+    @Param('page', new ParseIntPipe()) page: number,
+    @Query('size') amount: number,
+  ) {
+    const size = amount ? amount : 25;
+    const offset = (page - 1) * size;
+    return this.collectionService.getCollectionMediaWitPlexDataAndhPaging(id, {
+      offset: offset,
+      size: size,
+    });
   }
 }

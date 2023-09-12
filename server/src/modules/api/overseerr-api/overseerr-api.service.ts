@@ -175,6 +175,30 @@ export class OverseerrApiService {
     } catch (err) {
       this.logger.warn(
         'Overseerr communication failed. Is the application running?',
+        err,
+      );
+      return undefined;
+    }
+  }
+
+  public async removeSeasonRequest(tmdbid: string | number, season: number) {
+    try {
+      const media = await this.getShow(tmdbid);
+
+      if (media && media.mediaInfo) {
+        const requests = media.mediaInfo.requests.filter((el) =>
+          el.seasons.find((s) => s.seasonNumber === season),
+        );
+        if (requests.length > 0) {
+          requests.forEach((el) => {
+            this.deleteRequest(el.id.toString());
+          });
+        }
+      }
+    } catch (err) {
+      this.logger.warn(
+        'Overseerr communication failed. Is the application running?',
+        err,
       );
       return undefined;
     }

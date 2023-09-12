@@ -1,14 +1,18 @@
 import { useEffect } from 'react'
 import { ICollection, ICollectionMedia } from '../../Collection'
-import LoadingSpinner from '../../Common/LoadingSpinner'
+import LoadingSpinner, {
+  SmallLoadingSpinner,
+} from '../../Common/LoadingSpinner'
 import MediaCard from '../../Common/MediaCard'
+import _ from 'lodash'
 
 interface IOverviewContent {
   data: IPlexMetadata[]
-  dataFinished: Boolean
-  loading: Boolean
+  dataFinished: boolean
+  loading: boolean
+  extrasLoading?: boolean
   fetchData: () => void
-  onRemove?: () => void
+  onRemove?: (id: string) => void
   libraryId: number
   collectionPage?: boolean
   collectionInfo?: ICollectionMedia[]
@@ -66,54 +70,38 @@ export interface IPlexMetadata {
 }
 
 const OverviewContent = (props: IOverviewContent) => {
-  useEffect(() => {
-    window.addEventListener('scroll', (event: Event) => {
-      if (!props.dataFinished) {
-        event.stopPropagation()
-        const winheight =
-          window.innerHeight ||
-          (document.documentElement || document.body).clientHeight
-        const docheight = getDocHeight()
-        const scrollTop =
-          window.pageYOffset ||
-          (
-            document.documentElement ||
-            document.body.parentNode ||
-            document.body
-          ).scrollTop
-        const trackLength = docheight - winheight
-        const pctScrolled = Math.floor((scrollTop / trackLength) * 100)
-
-        if (pctScrolled >= 80) {
-          props.fetchData()
-        }
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+      document.documentElement.scrollHeight * 0.8
+    ) {
+      if (!props.extrasLoading && !props.dataFinished) {
+        props.fetchData()
       }
-    })
+    }
+  }
 
-    if (document.body.scrollHeight >= document.body.clientHeight) {
-      props.fetchData()
+  useEffect(() => {
+    window.addEventListener('scroll', _.debounce(handleScroll.bind(this), 200))
+    return () => {
+      window.removeEventListener(
+        'scroll',
+        _.debounce(handleScroll.bind(this), 200)
+      )
     }
   }, [])
 
   useEffect(() => {
-    if (props.data && props.data.length < 20) {
-      if (document.body.scrollHeight >= document.body.clientHeight) {
-        props.fetchData()
-      }
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.scrollHeight * 0.8 &&
+      !props.loading &&
+      !props.extrasLoading &&
+      !props.dataFinished
+    ) {
+      props.fetchData()
     }
   }, [props.data])
-
-  const getDocHeight = () => {
-    var D = document
-    return Math.max(
-      D.body.scrollHeight,
-      D.documentElement.scrollHeight,
-      D.body.offsetHeight,
-      D.documentElement.offsetHeight,
-      D.body.clientHeight,
-      D.documentElement.clientHeight
-    )
-  }
 
   const getDaysLeft = (plexId: number) => {
     if (props.collectionInfo) {
@@ -216,6 +204,8 @@ const OverviewContent = (props: IOverviewContent) => {
             />
           </div>
         ))}
+
+        {props.extrasLoading ? <SmallLoadingSpinner /> : undefined}
       </div>
     )
   }

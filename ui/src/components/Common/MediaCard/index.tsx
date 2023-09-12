@@ -26,7 +26,7 @@ interface IMediaCard {
   collectionPage: boolean
   daysLeft?: number
   collectionId?: number
-  onRemove?: () => void
+  onRemove?: (id: string) => void
 }
 
 const MediaCard: React.FC<IMediaCard> = ({
@@ -42,7 +42,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   tmdbid = undefined,
   canExpand = false,
   collectionPage = false,
-  onRemove = () => {},
+  onRemove = (id: string) => {},
 }) => {
   const isTouch = useIsTouch()
   const [isUpdating, setIsUpdating] = useState(false)
@@ -54,7 +54,6 @@ const MediaCard: React.FC<IMediaCard> = ({
   const [hasExclusion, setHasExclusion] = useState(false)
 
   useEffect(() => {
-    console.log(tmdbid)
     if (tmdbid) {
       GetApiHandler(`/moviedb/image/${mediaType}/${tmdbid}`).then((resp) =>
         setImage(resp)
@@ -295,7 +294,7 @@ const MediaCard: React.FC<IMediaCard> = ({
                     ) : (
                       <RemoveFromCollectionBtn
                         plexId={id}
-                        onRemove={onRemove}
+                        onRemove={() => onRemove(id.toString())}
                         collectionId={collectionId}
                       />
                     )}

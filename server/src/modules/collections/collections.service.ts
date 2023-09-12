@@ -63,7 +63,51 @@ export class CollectionsService {
       return await this.CollectionMediaRepo.find({ collectionId: id });
     } catch (err) {
       this.logger.warn(
-        'An error occurred while performing collection actions.',
+        'An error occurred while performing collection actions: ' + err,
+      );
+      return undefined;
+    }
+  }
+
+  public async getCollectionMediaWitPlexDataAndhPaging(
+    id: number,
+    { offset = 0, size = 25 }: { offset?: number; size?: number } = {},
+  ): Promise<{ totalSize: number; items: CollectionMedia[] }> {
+    try {
+      const queryBuilder =
+        this.CollectionMediaRepo.createQueryBuilder('collection_media');
+
+      queryBuilder
+        .orderBy('collection_media.addDate', 'DESC')
+        .skip(offset)
+        .take(size);
+
+      const itemCount = await queryBuilder.getCount();
+      let { entities } = await queryBuilder.getRawAndEntities();
+
+      entities = await Promise.all(
+        entities.map(async (el) => {
+          el.plexData = await this.plexApi.getMetadata(el.plexId.toString());
+          if (el.plexData?.grandparentRatingKey) {
+            el.plexData.parentData = await this.plexApi.getMetadata(
+              el.plexData.grandparentRatingKey.toString(),
+            );
+          } else if (el.plexData?.parentRatingKey) {
+            el.plexData.parentData = await this.plexApi.getMetadata(
+              el.plexData.parentRatingKey.toString(),
+            );
+          }
+          return el;
+        }),
+      );
+
+      return {
+        totalSize: itemCount,
+        items: entities ?? [],
+      };
+    } catch (err) {
+      this.logger.warn(
+        'An error occurred while performing collection actions: ' + err,
       );
       return undefined;
     }

@@ -6,7 +6,6 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { CollectionMedia } from './collection_media.entities';
 import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';

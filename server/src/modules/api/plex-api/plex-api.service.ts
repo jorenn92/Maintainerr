@@ -287,13 +287,15 @@ export class PlexApiService {
   }
 
   public async deleteMediaFromDisk(plexId: number | string): Promise<void> {
-    this.logger.log(`Deleting media with ID ${plexId} from Plex library.`);
+    this.logger.log(
+      `[Plex] Removed media with ID ${plexId} from Plex library.`,
+    );
     try {
       await this.plexClient.deleteQuery<void>({
         uri: `/library/metadata/${plexId}`,
       });
     } catch (e) {
-      this.logger.log('Something went wrong while deleting media from Plex.', {
+      this.logger.log('Something went wrong while removing media from Plex.', {
         label: 'Plex API',
         errorMessage: e.message,
         plexId,

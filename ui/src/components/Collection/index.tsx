@@ -5,6 +5,7 @@ import LoadingSpinner from '../Common/LoadingSpinner'
 import CollectionDetail from './CollectionDetail'
 import CollectionOverview from './CollectionOverview'
 import { EPlexDataType } from '../../utils/PlexDataType-enum'
+import { IPlexMetadata } from '../Overview/Content'
 
 export interface ICollection {
   id?: number
@@ -32,6 +33,7 @@ export interface ICollectionMedia {
   image_path: string
   isManual: boolean
   collection: ICollection
+  plexData?: IPlexMetadata
 }
 
 const Collection = () => {

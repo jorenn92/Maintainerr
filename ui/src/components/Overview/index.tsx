@@ -8,7 +8,9 @@ import { SmallLoadingSpinner } from '../Common/LoadingSpinner'
 import OverviewContent, { IPlexMetadata } from './Content'
 
 const Overview = () => {
-  const [isLoading, setIsLoading] = useState<Boolean>(false)
+  // const [isLoading, setIsLoading] = useState<Boolean>(false)
+  const loadingRef = useRef<boolean>(false)
+
   const [loadingExtra, setLoadingExtra] = useState<Boolean>(false)
 
   const [data, setData] = useState<IPlexMetadata[]>([])
@@ -27,11 +29,15 @@ const Overview = () => {
 
   const fetchAmount = 30
 
+  const setIsLoading = (val: boolean) => {
+    loadingRef.current = val
+  }
+
   useEffect(() => {
     document.title = 'Maintainerr - Overview'
     setTimeout(() => {
       if (
-        !isLoading &&
+        loadingRef.current &&
         data.length === 0 &&
         SearchCtx.search.text === '' &&
         LibrariesCtx.libraries.length > 0
@@ -113,6 +119,7 @@ const Overview = () => {
         setIsLoading(false)
       }
       setLoadingExtra(false)
+      setIsLoading(false)
     }
   }
 
@@ -123,17 +130,23 @@ const Overview = () => {
       ) : undefined}
       {selectedLibrary ? (
         <OverviewContent
-          dataFinished={!(totalSize >= pageData.current * fetchAmount)}
-          fetchData={debounce(() => {
+          dataFinished={
+            !(totalSizeRef.current >= pageData.current * fetchAmount)
+          }
+          fetchData={() => {
             setLoadingExtra(true)
             fetchData()
-          }, 100)}
-          loading={isLoading}
+          }}
+          loading={loadingRef.current}
+          extrasLoading={
+            loadingExtra &&
+            !loadingRef.current &&
+            totalSizeRef.current >= pageData.current * fetchAmount
+          }
           data={data}
           libraryId={selectedLibrary}
         />
       ) : undefined}
-      {loadingExtra && !isLoading && (totalSize >= pageData.current * fetchAmount) ? <SmallLoadingSpinner /> : undefined}
     </div>
   )
 }

@@ -391,19 +391,19 @@ const AddModal = (props: AddModal) => {
                 options={[
                   {
                     id: 0,
-                    name: 'Delete show from Sonarr',
+                    name: 'Delete',
                   },
                   {
                     id: 1,
-                    name: 'Delete files & unmonitor all seasons',
+                    name: 'Delete & unmonitor',
                   },
                   {
                     id: 2,
-                    name: 'Delete files & unmonitor existing seasons',
+                    name: 'Delete & unmonitor existing',
                   },
                   {
                     id: 3,
-                    name: 'Unmonitor all seasons, but keep files',
+                    name: 'Unmonitor and keep files',
                   },
                 ]}
               />
