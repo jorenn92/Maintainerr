@@ -78,6 +78,7 @@ export class CollectionsService {
         this.CollectionMediaRepo.createQueryBuilder('collection_media');
 
       queryBuilder
+        .where('collection_media.collectionId = :id', { id })
         .orderBy('collection_media.addDate', 'DESC')
         .skip(offset)
         .take(size);
