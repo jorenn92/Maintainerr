@@ -600,8 +600,9 @@ export class CollectionsService {
           ])
           .execute();
       } else {
-        this.infoLogger(
-          `Couldn't add media to collection: ` + responseColl.message,
+        this.logger.warn(
+          `Couldn't add media to collection: `,
+          responseColl.message,
         );
       }
     } catch (err) {

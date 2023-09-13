@@ -88,7 +88,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       if (ruleGroups) {
         for (const rulegroup of ruleGroups) {
           if (rulegroup.useRules) {
-            this.logger.log(`Executing rules for ${rulegroup.name}`);
+            this.logger.log(`Executing rules for '${rulegroup.name}'`);
 
             this.workerData = [];
             this.resultData = [];
@@ -127,7 +127,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
             await this.handleCollection(
               await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
             );
-            this.logger.log(`Execution of rules for ${rulegroup.name} done.`);
+            this.logger.log(`Execution of rules for '${rulegroup.name}' done.`);
           }
           await this.syncManualPlexMediaToCollectionDB(
             await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes

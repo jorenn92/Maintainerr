@@ -15,7 +15,17 @@ export class TmdbIdService {
     ratingKey: string,
   ): Promise<{ type: 'movie' | 'tv'; id: number | undefined }> {
     try {
-      const libItem: PlexMetadata = await this.plexApi.getMetadata(ratingKey);
+      let libItem: PlexMetadata = await this.plexApi.getMetadata(ratingKey);
+
+      // fetch show in case of season / episode
+      libItem = libItem.grandparentRatingKey
+        ? await this.plexApi.getMetadata(
+            libItem.grandparentRatingKey.toString(),
+          )
+        : libItem.parentRatingKey
+        ? await this.plexApi.getMetadata(libItem.parentRatingKey.toString())
+        : libItem;
+
       return this.getTmdbIdFromPlexData(libItem);
     } catch (e) {
       warn(`[TMDb] Failed to fetch id : ${e.message}`);
