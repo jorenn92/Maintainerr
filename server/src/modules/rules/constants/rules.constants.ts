@@ -262,7 +262,7 @@ export class RuleConstants {
         {
           id: 2,
           name: 'tags',
-          humanName: 'Tags',
+          humanName: 'Tags (Text if 1, otherwise list)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT, // return text[]
         } as Property,
@@ -419,7 +419,7 @@ export class RuleConstants {
         {
           id: 0,
           name: 'addUser',
-          humanName: 'Requested by user (username)',
+          humanName: 'Requested by user (Plex username)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
         } as Property, //  returns username[]

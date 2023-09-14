@@ -370,11 +370,11 @@ export class PlexApiService {
       await this.plexClient.deleteQuery<PlexLibraryResponse>({
         uri: `/library/collections/${collectionId}`,
       });
-    } catch (_err) {
+    } catch (err) {
       return {
         status: 'NOK',
         code: 0,
-        message: 'Something went wrong while deleting the collection from Plex',
+        message: `Something went wrong while deleting the collection from Plex: ${err}`,
       };
     }
     this.logger.log('Removed collection from Plex');

@@ -425,35 +425,41 @@ export class CollectionsService {
       });
       if (collectionMedia.length > 0) {
         for (const childMedia of media) {
-          if (collectionMedia.length > 0) {
-            if (
-              collectionMedia.find(
-                (el) => +el.plexId === +childMedia.plexId,
-              ) !== undefined
-            ) {
-              await this.removeChildFromCollection(
-                { plexId: +collection.plexId, dbId: collection.id },
-                childMedia.plexId,
-              );
-              collectionMedia = collectionMedia.filter(
-                (el) => +el.plexId !== +childMedia.plexId,
-              );
-            }
+          if (
+            collectionMedia.find((el) => +el.plexId === +childMedia.plexId) !==
+            undefined
+          ) {
+            await this.removeChildFromCollection(
+              { plexId: +collection.plexId, dbId: collection.id },
+              childMedia.plexId,
+            );
+
+            collectionMedia = collectionMedia.filter(
+              (el) => +el.plexId !== +childMedia.plexId,
+            );
           }
         }
 
         if (collectionMedia.length <= 0 && !collection.manualCollection) {
-          await this.plexApi.deleteCollection(collection.plexId.toString());
-          await this.collectionRepo.save({
-            ...collection,
-            plexId: null,
-          });
+          const resp = await this.plexApi.deleteCollection(
+            collection.plexId.toString(),
+          );
+
+          if (resp.code === 1) {
+            await this.collectionRepo.save({
+              ...collection,
+              plexId: null,
+            });
+          } else {
+            this.logger.warn(resp.message);
+          }
         }
       }
       return collection;
     } catch (err) {
       this.logger.warn(
-        'An error occurred while performing collection actions.',
+        `An error occurred while removing media from collection with internal id ${collectionDbId}`,
+        err,
       );
       return undefined;
     }
