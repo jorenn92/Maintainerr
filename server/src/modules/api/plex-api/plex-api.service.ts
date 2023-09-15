@@ -23,6 +23,7 @@ import {
   PlexMetadataResponse,
 } from './interfaces/media.interface';
 import { PlexStatusResponse } from './interfaces/server.interface';
+import { EPlexDataType } from './enums/plex-data-type-enum';
 
 @Injectable()
 export class PlexApiService {
@@ -173,10 +174,12 @@ export class PlexApiService {
   public async getLibraryContents(
     id: string,
     { offset = 0, size = 50 }: { offset?: number; size?: number } = {},
+    datatype?: EPlexDataType,
   ): Promise<{ totalSize: number; items: PlexLibraryItem[] }> {
     try {
+      const type = datatype ? '&type=' + datatype : '';
       const response = await this.plexClient.query<PlexLibraryResponse>({
-        uri: `/library/sections/${id}/all?includeGuids=1`,
+        uri: `/library/sections/${id}/all?includeGuids=1${type}`,
         extraHeaders: {
           'X-Plex-Container-Start': `${offset}`,
           'X-Plex-Container-Size': `${size}`,
@@ -284,13 +287,15 @@ export class PlexApiService {
   }
 
   public async deleteMediaFromDisk(plexId: number | string): Promise<void> {
-    this.logger.log(`Deleting media with ID ${plexId} from Plex library.`);
+    this.logger.log(
+      `[Plex] Removed media with ID ${plexId} from Plex library.`,
+    );
     try {
       await this.plexClient.deleteQuery<void>({
         uri: `/library/metadata/${plexId}`,
       });
     } catch (e) {
-      this.logger.log('Something went wrong while deleting media from Plex.', {
+      this.logger.log('Something went wrong while removing media from Plex.', {
         label: 'Plex API',
         errorMessage: e.message,
         plexId,
@@ -365,11 +370,11 @@ export class PlexApiService {
       await this.plexClient.deleteQuery<PlexLibraryResponse>({
         uri: `/library/collections/${collectionId}`,
       });
-    } catch (_err) {
+    } catch (err) {
       return {
         status: 'NOK',
         code: 0,
-        message: 'Something went wrong while deleting the collection from Plex',
+        message: `Something went wrong while deleting the collection from Plex: ${err}`,
       };
     }
     this.logger.log('Removed collection from Plex');

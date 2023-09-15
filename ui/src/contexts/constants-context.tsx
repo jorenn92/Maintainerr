@@ -5,6 +5,7 @@ import {
   ReactPortal,
   useState,
 } from 'react'
+import { EPlexDataType } from '../utils/PlexDataType-enum'
 
 interface Iconstants {
   applications: IApplication[] | null
@@ -21,6 +22,7 @@ export interface IProperty {
   humanName: string
   mediaType: MediaType,
   type: IPropertyType
+  showType?: EPlexDataType[]
 }
 
 interface IPropertyType {

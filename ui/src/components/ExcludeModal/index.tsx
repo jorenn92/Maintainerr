@@ -12,7 +12,7 @@ interface IExcludeModal {
   onCancel: () => void
   onSubmit: () => void
   libraryId?: number
-  type?: 1 | 2
+  type?: 1 | 2 | 3 | 4
   plexId: number
 }
 

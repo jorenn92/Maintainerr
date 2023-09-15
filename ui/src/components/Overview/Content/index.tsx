@@ -1,14 +1,18 @@
 import { useEffect } from 'react'
 import { ICollection, ICollectionMedia } from '../../Collection'
-import LoadingSpinner from '../../Common/LoadingSpinner'
+import LoadingSpinner, {
+  SmallLoadingSpinner,
+} from '../../Common/LoadingSpinner'
 import MediaCard from '../../Common/MediaCard'
+import _ from 'lodash'
 
 interface IOverviewContent {
   data: IPlexMetadata[]
-  dataFinished: Boolean
-  loading: Boolean
+  dataFinished: boolean
+  loading: boolean
+  extrasLoading?: boolean
   fetchData: () => void
-  onRemove?: () => void
+  onRemove?: (id: string) => void
   libraryId: number
   collectionPage?: boolean
   collectionInfo?: ICollectionMedia[]
@@ -18,13 +22,14 @@ export interface IPlexMetadata {
   ratingKey: string
   key: string
   parentRatingKey?: string
+  grandparentRatingKey?: string
   art: string
   audienceRating?: number
   audienceRatingImage?: string
   contentRating?: string
   duration: number
   guid: string
-  type: 'movie' | 'show' | 'season'
+  type: 'movie' | 'show' | 'season' | 'episode'
   title: string
   Guid: {
     id: string
@@ -56,57 +61,47 @@ export interface IPlexMetadata {
   summary: string
   studio: string
   year: number
+  parentTitle?: string
+  grandparentTitle?: string
+  parentData?: IPlexMetadata
+  parentYear?: number
+  grandParentYear?: number
+  index?: number
 }
 
 const OverviewContent = (props: IOverviewContent) => {
-  useEffect(() => {
-    window.addEventListener('scroll', (event: Event) => {
-      if (!props.dataFinished) {
-        event.stopPropagation()
-        const winheight =
-          window.innerHeight ||
-          (document.documentElement || document.body).clientHeight
-        const docheight = getDocHeight()
-        const scrollTop =
-          window.pageYOffset ||
-          (
-            document.documentElement ||
-            document.body.parentNode ||
-            document.body
-          ).scrollTop
-        const trackLength = docheight - winheight
-        const pctScrolled = Math.floor((scrollTop / trackLength) * 100)
-
-        if (pctScrolled >= 80) {
-          props.fetchData()
-        }
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+      document.documentElement.scrollHeight * 0.8
+    ) {
+      if (!props.extrasLoading && !props.dataFinished) {
+        props.fetchData()
       }
-    })
+    }
+  }
 
-    if (document.body.scrollHeight >= document.body.clientHeight) {
-      props.fetchData()
+  useEffect(() => {
+    window.addEventListener('scroll', _.debounce(handleScroll.bind(this), 200))
+    return () => {
+      window.removeEventListener(
+        'scroll',
+        _.debounce(handleScroll.bind(this), 200)
+      )
     }
   }, [])
 
   useEffect(() => {
-    if (props.data && props.data.length < 20) {
-      if (document.body.scrollHeight >= document.body.clientHeight) {
-        props.fetchData()
-      }
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.scrollHeight * 0.8 &&
+      !props.loading &&
+      !props.extrasLoading &&
+      !props.dataFinished
+    ) {
+      props.fetchData()
     }
   }, [props.data])
-
-  const getDocHeight = () => {
-    var D = document
-    return Math.max(
-      D.body.scrollHeight,
-      D.documentElement.scrollHeight,
-      D.body.offsetHeight,
-      D.documentElement.offsetHeight,
-      D.body.clientHeight,
-      D.documentElement.clientHeight
-    )
-  }
 
   const getDaysLeft = (plexId: number) => {
     if (props.collectionInfo) {
@@ -140,17 +135,55 @@ const OverviewContent = (props: IOverviewContent) => {
             <MediaCard
               id={+el.ratingKey}
               libraryId={props.libraryId}
-              type={el.type === 'movie' ? 1 : 2}
-              image={''}
-              summary={el.summary}
-              year={el.year?.toString()}
-              mediaType={
-                el.type !== 'movie' && el.type !== 'show' ? 'movie' : el.type
+              type={
+                el.type === 'movie'
+                  ? 1
+                  : el.type === 'show'
+                  ? 2
+                  : el.type === 'season'
+                  ? 3
+                  : 4
               }
-              title={el.title}
+              image={''}
+              summary={
+                el.type === 'movie' || el.type === 'show'
+                  ? el.summary
+                  : el.type === 'season'
+                  ? el.title
+                  : el.type === 'episode'
+                  ? 'Episode ' + el.index + ' - ' + el.title
+                  : ''
+              }
+              year={
+                el.type === 'episode'
+                  ? el.parentTitle
+                  : el.parentYear
+                  ? el.parentYear.toString()
+                  : el.year?.toString()
+              }
+              mediaType={
+                el.type === 'movie'
+                  ? 'movie'
+                  : el.type === 'show'
+                  ? 'show'
+                  : el.type === 'season'
+                  ? 'season'
+                  : 'episode'
+              }
+              title={
+                el.grandparentTitle
+                  ? el.grandparentTitle
+                  : el.parentTitle
+                  ? el.parentTitle
+                  : el.title
+              }
               userScore={el.audienceRating ? el.audienceRating : 0}
               tmdbid={
-                el.Guid
+                el.parentData
+                  ? el.parentData.Guid.find((e) =>
+                      e.id.includes('tmdb')
+                    )?.id.split('tmdb://')[1]
+                  : el.Guid
                   ? el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
                       'tmdb://'
                     )[1]
@@ -171,6 +204,8 @@ const OverviewContent = (props: IOverviewContent) => {
             />
           </div>
         ))}
+
+        {props.extrasLoading ? <SmallLoadingSpinner /> : undefined}
       </div>
     )
   }

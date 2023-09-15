@@ -9,6 +9,7 @@ import {
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
+import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
 
 @Injectable()
 export class RadarrGetterService {
@@ -25,7 +26,7 @@ export class RadarrGetterService {
     ).props;
   }
 
-  async get(id: number, libItem: PlexLibraryItem) {
+  async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
