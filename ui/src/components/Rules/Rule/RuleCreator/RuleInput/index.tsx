@@ -205,7 +205,7 @@ const RuleInput = (props: IRuleInput) => {
 
   useEffect(() => {
     submit(null)
-  }, [secondVal, customVal, operator, action, firstval])
+  }, [secondVal, customVal, operator, action, firstval, customValType])
 
   useEffect(() => {
     // reset firstval & secondval in case of type switch & choices don't exist

@@ -429,6 +429,12 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   private doRuleAction<T>(val1: T, val2: T, action: RulePossibility): boolean {
+    if (typeof val1 === 'string') {
+      val1 = val1.toLowerCase() as unknown as T;
+    }
+    if (typeof val2 === 'string') {
+      val2 = val2.toLowerCase() as unknown as T;
+    }
     if (action === RulePossibility.BIGGER) {
       return val1 > val2;
     }
@@ -447,6 +453,10 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       } else {
         if (val1.length > 0) {
           return val1.every((e) => {
+            e =
+              typeof e === 'string'
+                ? (e as unknown as string).toLowerCase()
+                : e;
             if (Array.isArray(val2)) {
               return (val2 as unknown as T[]).includes(e);
             } else {

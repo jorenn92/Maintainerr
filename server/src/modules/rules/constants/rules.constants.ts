@@ -151,7 +151,7 @@ export class RuleConstants {
         {
           id: 7,
           name: 'lastViewedAt',
-          humanName: 'Last viewed at',
+          humanName: 'Last view date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
         } as Property,
@@ -194,7 +194,7 @@ export class RuleConstants {
         {
           id: 13,
           name: 'sw_lastWatched',
-          humanName: 'Last episode seen at',
+          humanName: 'Newest episode view date',
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
@@ -347,27 +347,28 @@ export class RuleConstants {
         {
           id: 1,
           name: 'diskSizeEntireShow',
-          humanName:
-            'Files - Disk size all episodes in MB (Currently Broken in Sonarr)',
+          humanName: 'Files - Disk size in MB ',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
-          showType: [EPlexDataType.SHOWS],
+          showType: [
+            EPlexDataType.SHOWS,
+            EPlexDataType.SEASONS,
+            EPlexDataType.EPISODES,
+          ],
         } as Property,
         {
           id: 2,
           name: 'tags',
-          humanName: 'Tags',
+          humanName: 'Tags (show)',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT, // return text[]
-          showType: [EPlexDataType.SHOWS],
         } as Property,
         {
           id: 3,
           name: 'qualityProfileId',
-          humanName: 'Quality profile',
+          humanName: 'Quality profile ID',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
-          showType: [EPlexDataType.SHOWS],
         } as Property,
         {
           id: 4,
@@ -375,15 +376,14 @@ export class RuleConstants {
           humanName: 'First air date',
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
-          showType: [EPlexDataType.SHOWS],
         } as Property,
         {
           id: 5,
           name: 'seasons',
-          humanName: 'Number of seasons',
+          humanName: 'Number of seasons / episodes',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
-          showType: [EPlexDataType.SHOWS],
+          showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
         } as Property,
         {
           id: 6,
@@ -404,10 +404,16 @@ export class RuleConstants {
         {
           id: 8,
           name: 'monitored',
-          humanName: 'Is monitored',
+          humanName: 'Is monitored (deprecated)',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
-          showType: [EPlexDataType.SHOWS],
+        } as Property,
+        {
+          id: 9,
+          name: 'monitored',
+          humanName: 'Is monitored',
+          mediaType: MediaType.SHOW,
+          type: RuleType.BOOL,
         } as Property,
       ],
     },

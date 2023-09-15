@@ -50,9 +50,9 @@ export class SonarrApi extends ServarrApi<{
       );
     }
   }
-  public async getEpisodeFile(episodeFileId: number): Promise<SonarrEpisode[]> {
+  public async getEpisodeFile(episodeFileId: number): Promise<SonarrEpisode> {
     try {
-      const response = await this.axios.get<SonarrEpisode[]>(
+      const response = await this.axios.get<SonarrEpisode>(
         `/episodefile/${episodeFileId}`,
       );
 

@@ -175,9 +175,14 @@ export class PlexGetterService {
           return [];
         }
         case 'sw_lastWatched': {
-          const watchHistory = await this.plexApi.getWatchHistory(
+          let watchHistory = await this.plexApi.getWatchHistory(
             libItem.ratingKey,
           );
+          watchHistory?.sort((a, b) => a.parentIndex - b.parentIndex).reverse();
+          watchHistory = watchHistory?.filter(
+            (el) => el.parentIndex === watchHistory[0].parentIndex,
+          );
+          watchHistory?.sort((a, b) => a.index - b.index).reverse();
           return watchHistory
             ? new Date(+watchHistory[0].viewedAt * 1000)
             : null;
