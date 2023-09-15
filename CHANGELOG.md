@@ -1,3 +1,11 @@
+# [1.5.0](https://github.com/jorenn92/Maintainerr/compare/v1.4.2...v1.5.0) (2023-09-15)
+
+
+### Features
+
+* **rules:** Add possibility to unmonitor shows & movies without removing the files ([f41c2e8](https://github.com/jorenn92/Maintainerr/commit/f41c2e87c1c4ab6c0a2f339049f6995684321c11))
+* **rules:** added the ability to create rules for seasons & episodes ([#474](https://github.com/jorenn92/Maintainerr/issues/474)) ([b6e8a6c](https://github.com/jorenn92/Maintainerr/commit/b6e8a6ccaf31f2be6ba389db64fbabb0ee40d263))
+
 ## [1.4.2](https://github.com/jorenn92/Maintainerr/compare/v1.4.1...v1.4.2) (2023-08-09)
 
 
