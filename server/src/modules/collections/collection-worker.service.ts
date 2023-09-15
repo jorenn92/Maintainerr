@@ -58,6 +58,7 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
   public async handle() {
     const appStatus = await this.settings.testConnections();
     this.logger.log('Start handling all collections.');
+    let handledCollections = 0;
     if (appStatus) {
       // loop over all active collections
       const collections = await this.collectionRepo.find({ isActive: true });
@@ -75,14 +76,25 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         for (const media of collectionMedia) {
           // handle media addate <= due date
           if (new Date(media.addDate) <= dangerDate) {
-            this.handleMedia(collection, media);
+            await this.handleMedia(collection, media);
+            handledCollections++;
           }
         }
-        this.infoLogger(`Handling collection '${collection.title}' done`);
+        this.infoLogger(`Handling collection '${collection.title}' finished`);
+      }
+      if (handledCollections > 0) {
+        const resp = await this.overseerrApi.api.post(
+          '/settings/jobs/availability-sync/run',
+        );
+        this.infoLogger(
+          `All collections handled. Refreshing Overseerr because media was altered`,
+        );
+      } else {
+        this.infoLogger(`All collections handled. No data was altered`);
       }
     } else {
-      this.logger.log(
-        'Not all applications are reachable.. Skipped collection handling.',
+      this.infoLogger(
+        'Not all applications are reachable.. Skipping collection handling',
       );
     }
   }

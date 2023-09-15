@@ -231,90 +231,94 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   private async handleCollection(rulegroup: RuleGroup) {
-    let collection = await this.collectionService.getCollection(
-      rulegroup?.collectionId,
-    );
-    const exclusions = await this.rulesService.getExclusions(rulegroup.id);
-
-    // keep a record of parent/child ratingKeys for seasons & episodes
-    const collectionMediaCHildren: [{ parent: number; child: number }] =
-      undefined;
-
-    // filter exclusions out of results & get correct ratingKey
-    const data = this.resultData
-      .filter((el) => !exclusions.find((e) => +e.plexId === +el.ratingKey))
-      .map((el) => {
-        return +el.ratingKey;
-      });
-
-    if (collection) {
-      const collMediaData = await this.collectionService.getCollectionMedia(
-        collection.id,
+    try {
+      let collection = await this.collectionService.getCollection(
+        rulegroup?.collectionId,
       );
-      // Add manually added media to data
-      const manualData = collMediaData
-        .filter((el) => el.isManual === true)
-        .map((e) => e.plexId);
+      const exclusions = await this.rulesService.getExclusions(rulegroup.id);
 
-      data.push(...manualData);
+      // keep a record of parent/child ratingKeys for seasons & episodes
+      const collectionMediaCHildren: [{ parent: number; child: number }] =
+        undefined;
 
-      let currentCollectionData = collMediaData.map((e) => {
-        return e.plexId;
-      });
-
-      currentCollectionData = currentCollectionData
-        ? currentCollectionData
-        : [];
-
-      const dataToAdd = data
-        .filter((el) => !currentCollectionData.includes(el))
+      // filter exclusions out of results & get correct ratingKey
+      const data = this.resultData
+        .filter((el) => !exclusions.find((e) => +e.plexId === +el.ratingKey))
         .map((el) => {
-          return { plexId: el };
+          return +el.ratingKey;
         });
 
-      const dataToRemove = currentCollectionData
-        .filter((el) => !data.includes(el))
-        .map((el) => {
-          return { plexId: el };
+      if (collection) {
+        const collMediaData = await this.collectionService.getCollectionMedia(
+          collection.id,
+        );
+        // Add manually added media to data
+        const manualData = collMediaData
+          .filter((el) => el.isManual === true)
+          .map((e) => e.plexId);
+
+        data.push(...manualData);
+
+        let currentCollectionData = collMediaData.map((e) => {
+          return e.plexId;
         });
 
-      if (dataToRemove.length > 0) {
-        this.logInfo(
-          `Removing ${dataToRemove.length} media items from '${
-            collection.manualCollection
-              ? collection.manualCollectionName
-              : collection.title
-          }'.`,
+        currentCollectionData = currentCollectionData
+          ? currentCollectionData
+          : [];
+
+        const dataToAdd = data
+          .filter((el) => !currentCollectionData.includes(el))
+          .map((el) => {
+            return { plexId: el };
+          });
+
+        const dataToRemove = currentCollectionData
+          .filter((el) => !data.includes(el))
+          .map((el) => {
+            return { plexId: el };
+          });
+
+        if (dataToRemove.length > 0) {
+          this.logInfo(
+            `Removing ${dataToRemove.length} media items from '${
+              collection.manualCollection
+                ? collection.manualCollectionName
+                : collection.title
+            }'.`,
+          );
+        }
+
+        if (dataToAdd.length > 0) {
+          this.logInfo(
+            `Adding ${dataToAdd.length} media items to '${
+              collection.manualCollection
+                ? collection.manualCollectionName
+                : collection.title
+            }'.`,
+          );
+        }
+
+        collection = await this.collectionService.relinkManualCollection(
+          collection,
         );
-      }
 
-      if (dataToAdd.length > 0) {
-        this.logInfo(
-          `Adding ${dataToAdd.length} media items to '${
-            collection.manualCollection
-              ? collection.manualCollectionName
-              : collection.title
-          }'.`,
+        collection = await this.collectionService.addToCollection(
+          collection.id,
+          dataToAdd,
         );
+
+        collection = await this.collectionService.removeFromCollection(
+          collection.id,
+          dataToRemove,
+        );
+
+        return collection;
+      } else {
+        this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
       }
-
-      collection = await this.collectionService.relinkManualCollection(
-        collection,
-      );
-
-      collection = await this.collectionService.addToCollection(
-        collection.id,
-        dataToAdd,
-      );
-
-      collection = await this.collectionService.removeFromCollection(
-        collection.id,
-        dataToRemove,
-      );
-
-      return collection;
-    } else {
-      this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
+    } catch (err) {
+      this.logger.warn(`Execption occurred whild handling rule: `, err);
     }
   }
 
@@ -433,6 +437,12 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     }
     if (action === RulePossibility.EQUALS) {
       if (!Array.isArray(val1)) {
+        if (val1 instanceof Date && val2 instanceof Date) {
+          return (
+            new Date(val1.toDateString()).valueOf() ===
+            new Date(val2.toDateString()).valueOf()
+          );
+        }
         return val1 === val2;
       } else {
         if (val1.length > 0) {

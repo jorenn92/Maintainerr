@@ -91,10 +91,12 @@ const AddModal = (props: AddModal) => {
 
   function setLibraryId(event: { target: { value: string } }) {
     setSelectedLibraryId(event.target.value)
+    setArrOption(0)
   }
 
   function setCollectionType(event: { target: { value: string } }) {
     setSelectedType(event.target.value)
+    setArrOption(0)
   }
 
   function updateRules(rules: IRule[]) {
@@ -388,24 +390,53 @@ const AddModal = (props: AddModal) => {
                 title="Sonarr"
                 default={arrOption}
                 onUpdate={(e: number) => setArrOption(e)}
-                options={[
-                  {
-                    id: 0,
-                    name: 'Delete',
-                  },
-                  {
-                    id: 1,
-                    name: 'Delete & unmonitor',
-                  },
-                  {
-                    id: 2,
-                    name: 'Delete & unmonitor existing',
-                  },
-                  {
-                    id: 3,
-                    name: 'Unmonitor and keep files',
-                  },
-                ]}
+                options={
+                  +selectedType === EPlexDataType.SHOWS
+                    ? [
+                        {
+                          id: 0,
+                          name: 'Delete entire show',
+                        },
+                        {
+                          id: 1,
+                          name: 'Unmonitor and delete all seasons / episodes',
+                        },
+                        {
+                          id: 2,
+                          name: 'Unmonitor and delete existing seasons / episodes',
+                        },
+                        {
+                          id: 3,
+                          name: 'Unmonitor show and keep files',
+                        },
+                      ]
+                    : +selectedType === EPlexDataType.SEASONS
+                    ? [
+                        {
+                          id: 0,
+                          name: 'Unmonitor and delete season',
+                        },
+                        {
+                          id: 2,
+                          name: 'Unmonitor and Delete existing episodes',
+                        },
+                        {
+                          id: 3,
+                          name: 'Unmonitor season and keep files',
+                        },
+                      ]
+                    : // episodes
+                      [
+                        {
+                          id: 0,
+                          name: 'Unmonitor and delete episode',
+                        },
+                        {
+                          id: 3,
+                          name: 'Unmonitor and keep file',
+                        },
+                      ]
+                }
               />
             </>
           )}

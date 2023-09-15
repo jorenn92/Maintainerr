@@ -294,17 +294,6 @@ export class SonarrApi extends ServarrApi<{
           );
         }
       }
-
-      // episodes.forEach(async (e) => {
-      //   if (deleteFiles) {
-      //     await this.runDelete(`episodefile/${e.episodeFileId}`);
-      //   } else {
-      //     await this.runPut(
-      //       `episode/${e.id}`,
-      //       JSON.stringify({ ...e, monitored: false }),
-      //     );
-      //   }
-      // });
     } catch (e) {
       this.logger.log(`Couldn\'t remove/unmonitor episodes: ${episodeIds}`, {
         label: 'Sonarr API',
