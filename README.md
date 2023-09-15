@@ -6,7 +6,7 @@
 
 ![Build Status](https://ci.cyntek.be/buildStatus/icon?job=Maintainerr%2FMaintainerr-dev-build)
 
-[![](https://dcbadge.vercel.app/api/server/nyRaZzMgDN)](https://discord.gg/nyRaZzMgDN)
+[![](https://dcbadge.vercel.app/api/server/WP4ZW2QYwk)](https://discord.gg/WP4ZW2QYwk)
 
 </div>
 
