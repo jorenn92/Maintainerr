@@ -87,7 +87,7 @@ export class SonarrGetterService {
           case 'addDate': {
             return showResponse.added &&
               showResponse.added !== '0001-01-01T00:00:00Z'
-              ? showResponse.added
+              ? new Date(showResponse.added)
               : null;
           }
           case 'diskSizeEntireShow': {
@@ -124,9 +124,11 @@ export class SonarrGetterService {
             if (
               [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
             ) {
-              return episode?.airDate ? episode.airDate : null;
+              return episode?.airDate ? new Date(episode.airDate) : null;
             } else {
-              return showResponse.firstAired ? showResponse.firstAired : null;
+              return showResponse.firstAired
+                ? new Date(showResponse.firstAired)
+                : null;
             }
           }
           case 'seasons': {
