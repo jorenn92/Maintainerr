@@ -83,12 +83,14 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         this.infoLogger(`Handling collection '${collection.title}' finished`);
       }
       if (handledCollections > 0) {
-        const resp = await this.overseerrApi.api.post(
-          '/settings/jobs/availability-sync/run',
-        );
-        this.infoLogger(
-          `All collections handled. Refreshing Overseerr because media was altered`,
-        );
+        if (this.settings.overseerrConfigured()) {
+          const resp = await this.overseerrApi.api.post(
+            '/settings/jobs/availability-sync/run',
+          );
+          this.infoLogger(
+            `All collections handled. Refreshing Overseerr because media was altered`,
+          );
+        }
       } else {
         this.infoLogger(`All collections handled. No data was altered`);
       }
@@ -113,256 +115,268 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
     ]);
 
     if (plexLibrary.type === 'movie') {
-      const radarrMedia = await this.servarrApi.RadarrApi.getMovieByTmdbId(
-        media.tmdbId,
-      );
-      switch (collection.arrAction) {
-        case ServarrAction.DELETE:
-          await this.servarrApi.RadarrApi.deleteMovie(radarrMedia.id);
-          this.infoLogger('Removed movie from filesystem & Radarr');
-          break;
-        case ServarrAction.UNMONITOR:
-          await this.servarrApi.RadarrApi.unmonitorMovie(radarrMedia.id, false);
-          this.infoLogger('Unmonitored movie in Radarr');
-          break;
-        case ServarrAction.DELETE_UNMONITOR_ALL:
-          await this.servarrApi.RadarrApi.unmonitorMovie(radarrMedia.id, true);
-          this.infoLogger('Unmonitored movie in Radarr & removed files');
-          break;
-        case ServarrAction.DELETE_UNMONITOR_EXISTING:
-          await this.servarrApi.RadarrApi.deleteMovie(radarrMedia.id, true);
-          this.infoLogger('Removed movie from filesystem & Radarr');
-          break;
+      if (this.settings.radarrConfigured()) {
+        const radarrMedia = await this.servarrApi.RadarrApi.getMovieByTmdbId(
+          media.tmdbId,
+        );
+        switch (collection.arrAction) {
+          case ServarrAction.DELETE:
+            await this.servarrApi.RadarrApi.deleteMovie(radarrMedia.id);
+            this.infoLogger('Removed movie from filesystem & Radarr');
+            break;
+          case ServarrAction.UNMONITOR:
+            await this.servarrApi.RadarrApi.unmonitorMovie(
+              radarrMedia.id,
+              false,
+            );
+            this.infoLogger('Unmonitored movie in Radarr');
+            break;
+          case ServarrAction.DELETE_UNMONITOR_ALL:
+            await this.servarrApi.RadarrApi.unmonitorMovie(
+              radarrMedia.id,
+              true,
+            );
+            this.infoLogger('Unmonitored movie in Radarr & removed files');
+            break;
+          case ServarrAction.DELETE_UNMONITOR_EXISTING:
+            await this.servarrApi.RadarrApi.deleteMovie(radarrMedia.id, true);
+            this.infoLogger('Removed movie from filesystem & Radarr');
+            break;
+        }
       }
     } else {
-      // get the tvdb id
-      let tvdbId = undefined;
-      switch (collection.type) {
-        case EPlexDataType.SEASONS:
-          plexData = await this.plexApi.getMetadata(media.plexId.toString());
-          tvdbId = await this.tvdbidFinder({
-            ...media,
-            ...{ plexID: plexData.parentRatingKey },
-          });
-          media.tmdbId = media.tmdbId
-            ? media.tmdbId
-            : (
-                await this.tmdbIdService.getTmdbIdFromPlexRatingKey(
-                  plexData.parentRatingKey,
-                )
-              )?.id;
-          break;
-        case EPlexDataType.EPISODES:
-          plexData = await this.plexApi.getMetadata(media.plexId.toString());
-          tvdbId = await this.tvdbidFinder({
-            ...media,
-            ...{ plexID: plexData.grandparentRatingKey },
-          });
-          media.tmdbId = media.tmdbId
-            ? media.tmdbId
-            : (
-                await this.tmdbIdService.getTmdbIdFromPlexRatingKey(
-                  plexData.grandparentRatingKey.toString(),
-                )
-              )?.id;
-          break;
-        default:
-          tvdbId = await this.tvdbidFinder(media);
-          media.tmdbId = media.tmdbId
-            ? media.tmdbId
-            : (
-                await this.tmdbIdService.getTmdbIdFromPlexRatingKey(
-                  plexData.ratingKey,
-                )
-              )?.id;
-          break;
-      }
+      if (this.settings.sonarrConfigured()) {
+        // get the tvdb id
+        let tvdbId = undefined;
+        switch (collection.type) {
+          case EPlexDataType.SEASONS:
+            plexData = await this.plexApi.getMetadata(media.plexId.toString());
+            tvdbId = await this.tvdbidFinder({
+              ...media,
+              ...{ plexID: plexData.parentRatingKey },
+            });
+            media.tmdbId = media.tmdbId
+              ? media.tmdbId
+              : (
+                  await this.tmdbIdService.getTmdbIdFromPlexRatingKey(
+                    plexData.parentRatingKey,
+                  )
+                )?.id;
+            break;
+          case EPlexDataType.EPISODES:
+            plexData = await this.plexApi.getMetadata(media.plexId.toString());
+            tvdbId = await this.tvdbidFinder({
+              ...media,
+              ...{ plexID: plexData.grandparentRatingKey },
+            });
+            media.tmdbId = media.tmdbId
+              ? media.tmdbId
+              : (
+                  await this.tmdbIdService.getTmdbIdFromPlexRatingKey(
+                    plexData.grandparentRatingKey.toString(),
+                  )
+                )?.id;
+            break;
+          default:
+            tvdbId = await this.tvdbidFinder(media);
+            media.tmdbId = media.tmdbId
+              ? media.tmdbId
+              : (
+                  await this.tmdbIdService.getTmdbIdFromPlexRatingKey(
+                    plexData.ratingKey,
+                  )
+                )?.id;
+            break;
+        }
 
-      if (tvdbId) {
-        const sonarrMedia = await this.servarrApi.SonarrApi.getSeriesByTvdbId(
-          tvdbId,
-        );
-        if (sonarrMedia) {
-          switch (collection.arrAction) {
-            case ServarrAction.DELETE:
-              switch (collection.type) {
-                case EPlexDataType.SEASONS:
-                  await this.servarrApi.SonarrApi.unmonitorSeasons(
-                    sonarrMedia.id,
-                    plexData.index,
-                    true,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Removed season ${plexData.index} from show '${sonarrMedia.title}'`,
-                  );
-                  break;
-                case EPlexDataType.EPISODES:
-                  await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
-                    sonarrMedia.id,
-                    plexData.parentIndex,
-                    [plexData.index],
-                    true,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Removed season ${plexData.parentIndex} episode ${plexData.index} from show '${sonarrMedia.title}'`,
-                  );
-                  break;
-                default:
-                  await this.servarrApi.SonarrApi.deleteShow(sonarrMedia.id);
-                  this.infoLogger(
-                    `Removed show ${sonarrMedia.title}' from Sonarr`,
-                  );
-                  break;
-              }
-              break;
-            case ServarrAction.UNMONITOR:
-              switch (collection.type) {
-                case EPlexDataType.SEASONS:
-                  await this.servarrApi.SonarrApi.unmonitorSeasons(
-                    sonarrMedia.id,
-                    plexData.index,
-                    false,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Unmonitored season ${plexData.index} from show '${sonarrMedia.title}'`,
-                  );
-                  break;
-                case EPlexDataType.EPISODES:
-                  await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
-                    sonarrMedia.id,
-                    plexData.parentIndex,
-                    [plexData.index],
-                    false,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Unmonitored season ${plexData.parentIndex} episode ${plexData.index} from show '${sonarrMedia.title}'`,
-                  );
-                  break;
-                default:
-                  await this.servarrApi.SonarrApi.unmonitorSeasons(
-                    sonarrMedia.id,
-                    'all',
-                    false,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Unmonitored show '${sonarrMedia.title}'`,
-                  );
-                  break;
-              }
-              break;
-            case ServarrAction.DELETE_UNMONITOR_ALL:
-              switch (collection.type) {
-                case EPlexDataType.SEASONS:
-                  await this.servarrApi.SonarrApi.unmonitorSeasons(
-                    sonarrMedia.id,
-                    plexData.index,
-                    true,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Removed season ${plexData.index} from show '${sonarrMedia.title}'`,
-                  );
-                  break;
-                case EPlexDataType.EPISODES:
-                  await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
-                    sonarrMedia.id,
-                    plexData.parentIndex,
-                    [plexData.index],
-                    true,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Removed season ${plexData.parentIndex} episode ${plexData.index} from show '${sonarrMedia.title}'`,
-                  );
-                  break;
-                default:
-                  await this.servarrApi.SonarrApi.unmonitorSeasons(
-                    sonarrMedia.id,
-                    'all',
-                    true,
-                  );
-                  this.infoLogger(
-                    `Removed show ${sonarrMedia.title}' from Sonarr`,
-                  );
-                  break;
-              }
-              break;
-            case ServarrAction.DELETE_UNMONITOR_EXISTING:
-              switch (collection.type) {
-                case EPlexDataType.SEASONS:
-                  await this.servarrApi.SonarrApi.unmonitorSeasons(
-                    sonarrMedia.id,
-                    plexData.index,
-                    true,
-                    true,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Removed exisiting episodes from season ${plexData.index} from show '${sonarrMedia.title}'`,
-                  );
-                  break;
-                case EPlexDataType.EPISODES:
-                  await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
-                    sonarrMedia.id,
-                    plexData.parentIndex,
-                    [plexData.index],
-                    true,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Removed season ${plexData.parentIndex} episode ${plexData.index} from show '${sonarrMedia.title}'`,
-                  );
-                  break;
-                default:
-                  await this.servarrApi.SonarrApi.unmonitorSeasons(
-                    sonarrMedia.id,
-                    'existing',
-                    true,
-                  );
-                  this.infoLogger(
-                    `[Sonarr] Removed exisiting episodes from show '${sonarrMedia.title}'`,
-                  );
-                  break;
-              }
-              break;
+        if (tvdbId) {
+          const sonarrMedia = await this.servarrApi.SonarrApi.getSeriesByTvdbId(
+            tvdbId,
+          );
+          if (sonarrMedia) {
+            switch (collection.arrAction) {
+              case ServarrAction.DELETE:
+                switch (collection.type) {
+                  case EPlexDataType.SEASONS:
+                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                      sonarrMedia.id,
+                      plexData.index,
+                      true,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Removed season ${plexData.index} from show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                  case EPlexDataType.EPISODES:
+                    await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
+                      sonarrMedia.id,
+                      plexData.parentIndex,
+                      [plexData.index],
+                      true,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Removed season ${plexData.parentIndex} episode ${plexData.index} from show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                  default:
+                    await this.servarrApi.SonarrApi.deleteShow(sonarrMedia.id);
+                    this.infoLogger(
+                      `Removed show ${sonarrMedia.title}' from Sonarr`,
+                    );
+                    break;
+                }
+                break;
+              case ServarrAction.UNMONITOR:
+                switch (collection.type) {
+                  case EPlexDataType.SEASONS:
+                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                      sonarrMedia.id,
+                      plexData.index,
+                      false,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Unmonitored season ${plexData.index} from show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                  case EPlexDataType.EPISODES:
+                    await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
+                      sonarrMedia.id,
+                      plexData.parentIndex,
+                      [plexData.index],
+                      false,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Unmonitored season ${plexData.parentIndex} episode ${plexData.index} from show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                  default:
+                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                      sonarrMedia.id,
+                      'all',
+                      false,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Unmonitored show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                }
+                break;
+              case ServarrAction.DELETE_UNMONITOR_ALL:
+                switch (collection.type) {
+                  case EPlexDataType.SEASONS:
+                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                      sonarrMedia.id,
+                      plexData.index,
+                      true,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Removed season ${plexData.index} from show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                  case EPlexDataType.EPISODES:
+                    await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
+                      sonarrMedia.id,
+                      plexData.parentIndex,
+                      [plexData.index],
+                      true,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Removed season ${plexData.parentIndex} episode ${plexData.index} from show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                  default:
+                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                      sonarrMedia.id,
+                      'all',
+                      true,
+                    );
+                    this.infoLogger(
+                      `Removed show ${sonarrMedia.title}' from Sonarr`,
+                    );
+                    break;
+                }
+                break;
+              case ServarrAction.DELETE_UNMONITOR_EXISTING:
+                switch (collection.type) {
+                  case EPlexDataType.SEASONS:
+                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                      sonarrMedia.id,
+                      plexData.index,
+                      true,
+                      true,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Removed exisiting episodes from season ${plexData.index} from show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                  case EPlexDataType.EPISODES:
+                    await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
+                      sonarrMedia.id,
+                      plexData.parentIndex,
+                      [plexData.index],
+                      true,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Removed season ${plexData.parentIndex} episode ${plexData.index} from show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                  default:
+                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                      sonarrMedia.id,
+                      'existing',
+                      true,
+                    );
+                    this.infoLogger(
+                      `[Sonarr] Removed exisiting episodes from show '${sonarrMedia.title}'`,
+                    );
+                    break;
+                }
+                break;
+            }
+          } else {
+            this.infoLogger(
+              `Couldn't find correct tvdbid. No action taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
+            );
           }
         } else {
           this.infoLogger(
             `Couldn't find correct tvdbid. No action taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
           );
         }
-      } else {
-        this.infoLogger(
-          `Couldn't find correct tvdbid. No action taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
-        );
       }
     }
 
     // overseerr
-    switch (collection.type) {
-      case EPlexDataType.SEASONS:
-        await this.overseerrApi.removeSeasonRequest(
-          media.tmdbId,
-          plexData.index,
-        );
-        this.infoLogger(
-          `[Overseerr] Removed request of season ${plexData.index} from show with tmdbid '${media.tmdbId}'`,
-        );
-        break;
-      case EPlexDataType.EPISODES:
-        await this.overseerrApi.removeSeasonRequest(
-          media.tmdbId,
-          plexData.parentIndex,
-        );
-        this.infoLogger(
-          `[Overseerr] Removed request of season ${plexData.parentIndex} from show with tmdbid '${media.tmdbId}'. Because episode ${plexData.index} was removed.'`,
-        );
-        break;
-      default:
-        await this.overseerrApi.removeMediaByTmdbId(
-          media.tmdbId,
-          plexLibrary.type === 'show' ? 'tv' : 'movie',
-        );
-        this.infoLogger(
-          `[Overseerr] Removed requests of media with tmdbid '${media.tmdbId}'`,
-        );
-        break;
+    if (this.settings.overseerrConfigured()) {
+      switch (collection.type) {
+        case EPlexDataType.SEASONS:
+          await this.overseerrApi.removeSeasonRequest(
+            media.tmdbId,
+            plexData.index,
+          );
+          this.infoLogger(
+            `[Overseerr] Removed request of season ${plexData.index} from show with tmdbid '${media.tmdbId}'`,
+          );
+          break;
+        case EPlexDataType.EPISODES:
+          await this.overseerrApi.removeSeasonRequest(
+            media.tmdbId,
+            plexData.parentIndex,
+          );
+          this.infoLogger(
+            `[Overseerr] Removed request of season ${plexData.parentIndex} from show with tmdbid '${media.tmdbId}'. Because episode ${plexData.index} was removed.'`,
+          );
+          break;
+        default:
+          await this.overseerrApi.removeMediaByTmdbId(
+            media.tmdbId,
+            plexLibrary.type === 'show' ? 'tv' : 'movie',
+          );
+          this.infoLogger(
+            `[Overseerr] Removed requests of media with tmdbid '${media.tmdbId}'`,
+          );
+          break;
+      }
     }
 
     // plex

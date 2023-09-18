@@ -205,15 +205,15 @@ export class SettingsService implements SettingDto {
       let radarrState = true;
       let sonarrState = true;
       let overseerrState = true;
-      if (this.radarr_url && this.radarr_api_key) {
+      if (this.radarrConfigured()) {
         radarrState = (await this.testRadarr()).status === 'OK';
       }
 
-      if (this.sonarr_url && this.sonarr_api_key) {
+      if (this.sonarrConfigured()) {
         sonarrState = (await this.testSonarr()).status === 'OK';
       }
 
-      if (this.overseerr_url && this.overseerr_api_key) {
+      if (this.overseerrConfigured()) {
         overseerrState = (await this.testOverseerr()).status === 'OK';
       }
 
@@ -225,6 +225,18 @@ export class SettingsService implements SettingDto {
     } catch {
       return false;
     }
+  }
+
+  public radarrConfigured(): boolean {
+    return this.radarr_url !== null && this.radarr_api_key !== null;
+  }
+
+  public sonarrConfigured(): boolean {
+    return this.sonarr_url !== null && this.sonarr_api_key !== null;
+  }
+
+  public overseerrConfigured(): boolean {
+    return this.overseerr_url !== null && this.overseerr_api_key !== null;
   }
 
   // Test if all required settings are set.
