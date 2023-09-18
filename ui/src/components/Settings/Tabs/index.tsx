@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect } from 'react'
 
 export interface SettingsRoute {
   text: string
@@ -21,11 +21,18 @@ export interface ISettingsLink {
 
 const SettingsLink: React.FC<ISettingsLink> = (props: ISettingsLink) => {
   if (props.isMobile) {
-    return <option value={props.route}>{props.children}</option>
+    return (
+      <option
+        disabled={props.disabled}
+        value={props.route}
+      >
+        {props.children}
+      </option>
+    )
   }
 
   let linkClasses =
-    (props.disabled ? 'pointer-events-none ' : '') +
+    (props.disabled ? 'pointer-events-none touch-none ' : '') +
     'px-1 py-4 ml-8 text-sm font-medium leading-5 transition duration-300 border-b-2 border-transparent whitespace-nowrap first:ml-0'
   let activeLinkColor = 'text-amber-500 border-amber-600'
   let inactiveLinkColor =
@@ -60,6 +67,18 @@ const SettingsTabs: React.FC<{
   allEnabled?: boolean
 }> = ({ tabType = 'default', settingsRoutes, allEnabled = true }) => {
   const router = useRouter()
+
+  useEffect(() => {
+    window.addEventListener('touchstart', (e) => {
+      if (!allEnabled) {
+        e.preventDefault()
+        console.log('erin')
+      }
+    })
+    return () => {
+      window.removeEventListener('touchstart', (e) => e.preventDefault)
+    }
+  }, [])
 
   return (
     <>
