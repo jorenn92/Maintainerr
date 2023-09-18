@@ -33,8 +33,9 @@ export class TasksService implements TaskScheduler {
         `Task ${name} created successfully`,
       );
     } catch (e) {
-      this.logger.error(`An error occurred while creating the ${name} task`);
-      this.logger.debug(e);
+      this.logger.error(
+        `An error occurred while creating the ${name} task. This is normal on first boot.`,
+      );
       return this.status.createStatus(
         false,
         `An error occurred while creating the ${name} task`,

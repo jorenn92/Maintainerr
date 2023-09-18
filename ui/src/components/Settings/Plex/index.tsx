@@ -152,7 +152,7 @@ const PlexSettings = () => {
       ) : (
         <Alert
           type="info"
-          title="Plex configuration is required for Maintainerr to function."
+          title="Plex configuration is required. Other configuration options will become available after configuring Plex."
         />
       )}
 

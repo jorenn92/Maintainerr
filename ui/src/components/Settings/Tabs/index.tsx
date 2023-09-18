@@ -15,6 +15,7 @@ export interface ISettingsLink {
   regex: RegExp
   hidden?: boolean
   isMobile?: boolean
+  disabled?: boolean
   children?: ReactNode
 }
 
@@ -24,6 +25,7 @@ const SettingsLink: React.FC<ISettingsLink> = (props: ISettingsLink) => {
   }
 
   let linkClasses =
+    (props.disabled ? 'pointer-events-none ' : '') +
     'px-1 py-4 ml-8 text-sm font-medium leading-5 transition duration-300 border-b-2 border-transparent whitespace-nowrap first:ml-0'
   let activeLinkColor = 'text-amber-500 border-amber-600'
   let inactiveLinkColor =
@@ -55,7 +57,8 @@ const SettingsLink: React.FC<ISettingsLink> = (props: ISettingsLink) => {
 const SettingsTabs: React.FC<{
   tabType?: 'default' | 'button'
   settingsRoutes: SettingsRoute[]
-}> = ({ tabType = 'default', settingsRoutes }) => {
+  allEnabled?: boolean
+}> = ({ tabType = 'default', settingsRoutes, allEnabled = true }) => {
   const router = useRouter()
 
   return (
@@ -79,6 +82,7 @@ const SettingsTabs: React.FC<{
         >
           {settingsRoutes.map((route, index) => (
             <SettingsLink
+              disabled={!allEnabled}
               tabType={tabType}
               currentPath={router.pathname}
               route={route.route}
@@ -96,6 +100,7 @@ const SettingsTabs: React.FC<{
           <nav className="-mx-2 -my-1 flex flex-wrap" aria-label="Tabs">
             {settingsRoutes.map((route, index) => (
               <SettingsLink
+                disabled={!allEnabled}
                 tabType={tabType}
                 currentPath={router.pathname}
                 route={route.route}
@@ -112,6 +117,7 @@ const SettingsTabs: React.FC<{
           <nav className="flex">
             {settingsRoutes.map((route, index) => (
               <SettingsLink
+                disabled={!allEnabled}
                 tabType={tabType}
                 currentPath={router.pathname}
                 route={route.route}
