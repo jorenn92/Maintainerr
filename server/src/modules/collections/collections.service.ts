@@ -309,7 +309,7 @@ export class CollectionsService {
     return collection;
   }
 
-  private async checkAutomaticPlexLink(
+  public async checkAutomaticPlexLink(
     collection: Collection,
   ): Promise<Collection> {
     // checks and fixes automatic collection link
