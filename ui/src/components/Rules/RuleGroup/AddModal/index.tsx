@@ -38,6 +38,7 @@ interface ICreateApiObject {
   arrAction: number
   isActive: boolean
   useRules: boolean
+  listExclusions: boolean
   collection: {
     visibleOnHome: boolean
     deleteAfterDays: number
@@ -67,6 +68,7 @@ const AddModal = (props: AddModal) => {
   const deleteAfterRef = useRef<any>()
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showHome, setShowHome] = useState<boolean>(true)
+  const [listExclusions, setListExclusion] = useState<boolean>(true)
   const [manualCollection, setManualCollection] = useState<boolean>(false)
   const [manualCollectionName, setManualCollectionName] = useState<string>(
     'My custom collection'
@@ -159,6 +161,9 @@ const AddModal = (props: AddModal) => {
         resp ? setArrOption(resp.arrAction) : undefined
         resp && resp.type ? setSelectedType(resp.type.toString()) : '1'
         resp ? setManualCollection(resp.manualCollection) : undefined
+        resp && resp.listExclusions
+          ? setListExclusion(resp.listExclusions)
+          : undefined
         setIsLoading(false)
       })
     } else {
@@ -197,6 +202,7 @@ const AddModal = (props: AddModal) => {
         dataType: +selectedType,
         isActive: active,
         useRules: useRules,
+        listExclusions: listExclusions,
         collection: {
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
@@ -475,6 +481,29 @@ const AddModal = (props: AddModal) => {
                   defaultChecked={showHome}
                   onChange={() => {
                     setShowHome(!showHome)
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="list_exclusions" className="text-label">
+              Add list exclusions
+              <p className="text-xs font-normal">
+                Prevent lists to re-add removed {selectedLibrary ? selectedLibrary.type : 'movie'}
+              </p>
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  type="checkbox"
+                  name="list_exclusions"
+                  id="list_exclusions"
+                  className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                  defaultChecked={listExclusions}
+                  onChange={() => {
+                    setListExclusion(!listExclusions)
                   }}
                 />
               </div>

@@ -12,6 +12,7 @@ export class RulesDto {
   arrAction?: number;
   useRules?: boolean;
   collection?: ICollection;
+  listExclusions?: boolean;
   rules: RuleDto[] | RuleDbDto[];
   manualCollection?: boolean;
   manualCollectionName?: string;

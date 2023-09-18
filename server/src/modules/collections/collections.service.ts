@@ -681,6 +681,7 @@ export class CollectionsService {
                 isActive: collection.isActive,
                 visibleOnHome: collection?.visibleOnHome,
                 deleteAfterDays: collection?.deleteAfterDays,
+                listExclusions: collection?.listExclusions,
                 manualCollection:
                   collection?.manualCollection !== undefined
                     ? collection?.manualCollection
