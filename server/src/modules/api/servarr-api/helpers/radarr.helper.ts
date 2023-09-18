@@ -44,7 +44,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       });
 
       if (!response.data[0]) {
-        this.logger.error(`Movie not found`);
+        this.logger.warn(`Could not find Movie with TMDb id ${id} in Radarr`);
       }
 
       return response.data[0];

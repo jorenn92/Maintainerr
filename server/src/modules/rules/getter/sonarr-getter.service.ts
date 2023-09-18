@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { warn } from 'console';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
 import { SonarrApi } from '../../../modules/api/servarr-api/helpers/sonarr.helper';
@@ -15,6 +15,8 @@ import _ from 'lodash';
 @Injectable()
 export class SonarrGetterService {
   plexProperties: Property[];
+  private readonly logger = new Logger(SonarrGetterService.name);
+
   constructor(
     private readonly servarrService: ServarrService,
     private readonly plexApi: PlexApiService,
@@ -180,7 +182,7 @@ export class SonarrGetterService {
         }
       } else return null;
     } catch (e) {
-      warn(`Sonarr-Getter - Action failed : ${e.message}`);
+      this.logger.warn(`Sonarr-Getter - Action failed : ${e.message}`);
       return undefined;
     }
   }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { warn } from 'console';
 import {
   PlexLibraryItem,
@@ -16,6 +16,8 @@ import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enu
 @Injectable()
 export class PlexGetterService {
   plexProperties: Property[];
+  private readonly logger = new Logger(PlexGetterService.name);
+
   constructor(private readonly plexApi: PlexApiService) {
     const ruleConstanst = new RuleConstants();
     this.plexProperties = ruleConstanst.applications.find(
@@ -266,7 +268,7 @@ export class PlexGetterService {
         }
       }
     } catch (e) {
-      warn(`Plex-Getter - Action failed : ${e.message}`);
+      this.logger.warn(`Plex-Getter - Action failed : ${e.message}`);
       return undefined;
     }
   }
