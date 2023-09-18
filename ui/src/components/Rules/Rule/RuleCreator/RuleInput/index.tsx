@@ -364,8 +364,8 @@ const RuleInput = (props: IRuleInput) => {
             >
               <option value={undefined}></option>
               {ConstantsCtx.constants.applications?.map((app) => {
-                return app.mediaType === MediaType.BOTH ||
-                  props.mediaType === app.mediaType ? (
+                return (app.mediaType === MediaType.BOTH ||
+                  props.mediaType === app.mediaType) ? (
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
                       return (prop.mediaType === MediaType.BOTH ||
