@@ -235,6 +235,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       let collection = await this.collectionService.getCollection(
         rulegroup?.collectionId,
       );
+
       const exclusions = await this.rulesService.getExclusions(rulegroup.id);
 
       // keep a record of parent/child ratingKeys for seasons & episodes
@@ -252,6 +253,27 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         const collMediaData = await this.collectionService.getCollectionMedia(
           collection.id,
         );
+
+        // check Plex collection link
+        if (collMediaData.length > 0 && collection.plexId) {
+          collection = await this.collectionService.checkAutomaticPlexLink(
+            collection,
+          );
+          // if collection was removed while it should be available.. resync current data
+          if (!collection.plexId) {
+            collection = await this.collectionService.addToCollection(
+              collection.id,
+              collMediaData,
+              collection.manualCollection,
+            );
+            if (collection) {
+              collection = await this.collectionService.saveCollection(
+                collection,
+              );
+            }
+          }
+        }
+
         // Add manually added media to data
         const manualData = collMediaData
           .filter((el) => el.isManual === true)
