@@ -253,10 +253,16 @@ export class SonarrApi extends ServarrApi<{
     }
   }
 
-  public async deleteShow(seriesId: number | string, deleteFiles = true) {
+  public async deleteShow(
+    seriesId: number | string,
+    deleteFiles = true,
+    importListExclusion = false,
+  ) {
     this.logger.log(`Deleting show with ID ${seriesId} from Sonarr.`);
     try {
-      await this.runDelete(`series/${seriesId}?deleteFiles=${deleteFiles}`);
+      await this.runDelete(
+        `series/${seriesId}?deleteFiles=${deleteFiles}&addImportListExclusion=${importListExclusion}`,
+      );
     } catch (e) {
       this.logger.log("Couldn't delete show. Does it exist in sonarr?", {
         label: 'Sonarr API',

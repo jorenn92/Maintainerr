@@ -11,6 +11,7 @@ export interface ICollection {
   isActive: boolean;
   arrAction: number;
   visibleOnHome?: boolean;
+  listExclusions?: boolean;
   deleteAfterDays?: number; // amount of days after add
   media?: CollectionMedia[];
   manualCollection?: boolean;

@@ -121,7 +121,11 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         );
         switch (collection.arrAction) {
           case ServarrAction.DELETE:
-            await this.servarrApi.RadarrApi.deleteMovie(radarrMedia.id);
+            await this.servarrApi.RadarrApi.deleteMovie(
+              radarrMedia.id,
+              true,
+              collection.listExclusions,
+            );
             this.infoLogger('Removed movie from filesystem & Radarr');
             break;
           case ServarrAction.UNMONITOR:
@@ -139,7 +143,11 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
             this.infoLogger('Unmonitored movie in Radarr & removed files');
             break;
           case ServarrAction.DELETE_UNMONITOR_EXISTING:
-            await this.servarrApi.RadarrApi.deleteMovie(radarrMedia.id, true);
+            await this.servarrApi.RadarrApi.deleteMovie(
+              radarrMedia.id,
+              true,
+              collection.listExclusions,
+            );
             this.infoLogger('Removed movie from filesystem & Radarr');
             break;
         }
@@ -219,7 +227,11 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
                     );
                     break;
                   default:
-                    await this.servarrApi.SonarrApi.deleteShow(sonarrMedia.id);
+                    await this.servarrApi.SonarrApi.deleteShow(
+                      sonarrMedia.id,
+                      true,
+                      collection.listExclusions,
+                    );
                     this.infoLogger(
                       `Removed show ${sonarrMedia.title}' from Sonarr`,
                     );

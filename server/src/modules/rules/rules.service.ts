@@ -186,6 +186,9 @@ export class RulesService {
             description: params.description,
             arrAction: params.arrAction ? params.arrAction : 0,
             isActive: params.isActive,
+            listExclusions: params.listExclusions
+              ? params.listExclusions
+              : false,
             visibleOnHome: params.collection?.visibleOnHome,
             deleteAfterDays: +params.collection?.deleteAfterDays,
             manualCollection: params.collection?.manualCollection,
