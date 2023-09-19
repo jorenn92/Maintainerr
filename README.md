@@ -5,7 +5,7 @@
 <p align="center" >
   <a href="https://discord.gg/WP4ZW2QYwk"><img src="https://dcbadge.vercel.app/api/server/WP4ZW2QYwk?style=flat&theme=default-inverted" width="25%" alt="Discord link"/></a>
   &nbsp; 
-  <img src="https://ci.cyntek.be/buildStatus/icon?job=Maintainerr%2FMaintainerr-dev-build" width="17%" alt="Build status" />
+  <picture><img src="https://ci.cyntek.be/buildStatus/icon?job=Maintainerr%2FMaintainerr-dev-build" width="17%" alt="Build status" /></picture>
   &nbsp; 
   <a href="https://hub.docker.com/r/jorenn92/maintainerr"><img src="https://img.shields.io/docker/pulls/jorenn92/maintainerr" alt="Docker pulls" width="17%"></a>
 </p>
@@ -53,6 +53,16 @@ Data is saved within the container under /opt/data, it is recommended to tie a p
 
 For more information visit the [installation guide](docs/2-getting-started/1-installation/Installation.md) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your <b>Maintainerr</b> container.
 
+Docker run:
+```Yaml
+docker run -d \
+--name maintainerr \
+-e TZ=Europe/Brussels \
+-v <persistent-local-volume>:/opt/data \
+-p 8154:80 \
+--restart unless-stopped \
+jorenn92/maintainerr
+```
 Docker-compose: 
 ```Yaml
 version: '3'
