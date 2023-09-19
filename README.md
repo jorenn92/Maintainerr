@@ -3,7 +3,7 @@
 </p>
 
 <p align="center" >
-  <a href="https://discord.gg/WP4ZW2QYwk"><img src="https://dcbadge.vercel.app/api/server/WP4ZW2QYwk" width="25%" alt="Discord link"/></a>
+  <a href="https://discord.gg/WP4ZW2QYwk"><img src="https://dcbadge.vercel.app/api/server/WP4ZW2QYwk?style=flat&theme=default-inverted" width="25%" alt="Discord link"/></a>
   &nbsp; 
   <img src="https://ci.cyntek.be/buildStatus/icon?job=Maintainerr%2FMaintainerr-dev-build" width="17%" alt="Build status" />
   &nbsp; 
