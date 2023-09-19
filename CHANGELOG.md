@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/jorenn92/Maintainerr/compare/v1.6.0...v1.6.1) (2023-09-19)
+
+
+### Bug Fixes
+
+* **rules:** Fixed an issue where list exclusions would always be checked ([9280100](https://github.com/jorenn92/Maintainerr/commit/92801004a8efe87dcf93a2919d0e30fa7159c8b3))
+
 # [1.6.0](https://github.com/jorenn92/Maintainerr/compare/v1.5.0...v1.6.0) (2023-09-18)
 
 
