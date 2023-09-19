@@ -15,11 +15,7 @@
  - Do you have a lot of (requested) media that never gets watched?
  - Have people requested shows to be added, watch it, and let the media just sit there never to be touched again?
  
- If you answered yes to any of those questions.. You NEED <b>Maintainerr</b>.
-
-With <b>Maintainerr</b> you create custom rules using parameters from different services.
-<b>Maintainerr</b> will scrape your media for matches, create a collection in Plex, optionally show you and your users the collection on the Plex home screen and handle the deletion after a custom specified amount of time. 
-
+If you answered yes to any of those questions.. You NEED <b>Maintainerr</b>.
 It's literally a one-stop-shop for handling those outlying shows and movies that are taking up precious and valuable space on your server.
 
 # Features
