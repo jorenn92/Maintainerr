@@ -5,9 +5,9 @@
 <p align="center" >
   <a href="https://discord.gg/WP4ZW2QYwk"><img src="https://dcbadge.vercel.app/api/server/WP4ZW2QYwk" width="25%" alt="Discord link"/></a>
   &nbsp; 
-  <img src="https://ci.cyntek.be/buildStatus/icon?job=Maintainerr%2FMaintainerr-dev-build" width="20%" alt="Build status" />
+  <img src="https://ci.cyntek.be/buildStatus/icon?job=Maintainerr%2FMaintainerr-dev-build" width="17%" alt="Build status" />
   &nbsp; 
-  <a href="https://hub.docker.com/r/jorenn92/maintainerr"><img src="https://img.shields.io/docker/pulls/jorenn92/maintainerr" alt="Docker pulls" width="20%"></a>
+  <a href="https://hub.docker.com/r/jorenn92/maintainerr"><img src="https://img.shields.io/docker/pulls/jorenn92/maintainerr" alt="Docker pulls" width="17%"></a>
 </p>
 
 <b>Maintainerr</b> makes managing your media easy. 
