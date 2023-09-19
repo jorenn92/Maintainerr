@@ -1,35 +1,42 @@
 <p align="center">
-  <img src="ui/public/logo_black.svg?raw=true" alt="Sublime's custom image"/>
+  <img src="ui/public/logo_black.svg?raw=true" alt="Maintainerr's custom image"/>
 </p>
 
-<div align="center">
-
-![Build Status](https://ci.cyntek.be/buildStatus/icon?job=Maintainerr%2FMaintainerr-dev-build)
-
-[![](https://dcbadge.vercel.app/api/server/WP4ZW2QYwk)](https://discord.gg/WP4ZW2QYwk)
-
-</div>
+<p align="center" >
+  <a href="https://discord.gg/WP4ZW2QYwk"><img src="https://dcbadge.vercel.app/api/server/WP4ZW2QYwk" width="15%" alt="Discord link"/></a>
+  &nbsp; 
+  <img src="https://ci.cyntek.be/buildStatus/icon?job=Maintainerr%2FMaintainerr-dev-build" width="10%" alt="Build status" />
+  &nbsp; 
+  <a href="https://hub.docker.com/r/jorenn92/maintainerr"><img src="https://img.shields.io/docker/pulls/jorenn92/maintainerr" alt="Docker pulls" width="10%"></a>
+</p>
 
 <b>Maintainerr</b> makes managing your media easy. 
- - Do you have a lot of media that you probably don't even need anymore?
- - Do people request stuff to be added to your server, then never watch it?
- - Have people requested some 6 episode show to be added, watch the show, and then the media just sits there never to be touched again?
+ - Do you hate being the janitor of your server?
+ - Do you have a lot of (requested) media that never gets watched?
+ - Have people requested shows to be added, watch it, and let the media just sit there never to be touched again?
  
- If you answered yes to any of those questions, or a similar scenario has happened... You NEED <b>Maintainerr</b>.
+ If you answered yes to any of those questions.. You NEED <b>Maintainerr</b>.
 
-In <b>Maintainerr</b> you create custom rules with your own specified parameters. <b>Maintainerr</b> will scrape your media for any matches to your set rules, create a collection in Plex, show you the collection in <b>Maintainerr</b>, and after a custom specified amount of time...handle the deletion. It's literally a one-stop-shop for handling those outlying shows and movies that are taking up precious and valuable space on your server.
+With <b>Maintainerr</b> you create custom rules using parameters from different services.
+<b>Maintainerr</b> will scrape your media for matches, create a collection in Plex, optionally show you and your users the collection on the Plex home screen and handle the deletion after a custom specified amount of time. 
+
+It's literally a one-stop-shop for handling those outlying shows and movies that are taking up precious and valuable space on your server.
 
 # Features
 - Configure rules specific to your needs, based off of several available options from Plex, Overseerr, Radarr, and Sonarr.
 - Manually add media to a collection, in case it's not included after rule execution. (one-off items that don't match a rule set)
 - Selectively exclude media from being added to a collection, even if it matches a rule.
-- Show a collection, containing  rule matched media, on the Plex home screen for a specific duration before deletion. Think "soon to be going away".
+- Show a collection, containing  rule matched media, on the Plex home screen for a specific duration before deletion. Think "Leaving soon".
+- Optionally use a manual Plex collection, in case you don't want <b>Maintainerr</b> to add & remove collections in Plex at will.
+- Add or remove media to/from the collection within Plex. <b>Maintainerr</b> will sync and add or exclude media to/from the internal collection.
+
 - Remove or unmonitor media from Radarr
 - Remove or unmonitor media from Sonarr
 - Clear requests from Overseerr
 - Delete files from disk
 
-Currently, <b>Maintainerr</b> supports using rule parameters from these apps :
+<br />
+Currently, <b>Maintainerr</b> supports rule parameters from these apps :
 
 - Plex
 - Overseerr
@@ -46,7 +53,7 @@ Currently, <b>Maintainerr</b> supports using rule parameters from these apps :
 # Installation
 
 Docker images for amd64, arm64 & armv7 are available under jorenn92/maintainerr. <br />
-Data is saved within the container under /opt/data, it is recommended to tie a persistant volume to this location in your docker command/compose file.
+Data is saved within the container under /opt/data, it is recommended to tie a persistent volume to this location in your docker command/compose file.
 
 For more information visit the [installation guide](docs/2-getting-started/1-installation/Installation.md) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your <b>Maintainerr</b> container.
 
@@ -59,7 +66,7 @@ services:
     image: jorenn92/maintainerr:latest
     container_name: maintainerr
     volumes:
-      - <persistant-local-file-directory>:/opt/data
+      - <persistent-local-volume>:/opt/data
     environment:
       - TZ=Europe/Brussels
     ports:
