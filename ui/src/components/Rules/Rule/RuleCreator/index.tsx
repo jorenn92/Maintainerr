@@ -9,6 +9,7 @@ import LoadingSpinner from '../../../Common/LoadingSpinner'
 import SectionHeading from '../../../Common/SectionHeading'
 import _ from 'lodash'
 import { ClipboardListIcon } from '@heroicons/react/solid'
+import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 
 interface IRulesToCreate {
   id: number
@@ -31,6 +32,7 @@ export interface ILoadedRule {
 
 interface iRuleCreator {
   mediaType?: MediaType
+  dataType?: EPlexDataType
   editData?: { rules: IRule[] }
   onUpdate: (rules: IRule[]) => void
   onCancel: () => void
@@ -263,6 +265,7 @@ const RuleCreator = (props: iRuleCreator) => {
                   section={sid}
                   newlyAdded={added.current}
                   mediaType={props.mediaType}
+                  dataType={props.dataType}
                   onCommit={ruleCommited}
                   onIncomplete={ruleOmitted}
                   onDelete={ruleDeleted}
@@ -281,7 +284,7 @@ const RuleCreator = (props: iRuleCreator) => {
               title={`Add a new section`}
             >
               {<ClipboardListIcon className="m-auto ml-5 h-5" />}
-              <p className="button-text m-auto mr-5 ml-1  text-zinc-200">
+              <p className="button-text m-auto ml-1 mr-5  text-zinc-200">
                 New section
               </p>
             </button>

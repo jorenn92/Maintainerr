@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface ArrActionProps {
   title: string
@@ -14,6 +14,10 @@ interface Option {
 
 const ArrAction = (props: ArrActionProps) => {
   const [state, setState] = useState<string>(props.default ? props.default.toString() : '0')
+
+  useEffect(() => {
+    setState(props.default ? props.default.toString() : '0')
+  }, [props.default])
 
   const options: Option[] = props.options
     ? props.options

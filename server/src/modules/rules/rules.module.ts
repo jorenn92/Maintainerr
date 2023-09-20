@@ -20,6 +20,7 @@ import { Collection } from '../collections/entities/collection.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
 import { Exclusion } from './entities/exclusion.entities';
 import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
+import { Settings } from '../settings/entities/settings.entities';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
       CollectionMedia,
       Exclusion,
       CommunityRuleKarma,
+      Settings,
     ]),
     OverseerrApiModule,
     TmdbApiModule,

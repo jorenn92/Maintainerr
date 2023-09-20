@@ -15,7 +15,17 @@ export class TmdbIdService {
     ratingKey: string,
   ): Promise<{ type: 'movie' | 'tv'; id: number | undefined }> {
     try {
-      const libItem: PlexMetadata = await this.plexApi.getMetadata(ratingKey);
+      let libItem: PlexMetadata = await this.plexApi.getMetadata(ratingKey);
+
+      // fetch show in case of season / episode
+      libItem = libItem.grandparentRatingKey
+        ? await this.plexApi.getMetadata(
+            libItem.grandparentRatingKey.toString(),
+          )
+        : libItem.parentRatingKey
+        ? await this.plexApi.getMetadata(libItem.parentRatingKey.toString())
+        : libItem;
+
       return this.getTmdbIdFromPlexData(libItem);
     } catch (e) {
       warn(`[TMDb] Failed to fetch id : ${e.message}`);
@@ -27,36 +37,47 @@ export class TmdbIdService {
     libItem: PlexMetadata | PlexLibraryItem,
   ): Promise<{ type: 'movie' | 'tv'; id: number | undefined }> {
     try {
-      const id = libItem.Guid
-        ? +libItem.Guid.find((el) => el.id.includes('tmdb'))?.id.split('://')[1]
-        : libItem.guid.includes('tmdb')
-        ? +libItem.guid.split('://')[1].split('?')[0]
-        : libItem.guid.includes('tvdb')
-        ? await this.tmdbApi
-            .getByExternalId({
-              externalId: +libItem.guid.split('://')[1]?.split('?')[0],
-              type: 'tvdb',
-            })
-            .then((resp) =>
-              resp?.movie_results.length > 0
-                ? resp?.movie_results[0].id
-                : resp?.tv_results[0].id,
-            )
-        : libItem.guid.includes('imdb')
-        ? await this.tmdbApi
-            .getByExternalId({
-              externalId: libItem.guid
-                .split('://')[1]
-                ?.split('?')[0]
-                ?.toString(),
-              type: 'imdb',
-            })
-            .then((resp) =>
-              resp?.movie_results.length > 0
-                ? resp?.movie_results[0]?.id
-                : resp?.tv_results[0]?.id,
-            )
-        : undefined;
+      let id: number = undefined;
+
+      if (libItem.Guid) {
+        if (libItem.Guid.find((el) => el.id.includes('tmdb'))) {
+          id = +libItem.Guid.find((el) => el.id.includes('tmdb')).id.split(
+            '://',
+          )[1];
+        }
+
+        if (!id && libItem.Guid.find((el) => el.id.includes('tvdb'))) {
+          const resp = await this.tmdbApi.getByExternalId({
+            externalId: +libItem.Guid.find((el) => el.id.includes('tvdb'))
+              ?.id.split('://')[1]
+              ?.split('?')[0],
+            type: 'tvdb',
+          });
+
+          if (resp) {
+            id =
+              resp.movie_results?.length > 0
+                ? resp.movie_results[0]?.id
+                : resp.tv_results[0]?.id;
+          }
+        }
+
+        if (!id && libItem.Guid.find((el) => el.id.includes('imdb'))) {
+          const resp = await this.tmdbApi.getByExternalId({
+            externalId: libItem.Guid.find((el) => el.id.includes('imdb'))
+              ?.id.split('://')[1]
+              ?.split('?')[0],
+            type: 'imdb',
+          });
+
+          if (resp) {
+            id =
+              resp.movie_results?.length > 0
+                ? resp.movie_results[0]?.id
+                : resp.tv_results[0]?.id;
+          }
+        }
+      }
       return {
         type: ['show', 'season', 'episode'].includes(libItem.type)
           ? 'tv'

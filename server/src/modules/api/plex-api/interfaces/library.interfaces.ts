@@ -6,6 +6,7 @@ export interface PlexLibraryItem {
   parentRatingKey?: string;
   grandparentRatingKey?: string;
   title: string;
+  parentTitle?: string;
   guid: string;
   parentGuid?: string;
   grandparentGuid?: string;
@@ -32,6 +33,8 @@ export interface PlexLibraryItem {
   Role?: PlexActor[];
   leafCount?: number;
   viewedLeafCount?: number;
+  index?: number;
+  parentIndex?: number;
   Collection?: { tag: string }[];
 }
 

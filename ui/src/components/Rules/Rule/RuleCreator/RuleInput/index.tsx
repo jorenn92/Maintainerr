@@ -5,6 +5,8 @@ import ConstantsContext, {
   IProperty,
   MediaType,
 } from '../../../../../contexts/constants-context'
+import { EPlexDataType } from '../../../../../utils/PlexDataType-enum'
+import _, { first } from 'lodash'
 
 enum RulePossibility {
   BIGGER,
@@ -42,6 +44,7 @@ interface IRuleInput {
   id?: number
   tagId?: number
   mediaType?: MediaType
+  dataType?: EPlexDataType
   section?: number
   newlyAdded?: number[]
   editData?: { rule: IRule }
@@ -63,10 +66,6 @@ const RuleInput = (props: IRuleInput) => {
 
   const [possibilities, setPossibilities] = useState<number[]>([])
   const [ruleType, setRuleType] = useState<number>(0)
-
-  useEffect(() => {
-    console.log(customVal)
-  }, [customVal])
 
   useEffect(() => {
     if (props.editData?.rule) {
@@ -206,7 +205,29 @@ const RuleInput = (props: IRuleInput) => {
 
   useEffect(() => {
     submit(null)
-  }, [secondVal, customVal, operator, action, firstval])
+  }, [secondVal, customVal, operator, action, firstval, customValType])
+
+  useEffect(() => {
+    // reset firstval & secondval in case of type switch & choices don't exist
+    const apps = _.cloneDeep(ConstantsCtx.constants.applications)?.map(
+      (app) => {
+        app.props = app.props.filter((prop) => {
+          return (
+            (prop.mediaType === MediaType.BOTH ||
+              props.mediaType === prop.mediaType) &&
+            (!prop.showType || prop.showType.includes(props.dataType!))
+          )
+        })
+        return app
+      }
+    )
+    if (firstval) {
+      const val = JSON.parse(firstval)
+      if (apps && !apps[val[0]].props.find((el) => el.id == val[1])) {
+        setFirstVal(undefined)
+      }
+    }
+  }, [props.dataType, props.mediaType])
 
   useEffect(() => {
     if (firstval) {
@@ -343,12 +364,14 @@ const RuleInput = (props: IRuleInput) => {
             >
               <option value={undefined}></option>
               {ConstantsCtx.constants.applications?.map((app) => {
-                return app.mediaType === MediaType.BOTH ||
-                  props.mediaType === app.mediaType ? (
+                return (app.mediaType === MediaType.BOTH ||
+                  props.mediaType === app.mediaType) ? (
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
-                      return prop.mediaType === MediaType.BOTH ||
-                        props.mediaType === prop.mediaType ? (
+                      return (prop.mediaType === MediaType.BOTH ||
+                        props.mediaType === prop.mediaType) &&
+                        (!prop.showType ||
+                          prop.showType.includes(props.dataType!)) ? (
                         <option
                           key={app.id + 10 + prop.id}
                           value={JSON.stringify([app.id, prop.id])}
@@ -443,8 +466,10 @@ const RuleInput = (props: IRuleInput) => {
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
                       if (+prop.type.key === ruleType) {
-                        return prop.mediaType === MediaType.BOTH ||
-                          props.mediaType === prop.mediaType ? (
+                        return (prop.mediaType === MediaType.BOTH ||
+                          props.mediaType === prop.mediaType) &&
+                          (!prop.showType ||
+                            prop.showType.includes(props.dataType!)) ? (
                           <option
                             key={app.id + 10 + prop.id}
                             value={JSON.stringify([app.id, prop.id])}

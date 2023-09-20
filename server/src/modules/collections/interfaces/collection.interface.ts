@@ -1,8 +1,9 @@
+import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
 import { CollectionMedia } from '../entities/collection_media.entities';
 
 export interface ICollection {
   id?: number;
-  type: 1 | 2;
+  type: EPlexDataType;
   plexId?: number;
   libraryId: number;
   title: string;
@@ -10,6 +11,7 @@ export interface ICollection {
   isActive: boolean;
   arrAction: number;
   visibleOnHome?: boolean;
+  listExclusions?: boolean;
   deleteAfterDays?: number; // amount of days after add
   media?: CollectionMedia[];
   manualCollection?: boolean;

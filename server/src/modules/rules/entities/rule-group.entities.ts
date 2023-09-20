@@ -34,6 +34,9 @@ export class RuleGroup {
   @Column({ nullable: false, default: true })
   useRules: boolean;
 
+  @Column({ nullable: true })
+  dataType: number;
+
   @OneToMany((type) => Rules, (rules) => rules.ruleGroup, {
     onDelete: 'CASCADE',
   })

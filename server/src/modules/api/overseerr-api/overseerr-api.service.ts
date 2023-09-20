@@ -7,7 +7,8 @@ export interface OverSeerrMediaResponse {
   imdbid: string;
   collection: OverseerCollection;
   mediaInfo: OverseerrMediaInfo;
-  releaseDate: Date;
+  releaseDate?: Date;
+  firstAirDate?: Date;
 }
 interface OverseerCollection {
   id: number;
@@ -28,9 +29,10 @@ interface OverseerrMediaInfo {
   externalServiceId: number;
   externalServiceId4k: number;
   requests?: OverseerrRequest[];
+  seasons?: OverseerrSeason[];
 }
 
-interface OverseerrRequest {
+export interface OverseerrRequest {
   id: number;
   status: number;
   media: OverseerMedia;
@@ -42,6 +44,7 @@ interface OverseerrRequest {
   serverId: number;
   profileId: number;
   rootFolder: string;
+  seasons: OverseerrSeason[];
 }
 
 interface OverseerrUser {
@@ -56,6 +59,14 @@ interface OverseerrUser {
   createdAt: string;
   updatedAt: string;
   requestCount: number;
+}
+
+export interface OverseerrSeason {
+  id: number;
+  name: string;
+  seasonNumber: number;
+  requestedBy: OverseerrUser;
+  // episodes: OverseerrEpisode[];
 }
 
 interface OverseerrStatus {
@@ -165,6 +176,46 @@ export class OverseerrApiService {
     } catch (err) {
       this.logger.warn(
         'Overseerr communication failed. Is the application running?',
+        err,
+      );
+      return undefined;
+    }
+  }
+
+  public async removeSeasonRequest(tmdbid: string | number, season: number) {
+    try {
+      const media = await this.getShow(tmdbid);
+
+      if (media && media.mediaInfo) {
+        const requests = media.mediaInfo.requests.filter((el) =>
+          el.seasons.find((s) => s.seasonNumber === season),
+        );
+        if (requests.length > 0) {
+          requests.forEach((el) => {
+            this.deleteRequest(el.id.toString());
+          });
+        } else {
+          // no requests ? clear data and let Overseerr refetch.
+          await this.api.delete(`/media/${media.id}`);
+        }
+
+        // can't clear season data. Overserr doesn't have media ID's for seasons...
+
+        // const seasons = media.mediaInfo.seasons?.filter(
+        //   (el) => el.seasonNumber === season,
+        // );
+
+        // if (seasons.length > 0) {
+        //   for (const el of seasons) {
+        //     const resp = await this.api.post(`/media/${el.id}/unknown`);
+        //     console.log(resp);
+        //   }
+        // }
+      }
+    } catch (err) {
+      this.logger.warn(
+        'Overseerr communication failed. Is the application running?',
+        err,
       );
       return undefined;
     }

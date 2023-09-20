@@ -7,6 +7,7 @@ import { CollectionsService } from '../collections/collections.service';
 import { Collection } from '../collections/entities/collection.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
 import {
+  Application,
   Property,
   RuleConstants,
   RulePossibility,
@@ -20,6 +21,9 @@ import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Exclusion } from './entities/exclusion.entities';
 import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
+import { Settings } from '../settings/entities/settings.entities';
+import _ from 'lodash';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -47,14 +51,41 @@ export class RulesService {
     private readonly communityRuleKarmaRepository: Repository<CommunityRuleKarma>,
     @InjectRepository(Exclusion)
     private readonly exclusionRepo: Repository<Exclusion>,
+    @InjectRepository(Settings)
+    private readonly settingsRepo: Repository<Settings>,
     private readonly collectionService: CollectionsService,
     private readonly plexApi: PlexApiService,
     private readonly connection: Connection,
   ) {
     this.ruleConstants = new RuleConstants();
   }
-  get getRuleConstants(): RuleConstants {
-    return this.ruleConstants;
+  async getRuleConstants(): Promise<RuleConstants> {
+    const settings = await this.settingsRepo.findOne();
+    const localConstants = _.cloneDeep(this.ruleConstants);
+    if (settings) {
+      // remove overseerr if not configured
+      if (!settings.overseerr_api_key || !settings.overseerr_url) {
+        localConstants.applications = localConstants.applications.filter(
+          (el) => el.id !== Application.OVERSEERR,
+        );
+      }
+
+      // remove radarr if not configured
+      if (!settings.radarr_url || !settings.radarr_api_key) {
+        localConstants.applications = localConstants.applications.filter(
+          (el) => el.id !== Application.RADARR,
+        );
+      }
+
+      // remove sonarr if not configured
+      if (!settings.sonarr_url || !settings.sonarr_api_key) {
+        localConstants.applications = localConstants.applications.filter(
+          (el) => el.id !== Application.SONARR,
+        );
+      }
+    }
+
+    return localConstants;
   }
   async getRules(ruleGroupId: string): Promise<Rules[]> {
     try {
@@ -145,11 +176,19 @@ export class RulesService {
         const collection = (
           await this.collectionService.createCollection({
             libraryId: +params.libraryId,
-            type: lib.type === 'movie' ? 1 : 2,
+            type:
+              lib.type === 'movie'
+                ? EPlexDataType.MOVIES
+                : params.dataType !== undefined
+                ? params.dataType
+                : EPlexDataType.SHOWS,
             title: params.name,
             description: params.description,
             arrAction: params.arrAction ? params.arrAction : 0,
             isActive: params.isActive,
+            listExclusions: params.listExclusions
+              ? params.listExclusions
+              : false,
             visibleOnHome: params.collection?.visibleOnHome,
             deleteAfterDays: +params.collection?.deleteAfterDays,
             manualCollection: params.collection?.manualCollection,
@@ -164,6 +203,7 @@ export class RulesService {
           collection.id,
           params.useRules !== undefined ? params.useRules : true,
           params.isActive !== undefined ? params.isActive : true,
+          params.dataType !== undefined ? params.dataType : undefined,
         );
         // create rules
         if (params.useRules) {
@@ -332,6 +372,7 @@ export class RulesService {
     collectionId: number,
     useRules = true,
     isActive = true,
+    dataType = undefined,
   ): Promise<number> {
     try {
       const groupId = await this.connection
@@ -346,6 +387,7 @@ export class RulesService {
             collectionId: +collectionId,
             isActive: isActive,
             useRules: useRules,
+            dataType: dataType,
           },
         ])
         .execute();

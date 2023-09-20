@@ -23,7 +23,7 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
   }
 
   return (
-    <div>
+    <div className='w-full'>
       {!sure ? (
         <Button
           buttonType="primary"

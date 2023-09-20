@@ -44,7 +44,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       });
 
       if (!response.data[0]) {
-        this.logger.error(`Movie not found`);
+        this.logger.warn(`Could not find Movie with TMDb id ${id} in Radarr`);
       }
 
       return response.data[0];
@@ -149,10 +149,14 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
     }
   }
 
-  public async deleteMovie(movieId: number, deleteFiles = true) {
+  public async deleteMovie(
+    movieId: number,
+    deleteFiles = true,
+    importExclusion = false,
+  ) {
     try {
       await this.runDelete(
-        `movie/${movieId}?addImportExclusion=false&deleteFiles=${deleteFiles}`,
+        `movie/${movieId}?deleteFiles=${deleteFiles}&addImportExclusion=${importExclusion}`,
       );
     } catch (e) {
       this.logger.log("Couldn't delete movie. Does it exist in radarr?");

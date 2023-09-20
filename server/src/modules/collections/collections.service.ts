@@ -63,7 +63,52 @@ export class CollectionsService {
       return await this.CollectionMediaRepo.find({ collectionId: id });
     } catch (err) {
       this.logger.warn(
-        'An error occurred while performing collection actions.',
+        'An error occurred while performing collection actions: ' + err,
+      );
+      return undefined;
+    }
+  }
+
+  public async getCollectionMediaWitPlexDataAndhPaging(
+    id: number,
+    { offset = 0, size = 25 }: { offset?: number; size?: number } = {},
+  ): Promise<{ totalSize: number; items: CollectionMedia[] }> {
+    try {
+      const queryBuilder =
+        this.CollectionMediaRepo.createQueryBuilder('collection_media');
+
+      queryBuilder
+        .where('collection_media.collectionId = :id', { id })
+        .orderBy('collection_media.addDate', 'DESC')
+        .skip(offset)
+        .take(size);
+
+      const itemCount = await queryBuilder.getCount();
+      let { entities } = await queryBuilder.getRawAndEntities();
+
+      entities = await Promise.all(
+        entities.map(async (el) => {
+          el.plexData = await this.plexApi.getMetadata(el.plexId.toString());
+          if (el.plexData?.grandparentRatingKey) {
+            el.plexData.parentData = await this.plexApi.getMetadata(
+              el.plexData.grandparentRatingKey.toString(),
+            );
+          } else if (el.plexData?.parentRatingKey) {
+            el.plexData.parentData = await this.plexApi.getMetadata(
+              el.plexData.parentRatingKey.toString(),
+            );
+          }
+          return el;
+        }),
+      );
+
+      return {
+        totalSize: itemCount,
+        items: entities ?? [],
+      };
+    } catch (err) {
+      this.logger.warn(
+        'An error occurred while performing collection actions: ' + err,
       );
       return undefined;
     }
@@ -264,7 +309,7 @@ export class CollectionsService {
     return collection;
   }
 
-  private async checkAutomaticPlexLink(
+  public async checkAutomaticPlexLink(
     collection: Collection,
   ): Promise<Collection> {
     // checks and fixes automatic collection link
@@ -380,35 +425,41 @@ export class CollectionsService {
       });
       if (collectionMedia.length > 0) {
         for (const childMedia of media) {
-          if (collectionMedia.length > 0) {
-            if (
-              collectionMedia.find(
-                (el) => +el.plexId === +childMedia.plexId,
-              ) !== undefined
-            ) {
-              await this.removeChildFromCollection(
-                { plexId: +collection.plexId, dbId: collection.id },
-                childMedia.plexId,
-              );
-              collectionMedia = collectionMedia.filter(
-                (el) => +el.plexId !== +childMedia.plexId,
-              );
-            }
+          if (
+            collectionMedia.find((el) => +el.plexId === +childMedia.plexId) !==
+            undefined
+          ) {
+            await this.removeChildFromCollection(
+              { plexId: +collection.plexId, dbId: collection.id },
+              childMedia.plexId,
+            );
+
+            collectionMedia = collectionMedia.filter(
+              (el) => +el.plexId !== +childMedia.plexId,
+            );
           }
         }
 
         if (collectionMedia.length <= 0 && !collection.manualCollection) {
-          await this.plexApi.deleteCollection(collection.plexId.toString());
-          await this.collectionRepo.save({
-            ...collection,
-            plexId: null,
-          });
+          const resp = await this.plexApi.deleteCollection(
+            collection.plexId.toString(),
+          );
+
+          if (resp.code === 1) {
+            await this.collectionRepo.save({
+              ...collection,
+              plexId: null,
+            });
+          } else {
+            this.logger.warn(resp.message);
+          }
         }
       }
       return collection;
     } catch (err) {
       this.logger.warn(
-        'An error occurred while performing collection actions.',
+        `An error occurred while removing media from collection with internal id ${collectionDbId}`,
+        err,
       );
       return undefined;
     }
@@ -555,8 +606,9 @@ export class CollectionsService {
           ])
           .execute();
       } else {
-        this.infoLogger(
-          `Couldn't add media to collection: ` + responseColl.message,
+        this.logger.warn(
+          `Couldn't add media to collection: `,
+          responseColl.message,
         );
       }
     } catch (err) {
@@ -629,6 +681,7 @@ export class CollectionsService {
                 isActive: collection.isActive,
                 visibleOnHome: collection?.visibleOnHome,
                 deleteAfterDays: collection?.deleteAfterDays,
+                listExclusions: collection?.listExclusions,
                 manualCollection:
                   collection?.manualCollection !== undefined
                     ? collection?.manualCollection
@@ -727,6 +780,59 @@ export class CollectionsService {
       return undefined;
     }
   }
+
+  // TODO: verwijderen als effectief niet nodig
+  // async syncCollectionMediaChildren(
+  //   collectionDbId: number,
+  //   collectionMediaChildren: [{ parent: number; child: number }],
+  // ): Promise<Collection> {
+  //   const collection = await this.collectionRepo.findOne(collectionDbId);
+  //   if (collectionMediaChildren) {
+  //     if (collection) {
+  //       // add missing children
+  //       collectionMediaChildren.forEach((el) => {
+  //         const media = collection.collectionMedia.find(
+  //           (media) => media.plexId === el.parent,
+  //         );
+  //         if (media) {
+  //           if (
+  //             !media.collectionMediaChild.find(
+  //               (child) => child.plexId === el.child,
+  //             )
+  //           ) {
+  //             this.collectionMediaChildRepo.save({
+  //               plexId: el.child,
+  //               collectionMediaId: media.id,
+  //             });
+  //           }
+  //         } else {
+  //           this.infoLogger(
+  //             `Couldn't find media with plexId ${el.parent}, this means the child with plexId ${el.child} could not be synced`,
+  //           );
+  //         }
+  //       });
+
+  //       // remove deleted children
+  //       collection.collectionMedia.forEach((media) => {
+  //         media.collectionMediaChild.forEach((child) => {
+  //           if (
+  //             !collectionMediaChildren.find(
+  //               (el) => el.parent === media.plexId && el.child === child.plexId,
+  //             )
+  //           ) {
+  //             this.collectionMediaChildRepo.delete(child.id);
+  //           }
+  //         });
+  //       });
+
+  //       // update & return collection
+  //       return await this.collectionRepo.findOne(collectionDbId);
+  //     } else {
+  //       this.infoLogger(`Couldn't find collection with id ${collectionDbId}`);
+  //     }
+  //   }
+  //   return collection;
+  // }
 
   private infoLogger(message: string) {
     this.logger.log(message);

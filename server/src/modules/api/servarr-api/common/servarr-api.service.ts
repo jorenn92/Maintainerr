@@ -117,15 +117,21 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     }
   };
 
-  protected async runCommand(
+  public async runCommand(
     commandName: string,
     options: Record<string, unknown>,
-  ): Promise<void> {
+    wait = false,
+  ): Promise<any> {
     try {
-      await this.axios.post(`/command`, {
+      const resp = await this.axios.post(`/command`, {
         name: commandName,
         ...options,
       });
+      if (wait && resp.data) {
+        while (resp.data.status !== 'failed' && resp.data.status !== 'finished')
+          resp.data = await this.get('/command/' + resp.data.id);
+      }
+      return resp ? resp.data : undefined;
     } catch (e) {
       warn(`[${this.apiName}] Failed to run command: ${e.message}`);
     }

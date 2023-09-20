@@ -32,9 +32,12 @@ export interface SonarrInfo {
 export interface SonarrEpisode {
   seriesId: number;
   seasonNumber: number;
+  episodeNumber: number;
+  episodeFileId: number;
   relativePath: string;
   path: string;
   size: number;
+  monitored: boolean;
   dateAdded: Date;
   sceneName?: string;
   releaseGroup?: string;

@@ -15,6 +15,8 @@ export interface IRuleGroup {
   collectionId: number
   rules: IRuleJson[]
   useRules: boolean
+  type?: number
+  listExclusions?: boolean
 }
 
 const RuleGroup = (props: {

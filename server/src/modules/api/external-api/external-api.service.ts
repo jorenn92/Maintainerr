@@ -81,6 +81,19 @@ export class ExternalApiService {
     }
   }
 
+  public async post<T>(
+    endpoint: string,
+    data?: string,
+    config?: RawAxiosRequestConfig,
+  ): Promise<T> {
+    try {
+      const response = await this.axios.post<T>(endpoint, data, config);
+      return response.data;
+    } catch (err) {
+      return undefined;
+    }
+  }
+
   public async getRolling<T>(
     endpoint: string,
     config?: RawAxiosRequestConfig,

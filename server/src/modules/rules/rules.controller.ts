@@ -21,8 +21,8 @@ export class RulesController {
     private readonly ruleExecutorService: RuleExecutorService,
   ) {}
   @Get('/constants')
-  getRuleConstants() {
-    return this.rulesService.getRuleConstants;
+  async getRuleConstants() {
+    return await this.rulesService.getRuleConstants();
   }
 
   @Get('/community')

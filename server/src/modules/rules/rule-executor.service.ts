@@ -19,6 +19,7 @@ import { RulesDto } from './dtos/rules.dto';
 import { RuleGroup } from './entities/rule-group.entities';
 import { ValueGetterService } from './getter/getter.service';
 import { RulesService } from './rules.service';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 
 interface PlexData {
   page: number;
@@ -34,6 +35,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   ruleConstants: RuleConstants;
   userId: string;
   plexData: PlexData;
+  plexDataType: EPlexDataType;
   workerData: PlexLibraryItem[];
   resultData: PlexLibraryItem[];
   constructor(
@@ -86,12 +88,15 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       if (ruleGroups) {
         for (const rulegroup of ruleGroups) {
           if (rulegroup.useRules) {
-            this.logger.log(`Executing rules for ${rulegroup.name}`);
+            this.logger.log(`Executing rules for '${rulegroup.name}'`);
 
             this.workerData = [];
             this.resultData = [];
 
             this.plexData = { page: 0, finished: false, data: [] };
+            this.plexDataType = rulegroup.dataType
+              ? rulegroup.dataType
+              : undefined;
             while (!this.plexData.finished) {
               await this.getPlexData(rulegroup.libraryId);
               let currentSection = 0;
@@ -122,7 +127,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
             await this.handleCollection(
               await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
             );
-            this.logger.log(`Execution of rules for ${rulegroup.name} done.`);
+            this.logger.log(`Execution of rules for '${rulegroup.name}' done.`);
           }
           await this.syncManualPlexMediaToCollectionDB(
             await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
@@ -226,87 +231,116 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   private async handleCollection(rulegroup: RuleGroup) {
-    let collection = await this.collectionService.getCollection(
-      rulegroup.collectionId,
-    );
-    const exclusions = await this.rulesService.getExclusions(rulegroup.id);
-
-    let data = this.resultData.map((e) => {
-      return +e.ratingKey;
-    });
-
-    // Filter exclusions out of resultData
-    data = data.filter(
-      (el) => exclusions.find((e) => +e.plexId === +el) === undefined,
-    );
-
-    if (collection) {
-      const collMediaData = await this.collectionService.getCollectionMedia(
-        collection.id,
+    try {
+      let collection = await this.collectionService.getCollection(
+        rulegroup?.collectionId,
       );
-      // Add manually added media to data
-      const manualData = collMediaData
-        .filter((el) => el.isManual === true)
-        .map((e) => e.plexId);
 
-      data.push(...manualData);
+      const exclusions = await this.rulesService.getExclusions(rulegroup.id);
 
-      let currentCollectionData = collMediaData.map((e) => {
-        return e.plexId;
-      });
+      // keep a record of parent/child ratingKeys for seasons & episodes
+      const collectionMediaCHildren: [{ parent: number; child: number }] =
+        undefined;
 
-      currentCollectionData = currentCollectionData
-        ? currentCollectionData
-        : [];
-
-      const dataToAdd = data
-        .filter((el) => !currentCollectionData.includes(el))
+      // filter exclusions out of results & get correct ratingKey
+      const data = this.resultData
+        .filter((el) => !exclusions.find((e) => +e.plexId === +el.ratingKey))
         .map((el) => {
-          return { plexId: el };
+          return +el.ratingKey;
         });
 
-      const dataToRemove = currentCollectionData
-        .filter((el) => !data.includes(el))
-        .map((el) => {
-          return { plexId: el };
+      if (collection) {
+        const collMediaData = await this.collectionService.getCollectionMedia(
+          collection.id,
+        );
+
+        // check Plex collection link
+        if (collMediaData.length > 0 && collection.plexId) {
+          collection = await this.collectionService.checkAutomaticPlexLink(
+            collection,
+          );
+          // if collection was removed while it should be available.. resync current data
+          if (!collection.plexId) {
+            collection = await this.collectionService.addToCollection(
+              collection.id,
+              collMediaData,
+              collection.manualCollection,
+            );
+            if (collection) {
+              collection = await this.collectionService.saveCollection(
+                collection,
+              );
+            }
+          }
+        }
+
+        // Add manually added media to data
+        const manualData = collMediaData
+          .filter((el) => el.isManual === true)
+          .map((e) => e.plexId);
+
+        data.push(...manualData);
+
+        let currentCollectionData = collMediaData.map((e) => {
+          return e.plexId;
         });
 
-      if (dataToRemove.length > 0) {
-        this.logInfo(
-          `Removing ${dataToRemove.length} media items from '${
-            collection.manualCollection
-              ? collection.manualCollectionName
-              : collection.title
-          }'.`,
+        currentCollectionData = currentCollectionData
+          ? currentCollectionData
+          : [];
+
+        const dataToAdd = data
+          .filter((el) => !currentCollectionData.includes(el))
+          .map((el) => {
+            return { plexId: el };
+          });
+
+        const dataToRemove = currentCollectionData
+          .filter((el) => !data.includes(el))
+          .map((el) => {
+            return { plexId: el };
+          });
+
+        if (dataToRemove.length > 0) {
+          this.logInfo(
+            `Removing ${dataToRemove.length} media items from '${
+              collection.manualCollection
+                ? collection.manualCollectionName
+                : collection.title
+            }'.`,
+          );
+        }
+
+        if (dataToAdd.length > 0) {
+          this.logInfo(
+            `Adding ${dataToAdd.length} media items to '${
+              collection.manualCollection
+                ? collection.manualCollectionName
+                : collection.title
+            }'.`,
+          );
+        }
+
+        collection = await this.collectionService.relinkManualCollection(
+          collection,
         );
-      }
 
-      if (dataToAdd.length > 0) {
-        this.logInfo(
-          `Adding ${dataToAdd.length} media items to '${
-            collection.manualCollection
-              ? collection.manualCollectionName
-              : collection.title
-          }'.`,
+        collection = await this.collectionService.addToCollection(
+          collection.id,
+          dataToAdd,
         );
+
+        collection = await this.collectionService.removeFromCollection(
+          collection.id,
+          dataToRemove,
+        );
+
+        return collection;
+      } else {
+        this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
       }
-
-      collection = await this.collectionService.relinkManualCollection(
-        collection,
-      );
-
-      collection = await this.collectionService.addToCollection(
-        collection.id,
-        dataToAdd,
-      );
-
-      collection = await this.collectionService.removeFromCollection(
-        collection.id,
-        dataToRemove,
-      );
-      return collection;
-    } else {
-      this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
+    } catch (err) {
+      this.logger.warn(`Execption occurred whild handling rule: `, err);
     }
   }
 
@@ -322,6 +356,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         offset: +this.plexData.page * size,
         size: size,
       },
+      this.plexDataType,
     );
     if (response) {
       this.plexData.data = response.items ? response.items : [];
@@ -348,9 +383,17 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     }
     // for (const [index, el] of data.entries()) {
     for (let i = data.length - 1; i >= 0; i--) {
-      firstVal = await this.valueGetter.get(rule.firstVal, data[i]);
+      firstVal = await this.valueGetter.get(
+        rule.firstVal,
+        data[i],
+        this.plexDataType,
+      );
       if (rule.lastVal) {
-        secondVal = await this.valueGetter.get(rule.lastVal, data[i]);
+        secondVal = await this.valueGetter.get(
+          rule.lastVal,
+          data[i],
+          this.plexDataType,
+        );
       } else {
         secondVal =
           rule.customVal.ruleTypeId === +RuleType.DATE
@@ -408,6 +451,12 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   private doRuleAction<T>(val1: T, val2: T, action: RulePossibility): boolean {
+    if (typeof val1 === 'string') {
+      val1 = val1.toLowerCase() as unknown as T;
+    }
+    if (typeof val2 === 'string') {
+      val2 = val2.toLowerCase() as unknown as T;
+    }
     if (action === RulePossibility.BIGGER) {
       return val1 > val2;
     }
@@ -416,10 +465,20 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     }
     if (action === RulePossibility.EQUALS) {
       if (!Array.isArray(val1)) {
+        if (val1 instanceof Date && val2 instanceof Date) {
+          return (
+            new Date(val1.toDateString()).valueOf() ===
+            new Date(val2.toDateString()).valueOf()
+          );
+        }
         return val1 === val2;
       } else {
         if (val1.length > 0) {
           return val1.every((e) => {
+            e =
+              typeof e === 'string'
+                ? (e as unknown as string).toLowerCase()
+                : e;
             if (Array.isArray(val2)) {
               return (val2 as unknown as T[]).includes(e);
             } else {

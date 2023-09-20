@@ -1,3 +1,33 @@
+## [1.6.1](https://github.com/jorenn92/Maintainerr/compare/v1.6.0...v1.6.1) (2023-09-19)
+
+
+### Bug Fixes
+
+* **rules:** Fixed an issue where list exclusions would always be checked ([9280100](https://github.com/jorenn92/Maintainerr/commit/92801004a8efe87dcf93a2919d0e30fa7159c8b3))
+
+# [1.6.0](https://github.com/jorenn92/Maintainerr/compare/v1.5.0...v1.6.0) (2023-09-18)
+
+
+### Bug Fixes
+
+* **rules & collections:** Fixed rule & collection handling issues when not all apps were configured ([54a25d5](https://github.com/jorenn92/Maintainerr/commit/54a25d5354bc974058ca829fc2098f3ef043a61e))
+* **rules:** Fix  a problem where Sonarr's date rules don't work as expected ([d271fb0](https://github.com/jorenn92/Maintainerr/commit/d271fb050e66b787a28fff41b01e7e12bb789e58))
+* **rules:** Fixed an issue where rule handling would fail when the Plex collection was manually removed. The collection will now get recreated. ([65f551d](https://github.com/jorenn92/Maintainerr/commit/65f551d412cb6c5c480114ed2d71e196607d803d))
+* **settings:** Disabled configuration of apps while Plex is not yet configured ([69def0c](https://github.com/jorenn92/Maintainerr/commit/69def0cef289b5f2dbc3a5a87a408e05ce0be02e))
+
+
+### Features
+
+* **rules:** Added the possibility to add removed media to *arr's list exclusion ([37b511a](https://github.com/jorenn92/Maintainerr/commit/37b511aed262ac8d6957d6045e0b8932f1634d6f))
+
+# [1.5.0](https://github.com/jorenn92/Maintainerr/compare/v1.4.2...v1.5.0) (2023-09-15)
+
+
+### Features
+
+* **rules:** Add possibility to unmonitor shows & movies without removing the files ([f41c2e8](https://github.com/jorenn92/Maintainerr/commit/f41c2e87c1c4ab6c0a2f339049f6995684321c11))
+* **rules:** added the ability to create rules for seasons & episodes ([#474](https://github.com/jorenn92/Maintainerr/issues/474)) ([b6e8a6c](https://github.com/jorenn92/Maintainerr/commit/b6e8a6ccaf31f2be6ba389db64fbabb0ee40d263))
+
 ## [1.4.2](https://github.com/jorenn92/Maintainerr/compare/v1.4.1...v1.4.2) (2023-08-09)
 
 

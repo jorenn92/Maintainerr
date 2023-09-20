@@ -19,6 +19,7 @@ export interface PlexMetadata {
   addedAt: number;
   updatedAt: number;
   media: Media[];
+  parentData?: PlexMetadata;
 }
 
 export interface Media {

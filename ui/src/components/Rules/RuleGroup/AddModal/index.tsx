@@ -23,6 +23,7 @@ import Router from 'next/router'
 import Link from 'next/link'
 import Button from '../../../Common/Button'
 import CommunityRuleModal from '../../../Common/CommunityRuleModal'
+import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -37,6 +38,7 @@ interface ICreateApiObject {
   arrAction: number
   isActive: boolean
   useRules: boolean
+  listExclusions: boolean
   collection: {
     visibleOnHome: boolean
     deleteAfterDays: number
@@ -44,11 +46,15 @@ interface ICreateApiObject {
     manualCollectionName?: String
   }
   rules: IRule[]
+  dataType: EPlexDataType
 }
 
 const AddModal = (props: AddModal) => {
   const [selectedLibraryId, setSelectedLibraryId] = useState<string>(
     props.editData ? props.editData.libraryId.toString() : '1'
+  )
+  const [selectedType, setSelectedType] = useState<string>(
+    props.editData && props.editData.type ? props.editData.type.toString() : '1'
   )
   const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
   const [collection, setCollection] = useState<ICollection>()
@@ -58,9 +64,12 @@ const AddModal = (props: AddModal) => {
   const nameRef = useRef<any>()
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
+  const collectionTypeRef = useRef<any>(EPlexDataType.MOVIES)
   const deleteAfterRef = useRef<any>()
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showHome, setShowHome] = useState<boolean>(true)
+  const [listExclusion, setListExclusion] = useState<boolean>(true)
+
   const [manualCollection, setManualCollection] = useState<boolean>(false)
   const [manualCollectionName, setManualCollectionName] = useState<string>(
     'My custom collection'
@@ -85,6 +94,12 @@ const AddModal = (props: AddModal) => {
 
   function setLibraryId(event: { target: { value: string } }) {
     setSelectedLibraryId(event.target.value)
+    setArrOption(0)
+  }
+
+  function setCollectionType(event: { target: { value: string } }) {
+    setSelectedType(event.target.value)
+    setArrOption(0)
   }
 
   function updateRules(rules: IRule[]) {
@@ -124,6 +139,7 @@ const AddModal = (props: AddModal) => {
       (el: ILibrary) => +el.key === +selectedLibraryId
     )
     setSelectedLibrary(lib)
+    setSelectedType(lib?.type === 'movie' ? '1' : '2')
   }, [selectedLibraryId])
 
   useEffect(() => {
@@ -143,8 +159,11 @@ const AddModal = (props: AddModal) => {
       ).then((resp: ICollection) => {
         resp ? setCollection(resp) : undefined
         resp ? setShowHome(resp.visibleOnHome!) : undefined
+        resp ? setListExclusion(resp.listExclusions!) : undefined
         resp ? setArrOption(resp.arrAction) : undefined
+        resp && resp.type ? setSelectedType(resp.type.toString()) : '1'
         resp ? setManualCollection(resp.manualCollection) : undefined
+
         setIsLoading(false)
       })
     } else {
@@ -180,8 +199,10 @@ const AddModal = (props: AddModal) => {
         description: descriptionRef.current.value,
         libraryId: +libraryRef.current.value,
         arrAction: arrOption ? arrOption : 0,
+        dataType: +selectedType,
         isActive: active,
         useRules: useRules,
+        listExclusions: listExclusion,
         collection: {
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
@@ -327,29 +348,103 @@ const AddModal = (props: AddModal) => {
               onUpdate={(e: number) => setArrOption(e)}
             />
           ) : (
-            <ArrAction
-              title="Sonarr"
-              default={arrOption}
-              onUpdate={(e: number) => setArrOption(e)}
-              options={[
-                {
-                  id: 0,
-                  name: 'Delete show from Sonarr',
-                },
-                {
-                  id: 1,
-                  name: 'Delete files & unmonitor all seasons',
-                },
-                {
-                  id: 2,
-                  name: 'Delete files & unmonitor existing seasons',
-                },
-                {
-                  id: 3,
-                  name: 'Unmonitor all seasons, but keep files',
-                },
-              ]}
-            />
+            <>
+              <div className="form-row">
+                <label htmlFor="type" className="text-label">
+                  Media type*
+                  <p className="text-xs font-normal">
+                    The type of TV media rules should apply to
+                  </p>
+                </label>
+                <div className="form-input">
+                  <div className="form-input-field">
+                    <select
+                      name="type"
+                      id="type"
+                      value={selectedType}
+                      onChange={setCollectionType}
+                      ref={collectionTypeRef}
+                    >
+                      {Object.keys(EPlexDataType)
+                        .filter((v) => isNaN(Number(v)))
+                        .filter((v) => v !== 'MOVIES') // We don't need movies here.
+                        .map((data: string) => {
+                          return (
+                            <option
+                              key={
+                                EPlexDataType[
+                                  data as keyof typeof EPlexDataType
+                                ]
+                              }
+                              value={
+                                EPlexDataType[
+                                  data as keyof typeof EPlexDataType
+                                ]
+                              }
+                            >
+                              {data[0].toUpperCase() +
+                                data.slice(1).toLowerCase()}
+                            </option>
+                          )
+                        })}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <ArrAction
+                title="Sonarr"
+                default={arrOption}
+                onUpdate={(e: number) => setArrOption(e)}
+                options={
+                  +selectedType === EPlexDataType.SHOWS
+                    ? [
+                        {
+                          id: 0,
+                          name: 'Delete entire show',
+                        },
+                        {
+                          id: 1,
+                          name: 'Unmonitor and delete all seasons / episodes',
+                        },
+                        {
+                          id: 2,
+                          name: 'Unmonitor and delete existing seasons / episodes',
+                        },
+                        {
+                          id: 3,
+                          name: 'Unmonitor show and keep files',
+                        },
+                      ]
+                    : +selectedType === EPlexDataType.SEASONS
+                    ? [
+                        {
+                          id: 0,
+                          name: 'Unmonitor and delete season',
+                        },
+                        {
+                          id: 2,
+                          name: 'Unmonitor and Delete existing episodes',
+                        },
+                        {
+                          id: 3,
+                          name: 'Unmonitor season and keep files',
+                        },
+                      ]
+                    : // episodes
+                      [
+                        {
+                          id: 0,
+                          name: 'Unmonitor and delete episode',
+                        },
+                        {
+                          id: 3,
+                          name: 'Unmonitor and keep file',
+                        },
+                      ]
+                }
+              />
+            </>
           )}
 
           <div className="form-row">
@@ -393,6 +488,30 @@ const AddModal = (props: AddModal) => {
           </div>
 
           <div className="form-row">
+            <label htmlFor="list_exclusions" className="text-label">
+              Add list exclusions
+              <p className="text-xs font-normal">
+                Prevent lists to re-add removed{' '}
+                {selectedLibrary ? selectedLibrary.type : 'movie'}
+              </p>
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  type="checkbox"
+                  name="list_exclusions"
+                  id="list_exclusions"
+                  className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                  defaultChecked={listExclusion}
+                  onChange={() => {
+                    setListExclusion(!listExclusion)
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
             <label htmlFor="collection_deleteDays" className="text-label">
               Media deleted after days*
             </label>
@@ -412,9 +531,7 @@ const AddModal = (props: AddModal) => {
           <div className="form-row">
             <label htmlFor="use_rules" className="text-label">
               Use rules
-              <p className="text-xs font-normal">
-                Toggle the rule system
-              </p>
+              <p className="text-xs font-normal">Toggle the rule system</p>
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -494,7 +611,7 @@ const AddModal = (props: AddModal) => {
                     {
                       <DownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
                     }
-                    <p className="button-text m-auto mr-4 ml-1 text-zinc-100">
+                    <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
                       Community Rules
                     </p>
                   </button>
@@ -519,6 +636,7 @@ const AddModal = (props: AddModal) => {
                       : 2
                     : 0
                 }
+                dataType={+selectedType as EPlexDataType}
                 editData={{ rules: rules }}
                 onCancel={cancel}
                 onUpdate={updateRules}
@@ -534,7 +652,7 @@ const AddModal = (props: AddModal) => {
                 onClick={create}
               >
                 {<SaveIcon className="m-auto ml-5 h-6 w-6 text-zinc-200" />}
-                <p className="button-text m-auto mr-5 ml-1 text-zinc-100">
+                <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
                   Save
                 </p>
               </button>
@@ -544,7 +662,7 @@ const AddModal = (props: AddModal) => {
                 onClick={cancel}
               >
                 {<BanIcon className="m-auto ml-5 h-6 w-6 text-zinc-200" />}
-                <p className="button-text m-auto mr-5 ml-1 text-zinc-100">
+                <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
                   Cancel
                 </p>
               </button>
