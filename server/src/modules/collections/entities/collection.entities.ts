@@ -48,6 +48,9 @@ export class Collection {
   @Column({ nullable: false, default: false })
   listExclusions: boolean;
 
+  @Column({ nullable: false, default: false })
+  forceOverseerr: boolean;
+
   @Column({ nullable: false, default: 1 })
   type: EPlexDataType;
 

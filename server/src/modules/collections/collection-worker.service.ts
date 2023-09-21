@@ -358,42 +358,48 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
       }
     }
 
-    // overseerr
-    if (this.settings.overseerrConfigured()) {
-      switch (collection.type) {
-        case EPlexDataType.SEASONS:
-          await this.overseerrApi.removeSeasonRequest(
-            media.tmdbId,
-            plexData.index,
-          );
-          this.infoLogger(
-            `[Overseerr] Removed request of season ${plexData.index} from show with tmdbid '${media.tmdbId}'`,
-          );
-          break;
-        case EPlexDataType.EPISODES:
-          await this.overseerrApi.removeSeasonRequest(
-            media.tmdbId,
-            plexData.parentIndex,
-          );
-          this.infoLogger(
-            `[Overseerr] Removed request of season ${plexData.parentIndex} from show with tmdbid '${media.tmdbId}'. Because episode ${plexData.index} was removed.'`,
-          );
-          break;
-        default:
-          await this.overseerrApi.removeMediaByTmdbId(
-            media.tmdbId,
-            plexLibrary.type === 'show' ? 'tv' : 'movie',
-          );
-          this.infoLogger(
-            `[Overseerr] Removed requests of media with tmdbid '${media.tmdbId}'`,
-          );
-          break;
+    // Only remove requests & file if needed
+    if (collection.arrAction !== ServarrAction.UNMONITOR) {
+      // overseerr, if forced. Otherwise rely on media sync
+      if (this.settings.overseerrConfigured() && collection.forceOverseerr) {
+        switch (collection.type) {
+          case EPlexDataType.SEASONS:
+            await this.overseerrApi.removeSeasonRequest(
+              media.tmdbId,
+              plexData.index,
+            );
+            this.infoLogger(
+              `[Overseerr] Removed request of season ${plexData.index} from show with tmdbid '${media.tmdbId}'`,
+            );
+            break;
+          case EPlexDataType.EPISODES:
+            await this.overseerrApi.removeSeasonRequest(
+              media.tmdbId,
+              plexData.parentIndex,
+            );
+            this.infoLogger(
+              `[Overseerr] Removed request of season ${plexData.parentIndex} from show with tmdbid '${media.tmdbId}'. Because episode ${plexData.index} was removed.'`,
+            );
+            break;
+          default:
+            await this.overseerrApi.removeMediaByTmdbId(
+              media.tmdbId,
+              plexLibrary.type === 'show' ? 'tv' : 'movie',
+            );
+            this.infoLogger(
+              `[Overseerr] Removed requests of media with tmdbid '${media.tmdbId}'`,
+            );
+            break;
+        }
       }
-    }
 
-    // plex
-    if (!ServarrAction.UNMONITOR) {
-      await this.plexApi.deleteMediaFromDisk(media.plexId);
+      // If *arr not configured, remove media through Plex
+      if (
+        !(plexLibrary.type === 'movie'
+          ? this.settings.radarrConfigured()
+          : this.settings.sonarrConfigured())
+      )
+        await this.plexApi.deleteMediaFromDisk(media.plexId);
     }
   }
 
