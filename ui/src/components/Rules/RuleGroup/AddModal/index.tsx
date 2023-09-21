@@ -39,6 +39,7 @@ interface ICreateApiObject {
   isActive: boolean
   useRules: boolean
   listExclusions: boolean
+  forceOverseerr: boolean
   collection: {
     visibleOnHome: boolean
     deleteAfterDays: number
@@ -69,6 +70,7 @@ const AddModal = (props: AddModal) => {
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showHome, setShowHome] = useState<boolean>(true)
   const [listExclusion, setListExclusion] = useState<boolean>(true)
+  const [forceOverseerr, setForceOverseerr] = useState<boolean>(true)
 
   const [manualCollection, setManualCollection] = useState<boolean>(false)
   const [manualCollectionName, setManualCollectionName] = useState<string>(
@@ -160,6 +162,7 @@ const AddModal = (props: AddModal) => {
         resp ? setCollection(resp) : undefined
         resp ? setShowHome(resp.visibleOnHome!) : undefined
         resp ? setListExclusion(resp.listExclusions!) : undefined
+        resp ? setForceOverseerr(resp.forceOverseerr!) : undefined
         resp ? setArrOption(resp.arrAction) : undefined
         resp && resp.type ? setSelectedType(resp.type.toString()) : '1'
         resp ? setManualCollection(resp.manualCollection) : undefined
@@ -203,6 +206,7 @@ const AddModal = (props: AddModal) => {
         isActive: active,
         useRules: useRules,
         listExclusions: listExclusion,
+        forceOverseerr: forceOverseerr,
         collection: {
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
@@ -505,6 +509,29 @@ const AddModal = (props: AddModal) => {
                   defaultChecked={listExclusion}
                   onChange={() => {
                     setListExclusion(!listExclusion)
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="force_overseerr" className="text-label">
+              Force reset Overseerr record
+              <p className="text-xs font-normal">
+                Resets the Overseerr record instead of just fixing the status
+              </p>
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  type="checkbox"
+                  name="force_overseerr"
+                  id="force_overseerr"
+                  className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                  defaultChecked={forceOverseerr}
+                  onChange={() => {
+                    setForceOverseerr(!forceOverseerr)
                   }}
                 />
               </div>

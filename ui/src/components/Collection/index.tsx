@@ -17,6 +17,7 @@ export interface ICollection {
   visibleOnHome?: boolean
   deleteAfterDays?: number
   listExclusions?: boolean
+  forceOverseerr?: boolean
   type: EPlexDataType
   arrAction: number
   media: ICollectionMedia[]

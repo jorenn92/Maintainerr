@@ -189,6 +189,9 @@ export class RulesService {
             listExclusions: params.listExclusions
               ? params.listExclusions
               : false,
+            forceOverseerr: params.forceOverseerr
+              ? params.forceOverseerr
+              : false,
             visibleOnHome: params.collection?.visibleOnHome,
             deleteAfterDays: +params.collection?.deleteAfterDays,
             manualCollection: params.collection?.manualCollection,
