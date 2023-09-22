@@ -12,6 +12,7 @@ import {
   RuleConstants,
 } from '../constants/rules.constants';
 import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+import { RulesDto } from '../dtos/rules.dto';
 
 @Injectable()
 export class PlexGetterService {
@@ -25,7 +26,12 @@ export class PlexGetterService {
     ).props;
   }
 
-  async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
+  async get(
+    id: number,
+    libItem: PlexLibraryItem,
+    dataType?: EPlexDataType,
+    ruleGroup?: RulesDto,
+  ) {
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
       switch (prop.name) {
@@ -66,7 +72,28 @@ export class PlexGetterService {
           return count ? count.length : 0;
         }
         case 'collections': {
-          return libItem.Collection ? libItem.Collection.length : null;
+          // fetch metadata because collections in plexLibrary object are wrong
+          return libItem.Collection
+            ? (
+                await this.plexApi.getMetadata(libItem.ratingKey)
+              ).Collection.filter(
+                (el) =>
+                  el.tag.toLowerCase().trim() !==
+                  (ruleGroup.manualCollectionName
+                    ? ruleGroup.manualCollectionName
+                    : ruleGroup.name
+                  )
+                    .toLowerCase()
+                    .trim(),
+              ).length
+            : null;
+        }
+        case 'collection_names': {
+          // fetch metadata  because collections in plexLibrary object are wrong
+          const moreData = await this.plexApi.getMetadata(libItem.ratingKey);
+          return moreData.Collection
+            ? moreData.Collection.map((el) => el.tag.trim())
+            : null;
         }
         case 'lastViewedAt': {
           return await this.plexApi

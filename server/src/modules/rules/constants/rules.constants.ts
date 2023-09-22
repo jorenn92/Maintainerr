@@ -139,14 +139,12 @@ export class RuleConstants {
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
         } as Property,
-
         {
           id: 6,
           name: 'collections',
-          humanName: 'Present in amount of collections',
+          humanName: 'Present in amount of other collections',
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
-          showType: [EPlexDataType.SHOWS],
         } as Property,
         {
           id: 7,
@@ -237,6 +235,13 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT, // return usernames []
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
+        } as Property,
+        {
+          id: 19,
+          name: 'collection_names',
+          humanName: 'Collections media is present in (list of titles)',
+          mediaType: MediaType.BOTH,
+          type: RuleType.TEXT,
         } as Property,
       ],
     },

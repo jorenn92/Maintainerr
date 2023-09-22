@@ -6,6 +6,7 @@ import { PlexGetterService } from './plex-getter.service';
 import { RadarrGetterService } from './radarr-getter.service';
 import { SonarrGetterService } from './sonarr-getter.service';
 import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+import { RulesDto } from '../dtos/rules.dto';
 
 @Injectable()
 export class ValueGetterService {
@@ -20,10 +21,11 @@ export class ValueGetterService {
     [val1, val2]: [number, number],
     libItem: PlexLibraryItem,
     dataType?: EPlexDataType,
+    ruleGroup?: RulesDto,
   ) {
     switch (val1) {
       case Application.PLEX: {
-        return await this.plexGetter.get(val2, libItem, dataType);
+        return await this.plexGetter.get(val2, libItem, dataType, ruleGroup);
       }
       case Application.RADARR: {
         return await this.radarrGetter.get(val2, libItem, dataType);
