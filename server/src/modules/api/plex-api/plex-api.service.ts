@@ -24,6 +24,7 @@ import {
 } from './interfaces/media.interface';
 import { PlexStatusResponse } from './interfaces/server.interface';
 import { EPlexDataType } from './enums/plex-data-type-enum';
+import axios from 'axios';
 
 @Injectable()
 export class PlexApiService {
@@ -215,6 +216,29 @@ export class PlexApiService {
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
+  }
+
+  public async getDiscoverDataUserState(
+    metaDataRatingKey: string,
+  ): Promise<any> {
+    try {
+      const response = await axios.get(
+        `https://discover.provider.plex.tv/library/metadata/${metaDataRatingKey}/userState`,
+        {
+          headers: {
+            'content-type': 'application/json',
+            'X-Plex-Token': this.plexClient.authToken,
+          },
+        },
+      );
+
+      return response.data.MediaContainer.UserState;
+    } catch (err) {
+      this.logger.warn(
+        "Outbound call to discover.provider.plex.tv failed. Couldn't fetch userState",
       );
       return undefined;
     }
