@@ -84,12 +84,15 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
       }
       if (handledCollections > 0) {
         if (this.settings.overseerrConfigured()) {
-          const resp = await this.overseerrApi.api.post(
-            '/settings/jobs/availability-sync/run',
-          );
-          this.infoLogger(
-            `All collections handled. Refreshing Overseerr because media was altered`,
-          );
+          setTimeout(() => {
+            this.overseerrApi.api
+              .post('/settings/jobs/availability-sync/run')
+              .then(() => {
+                this.infoLogger(
+                  `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
+                );
+              });
+          }, 7000);
         }
       } else {
         this.infoLogger(`All collections handled. No data was altered`);
