@@ -109,7 +109,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
                 if (currentSection === (rule as RuleDbDto).section) {
                   // if section didn't change
                   // execute and store in work array
-                  await this.executeRule(parsedRule);
+                  await this.executeRule(parsedRule, rulegroup);
                 } else {
                   // handle section action
                   this.handleSectionAction(sectionActionAnd);
@@ -118,7 +118,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
                   // reset first operator of new section
                   parsedRule.operator = null;
                   // Execute the rule and set the new section
-                  await this.executeRule(parsedRule);
+                  await this.executeRule(parsedRule, rulegroup);
                   currentSection = (rule as RuleDbDto).section;
                 }
               }
@@ -370,7 +370,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     this.plexData.page++;
   }
 
-  private async executeRule(rule: RuleDto) {
+  private async executeRule(rule: RuleDto, ruleGroup: RulesDto) {
     let data: PlexLibraryItem[];
     let firstVal: any;
     let secondVal: any;
@@ -387,12 +387,14 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         rule.firstVal,
         data[i],
         this.plexDataType,
+        ruleGroup,
       );
       if (rule.lastVal) {
         secondVal = await this.valueGetter.get(
           rule.lastVal,
           data[i],
           this.plexDataType,
+          ruleGroup,
         );
       } else {
         secondVal =
@@ -451,8 +453,13 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   private doRuleAction<T>(val1: T, val2: T, action: RulePossibility): boolean {
-    if (typeof val1 === 'string') {
-      val1 = val1.toLowerCase() as unknown as T;
+    if (
+      typeof val1 === 'string' ||
+      (Array.isArray(val1) ? typeof val1[0] === 'string' : false)
+    ) {
+      val1 = Array.isArray(val1)
+        ? (val1.map((el) => el.toLowerCase()) as unknown as T)
+        : ((val1 as string).toLowerCase() as unknown as T);
     }
     if (typeof val2 === 'string') {
       val2 = val2.toLowerCase() as unknown as T;

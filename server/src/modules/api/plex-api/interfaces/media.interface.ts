@@ -13,6 +13,7 @@ export interface PlexMetadata {
   };
   index: number;
   parentIndex?: number;
+  Collection?: { tag: string }[];
   leafCount: number;
   grandparentRatingKey?: number;
   viewedLeafCount: number;

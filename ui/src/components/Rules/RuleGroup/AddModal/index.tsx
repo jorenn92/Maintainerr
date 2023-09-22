@@ -70,7 +70,7 @@ const AddModal = (props: AddModal) => {
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showHome, setShowHome] = useState<boolean>(true)
   const [listExclusion, setListExclusion] = useState<boolean>(true)
-  const [forceOverseerr, setForceOverseerr] = useState<boolean>(true)
+  const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
 
   const [manualCollection, setManualCollection] = useState<boolean>(false)
   const [manualCollectionName, setManualCollectionName] = useState<string>(
@@ -452,6 +452,23 @@ const AddModal = (props: AddModal) => {
           )}
 
           <div className="form-row">
+            <label htmlFor="collection_deleteDays" className="text-label">
+              Media deleted after days*
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  type="number"
+                  name="collection_deleteDays"
+                  id="collection_deleteDays"
+                  defaultValue={collection ? collection.deleteAfterDays : 30}
+                  ref={deleteAfterRef}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
             <label htmlFor="active" className="text-label">
               Active
             </label>
@@ -519,7 +536,8 @@ const AddModal = (props: AddModal) => {
             <label htmlFor="force_overseerr" className="text-label">
               Force reset Overseerr record
               <p className="text-xs font-normal">
-                Resets the Overseerr record instead of just fixing the status
+                Resets the Overseerr record instead of relying on
+                availability-sync
               </p>
             </label>
             <div className="form-input">
@@ -533,23 +551,6 @@ const AddModal = (props: AddModal) => {
                   onChange={() => {
                     setForceOverseerr(!forceOverseerr)
                   }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="collection_deleteDays" className="text-label">
-              Media deleted after days*
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  type="number"
-                  name="collection_deleteDays"
-                  id="collection_deleteDays"
-                  defaultValue={collection ? collection.deleteAfterDays : 30}
-                  ref={deleteAfterRef}
                 />
               </div>
             </div>

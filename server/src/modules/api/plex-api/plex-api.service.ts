@@ -205,7 +205,9 @@ export class PlexApiService {
     try {
       const response = await this.plexClient.query<PlexMetadataResponse>(
         `/library/metadata/${key}${
-          options.includeChildren ? '?includeChildren=1' : ''
+          options.includeChildren
+            ? '?includeChildren=1&includeExternalMedia=1&asyncAugmentMetadata=1&asyncCheckFiles=1&asyncRefreshAnalysis=1'
+            : ''
         }`,
       );
 
