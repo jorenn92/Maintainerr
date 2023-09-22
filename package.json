@@ -33,7 +33,7 @@
     "@nestjs/platform-express": "^10.2.5",
     "@nestjs/schedule": "^3.0.3",
     "@nestjs/typeorm": "^10.0.0",
-    "axios": "^1.4.0",
+    "axios": "^1.5.0",
     "bowser": "^2.11.0",
     "cron": "^2.4.3",
     "crypto": "^1.0.1",
@@ -51,9 +51,9 @@
     "rimraf": "^4.4.1",
     "rxjs": "^7.8.1",
     "sqlite3": "^5.1.6",
-    "swr": "^2.2.0",
+    "swr": "^2.2.2",
     "typeorm": "^0.2.45",
-    "web-push": "^3.6.4"
+    "web-push": "^3.6.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.22.9",
