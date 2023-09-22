@@ -56,8 +56,8 @@
     "web-push": "^3.6.6"
   },
   "devDependencies": {
-    "@babel/cli": "^7.22.9",
-    "@babel/core": "^7.22.9",
+    "@babel/cli": "^7.22.15",
+    "@babel/core": "^7.22.20",
     "@nestjs/cli": "^10.1.18",
     "@nestjs/schematics": "^10.0.2",
     "@nestjs/testing": "^10.2.6",
