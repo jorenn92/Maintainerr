@@ -1,3 +1,13 @@
+## [1.6.2](https://github.com/jorenn92/Maintainerr/compare/v1.6.1...v1.6.2) (2023-09-22)
+
+
+### Bug Fixes
+
+* **collections:** Added a 7 second timeout to the availability-sync trigger ([a662eda](https://github.com/jorenn92/Maintainerr/commit/a662eda76002390f5e88d35670767f11fb9d8e35))
+* **rules:** Changed the default Overseer behavior to rely more on availability-sync. Added the option to trigger the old behavior (force remove requests) ([39f890c](https://github.com/jorenn92/Maintainerr/commit/39f890ce5cc90859084c3947fe656532c91c9a30))
+* **rules:** Fixed an issue where not all rules would be available in the rule dropdown ([5f589e6](https://github.com/jorenn92/Maintainerr/commit/5f589e69d0fa3fb266da59a904c7b2cc6f6734f1))
+* **rules:** Improved 'amount of collections'  & added the 'Collections media is present in' rule values ([1ffb69b](https://github.com/jorenn92/Maintainerr/commit/1ffb69b4e98eaa7df06ab2a5aa0a67f62fcb7c3e))
+
 ## [1.6.1](https://github.com/jorenn92/Maintainerr/compare/v1.6.0...v1.6.1) (2023-09-19)
 
 
