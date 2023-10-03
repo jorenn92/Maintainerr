@@ -461,8 +461,13 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         ? (val1.map((el) => el.toLowerCase()) as unknown as T)
         : ((val1 as string).toLowerCase() as unknown as T);
     }
-    if (typeof val2 === 'string') {
-      val2 = val2.toLowerCase() as unknown as T;
+    if (
+      typeof val2 === 'string' ||
+      (Array.isArray(val2) ? typeof val2[0] === 'string' : false)
+    ) {
+      val2 = Array.isArray(val2)
+        ? (val2.map((el) => el.toLowerCase()) as unknown as T)
+        : ((val2 as string).toLowerCase() as unknown as T);
     }
     if (action === RulePossibility.BIGGER) {
       return val1 > val2;
@@ -516,10 +521,9 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           return (val1 as unknown as T[]).includes(val2);
         } else {
           if (val2.length > 0) {
-            const test = val2.every((el) => {
+            return val2.some((el) => {
               return (val1 as unknown as T[]).includes(el);
             });
-            return test;
           } else {
             return false;
           }
@@ -534,10 +538,9 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           return !(val1 as unknown as T[]).includes(val2);
         } else {
           if (val2.length > 0) {
-            const test = val2.every((el) => {
-              return !(val1 as unknown as T[]).includes(el);
+            return !val2.some((el) => {
+              return (val1 as unknown as T[]).includes(el);
             });
-            return test;
           } else {
             return false;
           }
