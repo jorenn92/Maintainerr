@@ -11,6 +11,7 @@ COPY ui/ /opt/ui/
 COPY docs/ /opt/docs/
 COPY package.json /opt/package.json
 COPY yarn.lock /opt/yarn.lock 
+COPY datasource-config.ts /opt/datasource-config.ts
 COPY ormconfig.json /opt/ormconfig.json
 COPY jsdoc.json /opt/jsdoc.json
 COPY start.sh /opt/start.sh
