@@ -18,7 +18,7 @@ import {
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
-import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import _ from 'lodash';
 
 @Injectable()

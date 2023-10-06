@@ -1,5 +1,5 @@
-import { Collection } from 'src/modules/collections/entities/collection.entities';
-import { ICollection } from 'src/modules/collections/interfaces/collection.interface';
+import { Collection } from '../../collections/entities/collection.entities';
+import { ICollection } from '../../collections/interfaces/collection.interface';
 import {
   Entity,
   Column,

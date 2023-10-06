@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Collection } from './collection.entities';
-import { PlexMetadata } from 'src/modules/api/plex-api/interfaces/media.interface';
+import { PlexMetadata } from '../../api/plex-api/interfaces/media.interface';
 
 @Entity()
 export class CollectionMedia {
