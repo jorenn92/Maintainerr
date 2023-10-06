@@ -60,7 +60,7 @@ export class RulesService {
     this.ruleConstants = new RuleConstants();
   }
   async getRuleConstants(): Promise<RuleConstants> {
-    const settings = await this.settingsRepo.findOne();
+    const settings = await this.settingsRepo.findOne({ where: {} });
     const localConstants = _.cloneDeep(this.ruleConstants);
     if (settings) {
       // remove overseerr if not configured
@@ -131,7 +131,9 @@ export class RulesService {
 
   async getRuleGroupById(ruleGroupId: number): Promise<RuleGroup> {
     try {
-      return await this.ruleGroupRepository.findOne(ruleGroupId);
+      return await this.ruleGroupRepository.findOne({
+        where: { id: ruleGroupId },
+      });
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       return undefined;
@@ -140,7 +142,9 @@ export class RulesService {
 
   async deleteRuleGroup(ruleGroupId: number): Promise<ReturnStatus> {
     try {
-      const group = await this.ruleGroupRepository.findOne(ruleGroupId);
+      const group = await this.ruleGroupRepository.findOne({
+        where: { id: ruleGroupId },
+      });
 
       await this.exclusionRepo.delete({ ruleGroupId: ruleGroupId });
       await this.ruleGroupRepository.delete(ruleGroupId);
@@ -243,13 +247,17 @@ export class RulesService {
   async setExclusion(data: ExclusionDto) {
     if (data.collectionId) {
       const group = await this.ruleGroupRepository.findOne({
-        collectionId: data.collectionId,
+        where: {
+          collectionId: data.collectionId,
+        },
       });
       data = { plexId: data.plexId, ruleGroupId: group.id };
     }
     try {
       const old = await this.exclusionRepo.findOne({
-        ...data,
+        where: {
+          ...data,
+        },
       });
 
       await this.exclusionRepo.save([
@@ -298,12 +306,16 @@ export class RulesService {
     try {
       if (rulegroupId || plexId) {
         const exclusions = await this.exclusionRepo.find(
-          rulegroupId ? { ruleGroupId: rulegroupId } : { plexId: plexId },
+          rulegroupId
+            ? { where: { ruleGroupId: rulegroupId } }
+            : { where: { plexId: plexId } },
         );
         return rulegroupId
           ? exclusions.concat(
               await this.exclusionRepo.find({
-                ruleGroupId: null,
+                where: {
+                  ruleGroupId: null,
+                },
               }),
             )
           : exclusions;
@@ -483,7 +495,9 @@ export class RulesService {
   ): Promise<ReturnStatus> {
     const rules = await this.getCommunityRules();
     const history = await this.communityRuleKarmaRepository.find({
-      community_rule_id: id,
+      where: {
+        community_rule_id: id,
+      },
     });
     if (history.length <= 0) {
       if (!('code' in rules)) {
