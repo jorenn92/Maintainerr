@@ -1,3 +1,10 @@
+## [1.6.3](https://github.com/jorenn92/Maintainerr/compare/v1.6.2...v1.6.3) (2023-10-05)
+
+
+### Bug Fixes
+
+* **rules:** Fixed an issue where contains would not work as expected when comparing 2 lists ([fd640e9](https://github.com/jorenn92/Maintainerr/commit/fd640e96019c8a605e228ddc9e4a6efcddec1fe1))
+
 ## [1.6.2](https://github.com/jorenn92/Maintainerr/compare/v1.6.1...v1.6.2) (2023-09-22)
 
 
