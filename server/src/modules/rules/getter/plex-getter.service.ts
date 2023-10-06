@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { warn } from 'console';
 import {
   PlexLibraryItem,
   PlexSeenBy,
@@ -193,7 +192,9 @@ export class PlexGetterService {
             libItem.ratingKey,
           );
 
-          const viewers = watchHistory.map((el) => +el.accountID);
+          const viewers = watchHistory
+            ? watchHistory.map((el) => +el.accountID)
+            : [];
           const uniqueViewers = [...new Set(viewers)];
 
           if (uniqueViewers && uniqueViewers.length > 0) {

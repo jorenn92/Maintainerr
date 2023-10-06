@@ -1,5 +1,5 @@
-import { RulesDto } from 'src/modules/rules/dtos/rules.dto';
-import { RuleGroup } from 'src/modules/rules/entities/rule-group.entities';
+import { RulesDto } from '../../rules/dtos/rules.dto';
+import { RuleGroup } from '../../rules/entities/rule-group.entities';
 import {
   Entity,
   Column,
@@ -8,7 +8,7 @@ import {
   OneToOne,
 } from 'typeorm';
 import { CollectionMedia } from './collection_media.entities';
-import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 
 @Entity()
 export class Collection {

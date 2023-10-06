@@ -5,7 +5,7 @@ import { OverseerrGetterService } from './overseerr-getter.service';
 import { PlexGetterService } from './plex-getter.service';
 import { RadarrGetterService } from './radarr-getter.service';
 import { SonarrGetterService } from './sonarr-getter.service';
-import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { RulesDto } from '../dtos/rules.dto';
 
 @Injectable()

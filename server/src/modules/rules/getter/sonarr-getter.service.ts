@@ -1,15 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { warn } from 'console';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
-import { SonarrApi } from '../../../modules/api/servarr-api/helpers/sonarr.helper';
 import { ServarrService } from '../../../modules/api/servarr-api/servarr.service';
 import {
   Application,
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
-import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
-import { PlexApiService } from 'src/modules/api/plex-api/plex-api.service';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import _ from 'lodash';
 
 @Injectable()
