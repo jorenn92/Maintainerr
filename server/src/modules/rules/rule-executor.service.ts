@@ -498,17 +498,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       }
     }
     if (action === RulePossibility.NOT_EQUALS) {
-      if (!Array.isArray(val1)) {
-        return val1 !== val2;
-      } else {
-        return val1.every((e) => {
-          if (Array.isArray(val2)) {
-            return !(val2 as unknown as T[]).includes(e);
-          } else {
-            return e !== val2;
-          }
-        });
-      }
+      return !this.doRuleAction(val1, val2, RulePossibility.EQUALS);
     }
     if (action === RulePossibility.CONTAINS) {
       try {
@@ -529,22 +519,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       }
     }
     if (action === RulePossibility.NOT_CONTAINS) {
-      try {
-        if (!Array.isArray(val2)) {
-          return !(val1 as unknown as T[]).includes(val2);
-        } else {
-          if (val2.length > 0) {
-            const test = val2.every((el) => {
-              return !(val1 as unknown as T[]).includes(el);
-            });
-            return test;
-          } else {
-            return false;
-          }
-        }
-      } catch (_err) {
-        return null;
-      }
+      return !this.doRuleAction(val1, val2, RulePossibility.CONTAINS);
     }
     if (action === RulePossibility.BEFORE) {
       return val1 && val2 ? val1 <= val2 : false;
