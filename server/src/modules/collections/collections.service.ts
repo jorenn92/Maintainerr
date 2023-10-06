@@ -46,9 +46,9 @@ export class CollectionsService {
   async getCollection(id?: number, title?: string) {
     try {
       if (title) {
-        return await this.collectionRepo.findOne({ title: title });
+        return await this.collectionRepo.findOne({ where: { title: title } });
       } else {
-        return await this.collectionRepo.findOne(id);
+        return await this.collectionRepo.findOne({ where: { id: id } });
       }
     } catch (err) {
       this.logger.warn(
@@ -60,7 +60,9 @@ export class CollectionsService {
 
   async getCollectionMedia(id: number) {
     try {
-      return await this.CollectionMediaRepo.find({ collectionId: id });
+      return await this.CollectionMediaRepo.find({
+        where: { collectionId: id },
+      });
     } catch (err) {
       this.logger.warn(
         'An error occurred while performing collection actions: ' + err,
@@ -118,16 +120,18 @@ export class CollectionsService {
     try {
       const collections = await this.collectionRepo.find(
         libraryId
-          ? { libraryId: libraryId }
+          ? { where: { libraryId: libraryId } }
           : typeId
-          ? { type: typeId }
+          ? { where: { type: typeId } }
           : undefined,
       );
 
       return await Promise.all(
         collections.map(async (col) => {
           const colls = await this.CollectionMediaRepo.find({
-            collectionId: +col.id,
+            where: {
+              collectionId: +col.id,
+            },
           });
           return {
             ...col,
@@ -249,7 +253,9 @@ export class CollectionsService {
     dbCollection?: ICollection;
   }> {
     try {
-      const dbCollection = await this.collectionRepo.findOne(+collection.id);
+      const dbCollection = await this.collectionRepo.findOne({
+        where: { id: +collection.id },
+      });
       let plexColl: PlexCollection;
       if (dbCollection?.plexId) {
         const collectionObj: CreateUpdateCollection = {
@@ -352,14 +358,24 @@ export class CollectionsService {
     manual = false,
   ): Promise<Collection> {
     try {
-      let collection = await this.collectionRepo.findOne(collectionDbId);
+      let collection = await this.collectionRepo.findOne({
+        where: { id: collectionDbId },
+      });
+      const collectionMedia = await this.CollectionMediaRepo.find({
+        where: { collectionId: collectionDbId },
+      });
+
+      // filter already existing out
+      media = media.filter(
+        (m) => !collectionMedia.find((el) => el.plexId === m.plexId),
+      );
+
       if (collection) {
         collection = await this.checkAutomaticPlexLink(collection);
         if (media.length > 0) {
           if (!collection.plexId) {
             let newColl: PlexCollection = undefined;
             if (collection.manualCollection) {
-              // Does this need to happen here? We already refetch the correct collection in the rule-executor.service
               newColl = await this.findPlexCollection(
                 collection.manualCollectionName,
                 +collection.libraryId,
@@ -418,10 +434,14 @@ export class CollectionsService {
     media: AddCollectionMedia[],
   ) {
     try {
-      let collection = await this.collectionRepo.findOne(collectionDbId);
+      let collection = await this.collectionRepo.findOne({
+        where: { id: collectionDbId },
+      });
       collection = await this.checkAutomaticPlexLink(collection);
       let collectionMedia = await this.CollectionMediaRepo.find({
-        collectionId: collectionDbId,
+        where: {
+          collectionId: collectionDbId,
+        },
       });
       if (collectionMedia.length > 0) {
         for (const childMedia of media) {
@@ -480,7 +500,9 @@ export class CollectionsService {
 
   async deleteCollection(collectionDbId: number) {
     try {
-      let collection = await this.collectionRepo.findOne(collectionDbId);
+      let collection = await this.collectionRepo.findOne({
+        where: { id: collectionDbId },
+      });
       collection = await this.checkAutomaticPlexLink(collection);
 
       let status = { code: 1, status: 'OK' };
@@ -504,7 +526,9 @@ export class CollectionsService {
 
   public async deactivateCollection(collectionDbId: number) {
     try {
-      const collection = await this.collectionRepo.findOne(collectionDbId);
+      const collection = await this.collectionRepo.findOne({
+        where: { id: collectionDbId },
+      });
 
       if (!collection.manualCollection) {
         const status = await this.plexApi.deleteCollection(
@@ -520,7 +544,9 @@ export class CollectionsService {
       });
 
       const rulegroup = await this.ruleGroupRepo.findOne({
-        collectionId: collection.id,
+        where: {
+          collectionId: collection.id,
+        },
       });
       if (rulegroup) {
         await this.ruleGroupRepo.save({
@@ -538,7 +564,9 @@ export class CollectionsService {
 
   public async activateCollection(collectionDbId: number) {
     try {
-      const collection = await this.collectionRepo.findOne(collectionDbId);
+      const collection = await this.collectionRepo.findOne({
+        where: { id: collectionDbId },
+      });
 
       await this.collectionRepo.save({
         ...collection,
@@ -546,7 +574,9 @@ export class CollectionsService {
       });
 
       const rulegroup = await this.ruleGroupRepo.findOne({
-        collectionId: collection.id,
+        where: {
+          collectionId: collection.id,
+        },
       });
       if (rulegroup) {
         await this.ruleGroupRepo.save({
@@ -787,7 +817,9 @@ export class CollectionsService {
   //   collectionDbId: number,
   //   collectionMediaChildren: [{ parent: number; child: number }],
   // ): Promise<Collection> {
-  //   const collection = await this.collectionRepo.findOne(collectionDbId);
+  //   const collection = await this.collectionRepo.findOne({
+  //   where: { id: collectionDbId },
+  // });
   //   if (collectionMediaChildren) {
   //     if (collection) {
   //       // add missing children
@@ -827,7 +859,9 @@ export class CollectionsService {
   //       });
 
   //       // update & return collection
-  //       return await this.collectionRepo.findOne(collectionDbId);
+  //       return await this.collectionRepo.findOne({
+  //   where: { id: collectionDbId },
+  // });
   //     } else {
   //       this.infoLogger(`Couldn't find collection with id ${collectionDbId}`);
   //     }

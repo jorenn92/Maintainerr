@@ -64,7 +64,9 @@ export class SettingsService implements SettingDto {
   ) {}
 
   public async init() {
-    const settingsDb = await this.settingsRepo.findOne({ cache: false });
+    const settingsDb = await this.settingsRepo.findOne({
+      where: {},
+    });
     if (settingsDb) {
       this.id = settingsDb?.id;
       this.clientId = settingsDb?.clientId;
@@ -98,7 +100,7 @@ export class SettingsService implements SettingDto {
 
   public async getSettings() {
     try {
-      return this.settingsRepo.findOne({});
+      return this.settingsRepo.findOne({ where: {} });
     } catch (err) {
       this.logger.error(
         'Something went wrong while getting settings. Is the database file locked?',
@@ -121,7 +123,7 @@ export class SettingsService implements SettingDto {
 
   public async updateSettings(settings: Settings): Promise<BasicResponseDto> {
     try {
-      const settingsDb = await this.settingsRepo.findOne({});
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
 
       // Plex SSL specifics
       settings.plex_ssl =

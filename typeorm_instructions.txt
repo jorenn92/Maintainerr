@@ -1,8 +1,8 @@
 // After each new entity, generate migration
-npx typeorm migration:generate -n <migration_name> -d server/src/database/migrations -f ormconfig.json   
+yarn migration:generate server/src/database/migrations/<migr_name>
 
 // Run migrations
-npx typeorm migration:run
+yarn migration:run
 
 // Revert migrations
-npx typeorm migration:revert
+yarn migration:revert

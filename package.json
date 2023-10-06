@@ -24,7 +24,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docs-generate": "jsdoc -c jsdoc.json --readme ./docs/1-home/Home.md ./server/dist/",
-    "docs-serve": "http-server ./docs-output/ --cors"
+    "docs-serve": "http-server ./docs-output/ --cors",
+    "migration:run": "ts-node node_modules/typeorm/cli.js migration:run -d ./datasource-config.ts",
+    "migration:revert": "ts-node node_modules/typeorm/cli.js migration:revert -d ./datasource-config.ts",
+    "migration:generate": "ts-node node_modules/typeorm/cli.js migration:generate --dataSource ./datasource-config.ts -p"
   },
   "dependencies": {
     "@heroicons/react": "^1.0.6",
@@ -52,7 +55,7 @@
     "rxjs": "^7.8.1",
     "sqlite3": "^5.1.6",
     "swr": "^2.2.2",
-    "typeorm": "^0.2.45",
+    "typeorm": "^0.3.17",
     "web-push": "^3.6.6"
   },
   "devDependencies": {

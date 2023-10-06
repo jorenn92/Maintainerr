@@ -61,12 +61,16 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
     let handledCollections = 0;
     if (appStatus) {
       // loop over all active collections
-      const collections = await this.collectionRepo.find({ isActive: true });
+      const collections = await this.collectionRepo.find({
+        where: { isActive: true },
+      });
       for (const collection of collections) {
         this.infoLogger(`Handling collection '${collection.title}'`);
 
         const collectionMedia = await this.collectionMediaRepo.find({
-          collectionId: collection.id,
+          where: {
+            collectionId: collection.id,
+          },
         });
 
         const dangerDate = new Date(
