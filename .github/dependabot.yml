@@ -7,5 +7,4 @@ updates:
       time: '20:00'
     open-pull-requests-limit: 10
     ignore:
-      - dependency-name: "typeorm*"
       - dependency-name: "@heroicons/react"
