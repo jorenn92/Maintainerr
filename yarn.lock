@@ -2657,10 +2657,10 @@
   dependencies:
     "@types/superagent" "*"
 
-"@types/web-push@^3.3.2":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@types/web-push/-/web-push-3.6.0.tgz#8411cc58d050e877f36713ed58a499d942a11fab"
-  integrity sha512-Kk23yDmYheAcQ0ALS9YE7MY7lqwaIfVQ67zVEFeqbLw+/g8jlYTg9o/zYJOk5YhebWrq2Cr/Lbh4RoYfzrn0ww==
+"@types/web-push@^3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@types/web-push/-/web-push-3.6.1.tgz#ade10d5a92932749bc08b33aba9c797b0526beea"
+  integrity sha512-Zu6Iju7c4IlE8I8eEeFLYRb7XFqvHFmWWAYr1cmug9EX3c6CDarxIXWN/GO0sxjbJLkHPwozUzp6cLdXsrq7Ew==
   dependencies:
     "@types/node" "*"
 
