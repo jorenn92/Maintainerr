@@ -87,7 +87,7 @@
     "autoprefixer": "10.4.16",
     "babel-plugin-react-intl": "^8.2.25",
     "babel-plugin-react-intl-auto": "^3.3.0",
-    "clean-jsdoc-theme": "^4.2.10",
+    "clean-jsdoc-theme": "^4.2.13",
     "eslint": "^8.46.0",
     "eslint-config-next": "13.4.12",
     "eslint-config-prettier": "^8.9.0",
