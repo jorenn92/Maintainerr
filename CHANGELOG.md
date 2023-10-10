@@ -1,3 +1,12 @@
+## [1.6.4](https://github.com/jorenn92/Maintainerr/compare/v1.6.3...v1.6.4) (2023-10-10)
+
+
+### Bug Fixes
+
+* **rules:** Added clarification to the 'show on home' flag during rule creation ([2d4792d](https://github.com/jorenn92/Maintainerr/commit/2d4792d82524da5919a9a8bd141c31d4c9c772ca))
+* **rules:** Fetching the watchHistory could throw an error when using the 'People that view show/season' rule ([9a1a3d6](https://github.com/jorenn92/Maintainerr/commit/9a1a3d6c47aabc4aeb57ac38e1190998652d3445))
+* **rules:** Fixed some minor issues with NOT_CONTAINS & NOT_EQUALS ([fa08cbc](https://github.com/jorenn92/Maintainerr/commit/fa08cbc005fbd57fdf97292b13a275a964a03101))
+
 ## [1.6.3](https://github.com/jorenn92/Maintainerr/compare/v1.6.2...v1.6.3) (2023-10-05)
 
 
