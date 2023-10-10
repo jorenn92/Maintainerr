@@ -36,7 +36,7 @@
     "@nestjs/platform-express": "^10.2.5",
     "@nestjs/schedule": "^3.0.3",
     "@nestjs/typeorm": "^10.0.0",
-    "axios": "^1.5.0",
+    "axios": "^1.5.1",
     "bowser": "^2.11.0",
     "cron": "^2.4.3",
     "crypto": "^1.0.1",
