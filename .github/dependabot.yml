@@ -9,4 +9,3 @@ updates:
     ignore:
       - dependency-name: "typeorm*"
       - dependency-name: "@heroicons/react"
-      - dependency-name: "@nestjs/typeorm"
