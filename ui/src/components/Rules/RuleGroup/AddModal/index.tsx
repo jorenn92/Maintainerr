@@ -491,6 +491,9 @@ const AddModal = (props: AddModal) => {
           <div className="form-row">
             <label htmlFor="collection_visible" className="text-label">
               Show on home
+              <p className="text-xs font-normal">
+                Show the collection on the Plex home screen
+              </p>
             </label>
             <div className="form-input">
               <div className="form-input-field">
