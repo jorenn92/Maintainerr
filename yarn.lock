@@ -1581,10 +1581,10 @@
     iterare "1.2.1"
     tslib "2.6.2"
 
-"@nestjs/core@^10.2.5":
-  version "10.2.5"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-10.2.5.tgz#7ed4315179ba9f74231f905a468ba647fe9e0815"
-  integrity sha512-O9AycZc4MjzIFrvCxcQVqfSNuN9eHZrfyVcYkp9CMPj6lGd9TQCZX2MmaP1CWs4UJBmTKflPdtPJ0sj9iIuvLQ==
+"@nestjs/core@^10.2.7":
+  version "10.2.7"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-10.2.7.tgz#26ca5cc63504b54a08c4cdc6da9300c9b8904fde"
+  integrity sha512-5GSu53QUUcwX17sNmlJPa1I0wIeAZOKbedyVuQx0ZAwWVa9g0wJBbsNP+R4EJ+j5Dkdzt/8xkiZvnKt8RFRR8g==
   dependencies:
     uid "2.0.2"
     "@nuxtjs/opencollective" "0.3.2"
@@ -10854,7 +10854,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typeorm@0.3.17:
+typeorm@^0.3.17:
   version "0.3.17"
   resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-0.3.17.tgz#a73c121a52e4fbe419b596b244777be4e4b57949"
   integrity sha512-UDjUEwIQalO9tWw9O2A4GU+sT3oyoUXheHJy4ft+RFdnRdQctdQ34L9SqE2p7LdwzafHx1maxT+bqXON+Qnmig==
