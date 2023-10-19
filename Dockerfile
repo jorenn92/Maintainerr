@@ -54,8 +54,10 @@ EXPOSE 80
 WORKDIR /opt
 
 COPY --from=BUILDER /opt ./
+COPY supervisord.conf /etc/supervisord.conf
 
-RUN rm -rf /tmp/* && \
+RUN apk add supervisor && \
+	rm -rf /tmp/* && \
     mkdir /opt/data
 
 VOLUME [ "/opt/data" ]
