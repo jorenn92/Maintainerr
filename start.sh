@@ -2,6 +2,5 @@
 
 cd /opt/
 yarn migration:run
-yarn docs-serve &
-yarn start:server &
-yarn start:ui
+
+/usr/bin/supervisord -c /etc/supervisord.conf

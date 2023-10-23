@@ -458,16 +458,16 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       (Array.isArray(val1) ? typeof val1[0] === 'string' : false)
     ) {
       val1 = Array.isArray(val1)
-        ? (val1.map((el) => el.toLowerCase()) as unknown as T)
-        : ((val1 as string).toLowerCase() as unknown as T);
+        ? (val1.map((el) => el?.toLowerCase()) as unknown as T)
+        : ((val1 as string)?.toLowerCase() as unknown as T);
     }
     if (
       typeof val2 === 'string' ||
       (Array.isArray(val2) ? typeof val2[0] === 'string' : false)
     ) {
       val2 = Array.isArray(val2)
-        ? (val2.map((el) => el.toLowerCase()) as unknown as T)
-        : ((val2 as string).toLowerCase() as unknown as T);
+        ? (val2.map((el) => el?.toLowerCase()) as unknown as T)
+        : ((val2 as string)?.toLowerCase() as unknown as T);
     }
     if (action === RulePossibility.BIGGER) {
       return val1 > val2;
@@ -479,20 +479,20 @@ export class RuleExecutorService implements OnApplicationBootstrap {
       if (!Array.isArray(val1)) {
         if (val1 instanceof Date && val2 instanceof Date) {
           return (
-            new Date(val1.toDateString()).valueOf() ===
-            new Date(val2.toDateString()).valueOf()
+            new Date(val1?.toDateString()).valueOf() ===
+            new Date(val2?.toDateString()).valueOf()
           );
         }
         return val1 === val2;
       } else {
         if (val1.length > 0) {
-          return val1.every((e) => {
+          return val1?.every((e) => {
             e =
               typeof e === 'string'
-                ? (e as unknown as string).toLowerCase()
+                ? (e as unknown as string)?.toLowerCase()
                 : e;
             if (Array.isArray(val2)) {
-              return (val2 as unknown as T[]).includes(e);
+              return (val2 as unknown as T[])?.includes(e);
             } else {
               return e === val2;
             }
@@ -508,11 +508,11 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     if (action === RulePossibility.CONTAINS) {
       try {
         if (!Array.isArray(val2)) {
-          return (val1 as unknown as T[]).includes(val2);
+          return (val1 as unknown as T[])?.includes(val2);
         } else {
           if (val2.length > 0) {
-            return val2.some((el) => {
-              return (val1 as unknown as T[]).includes(el);
+            return val2?.some((el) => {
+              return (val1 as unknown as T[])?.includes(el);
             });
           } else {
             return false;
