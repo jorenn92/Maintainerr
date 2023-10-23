@@ -123,9 +123,14 @@ export class SettingsService implements SettingDto {
 
   public async updateSettings(settings: Settings): Promise<BasicResponseDto> {
     try {
-      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+      settings.plex_hostname = settings.plex_hostname.toLowerCase();
+      settings.radarr_url = settings.radarr_url.toLowerCase();
+      settings.sonarr_url = settings.sonarr_url.toLowerCase();
+      settings.overseerr_url = settings.overseerr_url.toLowerCase();
 
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
       // Plex SSL specifics
+
       settings.plex_ssl =
         settings.plex_hostname.includes('https://') || settings.plex_port == 443
           ? 1
