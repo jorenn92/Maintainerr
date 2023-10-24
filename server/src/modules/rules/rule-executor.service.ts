@@ -147,9 +147,8 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         rulegroup.collectionId,
       );
 
-      collection = await this.collectionService.relinkManualCollection(
-        collection,
-      );
+      collection =
+        await this.collectionService.relinkManualCollection(collection);
 
       if (collection && collection.plexId) {
         const collectionMedia = await this.collectionService.getCollectionMedia(
@@ -256,9 +255,8 @@ export class RuleExecutorService implements OnApplicationBootstrap {
 
         // check Plex collection link
         if (collMediaData.length > 0 && collection.plexId) {
-          collection = await this.collectionService.checkAutomaticPlexLink(
-            collection,
-          );
+          collection =
+            await this.collectionService.checkAutomaticPlexLink(collection);
           // if collection was removed while it should be available.. resync current data
           if (!collection.plexId) {
             collection = await this.collectionService.addToCollection(
@@ -267,9 +265,8 @@ export class RuleExecutorService implements OnApplicationBootstrap {
               collection.manualCollection,
             );
             if (collection) {
-              collection = await this.collectionService.saveCollection(
-                collection,
-              );
+              collection =
+                await this.collectionService.saveCollection(collection);
             }
           }
         }
@@ -289,17 +286,21 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           ? currentCollectionData
           : [];
 
-        const dataToAdd = data
-          .filter((el) => !currentCollectionData.includes(el))
-          .map((el) => {
-            return { plexId: el };
-          });
+        const dataToAdd = this.deDupe(
+          data
+            .filter((el) => !currentCollectionData.includes(el))
+            .map((el) => {
+              return { plexId: +el };
+            }),
+        );
 
-        const dataToRemove = currentCollectionData
-          .filter((el) => !data.includes(el))
-          .map((el) => {
-            return { plexId: el };
-          });
+        const dataToRemove = this.deDupe(
+          currentCollectionData
+            .filter((el) => !data.includes(el))
+            .map((el) => {
+              return { plexId: +el };
+            }),
+        );
 
         if (dataToRemove.length > 0) {
           this.logInfo(
@@ -321,9 +322,8 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           );
         }
 
-        collection = await this.collectionService.relinkManualCollection(
-          collection,
-        );
+        collection =
+          await this.collectionService.relinkManualCollection(collection);
 
         collection = await this.collectionService.addToCollection(
           collection.id,
@@ -346,6 +346,16 @@ export class RuleExecutorService implements OnApplicationBootstrap {
 
   private async getAllActiveRuleGroups(): Promise<RulesDto[]> {
     return await this.rulesService.getRuleGroups(true);
+  }
+
+  private deDupe(arr: { plexId: number }[]): { plexId: number }[] {
+    const uniqueArr = [];
+    arr.filter(
+      (item) =>
+        !uniqueArr.find((el) => el.plexId === item.plexId) &&
+        uniqueArr.push({ plexId: item.plexId }),
+    );
+    return uniqueArr;
   }
 
   private async getPlexData(libraryId: number): Promise<void> {
@@ -432,7 +442,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         (firstVal !== undefined || null) &&
         (secondVal !== undefined || null)
       ) {
-        if (isNull(rule.operator) || rule.operator === RuleOperators.OR) {
+        if (isNull(rule.operator) || +rule.operator === +RuleOperators.OR) {
           if (this.doRuleAction(firstVal, secondVal, rule.action)) {
             // add to workerdata if not yet available
             if (
