@@ -121,7 +121,6 @@ const RuleInput = (props: IRuleInput) => {
 
   const updateFirstValue = (event: { target: { value: string } }) => {
     setFirstVal(event.target.value)
-    setSecondVal(undefined)
   }
 
   const updateSecondValue = (event: { target: { value: string } }) => {
@@ -219,7 +218,7 @@ const RuleInput = (props: IRuleInput) => {
           )
         })
         return app
-      }
+      },
     )
     if (firstval) {
       const val = JSON.parse(firstval)
@@ -232,9 +231,18 @@ const RuleInput = (props: IRuleInput) => {
   useEffect(() => {
     if (firstval) {
       const prop = getPropFromTuple(firstval)
-      if (prop?.type.key) {
-        setRuleType(+prop?.type.key)
-        setPossibilities(prop.type.possibilities)
+
+      if(prop?.type.key) {
+        if(possibilities.length <= 0) {
+          setRuleType(+prop?.type.key)
+          setPossibilities(prop.type.possibilities)
+        }
+        else if(+prop.type.key !== ruleType){
+          setSecondVal(undefined)
+          setCustomVal("")
+          setRuleType(+prop?.type.key)
+          setPossibilities(prop.type.possibilities)
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -267,13 +275,13 @@ const RuleInput = (props: IRuleInput) => {
   }, [secondVal])
 
   const getPropFromTuple = (
-    value: [number, number] | string
+    value: [number, number] | string,
   ): IProperty | undefined => {
     if (typeof value === 'string') {
       value = JSON.parse(value)
     }
     const application = ConstantsCtx.constants.applications?.find(
-      (el) => el.id === +value[0]
+      (el) => el.id === +value[0],
     )
 
     const prop = application?.props.find((el) => {
@@ -341,7 +349,7 @@ const RuleInput = (props: IRuleInput) => {
                           </option>
                         )
                       }
-                    }
+                    },
                   )}
                 </select>
               </div>
@@ -370,8 +378,9 @@ const RuleInput = (props: IRuleInput) => {
                     {app.props.map((prop) => {
                       return (prop.mediaType === MediaType.BOTH ||
                         props.mediaType === prop.mediaType) &&
-                        (props.mediaType === MediaType.MOVIE || (prop.showType === undefined ||
-                          prop.showType.includes(props.dataType!))) ? (
+                        (props.mediaType === MediaType.MOVIE ||
+                          prop.showType === undefined ||
+                          prop.showType.includes(props.dataType!)) ? (
                         <option
                           key={app.id + 10 + prop.id}
                           value={JSON.stringify([app.id, prop.id])}
@@ -410,7 +419,7 @@ const RuleInput = (props: IRuleInput) => {
                       )
                     }
                   }
-                }
+                },
               )}
             </select>
           </div>
