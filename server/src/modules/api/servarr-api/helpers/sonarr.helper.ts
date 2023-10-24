@@ -100,20 +100,12 @@ export class SonarrApi extends ServarrApi<{
         );
 
         if (!response.data[0]) {
-          this.logger.warn('Could not retrieve show by tvdb ID', {
-            label: 'Sonarr',
-            errorMessage: '',
-            tvdbId: id,
-          });
+          this.logger.warn(`Could not retrieve show by tvdb ID ${id}`);
         }
       }
       return response.data[0];
     } catch (e) {
-      this.logger.warn('Error retrieving show by tvdb ID', {
-        label: 'Sonarr',
-        errorMessage: e.message,
-        tvdbId: id,
-      });
+      this.logger.warn(`Error retrieving show by tvdb ID ${id}. ${e.message}`);
     }
   }
 
@@ -132,11 +124,9 @@ export class SonarrApi extends ServarrApi<{
         );
 
         if (newSeriesResponse.data.id) {
-          this.logger.log('Updated existing series in Sonarr.', {
-            label: 'Sonarr',
-            seriesId: newSeriesResponse.data.id,
-            seriesTitle: newSeriesResponse.data.title,
-          });
+          this.logger.log(
+            `Updated existing series in Sonarr with seriesId: ${newSeriesResponse.data.id} an title of ${newSeriesResponse.data.title}`,
+          );
           this.logger.debug('Sonarr update details', {
             label: 'Sonarr',
             movie: newSeriesResponse.data,
@@ -184,7 +174,7 @@ export class SonarrApi extends ServarrApi<{
       );
 
       if (createdSeriesResponse.data.id) {
-        this.logger.log('Sonarr accepted request', { label: 'Sonarr' });
+        this.logger.log('Sonarr accepted request');
         this.logger.debug('Sonarr add details', {
           label: 'Sonarr',
           movie: createdSeriesResponse.data,
