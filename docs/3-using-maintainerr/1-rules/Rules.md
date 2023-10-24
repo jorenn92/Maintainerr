@@ -13,20 +13,22 @@ On rule creation, Maintainerr will also generate a collection. The collection wi
 
 General info about the rule. Some of the information specified here will be shown on the generated collection. In here you also specify how to handle the collection.
 
-| Param                    | Description                                                                                                                |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| Name                     | The Rule and Collection name                                                                                               |
-| Description              | Description of the Rule. This is also used as the Collection's description                                                 |
-| Library                  | Which Plex library's media to use                                                                                          |
-| Media type               | The type of TV media the rules will apply to, either the entire show, only seasons or only episodes                        |
-| Radarr Action            | Unmonitor or delete movies from Radarr                                                                                     |
-| Sonarr Action            | Unmonitor or delete series from Sonarr                                                                                     |
-| Active                   | If inactive, the rule won't run                                                                                            |
-| Show on home             | Show the rule's collection on the Plex home screen                                                                         |
-| Media deleted after days | Amount of days media will live in the collection before deletion                                                           |
-| Use rules                | Disable the rule engine, in case you want to add media manually                                                            |
-| Custom collection        | Use a manual collection. Media will sync from Plex to Maintainerr. Maintainerr will never remove this collection from Plex |
-| Custom collection name   | The name of the manual collection to use                                                                                   |
+| Param                        | Description                                                                                                                                                                |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Name                         | The Rule and Collection name                                                                                                                                               |
+| Description                  | Description of the Rule. This is also used as the Collection's description                                                                                                 |
+| Library                      | Which Plex library's media to use                                                                                                                                          |
+| Media type                   | The type of TV media the rules will apply to, either the entire show, only seasons or only episodes                                                                        |
+| Radarr Action                | Unmonitor or delete movies from Radarr                                                                                                                                     |
+| Sonarr Action                | Unmonitor or delete series from Sonarr                                                                                                                                     |
+| Active                       | If inactive, the rule won't run                                                                                                                                            |
+| Show on home                 | Show the rule's collection on the Plex home screen                                                                                                                         |
+| Add list exclusions          | Prevent lists to re-add handled media behind Maintainerr's back                                                                                                            |
+| Media deleted after days     | Amount of days media will live in the collection before deletion                                                                                                           |
+| Use rules                    | Disable the rule engine, in case you want to add media manually                                                                                                            |
+| Force reset Overseerr record | Force resets the Overseerr record instead of relying on availability-sync. 'Enable CSRF Protection' needs to be disabled in Overseer's settings for this to work.          |
+| Custom collection            | Use a manual collection. Media will sync from Plex to Maintainerr. Maintainerr will never remove this collection from Plex                                                 |
+| Custom collection name       | The name of the manual collection to use                                                                                                                                   |
 
 ## TV media type
 

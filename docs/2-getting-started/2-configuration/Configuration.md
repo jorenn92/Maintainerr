@@ -22,7 +22,6 @@ This is the only **required** configuration. Without a valid Plex connection Mai
 
 # Overseerr
 Overseerr's configuration is required to use it's parameters in rules and to remove requests. <br />
-<mark>'Enable CSRF Protection' needs to be disabled in Overseer's settings. Otherwise Maintainerr won't be able to clear requests.</mark>
 
 | Param        | Description           |
 | ------------- |:-------------:|
