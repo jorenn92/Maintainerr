@@ -9,9 +9,9 @@ import {
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import _ from 'lodash';
-import { TmdbApiService } from 'src/modules/api/tmdb-api/tmdb.service';
-import { TmdbIdService } from 'src/modules/api/tmdb-api/tmdb-id.service';
-import { PlexMetadata } from 'src/modules/api/plex-api/interfaces/media.interface';
+import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
+import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
+import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
 
 @Injectable()
 export class SonarrGetterService {
