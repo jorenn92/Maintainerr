@@ -62,7 +62,7 @@
     "@automock/jest": "^1.4.0",
     "@babel/cli": "^7.23.0",
     "@babel/core": "^7.23.2",
-    "@nestjs/cli": "^10.1.18",
+    "@nestjs/cli": "^10.2.0",
     "@nestjs/schematics": "^10.0.2",
     "@nestjs/testing": "^10.2.7",
     "@semantic-release/changelog": "^6.0.3",
