@@ -47,7 +47,6 @@ describe('RuleExecutorService', () => {
       expect(result).toBe(false);
     });
 
-
     it('should return false when comparing two strings with action EQUALS and value is undefined', () => {
       const val1 = 'abc';
       const val2 = undefined;
