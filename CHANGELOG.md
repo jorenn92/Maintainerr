@@ -1,3 +1,16 @@
+## [1.6.5](https://github.com/jorenn92/Maintainerr/compare/v1.6.4...v1.6.5) (2023-10-24)
+
+
+### Bug Fixes
+
+* **docker:** Added all components to a supervisor so component crashes are mitigated ([2ccc73d](https://github.com/jorenn92/Maintainerr/commit/2ccc73d8970541c0ea8e756f1354b02400b3f5b1))
+* **rules:** Fixed an issue where 'OR' would not work as expected when used in rules (instead of sections) ([ef191b3](https://github.com/jorenn92/Maintainerr/commit/ef191b3dc03846533b27f714d37f3c2d6ec20428))
+* **rules:** Fixed an issue where switching first values of the same type would not keep the previous second value, and could cause a corrupt rule ([e4fe5c1](https://github.com/jorenn92/Maintainerr/commit/e4fe5c108b1bd3e31e70f8f35368a19844892f71))
+* **rules:** Fixed an issue where undefined return values during rule execution could crash the server ([a152251](https://github.com/jorenn92/Maintainerr/commit/a152251380897526c1da77915495aa736a33fbcd))
+* **rules:** Improved Sonarr log messages ([c944e2d](https://github.com/jorenn92/Maintainerr/commit/c944e2d435c2f51497df0e0e0461ece69e49a760))
+* **rules:** Improved the tvdb ID fallback mechanism for Sonarr rule values in case the tvdb ID is missing from Plex ([abd3dc8](https://github.com/jorenn92/Maintainerr/commit/abd3dc8bab4d86c2268220b39dc6fb08d2b7915c))
+* **settings:** Fixed an issue where uppercase characters in hostname settings could cause a failure in communication ([a7f6351](https://github.com/jorenn92/Maintainerr/commit/a7f6351bdd05bd5c5980a2f63dd1b0d3a5200f6e))
+
 ## [1.6.4](https://github.com/jorenn92/Maintainerr/compare/v1.6.3...v1.6.4) (2023-10-10)
 
 

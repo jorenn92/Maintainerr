@@ -1,6 +1,6 @@
 {
   "name": "maintainerr",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "private": true,
   "repository": {
     "type": "git",
@@ -110,57 +110,57 @@
   "resolutions": {
     "@nestjs/cli/inquirer/wrap-ansi": "^7.0.0"
   },
-    "jest": {
-      "moduleFileExtensions": [
-        "js",
-        "json",
-        "ts"
-      ],
-      "rootDir": "server/src",
-      "testRegex": ".*\\.spec\\.ts$",
-      "transform": {
-        "^.+\\.(t|j)s$": "ts-jest"
-      },
-      "collectCoverageFrom": [
-        "**/*.(t|j)s"
-      ],
-      "coverageDirectory": "./coverage",
-      "testEnvironment": "node"
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "server/src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
     },
-    "release": {
-      "plugins": [
-        "@semantic-release/commit-analyzer",
-        "@semantic-release/release-notes-generator",
-        [
-          "@semantic-release/changelog",
-          {
-            "changelogFile": "CHANGELOG.md"
-          }
-        ],
-        "@semantic-release/npm",
-        [
-          "@semantic-release/git",
-          {
-            "assets": [
-              "package.json",
-              "CHANGELOG.md"
-            ],
-            "message": "chore(release): ${nextRelease.version}"
-          }
-        ],
-        [
-          "@semantic-release/github",
-          {
-            "addReleases": "bottom"
-          }
-        ]
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "./coverage",
+    "testEnvironment": "node"
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "CHANGELOG.md"
+        }
       ],
-      "branches": [
-        "main"
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json",
+            "CHANGELOG.md"
+          ],
+          "message": "chore(release): ${nextRelease.version}"
+        }
       ],
-      "npmPublish": false,
-      "publish": [
-        "@semantic-release/github"
+      [
+        "@semantic-release/github",
+        {
+          "addReleases": "bottom"
+        }
       ]
-    }
+    ],
+    "branches": [
+      "main"
+    ],
+    "npmPublish": false,
+    "publish": [
+      "@semantic-release/github"
+    ]
   }
+}
