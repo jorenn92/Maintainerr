@@ -3,6 +3,7 @@ export interface SonarrSeason {
   monitored: boolean;
   statistics?: {
     previousAiring?: string;
+    nextAiring?: string;
     episodeFileCount: number;
     episodeCount: number;
     totalEpisodeCount: number;
