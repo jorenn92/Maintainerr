@@ -60,11 +60,11 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
           >
             <MenuAlt2Icon className="h-6 w-6" />
           </button>
-          <div className="flex flex-1 items-center justify-between pr-4 md:pr-4 md:pl-4">
+          <div className="flex flex-1 items-center justify-between pr-4 md:pr-4 md:pl-4 transparent-glass-bg">
             <button
               className={`mr-2 text-white ${
                 isScrolled ? 'opacity-90' : 'opacity-70'
-              } pwa-only transition duration-300 hover:text-white focus:text-white focus:outline-none`}
+              } transition duration-300 hover:text-white focus:text-white focus:outline-none`}
               onClick={() => router.back()}
             >
               <ArrowLeftIcon className="w-7" />
