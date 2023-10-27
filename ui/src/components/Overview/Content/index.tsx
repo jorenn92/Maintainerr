@@ -86,7 +86,7 @@ const OverviewContent = (props: IOverviewContent) => {
     return () => {
       window.removeEventListener(
         'scroll',
-        _.debounce(handleScroll.bind(this), 200)
+        _.debounce(handleScroll.bind(this), 200),
       )
     }
   }, [])
@@ -106,14 +106,14 @@ const OverviewContent = (props: IOverviewContent) => {
   const getDaysLeft = (plexId: number) => {
     if (props.collectionInfo) {
       const collectionData = props.collectionInfo.find(
-        (colEl) => colEl.plexId === +plexId
+        (colEl) => colEl.plexId === +plexId,
       )
       if (collectionData && collectionData.collection) {
         const date = new Date(collectionData.addDate)
         const today = new Date()
 
         date.setDate(
-          date.getDate() + collectionData.collection.deleteAfterDays!
+          date.getDate() + collectionData.collection.deleteAfterDays!,
         )
 
         const diffTime = Math.abs(date.getTime() - today.getTime())
@@ -129,84 +129,83 @@ const OverviewContent = (props: IOverviewContent) => {
 
   if (props.data && props.data.length > 0) {
     return (
-      <div className="flex w-full flex-wrap overflow-auto">
+      <ul className="cards-vertical">
         {props.data.map((el) => (
-          <div className="m-auto mb-2 mt-2 sm:m-2" key={+el.ratingKey}>
-            <MediaCard
-              id={+el.ratingKey}
-              libraryId={props.libraryId}
-              type={
-                el.type === 'movie'
-                  ? 1
-                  : el.type === 'show'
-                  ? 2
-                  : el.type === 'season'
-                  ? 3
-                  : 4
-              }
-              image={''}
-              summary={
-                el.type === 'movie' || el.type === 'show'
-                  ? el.summary
-                  : el.type === 'season'
-                  ? el.title
-                  : el.type === 'episode'
-                  ? 'Episode ' + el.index + ' - ' + el.title
-                  : ''
-              }
-              year={
-                el.type === 'episode'
-                  ? el.parentTitle
-                  : el.parentYear
-                  ? el.parentYear.toString()
-                  : el.year?.toString()
-              }
-              mediaType={
-                el.type === 'movie'
-                  ? 'movie'
-                  : el.type === 'show'
-                  ? 'show'
-                  : el.type === 'season'
-                  ? 'season'
-                  : 'episode'
-              }
-              title={
-                el.grandparentTitle
-                  ? el.grandparentTitle
-                  : el.parentTitle
-                  ? el.parentTitle
-                  : el.title
-              }
-              userScore={el.audienceRating ? el.audienceRating : 0}
-              tmdbid={
-                el.parentData
-                  ? el.parentData.Guid.find((e) =>
-                      e.id.includes('tmdb')
-                    )?.id.split('tmdb://')[1]
-                  : el.Guid
-                  ? el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
-                      'tmdb://'
-                    )[1]
-                  : undefined
-              }
-              collectionPage={
-                props.collectionPage ? props.collectionPage : false
-              }
-              onRemove={props.onRemove}
-              {...(props.collectionInfo
-                ? {
-                    daysLeft: getDaysLeft(+el.ratingKey),
-                    collectionId: props.collectionInfo.find(
-                      (colEl) => colEl.plexId === +el.ratingKey
-                    )?.collectionId,
-                  }
-                : {})}
-            />
-          </div>
+          <li key={+el.ratingKey}>
+              <MediaCard
+                id={+el.ratingKey}
+                libraryId={props.libraryId}
+                type={
+                  el.type === 'movie'
+                    ? 1
+                    : el.type === 'show'
+                    ? 2
+                    : el.type === 'season'
+                    ? 3
+                    : 4
+                }
+                image={''}
+                summary={
+                  el.type === 'movie' || el.type === 'show'
+                    ? el.summary
+                    : el.type === 'season'
+                    ? el.title
+                    : el.type === 'episode'
+                    ? 'Episode ' + el.index + ' - ' + el.title
+                    : ''
+                }
+                year={
+                  el.type === 'episode'
+                    ? el.parentTitle
+                    : el.parentYear
+                    ? el.parentYear.toString()
+                    : el.year?.toString()
+                }
+                mediaType={
+                  el.type === 'movie'
+                    ? 'movie'
+                    : el.type === 'show'
+                    ? 'show'
+                    : el.type === 'season'
+                    ? 'season'
+                    : 'episode'
+                }
+                title={
+                  el.grandparentTitle
+                    ? el.grandparentTitle
+                    : el.parentTitle
+                    ? el.parentTitle
+                    : el.title
+                }
+                userScore={el.audienceRating ? el.audienceRating : 0}
+                tmdbid={
+                  el.parentData
+                    ? el.parentData.Guid.find((e) =>
+                        e.id.includes('tmdb'),
+                      )?.id.split('tmdb://')[1]
+                    : el.Guid
+                    ? el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
+                        'tmdb://',
+                      )[1]
+                    : undefined
+                }
+                collectionPage={
+                  props.collectionPage ? props.collectionPage : false
+                }
+                onRemove={props.onRemove}
+                {...(props.collectionInfo
+                  ? {
+                      daysLeft: getDaysLeft(+el.ratingKey),
+                      collectionId: props.collectionInfo.find(
+                        (colEl) => colEl.plexId === +el.ratingKey,
+                      )?.collectionId,
+                    }
+                  : {})}
+              />
+          </li>
         ))}
-
         {props.extrasLoading ? <SmallLoadingSpinner /> : undefined}
-      </div>
+      </ul>
     )
   }
   return <></>

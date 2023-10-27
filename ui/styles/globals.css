@@ -82,6 +82,9 @@
     color: rgb(228 228 231 / var(--tw-text-opacity));
     font-weight: 600;
   }
+  .cards-vertical {
+    grid-template-columns: repeat(auto-fill, minmax(9.375rem, 1fr));
+  }
 
   .collection {
     @apply border-r border-zinc-700;

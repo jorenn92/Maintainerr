@@ -56,7 +56,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   useEffect(() => {
     if (tmdbid) {
       GetApiHandler(`/moviedb/image/${mediaType}/${tmdbid}`).then((resp) =>
-        setImage(resp)
+        setImage(resp),
       )
     }
     getExclusions()
@@ -65,7 +65,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   const getExclusions = () => {
     if (!collectionPage) {
       GetApiHandler(`/rules/exclusion?plexId=${id}`).then((resp: []) =>
-        resp.length > 0 ? setHasExclusion(true) : setHasExclusion(false)
+        resp.length > 0 ? setHasExclusion(true) : setHasExclusion(false),
       )
     }
   }
@@ -76,7 +76,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   }
 
   return (
-    <div className={canExpand ? 'w-full' : 'w-36 sm:w-36 md:w-44'}>
+    <div className={'w-full'}>
       {excludeModal ? (
         <ExcludeModal
           plexId={id}
