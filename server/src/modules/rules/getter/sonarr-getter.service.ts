@@ -143,8 +143,8 @@ export class SonarrGetterService {
                   dataType,
                 )
               ) {
-                return season?.statistics?.episodeCount
-                  ? +season.statistics.episodeCount
+                return season?.statistics?.totalEpisodeCount
+                  ? +season.statistics.totalEpisodeCount
                   : null;
               } else {
                 return showResponse.statistics.seasonCount
@@ -184,6 +184,39 @@ export class SonarrGetterService {
                   ? 1
                   : 0
                 : null;
+            }
+            case 'unaired_episodes': {
+              // returns true if a season with unaired episodes is found in monitored seasons
+              const data = [];
+              if (dataType === EPlexDataType.SEASONS) {
+                data.push(...season);
+              } else {
+                data.push(...showResponse.seasons.filter((el) => el.monitored));
+              }
+              return (
+                data.filter((el) => el.statistics?.nextAiring !== undefined)
+                  .length > 0
+              );
+            }
+            case 'unaired_episodes_season': {
+              // returns true if the season of an episode has unaired episodes
+              return season?.statistics
+                ? season.statistics.nextAiring !== undefined
+                : false;
+            }
+            case 'seasons_monitored': {
+              // returns the number of monitored seasons / episodes
+              if (
+                [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
+                  dataType,
+                )
+              ) {
+                return season?.statistics?.episodeCount
+                  ? +season.statistics.episodeCount
+                  : null;
+              } else {
+                return showResponse.seasons.filter((el) => el.monitored).length;
+              }
             }
           }
         } else return null;

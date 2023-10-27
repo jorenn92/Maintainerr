@@ -493,6 +493,9 @@ export class RuleExecutorService implements OnApplicationBootstrap {
             new Date(val2?.toDateString()).valueOf()
           );
         }
+        if (typeof val1 === 'boolean') {
+          return val1 == val2;
+        }
         return val1 === val2;
       } else {
         if (val1.length > 0) {
