@@ -51,16 +51,16 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
             WebkitBackdropFilter: isScrolled ? 'blur(5px)' : undefined,
           }}
         >
-          <button
-            className={`px-4 text-white ${
-              isScrolled ? 'opacity-90' : 'opacity-70'
-            } transition duration-300 focus:outline-none lg:hidden`}
-            aria-label="Open sidebar"
-            onClick={() => setNavBarOpen(true)}
-          >
-            <MenuAlt2Icon className="h-6 w-6" />
-          </button>
           <div className="flex flex-1 items-center justify-between pr-4 md:pr-4 md:pl-4 transparent-glass-bg">
+            <button
+              className={`px-4 text-white ${
+                isScrolled ? 'opacity-90' : 'opacity-70'
+              } transition duration-300 focus:outline-none lg:hidden`}
+              aria-label="Open sidebar"
+              onClick={() => setNavBarOpen(true)}
+            >
+              <MenuAlt2Icon className="h-6 w-6" />
+            </button>
             <button
               className={`mr-2 text-white ${
                 isScrolled ? 'opacity-90' : 'opacity-70'
