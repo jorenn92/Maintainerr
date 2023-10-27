@@ -1,3 +1,13 @@
+## [1.6.6](https://github.com/jorenn92/Maintainerr/compare/v1.6.5...v1.6.6) (2023-10-27)
+
+
+### Bug Fixes
+
+* **rules:** Added Sonarr rules: 'Has unaired episodes', 'Number of monitored seasons / episodes' & 'Season has unaired episodes' ([71c3b25](https://github.com/jorenn92/Maintainerr/commit/71c3b25de162250f4af551364be4dd8b9d801bc6))
+* **ui:** Improve media card spacing on different screen sizes ([8bd6f97](https://github.com/jorenn92/Maintainerr/commit/8bd6f9746772a4cef9ffb08df38fda5bdd9e0416))
+* **ui:** The back button & searchbar now have a glass background ([6fcee47](https://github.com/jorenn92/Maintainerr/commit/6fcee47f85b43053d39c8a3ee70a2c1d0f095749))
+* **ui:** The header back button is now the global return button. And the temporary collection detail 'rewind' button is gone ([1042de6](https://github.com/jorenn92/Maintainerr/commit/1042de6b9e736cb8e9a2e8174e88799f5793f161))
+
 ## [1.6.5](https://github.com/jorenn92/Maintainerr/compare/v1.6.4...v1.6.5) (2023-10-24)
 
 
