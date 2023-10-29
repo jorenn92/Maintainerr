@@ -57,7 +57,7 @@ const RuleGroup = (props: {
           </div>
 
           <div className="my-0.5 flex text-sm sm:my-1">
-            <span className="mr-2 font-bold ">{props.group.description}</span>
+            <span className="mr-2 font-bold w-full overflow-hidden overflow-ellipsis whitespace-nowrap">{props.group.description}</span>
           </div>
         </div>
 
