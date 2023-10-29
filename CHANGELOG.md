@@ -1,3 +1,11 @@
+## [1.6.7](https://github.com/jorenn92/Maintainerr/compare/v1.6.6...v1.6.7) (2023-10-29)
+
+
+### Bug Fixes
+
+* **settings:** Fixed an issue where initial configuration could fail ([3bec671](https://github.com/jorenn92/Maintainerr/commit/3bec6713b38d64ef4d6ee5ba4d614008eef4bfb4))
+* **ui:** Collection cards now scale correctly ([829e8a1](https://github.com/jorenn92/Maintainerr/commit/829e8a1ab17dd1c4547998fed86aed1314ab30ac))
+
 ## [1.6.6](https://github.com/jorenn92/Maintainerr/compare/v1.6.5...v1.6.6) (2023-10-27)
 
 
