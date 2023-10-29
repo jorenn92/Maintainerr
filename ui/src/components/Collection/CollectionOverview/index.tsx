@@ -31,16 +31,17 @@ const CollectionOverview = (props: ICollectionOverview) => {
             {'Automatic collections'}
           </h1>
         </div>
-
-        <div className="flex flex-col sm:flex-row">
+        <ul className="xs:collection-cards-vertical">
           {props.collections?.map((col) => (
-            <CollectionItem
-              key={col.id}
-              collection={col}
-              onClick={() => props.openDetail(col)}
-            />
+            <li key={+col.id!} className="collection relative mb-5 flex h-fit w-96 flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:mb-0 sm:mr-5 xs:w-full">
+              <CollectionItem
+                key={col.id}
+                collection={col}
+                onClick={() => props.openDetail(col)}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   )
