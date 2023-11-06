@@ -444,6 +444,14 @@ export class RuleConstants {
           type: RuleType.BOOL,
           showType: [EPlexDataType.EPISODES],
         } as Property,
+        {
+          id: 13,
+          name: 'part_of_latest_season',
+          humanName: 'Is (part of) latest aired/airing season',
+          mediaType: MediaType.SHOW,
+          type: RuleType.BOOL,
+          showType: [EPlexDataType.EPISODES, EPlexDataType.SEASONS],
+        } as Property,
       ],
     },
     {
