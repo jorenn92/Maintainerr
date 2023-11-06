@@ -31,6 +31,7 @@ export interface SonarrInfo {
 }
 
 export interface SonarrEpisode {
+  airDate: string;
   seriesId: number;
   seasonNumber: number;
   episodeNumber: number;

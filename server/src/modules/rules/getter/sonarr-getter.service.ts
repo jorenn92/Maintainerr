@@ -12,6 +12,7 @@ import _ from 'lodash';
 import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
 import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
 import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
+import { SonarrSeason } from 'src/modules/api/servarr-api/interfaces/sonarr.interface';
 
 @Injectable()
 export class SonarrGetterService {
@@ -218,6 +219,26 @@ export class SonarrGetterService {
                 return showResponse.seasons.filter((el) => el.monitored).length;
               }
             }
+            case 'part_of_latest_season': {
+              // returns the true when this is the latest season or the episode is part of the latest season
+              if (
+                [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
+                  dataType,
+                )
+              ) {
+                return season.seasonNumber && showResponse.seasons
+                  ? +season.seasonNumber ===
+                      (
+                        await this.getLastSeason(
+                          showResponse.seasons,
+                          showResponse.id,
+                        )
+                      ).seasonNumber
+                  : false;
+              } else {
+                false;
+              }
+            }
           }
         } else return null;
       } else {
@@ -227,6 +248,39 @@ export class SonarrGetterService {
       this.logger.warn(`Sonarr-Getter - Action failed : ${e.message}`);
       return undefined;
     }
+  }
+
+  /**
+   * Retrieves the last season from the given array of seasons.
+   *
+   * @param {SonarrSeason[]} seasons - The array of seasons to search through.
+   * @param {number} showId - The ID of the show.
+   * @return {Promise<SonarrSeason>} The last season found, or undefined if none is found.
+   */
+  private async getLastSeason(
+    seasons: SonarrSeason[],
+    showId: number,
+  ): Promise<SonarrSeason> {
+    // array find doesn't work as expected.. so keep this a for loop
+    for (const s of seasons.reverse()) {
+      const epResp = showId
+        ? await this.servarrService.SonarrApi.getEpisodes(
+            showId,
+            s.seasonNumber,
+            [1],
+          )
+        : [];
+
+      const resp =
+        epResp[0] && epResp[0].airDate === undefined
+          ? false
+          : s.statistics?.nextAiring !== undefined
+          ? s.statistics.previousAiring !== undefined
+          : true;
+
+      if (resp) return s;
+    }
+    return undefined;
   }
 
   public async findTvdbidFromPlexLibItem(libItem: PlexLibraryItem) {
