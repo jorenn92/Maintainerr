@@ -189,7 +189,7 @@ export class SonarrGetterService {
               // returns true if a season with unaired episodes is found in monitored seasons
               const data = [];
               if (dataType === EPlexDataType.SEASONS) {
-                data.push(...season);
+                data.push(season);
               } else {
                 data.push(...showResponse.seasons.filter((el) => el.monitored));
               }
