@@ -233,7 +233,7 @@ export class SonarrGetterService {
                           showResponse.seasons,
                           showResponse.id,
                         )
-                      ).seasonNumber
+                      )?.seasonNumber
                   : false;
               } else {
                 false;
