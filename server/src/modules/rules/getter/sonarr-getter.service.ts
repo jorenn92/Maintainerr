@@ -12,7 +12,7 @@ import _ from 'lodash';
 import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
 import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
 import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
-import { SonarrSeason } from 'src/modules/api/servarr-api/interfaces/sonarr.interface';
+import { SonarrSeason } from '../../../modules/api/servarr-api/interfaces/sonarr.interface';
 
 @Injectable()
 export class SonarrGetterService {
