@@ -12,6 +12,9 @@ These settings are OK for most installations.
 # Plex
 This is the only **required** configuration. Without a valid Plex connection Maintainerr won't be able to function.
 
+When using a local Plex instance, make sure your Plex's 'secure connections' network setting is set to 'preferred' instead of 'required'.
+If you'd like Maintainerr to communicate securely, you'll have to use your '*.plex.direct' URL as the hostname. You can copy this URL from Overseerr's configuration. Make sure you include 'https://'.
+
 | Param        | Description           |
 | ------------- |:-------------:|
 | Name          | The name of your server |
