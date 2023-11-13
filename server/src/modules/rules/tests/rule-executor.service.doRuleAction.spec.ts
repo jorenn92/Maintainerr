@@ -175,12 +175,44 @@ describe('RuleExecutorService', () => {
       expect(result).toBe(true);
     });
 
+    it('should return true when comparing a string with action CONTAINS', () => {
+      const val1 = 'abc';
+      const val2 = 'ab';
+      const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return false when comparing a string with action CONTAINS', () => {
+      const val1 = 'abc';
+      const val2 = 'de';
+      const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
     it('should return true when comparing an array of strings with action CONTAINS', () => {
       const val1 = ['abc', 'def'];
       const val2 = ['abc'];
       const action = RulePossibility.CONTAINS;
       const result = ruleExecutorService['doRuleAction'](val1, val2, action);
       expect(result).toBe(true);
+    });
+
+    it('should return true when comparing an array of multiple word strings with action CONTAINS', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['imdb'];
+      const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return false when comparing an array of multiple word strings with action CONTAINS', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['jos'];
+      const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
     });
 
     it('should return false when comparing an array of strings with action CONTAINS and value is an empty string', () => {
@@ -218,6 +250,22 @@ describe('RuleExecutorService', () => {
     it('should return true when comparing an array of strings with action NOT_CONTAINS', () => {
       const val1 = ['abc', 'def'];
       const val2 = ['ghi'];
+      const action = RulePossibility.NOT_CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return false when comparing an array of multiple word strings with action NOT_CONTAINS', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['ImDb'];
+      const action = RulePossibility.NOT_CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
+    it('should return true when comparing an array of multiple word strings with action NOT_CONTAINS', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['Jos'];
       const action = RulePossibility.NOT_CONTAINS;
       const result = ruleExecutorService['doRuleAction'](val1, val2, action);
       expect(result).toBe(true);
