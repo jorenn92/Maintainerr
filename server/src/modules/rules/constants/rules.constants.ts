@@ -11,6 +11,8 @@ export const enum RulePossibility {
   IN_LAST,
   IN_NEXT,
   NOT_CONTAINS,
+  CONTAINS_PARTIAL,
+  NOT_CONTAINS_PARTIAL,
 }
 
 export const enum RuleOperators {
@@ -60,6 +62,8 @@ export class RuleType {
     RulePossibility.NOT_EQUALS,
     RulePossibility.CONTAINS,
     RulePossibility.NOT_CONTAINS,
+    RulePossibility.CONTAINS_PARTIAL,
+    RulePossibility.NOT_CONTAINS_PARTIAL,
   ]);
   static readonly BOOL = new RuleType('3', [
     RulePossibility.EQUALS,
@@ -107,7 +111,7 @@ export class RuleConstants {
         {
           id: 1,
           name: 'seenBy',
-          humanName: 'Viewed by (list of usernames)',
+          humanName: '[list] Viewed by (username)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT, // returns id[]
         } as Property,
@@ -128,7 +132,7 @@ export class RuleConstants {
         {
           id: 4,
           name: 'people',
-          humanName: 'People involved (list of names)',
+          humanName: '[list] People involved',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT, // return text[]
         } as Property,
@@ -156,7 +160,7 @@ export class RuleConstants {
         {
           id: 8,
           name: 'fileVideoResolution',
-          humanName: 'Media file resolution (4k, 1080,..)',
+          humanName: '[list] Media file resolution (4k, 1080,..)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
         } as Property,
@@ -177,14 +181,14 @@ export class RuleConstants {
         {
           id: 11,
           name: 'genre',
-          humanName: 'List of genres (Action, Adventure,..)',
+          humanName: '[list] List of genres (Action, Adventure,..)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT, // return text[]
         } as Property,
         {
           id: 12,
           name: 'sw_allEpisodesSeenBy',
-          humanName: 'Users that saw all available episodes',
+          humanName: '[list] Users that saw all available episodes',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT, // return usernames []
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
@@ -231,7 +235,7 @@ export class RuleConstants {
         {
           id: 18,
           name: 'sw_watchers',
-          humanName: 'Users that watch the show/season',
+          humanName: '[list] Users that watch the show/season',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT, // return usernames []
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
@@ -239,7 +243,7 @@ export class RuleConstants {
         {
           id: 19,
           name: 'collection_names',
-          humanName: 'Collections media is present in (list of titles)',
+          humanName: '[list] Collections media is present in (list of titles)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
         } as Property,
@@ -267,7 +271,7 @@ export class RuleConstants {
         {
           id: 2,
           name: 'tags',
-          humanName: 'Tags (Text if 1, otherwise list)',
+          humanName: '[list] Tags (Text if 1, otherwise list)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT, // return text[]
         } as Property,
@@ -309,14 +313,14 @@ export class RuleConstants {
         {
           id: 8,
           name: 'fileAudioChannels',
-          humanName: 'File - audio channels',
+          humanName: '[list] File - audio channels',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
         } as Property,
         {
           id: 9,
           name: 'fileQuality',
-          humanName: 'File - quality (2160, 1080,..)',
+          humanName: '[list] File - quality (2160, 1080,..)',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
         } as Property,
@@ -364,7 +368,7 @@ export class RuleConstants {
         {
           id: 2,
           name: 'tags',
-          humanName: 'Tags (show)',
+          humanName: '[list] Tags (show)',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT, // return text[]
         } as Property,

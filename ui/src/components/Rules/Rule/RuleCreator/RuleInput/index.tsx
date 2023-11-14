@@ -4,6 +4,7 @@ import { IRule } from '../'
 import ConstantsContext, {
   IProperty,
   MediaType,
+  RulePossibilityTranslations,
 } from '../../../../../contexts/constants-context'
 import { EPlexDataType } from '../../../../../utils/PlexDataType-enum'
 import _, { first } from 'lodash'
@@ -19,6 +20,8 @@ enum RulePossibility {
   IN_LAST,
   IN_NEXT,
   NOT_CONTAINS,
+  CONTAINS_PARTIAL,
+  NOT_CONTAINS_PARTIAL,
 }
 
 enum RuleType {
@@ -231,15 +234,15 @@ const RuleInput = (props: IRuleInput) => {
   useEffect(() => {
     if (firstval) {
       const prop = getPropFromTuple(firstval)
+      console.log(prop)
 
-      if(prop?.type.key) {
-        if(possibilities.length <= 0) {
+      if (prop?.type.key) {
+        if (possibilities.length <= 0) {
           setRuleType(+prop?.type.key)
           setPossibilities(prop.type.possibilities)
-        }
-        else if(+prop.type.key !== ruleType){
+        } else if (+prop.type.key !== ruleType) {
           setSecondVal(undefined)
-          setCustomVal("")
+          setCustomVal('')
           setRuleType(+prop?.type.key)
           setPossibilities(prop.type.possibilities)
         }
@@ -414,7 +417,7 @@ const RuleInput = (props: IRuleInput) => {
                     if (possibilities.some((el) => +el === +value)) {
                       return (
                         <option key={+value} value={+value}>
-                          {RulePossibility[+value]}
+                          {Object.values(RulePossibilityTranslations)[+value]}
                         </option>
                       )
                     }

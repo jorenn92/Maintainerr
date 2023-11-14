@@ -13,14 +13,14 @@ interface Iconstants {
 interface IApplication {
   id: number
   name: string
-  mediaType: MediaType,
+  mediaType: MediaType
   props: IProperty[]
 }
 export interface IProperty {
   id: number
   name: string
   humanName: string
-  mediaType: MediaType,
+  mediaType: MediaType
   type: IPropertyType
   showType?: EPlexDataType[]
 }
@@ -41,6 +41,23 @@ export enum RulePossibility {
   IN_LAST,
   IN_NEXT,
   NOT_CONTAINS,
+  CONTAINS_PARTIAL,
+  NOT_CONTAINS_PARTIAL,
+}
+
+export enum RulePossibilityTranslations {
+  BIGGER = 'Bigger',
+  SMALLER = 'Smaller',
+  EQUALS = 'Equals',
+  NOT_EQUALS = 'Not Equals',
+  CONTAINS = 'Contains (Exact list match)',
+  BEFORE = 'Before',
+  AFTER = 'After',
+  IN_LAST = 'In Last',
+  IN_NEXT = 'In Next',
+  NOT_CONTAINS = 'Not Contains (Exact list match)',
+  CONTAINS_PARTIAL = 'Contains (Partial list match)',
+  NOT_CONTAINS_PARTIAL = 'Not Contains (Partial list match)',
 }
 
 export const enum MediaType {

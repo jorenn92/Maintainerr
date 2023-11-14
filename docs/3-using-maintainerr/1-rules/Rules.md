@@ -93,17 +93,20 @@ The output of the rule will then be passed on to the next rule.
 The action defines the way the `first value` and `second value` will be compared. <br />
 The available actions are dependent on the type of the `first value`
 
-| Action     | Description                                                 | Types              |
-| ---------- | ----------------------------------------------------------- | ------------------ |
-| bigger     | Is the `first value` bigger than the `second value` ?       | number             |
-| smaller    | Is the `first value` smaller than the `second value` ?      | number             |
-| contains   | Does the `first value` contain the `second value` ?         | number, text       |
-| equals     | Is the `first value` equal to the `second value` ?          | number, text, date |
-| not_equals | Is the `first value` unequal to the `second value` ?        | number, text, date |
-| before     | Does the `first value` occur before the `second value` ?    | date               |
-| after      | Does the `first value` occur after the `second value` ?     | date               |
-| in_last    | Does the `first value` occur in the last x amount of days ? | date               |
-| in_next    | Does the `first value` occur in the next x amount of days ? | date               |
+| Action                    | Description                                                                                                                               | Types              |
+| ----------                | -----------------------------------------------------------                                                                               | ------------------ |
+| bigger                    | Is the `first value` bigger than the `second value` ?                                                                                     | number             |
+| smaller                   | Is the `first value` smaller than the `second value` ?                                                                                    | number             |
+| contains                  | Does the `first value` contain the `second value`? Lists will confirm the existence of an exact match within the `first value` list       | number, text       |
+| contains (partial)        | Does the `first value` contain the `second value` ? Lists will confirm the existence of a partial match within the `first value` list     | number, text       |
+| not contains              | Does the `first value` lack the `second value`? Lists will indicate the absence of an exact match within the `first value` list.          | number, text       |
+| not contains (partial)    | Does the `first value` lack the `second value` ? Lists will indicate the absence of a partial match within the `first value` list.        | number, text       |
+| equals                    | Is the `first value` equal to the `second value` ?                                                                                        | number, text, date |
+| not equals                | Is the `first value` unequal to the `second value` ?                                                                                      | number, text, date |
+| before                    | Does the `first value` occur before the `second value` ?                                                                                  | date               |
+| after                     | Does the `first value` occur after the `second value` ?                                                                                   | date               |
+| in last                   | Does the `first value` occur in the last x amount of days ?                                                                               | date               |
+| in next                   | Does the `first value` occur in the next x amount of days ?                                                                               | date               |
 
 ## Custom values
 
