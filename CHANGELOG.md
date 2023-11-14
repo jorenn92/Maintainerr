@@ -1,3 +1,13 @@
+## [1.6.8](https://github.com/jorenn92/Maintainerr/compare/v1.6.7...v1.6.8) (2023-11-14)
+
+
+### Bug Fixes
+
+* **rules:** Added new rule 'Is part of latest aired/airing season' ([2f78a54](https://github.com/jorenn92/Maintainerr/commit/2f78a540c3e2806a5ee24c904136782aba71d040))
+* **rules:** Alter the CONTAINS behavior so it now validates for partial matches ([a04fec2](https://github.com/jorenn92/Maintainerr/commit/a04fec238eaa364d428bbeb179d17a0a1c29167f))
+* **rules:** Introduced the capability to detect partial text matches within text lists through the newly added 'Contains (Partial list match)' operator. ([5ee4c69](https://github.com/jorenn92/Maintainerr/commit/5ee4c6952a7f6f4ff8a86f57023df381d974a479))
+* **rules:** Introduced the capability to include text lists in custom values using JSON notation ([aa0b229](https://github.com/jorenn92/Maintainerr/commit/aa0b229762862f49e6d3aa2b16c696a51d6607c8))
+
 ## [1.6.7](https://github.com/jorenn92/Maintainerr/compare/v1.6.6...v1.6.7) (2023-10-29)
 
 
