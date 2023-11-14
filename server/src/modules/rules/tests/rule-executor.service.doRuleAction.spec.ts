@@ -175,7 +175,39 @@ describe('RuleExecutorService', () => {
       expect(result).toBe(true);
     });
 
-    it('should return true when comparing an array of strings with action CONTAINS', () => {
+    it('should return true when comparing a string with action CONTAINS', () => {
+      const val1 = 'abc';
+      const val2 = 'ab';
+      const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return false when comparing a string with action CONTAINS', () => {
+      const val1 = 'abc';
+      const val2 = 'de';
+      const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
+    it('should return false when comparing a string with action CONTAINS_PARTIAL', () => {
+      const val1 = 'abc';
+      const val2 = 'de';
+      const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
+    it('should return true when comparing a string with action CONTAINS_PARTIAL', () => {
+      const val1 = 'abc';
+      const val2 = 'ab';
+      const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return true when comparing an array of strings with an exact match with action CONTAINS', () => {
       const val1 = ['abc', 'def'];
       const val2 = ['abc'];
       const action = RulePossibility.CONTAINS;
@@ -183,10 +215,50 @@ describe('RuleExecutorService', () => {
       expect(result).toBe(true);
     });
 
+    it('should return true when comparing an array of strings with an exact match with action CONTAINS_PARTIAL', () => {
+      const val1 = ['abc', 'def'];
+      const val2 = ['abc'];
+      const action = RulePossibility.CONTAINS_PARTIAL;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return true when comparing an array of multiple word strings with action CONTAINS_PARTIAL', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['imdb'];
+      const action = RulePossibility.CONTAINS_PARTIAL;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return false when comparing an array of multiple word strings with action CONTAINS', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['imdb'];
+      const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
+    it('should return false when comparing an array of multiple word strings with action CONTAINS_PARTIAL', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['jos'];
+      const action = RulePossibility.CONTAINS_PARTIAL;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
     it('should return false when comparing an array of strings with action CONTAINS and value is an empty string', () => {
       const val1 = ['abc', 'def'];
       const val2 = [''];
       const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
+    it('should return false when comparing an array of strings with action CONTAINS_PARTIAL and value is an empty string', () => {
+      const val1 = ['abc', 'def'];
+      const val2 = [''];
+      const action = RulePossibility.CONTAINS_PARTIAL;
       const result = ruleExecutorService['doRuleAction'](val1, val2, action);
       expect(result).toBe(false);
     });
@@ -199,10 +271,34 @@ describe('RuleExecutorService', () => {
       expect(result).toBe(false);
     });
 
+    it('should return false when comparing an array of strings with action CONTAINS_PARTIAL and value contains undefined', () => {
+      const val1 = ['abc', 'def'];
+      const val2 = ['ral', undefined, 'rel'];
+      const action = RulePossibility.CONTAINS_PARTIAL;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
     it('should return true when comparing an array of strings with action CONTAINS and value contains undefined', () => {
       const val1 = ['abc', 'def'];
       const val2 = ['ral', undefined, 'abc'];
       const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return true when comparing an array of strings with action CONTAINS_PARTIAL and value contains undefined and an exact match', () => {
+      const val1 = ['abc', 'def'];
+      const val2 = ['ral', undefined, 'abc'];
+      const action = RulePossibility.CONTAINS_PARTIAL;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return true when comparing an array of strings with action CONTAINS_PARTIAL and value contains undefined and a partial match', () => {
+      const val1 = ['abc', 'def'];
+      const val2 = ['ral', undefined, 'ab'];
+      const action = RulePossibility.CONTAINS_PARTIAL;
       const result = ruleExecutorService['doRuleAction'](val1, val2, action);
       expect(result).toBe(true);
     });
@@ -223,6 +319,38 @@ describe('RuleExecutorService', () => {
       expect(result).toBe(true);
     });
 
+    it('should return true when comparing an array of multiple word strings with action NOT_CONTAINS', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['ImDb'];
+      const action = RulePossibility.NOT_CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return false when comparing an array of multiple word strings with action NOT_CONTAINS_PARTIAL', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['ImDb'];
+      const action = RulePossibility.NOT_CONTAINS_PARTIAL;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
+    it('should return true when comparing an array of multiple word strings with action NOT_CONTAINS', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['Jos'];
+      const action = RulePossibility.NOT_CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
+    it('should return true when comparing an array of multiple word strings with action NOT_CONTAINS_PARTIAL', () => {
+      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
+      const val2 = ['Jos'];
+      const action = RulePossibility.NOT_CONTAINS_PARTIAL;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(true);
+    });
+
     it('should return false when comparing an array of strings with action NOT_CONTAINS', () => {
       const val1 = ['abc', 'def'];
       const val2 = ['abc'];
@@ -231,18 +359,26 @@ describe('RuleExecutorService', () => {
       expect(result).toBe(false);
     });
 
-    it('should return true when comparing an array of numbers with action CONTAINS', () => {
+    it('should return false when comparing an array of strings with action NOT_CONTAINS_PARTIAL', () => {
       const val1 = ['abc', 'def'];
       const val2 = ['abc'];
-      const action = RulePossibility.CONTAINS;
+      const action = RulePossibility.NOT_CONTAINS_PARTIAL;
       const result = ruleExecutorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
 
     it('should return false when comparing an array of numbers against 1 value with action CONTAINS', () => {
       const val1 = [1, 2, 3, 4];
       const val2 = [6];
       const action = RulePossibility.CONTAINS;
+      const result = ruleExecutorService['doRuleAction'](val1, val2, action);
+      expect(result).toBe(false);
+    });
+
+    it('should return false when comparing an array of numbers against 1 value with action CONTAINS_PARTIAL', () => {
+      const val1 = [1, 2, 3, 4];
+      const val2 = [6];
+      const action = RulePossibility.CONTAINS_PARTIAL;
       const result = ruleExecutorService['doRuleAction'](val1, val2, action);
       expect(result).toBe(false);
     });

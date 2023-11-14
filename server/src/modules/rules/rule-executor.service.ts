@@ -535,8 +535,52 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         return null;
       }
     }
+    if (action === RulePossibility.CONTAINS_PARTIAL) {
+      try {
+        if (!Array.isArray(val2)) {
+          // return (val1 as unknown as T[])?.includes(val2);
+          return (
+            (Array.isArray(val1) ? (val1 as unknown as T[]) : [val1])?.some(
+              (line) => {
+                return typeof line === 'string' &&
+                  val2 != undefined &&
+                  String(val2).length > 0
+                  ? line.includes(String(val2))
+                  : line == val2
+                  ? true
+                  : false;
+              },
+            ) || false
+          );
+        } else {
+          if (val2.length > 0) {
+            return val2?.some((el) => {
+              // return (val1 as unknown as T[])?.includes(el);
+              return (
+                (val1 as unknown as T[])?.some((line) => {
+                  return typeof line === 'string' &&
+                    el != undefined &&
+                    el.length > 0
+                    ? line.includes(String(el))
+                    : line == el
+                    ? true
+                    : false;
+                }) || false
+              );
+            });
+          } else {
+            return false;
+          }
+        }
+      } catch (_err) {
+        return null;
+      }
+    }
     if (action === RulePossibility.NOT_CONTAINS) {
       return !this.doRuleAction(val1, val2, RulePossibility.CONTAINS);
+    }
+    if (action === RulePossibility.NOT_CONTAINS_PARTIAL) {
+      return !this.doRuleAction(val1, val2, RulePossibility.CONTAINS_PARTIAL);
     }
     if (action === RulePossibility.BEFORE) {
       return val1 && val2 ? val1 <= val2 : false;
