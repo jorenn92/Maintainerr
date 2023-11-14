@@ -437,11 +437,15 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         ) {
           secondVal = new Date(+secondVal);
         }
+        if (
+          // if custom secondval is text, check if it's parsable as an array
+          rule.customVal.ruleTypeId === +RuleType.TEXT &&
+          this.isStringParsableToArray(secondVal as string)
+        ) {
+          secondVal = JSON.parse(secondVal);
+        }
       }
-      if (
-        (firstVal !== undefined || null) &&
-        (secondVal !== undefined || null)
-      ) {
+      if (firstVal != undefined && secondVal != undefined) {
         if (isNull(rule.operator) || +rule.operator === +RuleOperators.OR) {
           if (this.doRuleAction(firstVal, secondVal, rule.action)) {
             // add to workerdata if not yet available
@@ -604,5 +608,14 @@ export class RuleExecutorService implements OnApplicationBootstrap {
 
   private async logInfo(message: string) {
     this.logger.log(message);
+  }
+
+  private isStringParsableToArray(str: string) {
+    try {
+      const array = JSON.parse(str);
+      return Array.isArray(array);
+    } catch (error) {
+      return false;
+    }
   }
 }
