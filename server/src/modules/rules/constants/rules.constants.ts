@@ -235,10 +235,14 @@ export class RuleConstants {
         {
           id: 18,
           name: 'sw_watchers',
-          humanName: '[list] Users that watch the show/season',
+          humanName: '[list] Users that watch the show/season/episode',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT, // return usernames []
-          showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
+          showType: [
+            EPlexDataType.SHOWS,
+            EPlexDataType.SEASONS,
+            EPlexDataType.EPISODES,
+          ],
         } as Property,
         {
           id: 19,
