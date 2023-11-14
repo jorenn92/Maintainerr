@@ -108,6 +108,10 @@ The available actions are dependent on the type of the `first value`
 | in last                   | Does the `first value` occur in the last x amount of days ?                                                                               | date               |
 | in next                   | Does the `first value` occur in the next x amount of days ?                                                                               | date               |
 
+Contains in conjunction with lists will check if at least 1 value in the `second value` list matches a value in the `first value` list. So, for example, if `first value` contains the list ["test1", "test2"] and `second value` contains the list ["test3", "test1"], the result will be true because "test1" is available in both.
+
+The difference between 'Contains' and 'Contains (partial)' is only apparent with text list values. When comparing a text list, 'Contains' will only return true if the 'second value' exactly matches a value in the 'first value' list. 'Contains (partial)' will return true if the 'first value' list has a value that partially matches the 'second value' (or an item in the 'second value' list). Otherwise, both options behave the same.
+
 ## Custom values
 
 The `Second value` field allows some custom values. The available custom values are dependent on the type of `first value`.
@@ -117,3 +121,5 @@ The `Second value` field allows some custom values. The available custom values 
 | Custom date | Takes a specific date | date
 | Custom number | Takes a specific number | number
 | Custom text | Takes a specific text | text
+
+You can incorporate text lists as custom values using JSON notation. For example, specifying ["Jef", "Frank", "Wilhelm"] will be parsed and treated as a list.
