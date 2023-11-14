@@ -445,7 +445,10 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           secondVal = JSON.parse(secondVal);
         }
       }
-      if (firstVal != undefined && secondVal != undefined) {
+      if (
+        (firstVal !== undefined || null) &&
+        (secondVal !== undefined || null)
+      ) {
         if (isNull(rule.operator) || +rule.operator === +RuleOperators.OR) {
           if (this.doRuleAction(firstVal, secondVal, rule.action)) {
             // add to workerdata if not yet available
