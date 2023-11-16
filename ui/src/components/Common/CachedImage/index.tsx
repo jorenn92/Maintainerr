@@ -9,7 +9,16 @@ import React from 'react'
  * the `unoptimized` prop based on the application setting `cacheImages`.
  **/
 const CachedImage: React.FC<ImageProps> = (props) => {
-  return <Image unoptimized={false} {...props} />
+  return (
+    // eslint-disable-next-line jsx-a11y/alt-text
+    <Image
+      unoptimized={false}
+      onError={(e) => {
+        console.warn('Image failed to load: ', e)
+      }}
+      {...props}
+    />
+  )
 }
 
 export default CachedImage
