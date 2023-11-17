@@ -76,7 +76,7 @@ export class TasksService implements TaskScheduler {
   public removeJob(name: string): Status {
     try {
       this.schedulerRegistry.deleteCronJob(name);
-      this.logger.warn(`job ${name} deleted!`);
+      this.logger.log(`Task ${name} removed successfully`);
       return this.status.createStatus(
         true,
         `Task ${name} removed successfully`,

@@ -57,18 +57,27 @@ export class CollectionsController {
   updateCollection(@Body() request: any) {
     return this.collectionService.updateCollection(request);
   }
+
   @Post('/handle')
   handleCollection(@Body() request: any) {
     return this.collectionWorkerService.handle();
   }
+
+  @Put('/schedule/update')
+  updateSchedule(@Body() request: { schedule: string }) {
+    return this.collectionWorkerService.updateJob(request.schedule);
+  }
+
   @Get('/deactivate/:id')
   deactivate(@Param('id') id: number) {
     return this.collectionService.deactivateCollection(id);
   }
+
   @Get('/activate/:id')
   activate(@Param('id') id: number) {
     return this.collectionService.activateCollection(id);
   }
+
   @Get()
   getCollections(
     @Query('libraryId') libraryId: number,

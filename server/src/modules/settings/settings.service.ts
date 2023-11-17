@@ -2,12 +2,14 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
+import { isValidCron } from 'cron-validator';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { SettingDto } from "./dto's/setting.dto";
 import { Settings } from './entities/settings.entities';
+import { InternalApiService } from '../api/internal-api/internal-api.service';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -59,6 +61,8 @@ export class SettingsService implements SettingDto {
     private readonly servarr: ServarrService,
     @Inject(forwardRef(() => OverseerrApiService))
     private readonly overseerr: OverseerrApiService,
+    @Inject(forwardRef(() => InternalApiService))
+    private readonly internalApi: InternalApiService,
     @InjectRepository(Settings)
     private readonly settingsRepo: Repository<Settings>,
   ) {}
@@ -139,18 +143,65 @@ export class SettingsService implements SettingDto {
         .replace('https://', '')
         .replace('http://', '');
 
-      await this.settingsRepo.save({
-        ...settingsDb,
-        ...settings,
-      });
-      await this.init();
-      this.logger.log('Settings updated');
-      this.plexApi.initialize({});
-      this.servarr.init();
-      this.overseerr.init();
-      return { status: 'OK', code: 1, message: 'Success' };
+      if (
+        this.cronIsValid(settings.collection_handler_job_cron) &&
+        this.cronIsValid(settings.rules_handler_job_cron)
+      ) {
+        await this.settingsRepo.save({
+          ...settingsDb,
+          ...settings,
+        });
+        await this.init();
+        this.logger.log('Settings updated');
+        this.plexApi.initialize({});
+        this.servarr.init();
+        this.overseerr.init();
+        this.internalApi.init();
+
+        // reload Rule handler job if changed
+        if (
+          settingsDb.rules_handler_job_cron !== settings.rules_handler_job_cron
+        ) {
+          this.logger.log(
+            `Rule Handler cron schedule changed.. Reloading job.`,
+          );
+          this.internalApi
+            .getApi()
+            .put(
+              '/rules/schedule/update',
+              `{"schedule": "${settings.rules_handler_job_cron}"}`,
+            );
+        }
+
+        // reload Collection handler job if changed
+        if (
+          settingsDb.collection_handler_job_cron !==
+          settings.collection_handler_job_cron
+        ) {
+          this.logger.log(
+            `Collection Handler cron schedule changed.. Reloading job.`,
+          );
+          this.internalApi
+            .getApi()
+            .put(
+              '/collections/schedule/update',
+              `{"schedule": "${settings.collection_handler_job_cron}"}`,
+            );
+        }
+
+        return { status: 'OK', code: 1, message: 'Success' };
+      } else {
+        this.logger.error(
+          'Invalid CRON configuration found, settings update aborted.',
+        );
+        return {
+          status: 'NOK',
+          code: 0,
+          message: 'Update failed, invalid CRON value was found',
+        };
+      }
     } catch (e) {
-      this.logger.error('Something went wrong while updating settings');
+      this.logger.error('Error while updating settings: ', e);
       return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
@@ -267,5 +318,12 @@ export class SettingsService implements SettingDto {
     return process.env.npm_package_version
       ? process.env.npm_package_version
       : '0.0.0';
+  }
+
+  public cronIsValid(schedule: string) {
+    if (isValidCron(schedule)) {
+      return true;
+    }
+    return false;
   }
 }

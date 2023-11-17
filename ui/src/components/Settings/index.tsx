@@ -36,11 +36,11 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
       route: '/settings/sonarr',
       regex: /^\/settings(\/sonarr)?$/,
     },
-    // {
-    //   text: 'Jobs',
-    //   route: '/settings/jobs',
-    //   regex: /^\/settings(\/jobs)?$/,
-    // },
+    {
+      text: 'Jobs',
+      route: '/settings/jobs',
+      regex: /^\/settings(\/jobs)?$/,
+    },
   ]
 
   useEffect(() => {
@@ -58,7 +58,10 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
     return (
       <>
         <div className="mt-6">
-          <SettingsTabs settingsRoutes={settingsRoutes} allEnabled={settingsCtx.settings.plex_auth_token !== null} />
+          <SettingsTabs
+            settingsRoutes={settingsRoutes}
+            allEnabled={settingsCtx.settings.plex_auth_token !== null}
+          />
         </div>
         <div className="mt-10 text-white">{props.children}</div>
       </>

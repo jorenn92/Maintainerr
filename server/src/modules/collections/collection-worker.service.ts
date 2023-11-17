@@ -55,6 +55,14 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
     }
   }
 
+  public updateJob(cron: string) {
+    return this.taskService.updateJob(
+      'CollectionHandler',
+      cron,
+      this.handle.bind(this),
+    );
+  }
+
   public async handle() {
     const appStatus = await this.settings.testConnections();
     this.logger.log('Start handling all collections.');
@@ -205,9 +213,8 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         }
 
         if (tvdbId) {
-          const sonarrMedia = await this.servarrApi.SonarrApi.getSeriesByTvdbId(
-            tvdbId,
-          );
+          const sonarrMedia =
+            await this.servarrApi.SonarrApi.getSeriesByTvdbId(tvdbId);
           if (sonarrMedia) {
             switch (collection.arrAction) {
               case ServarrAction.DELETE:

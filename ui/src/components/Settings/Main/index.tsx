@@ -29,7 +29,7 @@ const MainSettings = () => {
         {
           ...settingsCtx.settings,
           ...payload,
-        }
+        },
       )
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
@@ -66,7 +66,7 @@ const MainSettings = () => {
       {error ? (
         <Alert type="warning" title="Not all fields contain values" />
       ) : changed ? (
-        <Alert type="info" title="Settings succesfully updated" />
+        <Alert type="info" title="Settings successfully updated" />
       ) : undefined}
       <div className="section">
         <form onSubmit={submit}>
@@ -115,7 +115,7 @@ const MainSettings = () => {
 
           <div className="actions mt-5 w-full">
             <div className="flex justify-end">
-              <div className='w-full flex'>
+              <div className="w-full flex">
                 <span className="mr-auto flex  rounded-md shadow-sm">
                   <DocsButton />
                 </span>

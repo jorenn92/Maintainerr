@@ -25,6 +25,11 @@ export class RulesController {
     return await this.rulesService.getRuleConstants();
   }
 
+  @Put('/schedule/update')
+  updateSchedule(@Body() request: { schedule: string }) {
+    return this.ruleExecutorService.updateJob(request.schedule);
+  }
+
   @Get('/community')
   async getCommunityRules() {
     return await this.rulesService.getCommunityRules();

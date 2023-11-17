@@ -100,14 +100,14 @@ const RadarrSettings = () => {
       {error ? (
         <Alert type="warning" title="Not all fields contain values" />
       ) : changed ? (
-        <Alert type="info" title="Settings succesfully updated" />
+        <Alert type="info" title="Settings successfully updated" />
       ) : undefined}
 
       {testBanner.version !== '0' ? (
         testBanner.status ? (
           <Alert
             type="warning"
-            title={`Succesfully connected to Radarr (${testBanner.version})`}
+            title={`successfully connected to Radarr (${testBanner.version})`}
           />
         ) : (
           <Alert
