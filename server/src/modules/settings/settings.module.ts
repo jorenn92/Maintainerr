@@ -6,6 +6,7 @@ import { SettingsController } from './settings.controller';
 import { PlexApiModule } from '../api/plex-api/plex-api.module';
 import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
 import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
+import { InternalApiModule } from '../api/internal-api/internal-api.module';
 
 @Global()
 @Module({
@@ -13,6 +14,7 @@ import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
     forwardRef(() => PlexApiModule),
     forwardRef(() => ServarrApiModule),
     forwardRef(() => OverseerrApiModule),
+    forwardRef(() => InternalApiModule),
     TypeOrmModule.forFeature([Settings]),
   ],
   providers: [SettingsService],
