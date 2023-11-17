@@ -159,9 +159,8 @@ export class PlexApiService {
 
   public async getLibraries(): Promise<PlexLibrary[]> {
     try {
-      const response = await this.plexClient.query<PlexLibrariesResponse>(
-        '/library/sections',
-      );
+      const response =
+        await this.plexClient.query<PlexLibrariesResponse>('/library/sections');
 
       return response.MediaContainer.Directory;
     } catch (err) {
@@ -459,7 +458,7 @@ export class PlexApiService {
       return {
         status: 'OK',
         code: 1,
-        message: `Succesfully deleted child with id ${childId}`,
+        message: `successfully deleted child with id ${childId}`,
       } as BasicResponseDto;
     } catch (e) {
       return {

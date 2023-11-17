@@ -30,7 +30,7 @@ const PlexSettings = () => {
 
   const submit = async (
     e: React.FormEvent<HTMLFormElement> | undefined,
-    plex_token?: { plex_auth_token: string } | undefined
+    plex_token?: { plex_auth_token: string } | undefined,
   ) => {
     e ? e.preventDefault() : undefined
     if (
@@ -64,7 +64,7 @@ const PlexSettings = () => {
         {
           ...settingsCtx.settings,
           ...payload,
-        }
+        },
       )
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
@@ -144,7 +144,7 @@ const PlexSettings = () => {
       {error ? (
         <Alert type="warning" title="Not all fields contain values" />
       ) : changed ? (
-        <Alert type="info" title="Settings succesfully updated" />
+        <Alert type="info" title="Settings successfully updated" />
       ) : undefined}
 
       {tokenValid ? (
@@ -160,7 +160,7 @@ const PlexSettings = () => {
         testBanner.status ? (
           <Alert
             type="warning"
-            title={`Succesfully connected to Plex (${testBanner.version})`}
+            title={`successfully connected to Plex (${testBanner.version})`}
           />
         ) : (
           <Alert
@@ -285,7 +285,7 @@ const PlexSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex flex-wrap sm:flex-nowrap w-full">
               <span className="m-auto sm:mr-auto sm:ml-3 rounded-md shadow-sm">
-                <DocsButton page='tutorial-Configuration' />
+                <DocsButton page="tutorial-Configuration" />
               </span>
               <div className="flex sm:justify-end m-auto sm:m-0 mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/plex" />

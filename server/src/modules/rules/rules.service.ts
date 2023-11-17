@@ -453,13 +453,13 @@ export class RulesService {
             },
           )
           .then(() => {
-            this.logger.log(`Rules - Succesfully saved community rule`);
+            this.logger.log(`Rules - successfully saved community rule`);
             return this.createReturnStatus(true, 'Succes');
           })
           .catch((e) => {
             if (e.message.includes('422')) {
               // Due to a bug in jsonbin, it returns the wrong status code
-              this.logger.log(`Rules - Succesfully saved community rule`);
+              this.logger.log(`Rules - successfully saved community rule`);
               return this.createReturnStatus(true, 'Succes');
             } else {
               this.logger.warn(
@@ -531,7 +531,7 @@ export class RulesService {
             })
             .then(() => {
               this.logger.log(
-                `Rules - Succesfully updated community rule karma `,
+                `Rules - successfully updated community rule karma `,
               );
               return this.createReturnStatus(true, 'Succes');
             })
@@ -539,7 +539,7 @@ export class RulesService {
               if (e.message.includes('422')) {
                 // Due to a bug in jsonbin, it returns the wrong status code
                 this.logger.log(
-                  `Rules - Succesfully updated community rule karma`,
+                  `Rules - successfully updated community rule karma`,
                 );
                 return this.createReturnStatus(true, 'Succes');
               } else {

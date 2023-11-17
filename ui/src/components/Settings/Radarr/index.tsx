@@ -46,7 +46,7 @@ const RadarrSettings = () => {
         {
           ...settingsCtx.settings,
           ...payload,
-        }
+        },
       )
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
@@ -92,14 +92,14 @@ const RadarrSettings = () => {
       {error ? (
         <Alert type="warning" title="Not all fields contain values" />
       ) : changed ? (
-        <Alert type="info" title="Settings succesfully updated" />
+        <Alert type="info" title="Settings successfully updated" />
       ) : undefined}
 
       {testBanner.version !== '0' ? (
         testBanner.status ? (
           <Alert
             type="warning"
-            title={`Succesfully connected to Radarr (${testBanner.version})`}
+            title={`successfully connected to Radarr (${testBanner.version})`}
           />
         ) : (
           <Alert
@@ -165,7 +165,7 @@ const RadarrSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
               <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
-                <DocsButton page='tutorial-Configuration' />
+                <DocsButton page="tutorial-Configuration" />
               </span>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/radarr" />
