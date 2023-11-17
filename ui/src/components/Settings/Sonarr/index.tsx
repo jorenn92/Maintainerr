@@ -10,9 +10,11 @@ import TestButton from '../../Common/TestButton'
 const SonarrSettings = () => {
   const settingsCtx = useContext(SettingsContext)
   const hostnameRef = useRef<HTMLInputElement>(null)
+  const baseUrlRef = useRef<HTMLInputElement>(null)
   const portRef = useRef<HTMLInputElement>(null)
   const apiKeyRef = useRef<HTMLInputElement>(null)
   const [hostname, setHostname] = useState<string>()
+  const [baseURl, setBaseUrl] = useState<string>()
   const [port, setPort] = useState<string>()
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
@@ -38,7 +40,9 @@ const SonarrSettings = () => {
         ? hostnameRef.current.value
         : 'http://' + hostnameRef.current.value
       const payload = {
-        sonarr_url: `${hostnameVal}:${portRef.current.value}`,
+        sonarr_url: `${hostnameVal}:${portRef.current.value}${
+          baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
+        }`,
         sonarr_api_key: apiKeyRef.current.value,
       }
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
@@ -46,7 +50,7 @@ const SonarrSettings = () => {
         {
           ...settingsCtx.settings,
           ...payload,
-        }
+        },
       )
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
@@ -75,7 +79,11 @@ const SonarrSettings = () => {
       .split('')
       .reverse()
       .join('')
-    if (url) setPort(`${url}`)
+
+    const splitted = url?.split('/')
+
+    if (splitted.length > 0) setPort(`${splitted[0]}`)
+    if (splitted.length > 1) setBaseUrl(`${splitted[1]}`)
   }, [settingsCtx])
 
   const appTest = (result: { status: boolean; version: string }) => {
@@ -146,6 +154,23 @@ const SonarrSettings = () => {
           </div>
 
           <div className="form-row">
+            <label htmlFor="baseUrl" className="text-label">
+              Base URL
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  name="baseUrl"
+                  id="baseUrl"
+                  type="text"
+                  ref={baseUrlRef}
+                  defaultValue={baseURl}
+                ></input>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
             <label htmlFor="apikey" className="text-label">
               Api key
             </label>
@@ -165,7 +190,7 @@ const SonarrSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
               <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
-                <DocsButton page='tutorial-Configuration' />
+                <DocsButton page="tutorial-Configuration" />
               </span>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/sonarr" />
