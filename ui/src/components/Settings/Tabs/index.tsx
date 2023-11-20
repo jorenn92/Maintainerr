@@ -72,7 +72,6 @@ const SettingsTabs: React.FC<{
     window.addEventListener('touchstart', (e) => {
       if (!allEnabled) {
         e.preventDefault()
-        console.log('erin')
       }
     })
     return () => {

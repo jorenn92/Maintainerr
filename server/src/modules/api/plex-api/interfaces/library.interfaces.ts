@@ -41,7 +41,7 @@ export interface PlexLibraryItem {
 export interface PlexLibraryResponse {
   MediaContainer: {
     totalSize: number;
-    Metadata: PlexLibraryItem[] | PlexCollection[];
+    Metadata: PlexLibraryItem[] | PlexCollection[] | PlexCollection;
   };
 }
 export interface PlexGenre {

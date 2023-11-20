@@ -1,5 +1,3 @@
-// import cacheManager, { AvailableCacheIds } from '../../lib/cache';
-import { AxiosResponse } from 'axios';
 import { warn } from 'console';
 import { ExternalApiService } from '../../../../modules/api/external-api/external-api.service';
 import { DVRSettings } from '../../../../modules/settings/interfaces/dvr-settings.interface';
@@ -11,6 +9,7 @@ import {
   SystemStatus,
   Tag,
 } from '../interfaces/servarr.interface';
+import cacheManager, { AvailableCacheIds } from '../../lib/cache';
 
 export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
   static buildUrl(settings: DVRSettings, path?: string): string {
@@ -24,12 +23,12 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
   constructor({
     url,
     apiKey,
-    // cacheName,
+    cacheName,
     apiName,
   }: {
     url: string;
     apiKey: string;
-    // cacheName: AvailableCacheIds;
+    cacheName: AvailableCacheIds;
     apiName: string;
   }) {
     super(
@@ -38,7 +37,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
         apikey: apiKey,
       },
       {
-        // nodeCache: cacheManager.getCache(cacheName).data,
+        nodeCache: cacheManager.getCache(cacheName).data,
       },
     );
 
@@ -85,9 +84,8 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
 
   public getQueue = async (): Promise<(QueueItem & QueueItemAppendT)[]> => {
     try {
-      const response = await this.axios.get<QueueResponse<QueueItemAppendT>>(
-        `/queue`,
-      );
+      const response =
+        await this.axios.get<QueueResponse<QueueItemAppendT>>(`/queue`);
 
       return response.data.records;
     } catch (e) {

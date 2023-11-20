@@ -1,5 +1,4 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import NodePlexAPI from 'plex-api';
 import { PlexSettings } from '../../../modules/settings/interfaces/plex-settings.interface';
 import { SettingsService } from '../../..//modules/settings/settings.service';
 import { BasicResponseDto } from './dto/basic-response.dto';
@@ -22,13 +21,17 @@ import {
   PlexMetadata,
   PlexMetadataResponse,
 } from './interfaces/media.interface';
-import { PlexStatusResponse } from './interfaces/server.interface';
+import {
+  PlexAccountsResponse,
+  PlexStatusResponse,
+} from './interfaces/server.interface';
 import { EPlexDataType } from './enums/plex-data-type-enum';
 import axios from 'axios';
+import PlexApi from '../lib/plexApi';
 
 @Injectable()
 export class PlexApiService {
-  private plexClient: NodePlexAPI;
+  private plexClient: PlexApi;
   private machineId: string;
   private readonly logger = new Logger(PlexApiService.name);
   constructor(
@@ -62,7 +65,7 @@ export class PlexApiService {
       const settingsPlex = await this.getDbSettings();
       plexToken = plexToken || settingsPlex.auth_token;
       if (settingsPlex.ip && plexToken) {
-        this.plexClient = new NodePlexAPI({
+        this.plexClient = new PlexApi({
           hostname: settingsPlex.ip,
           port: settingsPlex.port,
           https: settingsPlex.useSsl,
@@ -104,7 +107,10 @@ export class PlexApiService {
 
   public async getStatus() {
     try {
-      const response: PlexStatusResponse = await this.plexClient.query('/');
+      const response: PlexStatusResponse = await this.plexClient.queryWithCache(
+        '/',
+        false,
+      );
       return response.MediaContainer;
     } catch (err) {
       this.logger.warn(
@@ -116,7 +122,7 @@ export class PlexApiService {
 
   public async searchContent(input: string) {
     try {
-      const response = await this.plexClient.query(
+      const response: PlexMetadataResponse = await this.plexClient.query(
         `/search?query=${encodeURIComponent(input)}&includeGuids=1`,
       );
       const results = response.MediaContainer.Metadata
@@ -147,8 +153,9 @@ export class PlexApiService {
 
   public async getUsers(): Promise<PlexUserAccount[]> {
     try {
-      const response = await this.plexClient.query('/accounts');
-      return response.MediaContainer.Account as PlexUserAccount[];
+      const response: PlexAccountsResponse =
+        await this.plexClient.query('/accounts');
+      return response.MediaContainer.Account;
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
@@ -188,7 +195,7 @@ export class PlexApiService {
 
       return {
         totalSize: response.MediaContainer.totalSize,
-        items: response.MediaContainer.Metadata ?? [],
+        items: (response.MediaContainer.Metadata as PlexLibraryItem[]) ?? [],
       };
     } catch (err) {
       this.logger.warn(
@@ -270,7 +277,7 @@ export class PlexApiService {
           options.addedAt / 1000,
         )}`,
       });
-      return response.MediaContainer.Metadata;
+      return response.MediaContainer.Metadata as PlexLibraryItem[];
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
@@ -415,7 +422,7 @@ export class PlexApiService {
   ): Promise<PlexLibraryItem[]> {
     try {
       const response: PlexLibraryResponse =
-        await this.plexClient.query<PlexLibrariesResponse>({
+        await this.plexClient.query<PlexLibraryResponse>({
           uri: `/library/collections/${collectionId}/children`,
         });
       return response.MediaContainer.Metadata as PlexLibraryItem[];
