@@ -1,14 +1,15 @@
 import { ExternalApiService } from '../../external-api/external-api.service';
+import cacheManager, { AvailableCacheIds } from '../../lib/cache';
 
 export class OverseerrApi extends ExternalApiService {
   constructor({
     url,
     apiKey,
-  }: // cacheName,
-  {
+    cacheName,
+  }: {
     url: string;
     apiKey: string;
-    // cacheName: AvailableCacheIds;
+    cacheName: AvailableCacheIds;
   }) {
     super(
       url,
@@ -19,7 +20,7 @@ export class OverseerrApi extends ExternalApiService {
         headers: {
           'X-Api-Key': apiKey,
         },
-        // nodeCache: cacheManager.getCache(cacheName).data,
+        nodeCache: cacheManager.getCache(cacheName).data,
       },
     );
   }

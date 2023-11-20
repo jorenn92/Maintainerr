@@ -56,6 +56,17 @@ export class ExternalApiService {
     }
   }
 
+  public async getWithoutCache<T>(
+    endpoint: string,
+    config?: RawAxiosRequestConfig,
+  ): Promise<T> {
+    try {
+      return (await this.axios.get<T>(endpoint, config)).data;
+    } catch (err) {
+      return undefined;
+    }
+  }
+
   public async delete<T>(
     endpoint: string,
     config?: RawAxiosRequestConfig,

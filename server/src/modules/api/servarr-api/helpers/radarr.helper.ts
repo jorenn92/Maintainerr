@@ -10,15 +10,15 @@ import {
 export class RadarrApi extends ServarrApi<{ movieId: number }> {
   logger: Logger;
   constructor({ url, apiKey }: { url: string; apiKey: string }) {
-    super({ url, apiKey, apiName: 'Radarr' });
+    super({ url, apiKey, cacheName: 'radarr', apiName: 'Radarr' });
     this.logger = new Logger(RadarrApi.name);
   }
 
   public getMovies = async (): Promise<RadarrMovie[]> => {
     try {
-      const response = await this.axios.get<RadarrMovie[]>('/movie');
+      const response = await this.get<RadarrMovie[]>('/movie');
 
-      return response.data;
+      return response;
     } catch (e) {
       this.logger.error(`Failed to retrieve movies`);
       this.logger.debug(`Failed to retrieve movies: ${e.message}`);
@@ -27,8 +27,8 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
   public getMovie = async ({ id }: { id: number }): Promise<RadarrMovie> => {
     try {
-      const response = await this.axios.get<RadarrMovie>(`/movie/${id}`);
-      return response.data;
+      const response = await this.get<RadarrMovie>(`/movie/${id}`);
+      return response;
     } catch (e) {
       this.logger.error(`[Radarr] Failed to retrieve movie with id ${id}`);
       this.logger.debug(`[Radarr] Failed to retrieve movie: ${e.message}`);
@@ -37,17 +37,17 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
   public async getMovieByTmdbId(id: number): Promise<RadarrMovie> {
     try {
-      const response = await this.axios.get<RadarrMovie[]>('/movie/lookup', {
+      const response = await this.get<RadarrMovie[]>('/movie/lookup', {
         params: {
           term: `tmdb:${id}`,
         },
       });
 
-      if (!response.data[0]) {
+      if (!response[0]) {
         this.logger.warn(`Could not find Movie with TMDb id ${id} in Radarr`);
       }
 
-      return response.data[0];
+      return response[0];
     } catch (e) {
       this.logger.error(`Error retrieving movie by TMDb ID ${id}`);
       this.logger.debug(e);
@@ -184,7 +184,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
   public async info(): Promise<RadarrInfo> {
     try {
-      const info: RadarrInfo = await this.get(`system/status`);
+      const info: RadarrInfo = (await this.axios.get(`system/status`)).data;
       return info ? info : null;
     } catch (e) {
       this.logger.warn("Couldn't fetch Radarr info.. Is Radarr up?");

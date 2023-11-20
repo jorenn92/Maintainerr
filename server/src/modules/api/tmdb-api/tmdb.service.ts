@@ -54,7 +54,7 @@ export class TmdbApiService extends ExternalApiService {
   public searchMulti = async ({
     query,
     page = 1,
-    includeAdult = false,
+    includeAdult = true,
     language = 'en',
   }: SearchOptions): Promise<TmdbSearchMultiResponse> => {
     try {
@@ -339,7 +339,7 @@ export class TmdbApiService extends ExternalApiService {
   public getDiscoverMovies = async ({
     sortBy = 'popularity.desc',
     page = 1,
-    includeAdult = false,
+    includeAdult = true,
     language = 'en',
     primaryReleaseDateGte,
     primaryReleaseDateLte,

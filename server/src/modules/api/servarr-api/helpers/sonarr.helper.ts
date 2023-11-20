@@ -15,15 +15,15 @@ export class SonarrApi extends ServarrApi<{
 }> {
   logger: Logger;
   constructor({ url, apiKey }: { url: string; apiKey: string }) {
-    super({ url, apiKey, apiName: 'Sonarr' });
+    super({ url, apiKey, cacheName: 'sonarr', apiName: 'Sonarr' });
     this.logger = new Logger(SonarrApi.name);
   }
 
   public async getSeries(): Promise<SonarrSeries[]> {
     try {
-      const response = await this.axios.get<SonarrSeries[]>('/series');
+      const response = await this.get<SonarrSeries[]>('/series');
 
-      return response.data;
+      return response;
     } catch (e) {
       this.logger.error(`[Sonarr] Failed to retrieve series: ${e.message}`);
     }
@@ -35,15 +35,13 @@ export class SonarrApi extends ServarrApi<{
     episodeIds?: number[],
   ): Promise<SonarrEpisode[]> {
     try {
-      const response = await this.axios.get<SonarrEpisode[]>(
+      const response = await this.get<SonarrEpisode[]>(
         `/episode?seriesId=${seriesID}${
           seasonNumber ? `&seasonNumber=${seasonNumber}` : ''
         }${episodeIds ? `&episodeIds=${episodeIds}` : ''}`,
       );
 
-      return response.data.filter((el) =>
-        episodeIds.includes(el.episodeNumber),
-      );
+      return response.filter((el) => episodeIds.includes(el.episodeNumber));
     } catch (e) {
       this.logger.error(
         `[Sonarr] Failed to retrieve show ${seriesID}'s episodes ${episodeIds}: ${e.message}`,
@@ -52,11 +50,11 @@ export class SonarrApi extends ServarrApi<{
   }
   public async getEpisodeFile(episodeFileId: number): Promise<SonarrEpisode> {
     try {
-      const response = await this.axios.get<SonarrEpisode>(
+      const response = await this.get<SonarrEpisode>(
         `/episodefile/${episodeFileId}`,
       );
 
-      return response.data;
+      return response;
     } catch (e) {
       this.logger.error(
         `[Sonarr] Failed to retrieve episode file id ${episodeFileId}`,
@@ -67,17 +65,17 @@ export class SonarrApi extends ServarrApi<{
 
   public async getSeriesByTitle(title: string): Promise<SonarrSeries[]> {
     try {
-      const response = await this.axios.get<SonarrSeries[]>('/series/lookup', {
+      const response = await this.get<SonarrSeries[]>('/series/lookup', {
         params: {
           term: title,
         },
       });
 
-      if (!response.data[0]) {
+      if (!response[0]) {
         this.logger.error(`Series not found`);
       }
 
-      return response.data;
+      return response;
     } catch (e) {
       this.logger.error('Error retrieving series by series title', {
         label: 'Sonarr API',
@@ -90,20 +88,18 @@ export class SonarrApi extends ServarrApi<{
 
   public async getSeriesByTvdbId(id: number): Promise<SonarrSeries> {
     try {
-      let response = await this.axios.get<SonarrSeries[]>(
-        `/series?tvdbId=${id}`,
-      );
+      let response = await this.get<SonarrSeries[]>(`/series?tvdbId=${id}`);
 
-      if (!response.data[0]) {
-        response = await this.axios.get<SonarrSeries[]>(
+      if (!response[0]) {
+        response = await this.get<SonarrSeries[]>(
           `/series/lookup?term=tvdb:${id}`,
         );
 
-        if (!response.data[0]) {
+        if (!response[0]) {
           this.logger.warn(`Could not retrieve show by tvdb ID ${id}`);
         }
       }
-      return response.data[0];
+      return response[0];
     } catch (e) {
       this.logger.warn(`Error retrieving show by tvdb ID ${id}. ${e.message}`);
     }
@@ -329,9 +325,9 @@ export class SonarrApi extends ServarrApi<{
 
       // delete files
       if (deleteFiles) {
-        const episodes: SonarrEpisode[] = (
-          await this.axios.get(`episodefile?seriesId=${seriesId}`)
-        ).data;
+        const episodes: SonarrEpisode[] = await this.get(
+          `episodefile?seriesId=${seriesId}`,
+        );
 
         for (const e of episodes) {
           if (typeof type === 'number') {
@@ -384,7 +380,7 @@ export class SonarrApi extends ServarrApi<{
 
   public async info(): Promise<SonarrInfo> {
     try {
-      const info: SonarrInfo = await this.get(`system/status`);
+      const info: SonarrInfo = (await this.axios.get(`system/status`)).data;
       return info ? info : null;
     } catch (e) {
       this.logger.warn("Couldn't fetch Sonarr info.. Is Sonarr up?");

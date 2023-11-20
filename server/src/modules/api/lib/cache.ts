@@ -4,14 +4,13 @@ export type AvailableCacheIds =
   | 'tmdb'
   | 'radarr'
   | 'sonarr'
-  | 'rt'
-  | 'github'
-  | 'plexguid';
+  | 'plexguid'
+  | 'overseerr';
 
-const DEFAULT_TTL = 300;
-const DEFAULT_CHECK_PERIOD = 120;
+const DEFAULT_TTL = 300; // 5 min
+const DEFAULT_CHECK_PERIOD = 120; // 2 min
 
-class Cache {
+export class Cache {
   public id: AvailableCacheIds;
   public data: NodeCache;
   public name: string;
@@ -41,23 +40,13 @@ class Cache {
 class CacheManager {
   private availableCaches: Record<AvailableCacheIds, Cache> = {
     tmdb: new Cache('tmdb', 'The Movie Database API', {
-      stdTtl: 21600,
+      stdTtl: 21600, // 6 hours
       checkPeriod: 60 * 30,
     }),
     radarr: new Cache('radarr', 'Radarr API'),
     sonarr: new Cache('sonarr', 'Sonarr API'),
-    rt: new Cache('rt', 'Rotten Tomatoes API', {
-      stdTtl: 43200,
-      checkPeriod: 60 * 30,
-    }),
-    github: new Cache('github', 'GitHub API', {
-      stdTtl: 21600,
-      checkPeriod: 60 * 30,
-    }),
-    plexguid: new Cache('plexguid', 'Plex GUID', {
-      stdTtl: 86400 * 7, // 1 week cache
-      checkPeriod: 60 * 30,
-    }),
+    plexguid: new Cache('plexguid', 'Plex GUID'),
+    overseerr: new Cache('overseerr', 'Overseerr API'),
   };
 
   public getCache(id: AvailableCacheIds): Cache {
