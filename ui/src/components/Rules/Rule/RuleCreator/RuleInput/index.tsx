@@ -234,7 +234,6 @@ const RuleInput = (props: IRuleInput) => {
   useEffect(() => {
     if (firstval) {
       const prop = getPropFromTuple(firstval)
-      console.log(prop)
 
       if (prop?.type.key) {
         if (possibilities.length <= 0) {

@@ -22,7 +22,6 @@ const JobSettings = () => {
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(collectionHandlerRef.current?.value)
     if (
       rulehanderRef.current?.value &&
       collectionHandlerRef.current?.value &&
