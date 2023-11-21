@@ -87,6 +87,72 @@ export class PlexGetterService {
               ).length
             : null;
         }
+        case 'playlists': {
+          if (libItem.type !== 'episode' && libItem.type !== 'movie') {
+            const filtered = [];
+
+            const seasons =
+              libItem.type !== 'season'
+                ? await this.plexApi.getChildrenMetadata(libItem.ratingKey)
+                : [libItem];
+            for (const season of seasons) {
+              const episodes = await this.plexApi.getChildrenMetadata(
+                season.ratingKey,
+              );
+              for (const episode of episodes) {
+                const playlists = await this.plexApi.getPlaylists(
+                  episode.ratingKey,
+                );
+
+                // add if it doesn't exist yet
+                playlists.forEach((el) => {
+                  if (!filtered.find((fil) => fil.ratingKey === el.ratingKey)) {
+                    filtered.push(el);
+                  }
+                });
+              }
+            }
+            return filtered.length;
+          } else {
+            const playlists = await this.plexApi.getPlaylists(
+              libItem.ratingKey,
+            );
+            return playlists.length;
+          }
+        }
+        case 'playlist_names': {
+          if (libItem.type !== 'episode' && libItem.type !== 'movie') {
+            const filtered = [];
+
+            const seasons =
+              libItem.type !== 'season'
+                ? await this.plexApi.getChildrenMetadata(libItem.ratingKey)
+                : [libItem];
+            for (const season of seasons) {
+              const episodes = await this.plexApi.getChildrenMetadata(
+                season.ratingKey,
+              );
+              for (const episode of episodes) {
+                const playlists = await this.plexApi.getPlaylists(
+                  episode.ratingKey,
+                );
+
+                // add if it doesn't exist yet
+                playlists.forEach((el) => {
+                  if (!filtered.find((fil) => fil.ratingKey === el.ratingKey)) {
+                    filtered.push(el);
+                  }
+                });
+              }
+            }
+            return filtered.map((el) => el.title.trim());
+          } else {
+            const playlists = await this.plexApi.getPlaylists(
+              libItem.ratingKey,
+            );
+            return playlists.map((el) => el.title.trim());
+          }
+        }
         case 'collection_names': {
           // fetch metadata  because collections in plexLibrary object are wrong
           const moreData = await this.plexApi.getMetadata(libItem.ratingKey);
