@@ -1,3 +1,14 @@
+## [1.6.9](https://github.com/jorenn92/Maintainerr/compare/v1.6.8...v1.6.9) (2023-11-21)
+
+
+### Bug Fixes
+
+* **api:** Enhanced the external API caching mechanism to minimize redundant calls to external applications ([478da57](https://github.com/jorenn92/Maintainerr/commit/478da57a9f6d828e34b9f2a5fcf527a61df09529))
+* **rules:** Added 2 rules for filtering Plex playlists ([e6f6621](https://github.com/jorenn92/Maintainerr/commit/e6f662174123fc6715ebd701dea0336027606f1c))
+* **settings:** Added the ability to configure arr's with base URL ([5a94ac6](https://github.com/jorenn92/Maintainerr/commit/5a94ac6c2d6164aec2fe4c08a248bfa92dd1b8dc))
+* **settings:** Added the ability to configure the cron rule & collection handler jobs ([3121cf6](https://github.com/jorenn92/Maintainerr/commit/3121cf6f1b54988e39ad9e356807466fe6ab1765))
+* **settings:** Implemented the capability to customize the image caching behavior ([126881b](https://github.com/jorenn92/Maintainerr/commit/126881b2b9f234620272d3d451f7cf124d824606))
+
 ## [1.6.8](https://github.com/jorenn92/Maintainerr/compare/v1.6.7...v1.6.8) (2023-11-14)
 
 
