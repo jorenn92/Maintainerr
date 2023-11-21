@@ -123,7 +123,7 @@ const MainSettings = () => {
             <label htmlFor="cacheImages" className="text-label">
               Cache Images
               <p className="text-xs font-normal">
-                Deactivate if you're having issues with images
+                Deactivate if you&apos;re having issues with images
               </p>
             </label>
             <div className="form-input">
