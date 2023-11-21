@@ -12,10 +12,15 @@ const MainSettings = () => {
   const apiKeyRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
+  const [cacheImage, setCacheImage] = useState<boolean>()
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - General'
   }, [])
+
+  useEffect(() => {
+    setCacheImage(settingsCtx.settings.cacheImages ? true : false)
+  }, [settingsCtx])
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -23,6 +28,7 @@ const MainSettings = () => {
       const payload = {
         applicationUrl: hostnameRef.current.value,
         apikey: apiKeyRef.current.value,
+        cacheImages: cacheImage ? 1 : 0,
       }
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
         '/settings',
@@ -109,6 +115,28 @@ const MainSettings = () => {
                 >
                   <RefreshIcon />
                 </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="cacheImages" className="text-label">
+              Cache Images
+              <p className="text-xs font-normal">
+                Deactivate if you're having issues with images
+              </p>
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  name="cacheImages"
+                  id="cacheImages"
+                  type="checkbox"
+                  onClick={() => {
+                    setCacheImage(!cacheImage)
+                  }}
+                  checked={cacheImage}
+                ></input>
               </div>
             </div>
           </div>
