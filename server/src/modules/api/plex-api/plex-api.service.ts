@@ -6,6 +6,7 @@ import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
 import {
   PlexCollection,
   CreateUpdateCollection,
+  PlexPlaylist,
 } from './interfaces/collection.interface';
 import {
   PlexHub,
@@ -310,6 +311,44 @@ export class PlexApiService {
         .Metadata as PlexCollection[];
 
       return collection;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
+  }
+
+  /**
+   * Retrieves all playlists from the Plex API the given ratingKey is part of.
+   *
+   * @return {Promise<PlexPlaylist[]>} A promise that resolves to an array of Plex playlists.
+   */
+  public async getPlaylists(libraryId: string): Promise<PlexPlaylist[]> {
+    try {
+      const filteredItems: PlexPlaylist[] = [];
+
+      const response = await this.plexClient.query<PlexLibraryResponse>({
+        uri: `/playlists?playlistType=video&includeCollections=1&includeExternalMedia=1&includeAdvanced=1&includeMeta=1`,
+      });
+
+      const items = response.MediaContainer.Metadata as PlexPlaylist[];
+
+      for (const item of items) {
+        const itemResp = await this.plexClient.query<PlexLibraryResponse>({
+          uri: item.key,
+        });
+
+        const filteredForRatingKey = (
+          itemResp.MediaContainer.Metadata as PlexLibraryItem[]
+        ).filter((i) => i.ratingKey === libraryId);
+
+        if (filteredForRatingKey.length > 0) {
+          filteredItems.push(item);
+        }
+      }
+
+      return filteredItems;
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',

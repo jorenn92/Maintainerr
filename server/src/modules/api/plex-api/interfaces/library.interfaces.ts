@@ -1,4 +1,4 @@
-import { PlexCollection } from './collection.interface';
+import { PlexCollection, PlexPlaylist } from './collection.interface';
 import { Media } from './media.interface';
 
 export interface PlexLibraryItem {
@@ -41,7 +41,11 @@ export interface PlexLibraryItem {
 export interface PlexLibraryResponse {
   MediaContainer: {
     totalSize: number;
-    Metadata: PlexLibraryItem[] | PlexCollection[] | PlexCollection;
+    Metadata:
+      | PlexLibraryItem[]
+      | PlexCollection[]
+      | PlexCollection
+      | PlexPlaylist[];
   };
 }
 export interface PlexGenre {

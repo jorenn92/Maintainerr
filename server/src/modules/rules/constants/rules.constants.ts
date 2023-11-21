@@ -247,7 +247,21 @@ export class RuleConstants {
         {
           id: 19,
           name: 'collection_names',
-          humanName: '[list] Collections media is present in (list of titles)',
+          humanName: '[list] Collections media is present in (titles)',
+          mediaType: MediaType.BOTH,
+          type: RuleType.TEXT,
+        } as Property,
+        {
+          id: 20,
+          name: 'playlists',
+          humanName: 'Present in amount of playlists',
+          mediaType: MediaType.BOTH,
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 21,
+          name: 'playlist_names',
+          humanName: '[list] Playlists media is present in (titles)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
         } as Property,

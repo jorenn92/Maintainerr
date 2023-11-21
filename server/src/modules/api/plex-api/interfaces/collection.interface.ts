@@ -1,4 +1,4 @@
-import { EPlexDataType } from "../enums/plex-data-type-enum";
+import { EPlexDataType } from '../enums/plex-data-type-enum';
 
 export class PlexCollection {
   ratingKey: string;
@@ -25,4 +25,23 @@ export interface CreateUpdateCollection {
   title?: string;
   summary?: string;
   child?: string;
+}
+
+export interface PlexPlaylist {
+  ratingKey: string;
+  key: string;
+  guid: string;
+  type: string;
+  title: string;
+  summary: string;
+  smart: boolean;
+  playlistType: string;
+  composite: string;
+  viewCount: number;
+  lastViewedAt: number;
+  duration: number;
+  leafCount: number;
+  addedAt: number;
+  updatedAt: number;
+  itemCount: number;
 }
