@@ -20,6 +20,7 @@ import { RuleGroup } from './entities/rule-group.entities';
 import { ValueGetterService } from './getter/getter.service';
 import { RulesService } from './rules.service';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
+import cacheManager, { Cache } from '../api/lib/cache';
 
 interface PlexData {
   page: number;
@@ -82,6 +83,11 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   public async executeAllRules() {
     this.logger.log('Starting Execution of all active rules.');
     const appStatus = await this.settings.testConnections();
+
+    // reset API caches, make sure latest data is used
+    for (const [key, value] of Object.entries(cacheManager.getAllCaches())) {
+      value.flush();
+    }
 
     if (appStatus) {
       const ruleGroups = await this.getAllActiveRuleGroups();

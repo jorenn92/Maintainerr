@@ -138,19 +138,19 @@ export class PlexGetterService {
                 );
 
                 // add if it doesn't exist yet
-                playlists.forEach((el) => {
+                playlists?.forEach((el) => {
                   if (!filtered.find((fil) => fil.ratingKey === el.ratingKey)) {
                     filtered.push(el);
                   }
                 });
               }
             }
-            return filtered.map((el) => el.title.trim());
+            return filtered ? filtered.map((el) => el.title.trim()) : [];
           } else {
             const playlists = await this.plexApi.getPlaylists(
               libItem.ratingKey,
             );
-            return playlists.map((el) => el.title.trim());
+            return playlists ? playlists.map((el) => el.title.trim()) : [];
           }
         }
         case 'collection_names': {

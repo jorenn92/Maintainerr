@@ -332,7 +332,9 @@ export class PlexApiService {
         uri: `/playlists?playlistType=video&includeCollections=1&includeExternalMedia=1&includeAdvanced=1&includeMeta=1`,
       });
 
-      const items = response.MediaContainer.Metadata as PlexPlaylist[];
+      const items = response.MediaContainer.Metadata
+        ? (response.MediaContainer.Metadata as PlexPlaylist[])
+        : [];
 
       for (const item of items) {
         const itemResp = await this.plexClient.query<PlexLibraryResponse>({
