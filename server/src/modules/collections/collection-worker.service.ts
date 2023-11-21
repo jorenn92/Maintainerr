@@ -14,6 +14,7 @@ import { ServarrAction } from './interfaces/collection.interface';
 import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
+import cacheManager from '../api/lib/cache';
 
 @Injectable()
 export class CollectionWorkerService implements OnApplicationBootstrap {
@@ -65,6 +66,12 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
 
   public async handle() {
     const appStatus = await this.settings.testConnections();
+
+    // reset API caches, make sure latest data is used
+    for (const [key, value] of Object.entries(cacheManager.getAllCaches())) {
+      value.flush();
+    }
+
     this.logger.log('Start handling all collections.');
     let handledCollections = 0;
     if (appStatus) {
