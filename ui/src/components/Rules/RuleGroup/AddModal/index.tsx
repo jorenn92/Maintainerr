@@ -3,7 +3,6 @@ import GetApiHandler, {
   PostApiHandler,
   PutApiHandler,
 } from '../../../../utils/ApiHandler'
-import Image from 'next/image'
 import RuleCreator, { IRule } from '../../Rule/RuleCreator'
 import { ConstantsContextProvider } from '../../../../contexts/constants-context'
 import LibrariesContext, {
@@ -24,6 +23,7 @@ import Link from 'next/link'
 import Button from '../../../Common/Button'
 import CommunityRuleModal from '../../../Common/CommunityRuleModal'
 import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
+import CachedImage from '../../../Common/CachedImage'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -243,7 +243,7 @@ const AddModal = (props: AddModal) => {
   if (isLoading) {
     return (
       <span>
-        <Image fill src="/spinner.svg" alt="Loading..."></Image>
+        <CachedImage fill src="/spinner.svg" alt="Loading..." />
       </span>
     )
   }
