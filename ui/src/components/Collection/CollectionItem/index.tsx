@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { useContext } from 'react'
 import { ICollection } from '..'
 import LibrariesContext from '../../../contexts/libraries-context'
+import CachedImage from '../../Common/CachedImage'
 
 interface ICollectionItem {
   collection: ICollection
@@ -16,14 +17,14 @@ const CollectionItem = (props: ICollectionItem) => {
       {/* <div className="collection relative mb-5 flex h-fit w-full flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:mb-0 sm:mr-5 sm:w-1/3"> */}
       {props.collection.media && props.collection.media.length > 1 ? (
         <div className="z-1 absolute inset-0 flex flex-row overflow-hidden">
-          <Image
+          <CachedImage
             className="backdrop-image"
             width="600"
             height="800"
             src={`https://image.tmdb.org/t/p/w500${props.collection.media[0].image_path}`}
             alt="img"
           />
-          <Image
+          <CachedImage
             className="backdrop-image"
             width="600"
             height="800"
