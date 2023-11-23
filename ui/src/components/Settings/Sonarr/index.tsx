@@ -82,8 +82,8 @@ const SonarrSettings = () => {
 
     const splitted = url?.split('/')
 
-    if (splitted.length > 0) setPort(`${splitted[0]}`)
-    if (splitted.length > 1) setBaseUrl(`${splitted[1]}`)
+    if (splitted?.length > 0) setPort(`${splitted[0]}`)
+    if (splitted?.length > 1) setBaseUrl(`${splitted[1]}`)
   }, [settingsCtx])
 
   const appTest = (result: { status: boolean; version: string }) => {
