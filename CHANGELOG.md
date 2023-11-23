@@ -1,3 +1,12 @@
+## [1.6.10](https://github.com/jorenn92/Maintainerr/compare/v1.6.9...v1.6.10) (2023-11-23)
+
+
+### Bug Fixes
+
+* **settings:** Fixed an issue where initial Radarr & Sonarr configuration would crash the client ([94dfcff](https://github.com/jorenn92/Maintainerr/commit/94dfcffe5cd74ecde13585506374b23ceb5873a9))
+* **ui:** Collection backdrop images now also leverage the configured caching option ([d28b530](https://github.com/jorenn92/Maintainerr/commit/d28b5303b2f7d2a13748f6a5ee4fc93f475ad4f8))
+* **ui:** Replace leftover Image components with CachedImage ([c8d172f](https://github.com/jorenn92/Maintainerr/commit/c8d172ff82fe212ff3968c79b431720d0ea77335))
+
 ## [1.6.9](https://github.com/jorenn92/Maintainerr/compare/v1.6.8...v1.6.9) (2023-11-21)
 
 
