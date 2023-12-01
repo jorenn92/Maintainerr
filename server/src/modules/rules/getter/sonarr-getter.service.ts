@@ -67,15 +67,15 @@ export class SonarrGetterService {
         episode =
           [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType) &&
           showResponse.added !== '0001-01-01T00:00:00Z'
-            ? (
-                await this.servarrService.SonarrApi.getEpisodes(
-                  showResponse.id,
-                  origLibItem.grandparentRatingKey
-                    ? origLibItem.parentIndex
-                    : origLibItem.index,
-                  [origLibItem.grandparentRatingKey ? origLibItem.index : 1],
-                )
-              )[0]
+            ? (showResponse.id
+                ? await this.servarrService.SonarrApi.getEpisodes(
+                    showResponse.id,
+                    origLibItem.grandparentRatingKey
+                      ? origLibItem.parentIndex
+                      : origLibItem.index,
+                    [origLibItem.grandparentRatingKey ? origLibItem.index : 1],
+                  )
+                : [])[0]
             : undefined;
 
         const episodeFile =
@@ -85,7 +85,7 @@ export class SonarrGetterService {
               )
             : undefined;
 
-        if (tvdbId && showResponse) {
+        if (tvdbId && showResponse?.id) {
           switch (prop.name) {
             case 'addDate': {
               return showResponse.added &&
