@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { warn } from 'console';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
 import { RadarrApi } from '../../../modules/api/servarr-api/helpers/radarr.helper';
 import { ServarrService } from '../../../modules/api/servarr-api/servarr.service';
