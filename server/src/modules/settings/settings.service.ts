@@ -115,7 +115,7 @@ export class SettingsService implements SettingDto {
 
   public async deletePlexApiAuth(): Promise<BasicResponseDto> {
     try {
-      await this.settingsRepo.update({}, { plex_auth_token: undefined });
+      await this.settingsRepo.update({}, { plex_auth_token: null });
       return { status: 'OK', code: 1, message: 'Success' };
     } catch (err) {
       this.logger.error(
