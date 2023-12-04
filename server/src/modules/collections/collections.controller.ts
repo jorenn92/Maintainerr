@@ -81,7 +81,7 @@ export class CollectionsController {
   @Get()
   getCollections(
     @Query('libraryId') libraryId: number,
-    @Query('typeId') typeId: 1 | 2,
+    @Query('typeId') typeId: 1 | 2 | 3 | 4,
   ) {
     if (libraryId) {
       return this.collectionService.getCollections(libraryId, undefined);
