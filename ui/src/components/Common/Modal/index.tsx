@@ -13,17 +13,21 @@ interface ModalProps {
   onOk?: (e?: MouseEvent<HTMLButtonElement>) => void
   onSecondary?: (e?: MouseEvent<HTMLButtonElement>) => void
   onTertiary?: (e?: MouseEvent<HTMLButtonElement>) => void
+  onSpecial?: (e?: MouseEvent<HTMLButtonElement>) => void
   cancelText?: string
   okText?: string
   secondaryText?: string
   tertiaryText?: string
+  specialText?: string
   okDisabled?: boolean
   cancelButtonType?: ButtonType
   okButtonType?: ButtonType
   secondaryButtonType?: ButtonType
   secondaryDisabled?: boolean
   tertiaryDisabled?: boolean
+  specialDisabled?: boolean
   tertiaryButtonType?: ButtonType
+  specialButtonType?: ButtonType
   disableScrollLock?: boolean
   backgroundClickable?: boolean
   iconSvg?: ReactNode
@@ -54,6 +58,10 @@ const Modal: React.FC<ModalProps> = ({
   tertiaryDisabled = false,
   tertiaryText,
   onTertiary,
+  specialButtonType = 'default',
+  specialDisabled = false,
+  specialText,
+  onSpecial,
   backdrop,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null)
@@ -130,6 +138,17 @@ const Modal: React.FC<ModalProps> = ({
               {children}
             </div>
           )}
+          <div className="flex justify-center sm:justify-end mt-4">
+            {typeof onSpecial === 'function' && (
+              <Button
+                buttonType={specialButtonType}
+                onClick={onSpecial}
+                className="ml-3"
+              >
+                {specialText ? specialText : 'Special'}
+              </Button>
+            )}
+          </div>
           {(onCancel || onOk || onSecondary || onTertiary) && (
             <div className="relative mt-5 flex flex-row-reverse justify-center sm:mt-4 sm:justify-start">
               {typeof onOk === 'function' && (
@@ -166,7 +185,7 @@ const Modal: React.FC<ModalProps> = ({
                 <Button
                   buttonType={cancelButtonType}
                   onClick={onCancel}
-                  className="ml-3 sm:ml-0"
+                  className="ml-3"
                 >
                   {cancelText ? cancelText : 'Cancel'}
                 </Button>

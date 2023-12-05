@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
+import GetApiHandler, {
+  DeleteApiHandler,
+  PostApiHandler,
+} from '../../utils/ApiHandler'
 import Modal from '../Common/Modal'
 import FormItem from '../Common/FormItem'
 import { EPlexDataType } from '../../utils/PlexDataType-enum'
@@ -10,6 +13,7 @@ const AddModal = (props: IAddModal) => {
   const [selectedCollection, setSelectedCollection] = useState<number>()
   const [loading, setLoading] = useState(true)
   const [alert, setAlert] = useState(false)
+  const [forceRemovalcheck, setForceRemovalCheck] = useState(false)
   const [selectedAction, setSelectedAction] = useState<number>(0)
   // For show only
   const [selectedSeasons, setSelectedSeasons] = useState<number>(-1)
@@ -71,6 +75,17 @@ const AddModal = (props: IAddModal) => {
     } else {
       setAlert(true)
     }
+  }
+
+  const handleForceRemoval = () => {
+    setForceRemovalCheck(false)
+    PostApiHandler(`/collections/media/add`, {
+      mediaId: props.plexId,
+      context: { id: -1, type: EPlexDataType.SHOWS },
+      collectionId: undefined,
+      action: 1,
+    })
+    props.onSubmit()
   }
 
   useEffect(() => {
@@ -168,7 +183,7 @@ const AddModal = (props: IAddModal) => {
   return (
     <Modal
       loading={loading}
-      backgroundClickable
+      backgroundClickable={false}
       onCancel={handleCancel}
       onOk={handleOk}
       okDisabled={false}
@@ -176,8 +191,30 @@ const AddModal = (props: IAddModal) => {
       okText={'Submit'}
       okButtonType={'primary'}
       onSecondary={() => {}}
+      specialButtonType="warning"
+      specialDisabled={false}
+      specialText="Remove from all collections"
+      onSpecial={() => {
+        setForceRemovalCheck(true)
+      }}
       iconSvg={''}
     >
+      {forceRemovalcheck ? (
+        <Modal
+          loading={loading}
+          backgroundClickable={false}
+          onCancel={() => setForceRemovalCheck(false)}
+          onOk={handleForceRemoval}
+          okDisabled={false}
+          title={'Confirmation required'}
+          okText={'Submit'}
+        >
+          Are you certain you want to proceed? This action will remove the media
+          from all collections. For shows, this entails removing all associated
+          seasons and episodes as well.
+        </Modal>
+      ) : undefined}
+
       {alert ? (
         <Alert title="Please select a collection" type="warning" />
       ) : undefined}
