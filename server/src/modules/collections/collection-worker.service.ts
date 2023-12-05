@@ -141,14 +141,15 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         // find tmdbid
         const tmdbid = media.tmdbId
           ? media.tmdbId
-          : await this.tmdbIdService.getTmdbIdFromPlexRatingKey(
-              media.plexId.toString(),
-            );
+          : (
+              await this.tmdbIdService.getTmdbIdFromPlexRatingKey(
+                media.plexId.toString(),
+              )
+            )?.id;
 
         if (tmdbid) {
-          const radarrMedia = await this.servarrApi.RadarrApi.getMovieByTmdbId(
-            media.tmdbId,
-          );
+          const radarrMedia =
+            await this.servarrApi.RadarrApi.getMovieByTmdbId(tmdbid);
           if (radarrMedia && radarrMedia.id) {
             switch (collection.arrAction) {
               case ServarrAction.DELETE:
@@ -184,12 +185,12 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
             }
           } else {
             this.infoLogger(
-              `Couldn't find movie with tmdbid ${tmdbid} in Radarr. No action taken for movie: ${media.plexData.title}`,
+              `Couldn't find movie with tmdbid ${tmdbid} in Radarr. No action taken for movie with Plex ID: ${media.plexId}`,
             );
           }
         } else {
           this.infoLogger(
-            `Couldn't find correct tmdbid. No action taken for movie: ${media.plexData.title}`,
+            `Couldn't find correct tmdbid. No action taken for movie with Plex ID: ${media.plexId}`,
           );
         }
       }
