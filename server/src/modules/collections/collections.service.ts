@@ -17,8 +17,12 @@ import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
-import { AddCollectionMedia } from './interfaces/collection-media.interface';
+import {
+  AddCollectionMedia,
+  IAlterableMediaDto,
+} from './interfaces/collection-media.interface';
 import { ICollection } from './interfaces/collection.interface';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 
 interface addCollectionDbResponse {
   id: number;
@@ -350,6 +354,174 @@ export class CollectionsService {
       }
     }
     return collection;
+  }
+
+  async MediaCollectionActionWithContext(
+    collectionDbId: number,
+    context: IAlterableMediaDto,
+    media: AddCollectionMedia,
+    action: 'add' | 'remove',
+  ): Promise<Collection> {
+    const handleMedia: AddCollectionMedia[] = [];
+
+    const collection =
+      collectionDbId !== -1
+        ? await this.collectionRepo.findOne({
+            where: { id: collectionDbId },
+          })
+        : undefined;
+
+    if (collection && media) {
+      // switch based on collection type
+      switch (collection.type) {
+        // when collection type is seasons
+        case EPlexDataType.SEASONS:
+          switch (context.type) {
+            // and context type is seasons
+            case EPlexDataType.SEASONS:
+              handleMedia.push({ plexId: context.id });
+              break;
+            // and content type is episodes
+            case EPlexDataType.EPISODES:
+              // this is not allowed
+              this.logger.warn(
+                'Tried to add episodes to a collection of type season. This is not allowed.',
+              );
+              break;
+            // and context type is full show
+            default:
+              const data = await this.plexApi.getChildrenMetadata(
+                media.plexId.toString(),
+              );
+              // transform & add season
+              data.forEach((el) => {
+                handleMedia.push({
+                  plexId: +el.ratingKey,
+                });
+              });
+              break;
+          }
+          break;
+
+        // when collection type is episodes
+        case EPlexDataType.EPISODES:
+          switch (context.type) {
+            // and context type is seasons
+            case EPlexDataType.SEASONS:
+              const eps = await this.plexApi.getChildrenMetadata(
+                context.id.toString(),
+              );
+              // transform & add episodes
+              eps.forEach((el) => {
+                handleMedia.push({
+                  plexId: +el.ratingKey,
+                });
+              });
+              break;
+            // and context type is episodes
+            case EPlexDataType.EPISODES:
+              handleMedia.push({ plexId: context.id });
+              break;
+            // and context type is full show
+            default:
+              // get all seasons
+              const seasons = await this.plexApi.getChildrenMetadata(
+                media.plexId.toString(),
+              );
+              // get and add all episodes for each season
+              for (const season of seasons) {
+                const eps = await this.plexApi.getChildrenMetadata(
+                  season.ratingKey,
+                );
+                eps.forEach((ep) => {
+                  handleMedia.push({
+                    plexId: +ep.ratingKey,
+                  });
+                });
+              }
+              break;
+          }
+          break;
+        // when collection type is SHOW or MOVIE
+        default:
+          // just add media item
+          handleMedia.push({ plexId: media.plexId });
+          break;
+      }
+    }
+    // for all collections
+    else {
+      switch (context.type) {
+        case EPlexDataType.SEASONS:
+          // for seasons, add all episode ID's + the season media item
+          handleMedia.push({ plexId: context.id });
+
+          // get all episodes
+          const data = await this.plexApi.getChildrenMetadata(
+            context.id.toString(),
+          );
+
+          // transform & add eps
+          data
+            ? handleMedia.push(
+                ...data.map((el) => {
+                  return {
+                    plexId: +el.ratingKey,
+                  };
+                }),
+              )
+            : undefined;
+          break;
+        case EPlexDataType.EPISODES:
+          // transform & push episode
+          handleMedia.push({
+            plexId: +context.id,
+          });
+          break;
+        case EPlexDataType.SHOWS:
+          // add show id
+          handleMedia.push({
+            plexId: +media.plexId,
+          });
+
+          // get all seasons
+          const seasons = await this.plexApi.getChildrenMetadata(
+            media.plexId.toString(),
+          );
+
+          for (const season of seasons) {
+            // transform & add season
+            handleMedia.push({
+              plexId: +season.ratingKey,
+            });
+
+            // get all eps of season
+            const eps = await this.plexApi.getChildrenMetadata(
+              season.ratingKey.toString(),
+            );
+            // transform & add eps
+            eps
+              ? handleMedia.push(
+                  ...eps.map((el) => {
+                    return {
+                      plexId: +el.ratingKey,
+                    };
+                  }),
+                )
+              : undefined;
+          }
+          break;
+        case EPlexDataType.MOVIES:
+          handleMedia.push({
+            plexId: +media.plexId,
+          });
+      }
+    }
+    if (action === 'add') {
+      return this.addToCollection(collectionDbId, handleMedia, true);
+    } else if (action === 'remove') {
+      return this.removeFromCollection(collectionDbId, handleMedia);
+    }
   }
 
   async addToCollection(

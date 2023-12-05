@@ -3,36 +3,17 @@ import GetApiHandler, {
   DeleteApiHandler,
   PostApiHandler,
 } from '../../utils/ApiHandler'
-import Alert from '../Common/Alert'
 import Modal from '../Common/Modal'
 import FormItem from '../Common/FormItem'
+import { EPlexDataType } from '../../utils/PlexDataType-enum'
+import { IAddModal, IAlterableMediaDto, ICollectionMedia } from './interfaces'
+import Alert from '../Common/Alert'
 
-interface IAddModal {
-  onCancel: () => void
-  onSubmit: () => void
-  libraryId?: number
-  type?: number
-  plexId: number
-}
-
-interface ICollectionMedia {
-  media?: []
-  id: number
-  plexId?: number
-  libraryId?: number
-  title: string
-  description?: string
-  isActive?: boolean
-  arrAction?: number
-  visibleOnHome?: boolean
-  deleteAfterDays?: number
-  type?: 1 | 2
-  collectionMedia?: []
-}
 const AddModal = (props: IAddModal) => {
-  const [selectedCollection, setSelectedCollection] = useState<number>(-1)
+  const [selectedCollection, setSelectedCollection] = useState<number>()
   const [loading, setLoading] = useState(true)
-  const [mediaChildren, setMediaChildren] = useState()
+  const [alert, setAlert] = useState(false)
+  const [forceRemovalcheck, setForceRemovalCheck] = useState(false)
   const [selectedAction, setSelectedAction] = useState<number>(0)
   // For show only
   const [selectedSeasons, setSelectedSeasons] = useState<number>(-1)
@@ -40,12 +21,7 @@ const AddModal = (props: IAddModal) => {
 
   const [collectionOptions, setCollectionOptions] = useState<
     ICollectionMedia[]
-  >([
-    {
-      id: -1,
-      title: 'All collections',
-    },
-  ])
+  >([])
   const [seasonOptions, setSeasonOptions] = useState<ICollectionMedia[]>([
     {
       id: -1,
@@ -70,11 +46,11 @@ const AddModal = (props: IAddModal) => {
   const selectedContext = useMemo(() => {
     return props.type === 2
       ? selectedEpisodes !== -1
-        ? 'episode'
+        ? EPlexDataType.EPISODES
         : selectedSeasons !== -1
-        ? 'season'
-        : null
-      : null
+        ? EPlexDataType.SEASONS
+        : EPlexDataType.SHOWS
+      : EPlexDataType.MOVIES
   }, [selectedSeasons, selectedEpisodes])
 
   const handleCancel = () => {
@@ -82,40 +58,33 @@ const AddModal = (props: IAddModal) => {
   }
 
   const handleOk = () => {
-    console.log(
-      selectedAction,
-      selectedMediaId,
-      selectedContext,
-      selectedCollection,
-    )
-    switch (selectedAction) {
-      case 0:
-        // PostApiHandler(`/collections/media/add`, {
-        //   mediaId: selectedMediaId,
-        //   context: selectedContext,
-        //   collectionId: selectedCollection,
-        // })
-        break
-      case 1:
-        // DeleteApiHandler(`/collections/media`, {
-        //   mediaId: selectedMediaId,
-        //   context: selectedContext,
-        //   collectionId: selectedCollection,
-        // })
-        break
-    }
+    if (selectedCollection !== undefined) {
+      const mediaDto: IAlterableMediaDto = {
+        id: selectedMediaId,
+        type: selectedContext,
+      }
 
-    // switch (selectedCollection) {
-    //   case -1:
-    //     DeleteApiHandler(`/collections/media?mediaId=${props.plexId}`)
-    //     break
-    //   default:
-    //     PostApiHandler(`/collections/media/add`, {
-    //       mediaId: props.plexId,
-    //       collectionId: selectedCollection,
-    //     })
-    //     break
-    // }
+      PostApiHandler(`/collections/media/add`, {
+        mediaId: props.plexId,
+        context: mediaDto,
+        collectionId: selectedCollection,
+        action: selectedAction,
+      })
+
+      props.onSubmit()
+    } else {
+      setAlert(true)
+    }
+  }
+
+  const handleForceRemoval = () => {
+    setForceRemovalCheck(false)
+    PostApiHandler(`/collections/media/add`, {
+      mediaId: props.plexId,
+      context: { id: -1, type: EPlexDataType.SHOWS },
+      collectionId: undefined,
+      action: 1,
+    })
     props.onSubmit()
   }
 
@@ -145,15 +114,11 @@ const AddModal = (props: IAddModal) => {
         },
       )
     }
-
-    // } else if (props.libraryId) {
-    //   GetApiHandler(`/collections?libraryId=${props.libraryId}`).then(
-    //     (resp) => {
-    //       props.type === 1 ? setLoading(false) : undefined
-    //       return setCollectionOptions([...collectionOptions, ...resp])
-    //     },
-    //   )
   }, [])
+
+  useEffect(() => {
+    setSelectedCollection(collectionOptions[0]?.id)
+  }, [collectionOptions])
 
   useEffect(() => {
     if (selectedSeasons !== -1) {
@@ -188,27 +153,14 @@ const AddModal = (props: IAddModal) => {
       ? selectedEpisodes !== -1
         ? GetApiHandler(`/collections?typeId=4`).then((resp) => {
             // get collections for episodes
-            setCollectionOptions([
-              {
-                id: -1,
-                title: 'All collections',
-              },
-              ...resp,
-            ])
+            setCollectionOptions([...resp])
             setLoading(false)
           })
         : selectedSeasons !== -1
         ? GetApiHandler(`/collections?typeId=3`).then((resp) => {
             // get collections for episodes and seasons
             GetApiHandler(`/collections?typeId=4`).then((resp2) => {
-              setCollectionOptions([
-                {
-                  id: -1,
-                  title: 'All collections',
-                },
-                ...resp,
-                ...resp2,
-              ])
+              setCollectionOptions([...resp, ...resp2])
               setLoading(false)
             })
           })
@@ -216,28 +168,14 @@ const AddModal = (props: IAddModal) => {
             // get collections for episodes, seasons and shows
             GetApiHandler(`/collections?typeId=3`).then((resp2) => {
               GetApiHandler(`/collections?typeId=4`).then((resp3) => {
-                setCollectionOptions([
-                  {
-                    id: -1,
-                    title: 'All collections',
-                  },
-                  ...resp,
-                  ...resp2,
-                  ...resp3,
-                ])
+                setCollectionOptions([...resp, ...resp2, ...resp3])
                 setLoading(false)
               })
             })
           })
       : GetApiHandler(`/collections?typeId=1`).then((resp) => {
           // get collections for movies
-          setCollectionOptions([
-            {
-              id: -1,
-              title: 'All collections',
-            },
-            ...resp,
-          ])
+          setCollectionOptions([...resp])
           setLoading(false)
         })
   }, [selectedSeasons, selectedEpisodes])
@@ -245,16 +183,42 @@ const AddModal = (props: IAddModal) => {
   return (
     <Modal
       loading={loading}
-      backgroundClickable
+      backgroundClickable={false}
       onCancel={handleCancel}
       onOk={handleOk}
       okDisabled={false}
-      title={'Add / Remove from Collection'}
+      title={'Add / Remove media'}
       okText={'Submit'}
       okButtonType={'primary'}
+      onSecondary={() => {}}
+      specialButtonType="warning"
+      specialDisabled={false}
+      specialText="Remove from all collections"
+      onSpecial={() => {
+        setForceRemovalCheck(true)
+      }}
       iconSvg={''}
-      // backdrop={`https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/1`}
     >
+      {forceRemovalcheck ? (
+        <Modal
+          loading={loading}
+          backgroundClickable={false}
+          onCancel={() => setForceRemovalCheck(false)}
+          onOk={handleForceRemoval}
+          okDisabled={false}
+          title={'Confirmation required'}
+          okText={'Submit'}
+        >
+          Are you certain you want to proceed? This action will remove the media
+          from all collections. For shows, this entails removing all associated
+          seasons and episodes as well.
+        </Modal>
+      ) : undefined}
+
+      {alert ? (
+        <Alert title="Please select a collection" type="warning" />
+      ) : undefined}
+
       <div className="mt-6">
         <FormItem label="Action">
           <select
