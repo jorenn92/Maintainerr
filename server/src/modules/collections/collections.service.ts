@@ -116,7 +116,7 @@ export class CollectionsService {
     }
   }
 
-  async getCollections(libraryId?: number, typeId?: 1 | 2) {
+  async getCollections(libraryId?: number, typeId?: 1 | 2 | 3 | 4) {
     try {
       const collections = await this.collectionRepo.find(
         libraryId
