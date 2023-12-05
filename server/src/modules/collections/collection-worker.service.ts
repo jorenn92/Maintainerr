@@ -149,37 +149,43 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
           const radarrMedia = await this.servarrApi.RadarrApi.getMovieByTmdbId(
             media.tmdbId,
           );
-          switch (collection.arrAction) {
-            case ServarrAction.DELETE:
-              await this.servarrApi.RadarrApi.deleteMovie(
-                radarrMedia.id,
-                true,
-                collection.listExclusions,
-              );
-              this.infoLogger('Removed movie from filesystem & Radarr');
-              break;
-            case ServarrAction.UNMONITOR:
-              await this.servarrApi.RadarrApi.unmonitorMovie(
-                radarrMedia.id,
-                false,
-              );
-              this.infoLogger('Unmonitored movie in Radarr');
-              break;
-            case ServarrAction.DELETE_UNMONITOR_ALL:
-              await this.servarrApi.RadarrApi.unmonitorMovie(
-                radarrMedia.id,
-                true,
-              );
-              this.infoLogger('Unmonitored movie in Radarr & removed files');
-              break;
-            case ServarrAction.DELETE_UNMONITOR_EXISTING:
-              await this.servarrApi.RadarrApi.deleteMovie(
-                radarrMedia.id,
-                true,
-                collection.listExclusions,
-              );
-              this.infoLogger('Removed movie from filesystem & Radarr');
-              break;
+          if (radarrMedia && radarrMedia.id) {
+            switch (collection.arrAction) {
+              case ServarrAction.DELETE:
+                await this.servarrApi.RadarrApi.deleteMovie(
+                  radarrMedia.id,
+                  true,
+                  collection.listExclusions,
+                );
+                this.infoLogger('Removed movie from filesystem & Radarr');
+                break;
+              case ServarrAction.UNMONITOR:
+                await this.servarrApi.RadarrApi.unmonitorMovie(
+                  radarrMedia.id,
+                  false,
+                );
+                this.infoLogger('Unmonitored movie in Radarr');
+                break;
+              case ServarrAction.DELETE_UNMONITOR_ALL:
+                await this.servarrApi.RadarrApi.unmonitorMovie(
+                  radarrMedia.id,
+                  true,
+                );
+                this.infoLogger('Unmonitored movie in Radarr & removed files');
+                break;
+              case ServarrAction.DELETE_UNMONITOR_EXISTING:
+                await this.servarrApi.RadarrApi.deleteMovie(
+                  radarrMedia.id,
+                  true,
+                  collection.listExclusions,
+                );
+                this.infoLogger('Removed movie from filesystem & Radarr');
+                break;
+            }
+          } else {
+            this.infoLogger(
+              `Couldn't find movie with tmdbid ${tmdbid} in Radarr. No action taken for movie: ${media.plexData.title}`,
+            );
           }
         } else {
           this.infoLogger(
