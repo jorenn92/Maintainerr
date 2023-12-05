@@ -108,7 +108,6 @@ const Modal: React.FC<ModalProps> = ({
             maxHeight: 'calc(100% - env(safe-area-inset-top) * 2)',
           }}
         >
-
           <div className="relative overflow-x-hidden sm:flex sm:items-center">
             {iconSvg && <div className="modal-icon">{iconSvg}</div>}
             <div
@@ -177,7 +176,7 @@ const Modal: React.FC<ModalProps> = ({
         </div>
       </Transition>
     </div>,
-    document.body
+    document.body,
   )
 }
 

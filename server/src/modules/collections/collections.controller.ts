@@ -11,7 +11,10 @@ import {
 } from '@nestjs/common';
 import { CollectionWorkerService } from './collection-worker.service';
 import { CollectionsService } from './collections.service';
-import { AddCollectionMedia } from './interfaces/collection-media.interface';
+import {
+  AddCollectionMedia,
+  IAlterableMediaDto,
+} from './interfaces/collection-media.interface';
 
 @Controller('api/collections')
 export class CollectionsController {
@@ -97,14 +100,22 @@ export class CollectionsController {
       collectionId ? collectionId : undefined,
     );
   }
+
   @Post('/media/add')
-  addManuallyToCollection(
-    @Body() request: { collectionId: number; mediaId: number },
+  ManualActionOnCollection(
+    @Body()
+    request: {
+      mediaId: number;
+      context: IAlterableMediaDto;
+      collectionId: number;
+      action: 0 | 1;
+    },
   ) {
-    return this.collectionService.addToCollection(
+    return this.collectionService.MediaCollectionActionWithContext(
       request.collectionId,
-      [{ plexId: request.mediaId }],
-      true,
+      request.context,
+      { plexId: request.mediaId },
+      request.action === 0 ? 'add' : 'remove',
     );
   }
   @Delete('/media')

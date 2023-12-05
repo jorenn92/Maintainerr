@@ -1,3 +1,5 @@
+import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+
 export interface ICollectionMedia {
   id: number;
   collectionId: number;
@@ -9,4 +11,11 @@ export interface ICollectionMedia {
 
 export interface AddCollectionMedia {
   plexId: number;
+}
+
+export interface IAlterableMediaDto {
+  id: number;
+  index?: number;
+  parenIndex?: number;
+  type: EPlexDataType;
 }
