@@ -365,7 +365,7 @@ export class CollectionsService {
     const handleMedia: AddCollectionMedia[] = [];
 
     const collection =
-      collectionDbId !== -1
+      collectionDbId !== -1 && collectionDbId !== undefined
         ? await this.collectionRepo.findOne({
             where: { id: collectionDbId },
           })
@@ -520,7 +520,11 @@ export class CollectionsService {
     if (action === 'add') {
       return this.addToCollection(collectionDbId, handleMedia, true);
     } else if (action === 'remove') {
-      return this.removeFromCollection(collectionDbId, handleMedia);
+      if (collectionDbId) {
+        return this.removeFromCollection(collectionDbId, handleMedia);
+      } else {
+        this.removeFromAllCollections(handleMedia);
+      }
     }
   }
 
