@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import GetApiHandler, {
-  DeleteApiHandler,
-  PostApiHandler,
-} from '../../utils/ApiHandler'
+import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
 import Modal from '../Common/Modal'
 import FormItem from '../Common/FormItem'
 import { EPlexDataType } from '../../utils/PlexDataType-enum'
@@ -35,6 +32,19 @@ const AddModal = (props: IAddModal) => {
     },
   ])
 
+  const origCollectionOptions = useMemo(
+    () =>
+      props.modalType === 'exclude'
+        ? [
+            {
+              id: -1,
+              title: 'All collections',
+            },
+          ]
+        : [],
+    [props.modalType],
+  )
+
   const selectedMediaId = useMemo(() => {
     return props.type === 1
       ? -1
@@ -64,12 +74,22 @@ const AddModal = (props: IAddModal) => {
         type: selectedContext,
       }
 
-      PostApiHandler(`/collections/media/add`, {
-        mediaId: props.plexId,
-        context: mediaDto,
-        collectionId: selectedCollection,
-        action: selectedAction,
-      })
+      if (props.modalType === 'add') {
+        PostApiHandler(`/collections/media/add`, {
+          mediaId: props.plexId,
+          context: mediaDto,
+          collectionId: selectedCollection,
+          action: selectedAction,
+        })
+      } else {
+        PostApiHandler('/rules/exclusion', {
+          mediaId: props.plexId,
+          context: mediaDto,
+          collectionId:
+            selectedCollection !== -1 ? selectedCollection : undefined,
+          action: selectedAction,
+        })
+      }
 
       props.onSubmit()
     } else {
@@ -79,12 +99,15 @@ const AddModal = (props: IAddModal) => {
 
   const handleForceRemoval = () => {
     setForceRemovalCheck(false)
-    PostApiHandler(`/collections/media/add`, {
-      mediaId: props.plexId,
-      context: { id: -1, type: props.type },
-      collectionId: undefined,
-      action: 1,
-    })
+    if (props.modalType === 'add') {
+      PostApiHandler(`/collections/media/add`, {
+        mediaId: props.plexId,
+        context: { id: -1, type: props.type },
+        collectionId: undefined,
+        action: 1,
+      })
+    } else {
+    }
     props.onSubmit()
   }
 
@@ -153,14 +176,18 @@ const AddModal = (props: IAddModal) => {
       ? selectedEpisodes !== -1
         ? GetApiHandler(`/collections?typeId=4`).then((resp) => {
             // get collections for episodes
-            setCollectionOptions([...resp])
+            setCollectionOptions([...origCollectionOptions, ...resp])
             setLoading(false)
           })
         : selectedSeasons !== -1
         ? GetApiHandler(`/collections?typeId=3`).then((resp) => {
             // get collections for episodes and seasons
             GetApiHandler(`/collections?typeId=4`).then((resp2) => {
-              setCollectionOptions([...resp, ...resp2])
+              setCollectionOptions([
+                ...origCollectionOptions,
+                ...resp,
+                ...resp2,
+              ])
               setLoading(false)
             })
           })
@@ -168,14 +195,19 @@ const AddModal = (props: IAddModal) => {
             // get collections for episodes, seasons and shows
             GetApiHandler(`/collections?typeId=3`).then((resp2) => {
               GetApiHandler(`/collections?typeId=4`).then((resp3) => {
-                setCollectionOptions([...resp, ...resp2, ...resp3])
+                setCollectionOptions([
+                  ...origCollectionOptions,
+                  ...resp,
+                  ...resp2,
+                  ...resp3,
+                ])
                 setLoading(false)
               })
             })
           })
       : GetApiHandler(`/collections?typeId=1`).then((resp) => {
           // get collections for movies
-          setCollectionOptions([...resp])
+          setCollectionOptions([...origCollectionOptions, ...resp])
           setLoading(false)
         })
   }, [selectedSeasons, selectedEpisodes])
@@ -187,16 +219,20 @@ const AddModal = (props: IAddModal) => {
       onCancel={handleCancel}
       onOk={handleOk}
       okDisabled={false}
-      title={'Add / Remove media'}
+      title={props.modalType === 'add' ? 'Add / Remove media' : 'Exclude media'}
       okText={'Submit'}
       okButtonType={'primary'}
       onSecondary={() => {}}
       specialButtonType="warning"
-      specialDisabled={false}
-      specialText="Remove from all collections"
-      onSpecial={() => {
-        setForceRemovalCheck(true)
-      }}
+      specialDisabled={props.modalType !== 'add'}
+      specialText={'Remove from all collections'}
+      onSpecial={
+        props.modalType === 'add'
+          ? () => {
+              setForceRemovalCheck(true)
+            }
+          : undefined
+      }
       iconSvg={''}
     >
       {forceRemovalcheck ? (
@@ -209,8 +245,10 @@ const AddModal = (props: IAddModal) => {
           title={'Confirmation required'}
           okText={'Submit'}
         >
-          Are you certain you want to proceed? This action will remove the media
-          from all collections. For shows, this entails removing all associated
+          Are you certain you want to proceed? This action will remove the{' '}
+          {props.modalType === 'add' ? 'media ' : 'exclusion '}
+          from all collections. For shows, this entails removing all associated{' '}
+          {props.modalType === 'add' ? '' : 'exclusions for '}
           seasons and episodes as well.
         </Modal>
       ) : undefined}

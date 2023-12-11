@@ -5,7 +5,6 @@ import { useIsTouch } from '../../../hooks/useIsTouch'
 import CachedImage from '../CachedImage'
 import GetApiHandler from '../../../utils/ApiHandler'
 import Button from '../Button'
-import ExcludeModal from '../../ExcludeModal'
 import AddModal from '../../AddModal'
 import { DocumentAddIcon, DocumentRemoveIcon } from '@heroicons/react/solid'
 import RemoveFromCollectionBtn from '../../Collection/CollectionDetail/RemoveFromCollectionBtn'
@@ -78,19 +77,18 @@ const MediaCard: React.FC<IMediaCard> = ({
   return (
     <div className={'w-full'}>
       {excludeModal ? (
-        <ExcludeModal
+        <AddModal
           plexId={id}
           {...(libraryId ? { libraryId: libraryId } : {})}
           {...(type ? { type: type } : {})}
           onSubmit={() => {
             setExcludeModal(false)
-            setTimeout(() => {
-              getExclusions()
-            }, 500)
           }}
           onCancel={() => setExcludeModal(false)}
+          modalType="exclude"
         />
       ) : undefined}
+
       {addModal ? (
         <AddModal
           plexId={id}
@@ -100,6 +98,7 @@ const MediaCard: React.FC<IMediaCard> = ({
             setAddModal(false)
           }}
           onCancel={() => setAddModal(false)}
+          modalType="add"
         />
       ) : undefined}
       <div

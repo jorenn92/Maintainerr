@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CommunityRule } from './dtos/communityRule.dto';
-import { ExclusionDto } from './dtos/exclusion.dto';
+import { ExclusionAction, ExclusionContextDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleExecutorService } from './rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
@@ -77,8 +77,12 @@ export class RulesController {
     return await this.rulesService.setRules(body);
   }
   @Post('/exclusion')
-  async setExclusion(@Body() body: ExclusionDto): Promise<ReturnStatus> {
-    return await this.rulesService.setExclusion(body);
+  async setExclusion(@Body() body: ExclusionContextDto): Promise<ReturnStatus> {
+    if (body.action === undefined || body.action === ExclusionAction.ADD) {
+      return await this.rulesService.setExclusion(body);
+    } else {
+      return await this.rulesService.removeExclusionWitData(body);
+    }
   }
   @Delete('/exclusion/:id')
   async removeExclusion(@Param('id') id: string): Promise<ReturnStatus> {

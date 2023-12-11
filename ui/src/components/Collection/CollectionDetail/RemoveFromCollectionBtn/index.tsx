@@ -1,6 +1,5 @@
 import { TrashIcon } from '@heroicons/react/solid'
-import { useRef, useState } from 'react'
-import { ICollection } from '../..'
+import { useState } from 'react'
 import { DeleteApiHandler, PostApiHandler } from '../../../../utils/ApiHandler'
 import Button from '../../../Common/Button'
 interface IRemoveFromCollectionBtn {
@@ -13,17 +12,18 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
 
   const handle = () => {
     DeleteApiHandler(
-      `/collections/media?mediaId=${props.plexId}&collectionId=${props.collectionId}`
+      `/collections/media?mediaId=${props.plexId}&collectionId=${props.collectionId}`,
     )
     PostApiHandler('/rules/exclusion', {
-      plexId: props.plexId,
       collectionId: props.collectionId,
+      mediaId: props.plexId,
+      action: 0,
     })
     props.onRemove()
   }
 
   return (
-    <div className='w-full'>
+    <div className="w-full">
       {!sure ? (
         <Button
           buttonType="primary"
