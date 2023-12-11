@@ -81,7 +81,7 @@ const AddModal = (props: IAddModal) => {
     setForceRemovalCheck(false)
     PostApiHandler(`/collections/media/add`, {
       mediaId: props.plexId,
-      context: { id: -1, type: EPlexDataType.SHOWS },
+      context: { id: -1, type: props.type },
       collectionId: undefined,
       action: 1,
     })
