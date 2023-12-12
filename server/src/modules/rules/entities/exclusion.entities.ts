@@ -10,4 +10,7 @@ export class Exclusion {
 
   @Column({ nullable: true })
   ruleGroupId: number;
+
+  @Column({ nullable: true })
+  parent: number;
 }

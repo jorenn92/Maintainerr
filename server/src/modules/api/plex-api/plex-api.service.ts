@@ -218,8 +218,11 @@ export class PlexApiService {
             : ''
         }`,
       );
-
-      return response.MediaContainer.Metadata[0];
+      if (response) {
+        return response.MediaContainer.Metadata[0];
+      } else {
+        return undefined;
+      }
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',

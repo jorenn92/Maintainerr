@@ -291,9 +291,12 @@ export class RulesService {
           {
             ...old,
             plexId: media.plexId,
+            // ruleGroupId is only set if it's available
             ...(data.ruleGroupId !== undefined
               ? { ruleGroupId: data.ruleGroupId }
               : { ruleGroupId: null }),
+            // set parent
+            parent: data.mediaId ? data.mediaId : null,
           },
         ]);
       }
@@ -403,11 +406,20 @@ export class RulesService {
   ): Promise<Exclusion[]> {
     try {
       if (rulegroupId || plexId) {
-        const exclusions = await this.exclusionRepo.find(
-          rulegroupId
-            ? { where: { ruleGroupId: rulegroupId } }
-            : { where: { plexId: plexId } },
-        );
+        let exclusions: Exclusion[] = [];
+        if (rulegroupId) {
+          exclusions = await this.exclusionRepo.find({
+            where: { ruleGroupId: rulegroupId },
+          });
+        } else {
+          exclusions = await this.exclusionRepo
+            .createQueryBuilder('exclusion')
+            .where('exclusion.plexId = :plexId OR exclusion.parent = :plexId', {
+              plexId,
+            })
+            .getMany();
+        }
+
         return rulegroupId
           ? exclusions.concat(
               await this.exclusionRepo.find({
@@ -422,6 +434,15 @@ export class RulesService {
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       return undefined;
+    }
+  }
+
+  async getAllExclusions(): Promise<Exclusion[]> {
+    try {
+      return await this.exclusionRepo.find();
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      return [];
     }
   }
 

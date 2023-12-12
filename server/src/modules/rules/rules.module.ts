@@ -21,6 +21,7 @@ import { CollectionMedia } from '../collections/entities/collection_media.entiti
 import { Exclusion } from './entities/exclusion.entities';
 import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Settings } from '../settings/entities/settings.entities';
+import { RuleMaintenanceService } from './rule-maintenance.service';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { Settings } from '../settings/entities/settings.entities';
   providers: [
     RulesService,
     RuleExecutorService,
+    RuleMaintenanceService,
     PlexGetterService,
     RadarrGetterService,
     SonarrGetterService,
