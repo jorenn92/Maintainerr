@@ -33,6 +33,7 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
     private readonly taskService: TasksService,
     private readonly settings: SettingsService,
     private readonly tmdbIdService: TmdbIdService,
+    private readonly tmdbIdHelper: TmdbIdService,
   ) {}
 
   onApplicationBootstrap() {
@@ -446,7 +447,16 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
 
   private async tvdbidFinder(media: CollectionMedia) {
     let tvdbid = undefined;
+    if (!media.tmdbId && media.plexId) {
+      media.tmdbId = (
+        await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
+          media.plexId.toString(),
+        )
+      )?.id;
+    }
+
     const tmdbShow = await this.tmdbApi.getTvShow({ tvId: media.tmdbId });
+
     if (!tmdbShow?.external_ids?.tvdb_id) {
       let plexData = await this.plexApi.getMetadata(media.plexId.toString());
       // fetch correct record for seasons & episodes
@@ -458,8 +468,10 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         ? await this.plexApi.getMetadata(plexData.parentRatingKey.toString())
         : plexData;
 
-      const tvdbidPlex = plexData.Guid.find((el) => el.id.includes('tvdb'));
-      tvdbid = tvdbidPlex.id.split('tvdb://')[1];
+      const tvdbidPlex = plexData?.Guid?.find((el) => el.id.includes('tvdb'));
+      if (tvdbidPlex) {
+        tvdbid = tvdbidPlex.id.split('tvdb://')[1];
+      }
     } else {
       tvdbid = tmdbShow.external_ids.tvdb_id;
     }
