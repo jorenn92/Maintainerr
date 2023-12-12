@@ -6,6 +6,7 @@ export interface IAddModal {
   libraryId?: number
   type?: number
   plexId: number
+  modalType: 'add' | 'exclude'
 }
 
 export interface ICollectionMedia {

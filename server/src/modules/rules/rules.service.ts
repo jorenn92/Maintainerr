@@ -13,7 +13,7 @@ import {
   RulePossibility,
 } from './constants/rules.constants';
 import { CommunityRule } from './dtos/communityRule.dto';
-import { ExclusionDto } from './dtos/exclusion.dto';
+import { ExclusionContextDto } from './dtos/exclusion.dto';
 import { RuleDto } from './dtos/rule.dto';
 import { RuleDbDto } from './dtos/ruleDb.dto';
 import { RulesDto } from './dtos/rules.dto';
@@ -24,6 +24,7 @@ import { Rules } from './entities/rules.entities';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { Settings } from '../settings/entities/settings.entities';
 import _ from 'lodash';
+import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -244,32 +245,66 @@ export class RulesService {
     }
   }
 
-  async setExclusion(data: ExclusionDto) {
+  async setExclusion(data: ExclusionContextDto) {
+    let handleMedia: AddCollectionMedia[] = [];
+
     if (data.collectionId) {
       const group = await this.ruleGroupRepository.findOne({
         where: {
           collectionId: data.collectionId,
         },
       });
-      data = { plexId: data.plexId, ruleGroupId: group.id };
+      // get media
+      handleMedia = (await this.plexApi.getAllIdsForContextAction(
+        group ? group.dataType : undefined,
+        data.context
+          ? data.context
+          : { type: group.libraryId, id: data.mediaId },
+        { plexId: data.mediaId },
+      )) as unknown as AddCollectionMedia[];
+      data.ruleGroupId = group.id;
+    } else {
+      // get type from metadata
+      const metaData = await this.plexApi.getMetadata(data.mediaId.toString());
+      const type =
+        metaData.type === 'movie' ? EPlexDataType.MOVIES : EPlexDataType.SHOWS;
+
+      handleMedia = (await this.plexApi.getAllIdsForContextAction(
+        undefined,
+        data.context ? data.context : { type: type, id: data.mediaId },
+        { plexId: data.mediaId },
+      )) as unknown as AddCollectionMedia[];
     }
     try {
-      const old = await this.exclusionRepo.findOne({
-        where: {
-          ...data,
-        },
-      });
+      // add all items
+      for (const media of handleMedia) {
+        const old = await this.exclusionRepo.findOne({
+          where: {
+            plexId: media.plexId,
+            ...(data.ruleGroupId !== undefined
+              ? { ruleGroupId: data.ruleGroupId }
+              : { ruleGroupId: null }),
+          },
+        });
 
-      await this.exclusionRepo.save([
-        {
-          ...old,
-          ...data,
-        },
-      ]);
+        await this.exclusionRepo.save([
+          {
+            ...old,
+            plexId: media.plexId,
+            // ruleGroupId is only set if it's available
+            ...(data.ruleGroupId !== undefined
+              ? { ruleGroupId: data.ruleGroupId }
+              : { ruleGroupId: null }),
+            // set parent
+            parent: data.mediaId ? data.mediaId : null,
+          },
+        ]);
+      }
+
       return this.createReturnStatus(true, 'Success');
     } catch (e) {
       this.logger.warn(
-        `Adding exclusion for Plex ID ${data.plexId} and rulegroup ID ${data.ruleGroupId} failed with error : ${e}`,
+        `Adding exclusion for Plex ID ${data.mediaId} and rulegroup ID ${data.ruleGroupId} failed with error : ${e}`,
       );
       return this.createReturnStatus(false, 'Failed');
     }
@@ -287,9 +322,75 @@ export class RulesService {
     }
   }
 
-  async removeAllExclusion(plexId: number) {
+  async removeExclusionWitData(data: ExclusionContextDto) {
+    let handleMedia: AddCollectionMedia[] = [];
+
+    if (data.collectionId) {
+      const group = await this.ruleGroupRepository.findOne({
+        where: {
+          collectionId: data.collectionId,
+        },
+      });
+
+      data.ruleGroupId = group.id;
+
+      // get media
+      handleMedia = (await this.plexApi.getAllIdsForContextAction(
+        group ? group.dataType : undefined,
+        data.context
+          ? data.context
+          : { type: group.libraryId, id: data.mediaId },
+        { plexId: data.mediaId },
+      )) as unknown as AddCollectionMedia[];
+    } else {
+      // get type from metadata
+      // const metaData = await this.plexApi.getMetadata(data.mediaId.toString());
+      // const type =
+      //   metaData.type === 'movie' ? EPlexDataType.MOVIES : EPlexDataType.SHOWS;
+
+      handleMedia = (await this.plexApi.getAllIdsForContextAction(
+        undefined,
+        { type: data.context.type, id: data.context.id },
+        { plexId: data.mediaId },
+      )) as unknown as AddCollectionMedia[];
+    }
+
     try {
-      await this.exclusionRepo.delete({ plexId: plexId });
+      for (const media of handleMedia) {
+        await this.exclusionRepo.delete({
+          plexId: media.plexId,
+          ...(data.ruleGroupId !== undefined
+            ? { ruleGroupId: data.ruleGroupId }
+            : {}),
+        });
+      }
+      return this.createReturnStatus(true, 'Success');
+    } catch (e) {
+      this.logger.warn(
+        `Removing exclusion for media with ID ${data.mediaId} failed with error : ${e}`,
+      );
+      return this.createReturnStatus(false, 'Failed');
+    }
+  }
+
+  async removeAllExclusion(plexId: number) {
+    // get type from metadata
+    let handleMedia: AddCollectionMedia[] = [];
+
+    const metaData = await this.plexApi.getMetadata(plexId.toString());
+    const type =
+      metaData.type === 'movie' ? EPlexDataType.MOVIES : EPlexDataType.SHOWS;
+
+    handleMedia = (await this.plexApi.getAllIdsForContextAction(
+      undefined,
+      { type: type, id: plexId },
+      { plexId: plexId },
+    )) as unknown as AddCollectionMedia[];
+
+    try {
+      for (const media of handleMedia) {
+        await this.exclusionRepo.delete({ plexId: media.plexId });
+      }
       return this.createReturnStatus(true, 'Success');
     } catch (e) {
       this.logger.warn(
@@ -305,11 +406,20 @@ export class RulesService {
   ): Promise<Exclusion[]> {
     try {
       if (rulegroupId || plexId) {
-        const exclusions = await this.exclusionRepo.find(
-          rulegroupId
-            ? { where: { ruleGroupId: rulegroupId } }
-            : { where: { plexId: plexId } },
-        );
+        let exclusions: Exclusion[] = [];
+        if (rulegroupId) {
+          exclusions = await this.exclusionRepo.find({
+            where: { ruleGroupId: rulegroupId },
+          });
+        } else {
+          exclusions = await this.exclusionRepo
+            .createQueryBuilder('exclusion')
+            .where('exclusion.plexId = :plexId OR exclusion.parent = :plexId', {
+              plexId,
+            })
+            .getMany();
+        }
+
         return rulegroupId
           ? exclusions.concat(
               await this.exclusionRepo.find({
@@ -324,6 +434,15 @@ export class RulesService {
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       return undefined;
+    }
+  }
+
+  async getAllExclusions(): Promise<Exclusion[]> {
+    try {
+      return await this.exclusionRepo.find();
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      return [];
     }
   }
 
