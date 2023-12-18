@@ -377,7 +377,9 @@ export class SonarrApi extends ServarrApi<{
 
   public async info(): Promise<SonarrInfo> {
     try {
-      const info: SonarrInfo = (await this.axios.get(`system/status`)).data;
+      const info: SonarrInfo = (await this.axios.get(`system/status`, {
+        signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
+      })).data;
       return info ? info : null;
     } catch (e) {
       this.logger.warn("Couldn't fetch Sonarr info.. Is Sonarr up?");

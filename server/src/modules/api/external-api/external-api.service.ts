@@ -25,7 +25,6 @@ export class ExternalApiService {
       baseURL: baseUrl,
       params,
       timeout: 5000, // timeout after 5s
-      signal: AbortSignal.timeout(30000), // aborts request after 30 seconds
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',

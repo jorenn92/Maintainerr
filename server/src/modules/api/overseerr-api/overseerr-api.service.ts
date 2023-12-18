@@ -124,7 +124,7 @@ export class OverseerrApiService {
   constructor(
     @Inject(forwardRef(() => SettingsService))
     private readonly settings: SettingsService,
-  ) {}
+  ) { }
 
   public async init() {
     this.api = new OverseerrApi({
@@ -273,7 +273,9 @@ export class OverseerrApiService {
   public async status(): Promise<OverseerrStatus> {
     try {
       const response: OverseerrStatus =
-        await this.api.getWithoutCache(`/status`);
+        await this.api.getWithoutCache(`/status`, {
+          signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
+        });
       return response;
     } catch (e) {
       this.logger.log("Couldn't fetch Overseerr status!", {

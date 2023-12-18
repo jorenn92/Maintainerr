@@ -184,7 +184,9 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
   public async info(): Promise<RadarrInfo> {
     try {
-      const info: RadarrInfo = (await this.axios.get(`system/status`)).data;
+      const info: RadarrInfo = (await this.axios.get(`system/status`, {
+        signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
+      })).data;
       return info ? info : null;
     } catch (e) {
       this.logger.warn("Couldn't fetch Radarr info.. Is Radarr up?");
