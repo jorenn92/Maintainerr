@@ -36,8 +36,7 @@ export class SonarrApi extends ServarrApi<{
   ): Promise<SonarrEpisode[]> {
     try {
       const response = await this.get<SonarrEpisode[]>(
-        `/episode?seriesId=${seriesID}${
-          seasonNumber ? `&seasonNumber=${seasonNumber}` : ''
+        `/episode?seriesId=${seriesID}${seasonNumber ? `&seasonNumber=${seasonNumber}` : ''
         }${episodeIds ? `&episodeIds=${episodeIds}` : ''}`,
       );
 
@@ -265,8 +264,7 @@ export class SonarrApi extends ServarrApi<{
     deleteFiles = true,
   ) {
     this.logger.log(
-      `${!deleteFiles ? 'Unmonitoring' : 'Deleting'} ${
-        episodeIds.length
+      `${!deleteFiles ? 'Unmonitoring' : 'Deleting'} ${episodeIds.length
       } episode(s) from show with ID ${seriesId} from Sonarr.`,
     );
     try {
@@ -347,8 +345,7 @@ export class SonarrApi extends ServarrApi<{
       });
     }
     this.logger.log(
-      `Unmonitored season(s) ${
-        typeof type === 'number' ? type : ''
+      `Unmonitored season(s) ${typeof type === 'number' ? type : ''
       } from Sonarr show with ID ${seriesId}`,
     );
   }
@@ -380,7 +377,9 @@ export class SonarrApi extends ServarrApi<{
 
   public async info(): Promise<SonarrInfo> {
     try {
-      const info: SonarrInfo = (await this.axios.get(`system/status`)).data;
+      const info: SonarrInfo = (await this.axios.get(`system/status`, {
+        signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
+      })).data;
       return info ? info : null;
     } catch (e) {
       this.logger.warn("Couldn't fetch Sonarr info.. Is Sonarr up?");
