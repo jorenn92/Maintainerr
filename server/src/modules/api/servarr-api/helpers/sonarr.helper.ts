@@ -377,12 +377,10 @@ export class SonarrApi extends ServarrApi<{
 
   public async info(): Promise<SonarrInfo> {
     try {
-      this.logger.log('requesting: ' + this.axios.getUri())
       const info: SonarrInfo = (await this.axios.get(`system/status`)).data;
       return info ? info : null;
     } catch (e) {
       this.logger.warn("Couldn't fetch Sonarr info.. Is Sonarr up?");
-      this.logger.error(e);
       return null;
     }
   }
