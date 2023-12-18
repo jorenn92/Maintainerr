@@ -188,6 +188,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       return info ? info : null;
     } catch (e) {
       this.logger.warn("Couldn't fetch Radarr info.. Is Radarr up?");
+      this.logger.error(e);
       return null;
     }
   }
