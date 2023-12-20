@@ -128,12 +128,12 @@ export class PlexApiService {
       );
       const results = response.MediaContainer.Metadata
         ? Promise.all(
-            response.MediaContainer.Metadata.map(async (el: PlexMetadata) => {
-              return el.grandparentRatingKey
-                ? await this.getMetadata(el.grandparentRatingKey.toString())
-                : el;
-            }),
-          )
+          response.MediaContainer.Metadata.map(async (el: PlexMetadata) => {
+            return el.grandparentRatingKey
+              ? await this.getMetadata(el.grandparentRatingKey.toString())
+              : el;
+          }),
+        )
         : [];
       const fileteredResults: PlexMetadata[] = [];
       (await results).forEach((el: PlexMetadata) => {
@@ -155,7 +155,13 @@ export class PlexApiService {
   public async getUsers(): Promise<PlexUserAccount[]> {
     try {
       const response: PlexAccountsResponse =
-        await this.plexClient.query('/accounts');
+        await this.plexClient.query({
+          uri: '/accounts',
+          extraHeaders: {
+            'X-Plex-Container-Start': `0`,
+            'X-Plex-Container-Size': `1000`,
+          },
+        });
       return response.MediaContainer.Account;
     } catch (err) {
       this.logger.warn(
@@ -168,7 +174,13 @@ export class PlexApiService {
   public async getLibraries(): Promise<PlexLibrary[]> {
     try {
       const response =
-        await this.plexClient.query<PlexLibrariesResponse>('/library/sections');
+        await this.plexClient.query<PlexLibrariesResponse>({
+          uri: '/library/sections',
+          extraHeaders: {
+            'X-Plex-Container-Start': `0`,
+            'X-Plex-Container-Size': `1000`,
+          },
+        });
 
       return response.MediaContainer.Directory;
     } catch (err) {
@@ -212,10 +224,9 @@ export class PlexApiService {
   ): Promise<PlexMetadata> {
     try {
       const response = await this.plexClient.query<PlexMetadataResponse>(
-        `/library/metadata/${key}${
-          options.includeChildren
-            ? '?includeChildren=1&includeExternalMedia=1&asyncAugmentMetadata=1&asyncCheckFiles=1&asyncRefreshAnalysis=1'
-            : ''
+        `/library/metadata/${key}${options.includeChildren
+          ? '?includeChildren=1&includeExternalMedia=1&asyncAugmentMetadata=1&asyncCheckFiles=1&asyncRefreshAnalysis=1'
+          : ''
         }`,
       );
       if (response) {
@@ -256,9 +267,13 @@ export class PlexApiService {
 
   public async getChildrenMetadata(key: string): Promise<PlexMetadata[]> {
     try {
-      const response = await this.plexClient.query<PlexMetadataResponse>(
-        `/library/metadata/${key}/children`,
-      );
+      const response = await this.plexClient.query<PlexMetadataResponse>({
+        uri: `/library/metadata/${key}/children`,
+        extraHeaders: {
+          'X-Plex-Container-Start': `0`,
+          'X-Plex-Container-Size': `1000`,
+        },
+      });
 
       return response.MediaContainer.Metadata;
     } catch (err) {
@@ -280,6 +295,10 @@ export class PlexApiService {
         uri: `/library/sections/${id}/all?sort=addedAt%3Adesc&addedAt>>=${Math.floor(
           options.addedAt / 1000,
         )}`,
+        extraHeaders: {
+          'X-Plex-Container-Start': `0`,
+          'X-Plex-Container-Size': `500`,
+        },
       });
       return response.MediaContainer.Metadata as PlexLibraryItem[];
     } catch (err) {
@@ -295,6 +314,10 @@ export class PlexApiService {
       const response: PlexLibraryResponse =
         await this.plexClient.query<PlexLibraryResponse>({
           uri: `/status/sessions/history/all?sort=viewedAt:desc&metadataItemID=${itemId}`,
+          extraHeaders: {
+            'X-Plex-Container-Start': `0`,
+            'X-Plex-Container-Size': `1000`,
+          },
         });
       return response.MediaContainer.Metadata as PlexSeenBy[];
     } catch (err) {
@@ -309,6 +332,10 @@ export class PlexApiService {
     try {
       const response = await this.plexClient.query<PlexLibraryResponse>({
         uri: `/library/sections/${libraryId}/collections?`,
+        extraHeaders: {
+          'X-Plex-Container-Start': `0`,
+          'X-Plex-Container-Size': `1000`,
+        },
       });
       const collection: PlexCollection[] = response.MediaContainer
         .Metadata as PlexCollection[];
@@ -333,6 +360,10 @@ export class PlexApiService {
 
       const response = await this.plexClient.query<PlexLibraryResponse>({
         uri: `/playlists?playlistType=video&includeCollections=1&includeExternalMedia=1&includeAdvanced=1&includeMeta=1`,
+        extraHeaders: {
+          'X-Plex-Container-Start': `0`,
+          'X-Plex-Container-Size': `1000`,
+        },
       });
 
       const items = response.MediaContainer.Metadata
@@ -399,11 +430,9 @@ export class PlexApiService {
   public async createCollection(params: CreateUpdateCollection) {
     try {
       const response = await this.plexClient.postQuery<PlexLibraryResponse>({
-        uri: `/library/collections?type=${
-          params.type
-        }&title=${encodeURIComponent(params.title)}&sectionId=${
-          params.libraryId
-        }`,
+        uri: `/library/collections?type=${params.type
+          }&title=${encodeURIComponent(params.title)}&sectionId=${params.libraryId
+          }`,
       });
       const collection: PlexCollection = response.MediaContainer
         .Metadata[0] as PlexCollection;
@@ -423,11 +452,10 @@ export class PlexApiService {
   public async updateCollection(body: CreateUpdateCollection) {
     try {
       await this.plexClient.putQuery<PlexLibraryResponse>({
-        uri: `/library/sections/${body.libraryId}/all?type=18&id=${
-          body.collectionId
-        }&title.value=${encodeURIComponent(
-          body.title,
-        )}&summary.value=${encodeURIComponent(body.summary)}`,
+        uri: `/library/sections/${body.libraryId}/all?type=18&id=${body.collectionId
+          }&title.value=${encodeURIComponent(
+            body.title,
+          )}&summary.value=${encodeURIComponent(body.summary)}`,
         // &titleSort.value=&summary.value=&contentRating.value=&title.locked=1&titleSort.locked=1&contentRating.locked=1`,
       });
       return await this.getCollection(+body.collectionId);
@@ -468,6 +496,10 @@ export class PlexApiService {
       const response: PlexLibraryResponse =
         await this.plexClient.query<PlexLibraryResponse>({
           uri: `/library/collections/${collectionId}/children`,
+          extraHeaders: {
+            'X-Plex-Container-Start': `0`,
+            'X-Plex-Container-Size': `1000`,
+          },
         });
       return response.MediaContainer.Metadata as PlexLibraryItem[];
     } catch (err) {
@@ -525,9 +557,8 @@ export class PlexApiService {
   ): Promise<PlexHub> {
     try {
       const response: PlexHubResponse = await this.plexClient.postQuery({
-        uri: `/hubs/sections/${params.libraryId}/manage?metadataItemId=${
-          params.collectionId
-        }&promotedToRecommended=${+params.recommended}&promotedToOwnHome=${+params.ownHome}&promotedToSharedHome=${+params.sharedHome}`,
+        uri: `/hubs/sections/${params.libraryId}/manage?metadataItemId=${params.collectionId
+          }&promotedToRecommended=${+params.recommended}&promotedToOwnHome=${+params.ownHome}&promotedToSharedHome=${+params.sharedHome}`,
       });
       return response.MediaContainer.Hub[0] as PlexHub;
     } catch (err) {
