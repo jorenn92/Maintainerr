@@ -89,13 +89,14 @@ export class SonarrApi extends ServarrApi<{
     try {
       let response = await this.get<SonarrSeries[]>(`/series?tvdbId=${id}`);
 
-      if (!response[0]) {
+      if (!response || !response[0]) {
         response = await this.get<SonarrSeries[]>(
           `/series/lookup?term=tvdb:${id}`,
         );
 
-        if (!response[0]) {
+        if (!response || !response[0]) {
           this.logger.warn(`Could not retrieve show by tvdb ID ${id}`);
+          return undefined;
         }
       }
       return response[0];
