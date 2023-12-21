@@ -36,8 +36,7 @@ export class SonarrApi extends ServarrApi<{
   ): Promise<SonarrEpisode[]> {
     try {
       const response = await this.get<SonarrEpisode[]>(
-        `/episode?seriesId=${seriesID}${
-          seasonNumber ? `&seasonNumber=${seasonNumber}` : ''
+        `/episode?seriesId=${seriesID}${seasonNumber ? `&seasonNumber=${seasonNumber}` : ''
         }${episodeIds ? `&episodeIds=${episodeIds}` : ''}`,
       );
 
@@ -90,13 +89,14 @@ export class SonarrApi extends ServarrApi<{
     try {
       let response = await this.get<SonarrSeries[]>(`/series?tvdbId=${id}`);
 
-      if (!response[0]) {
+      if (!response || !response[0]) {
         response = await this.get<SonarrSeries[]>(
           `/series/lookup?term=tvdb:${id}`,
         );
 
-        if (!response[0]) {
+        if (!response || !response[0]) {
           this.logger.warn(`Could not retrieve show by tvdb ID ${id}`);
+          return undefined;
         }
       }
       return response[0];
@@ -265,8 +265,7 @@ export class SonarrApi extends ServarrApi<{
     deleteFiles = true,
   ) {
     this.logger.log(
-      `${!deleteFiles ? 'Unmonitoring' : 'Deleting'} ${
-        episodeIds.length
+      `${!deleteFiles ? 'Unmonitoring' : 'Deleting'} ${episodeIds.length
       } episode(s) from show with ID ${seriesId} from Sonarr.`,
     );
     try {
@@ -347,8 +346,7 @@ export class SonarrApi extends ServarrApi<{
       });
     }
     this.logger.log(
-      `Unmonitored season(s) ${
-        typeof type === 'number' ? type : ''
+      `Unmonitored season(s) ${typeof type === 'number' ? type : ''
       } from Sonarr show with ID ${seriesId}`,
     );
   }
