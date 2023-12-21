@@ -38,17 +38,7 @@ export class PlexGetterService {
           return libItem.addedAt ? new Date(+libItem.addedAt * 1000) : null;
         }
         case 'seenBy': {
-          const plexTvUsers = await this.plexApi.getUserDataFromPlexTv();
-
-          const plexUsers = (await this.plexApi.getUsers()).map((el) => {
-            const plextv = plexTvUsers.find(tvEl => tvEl.$?.id == el.id)
-
-            // use the username from plex.tv if available, since Overseerr also does this
-            if (plextv && plextv.$) {
-              return { plexId: el.id, username: plextv.$.username } as PlexUser;
-            }
-            return { plexId: el.id, username: el.name } as PlexUser;
-          });
+          const plexUsers = await this.getCorrectedUsers();
 
           const viewers: PlexSeenBy[] = await this.plexApi
             .getWatchHistory(libItem.ratingKey)
@@ -215,9 +205,8 @@ export class PlexGetterService {
           return item.Genre ? item.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {
-          const plexUsers = (await this.plexApi.getUsers()).map((el) => {
-            return { plexId: el.id, username: el.name } as PlexUser;
-          });
+          const plexUsers = await this.getCorrectedUsers();
+
           const seasons =
             libItem.type !== 'season'
               ? await this.plexApi.getChildrenMetadata(libItem.ratingKey)
@@ -259,9 +248,7 @@ export class PlexGetterService {
           return [];
         }
         case 'sw_watchers': {
-          const plexUsers = (await this.plexApi.getUsers()).map((el) => {
-            return { plexId: el.id, username: el.name } as PlexUser;
-          });
+          const plexUsers = await this.getCorrectedUsers();
 
           const watchHistory = await this.plexApi.getWatchHistory(
             libItem.ratingKey,
@@ -374,5 +361,20 @@ export class PlexGetterService {
       this.logger.warn(`Plex-Getter - Action failed : ${e.message}`);
       return undefined;
     }
+  }
+
+  private async getCorrectedUsers(): Promise<PlexUser[]> {
+    const plexTvUsers = await this.plexApi.getUserDataFromPlexTv();
+
+    return (await this.plexApi.getUsers()).map((el) => {
+      const plextv = plexTvUsers.find(tvEl => tvEl.$?.id == el.id)
+
+      // use the username from plex.tv if available, since Overseerr also does this
+      if (plextv && plextv.$ && plextv.$.username) {
+        return { plexId: el.id, username: plextv.$.username } as PlexUser;
+      }
+      return { plexId: el.id, username: el.name } as PlexUser;
+    });
+
   }
 }
