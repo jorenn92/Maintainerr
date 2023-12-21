@@ -29,10 +29,12 @@ import {
 import { EPlexDataType } from './enums/plex-data-type-enum';
 import axios from 'axios';
 import PlexApi from '../lib/plexApi';
+import PlexTvApi from '../lib/plextvApi';
 
 @Injectable()
 export class PlexApiService {
   private plexClient: PlexApi;
+  private plexTvClient: PlexTvApi;
   private machineId: string;
   private readonly logger = new Logger(PlexApiService.name);
   constructor(
@@ -93,6 +95,9 @@ export class PlexApiService {
             platform: 'Maintainerr', // this.settings.applicationTitle
           },
         });
+
+        this.plexTvClient = new PlexTvApi(plexToken);
+
         this.setMachineId();
       } else {
         this.logger.log(
@@ -157,6 +162,25 @@ export class PlexApiService {
       const response: PlexAccountsResponse =
         await this.plexClient.query({
           uri: '/accounts',
+          extraHeaders: {
+            'X-Plex-Container-Start': `0`,
+            'X-Plex-Container-Size': `1000`,
+          },
+        });
+      return response.MediaContainer.Account;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      return undefined;
+    }
+  }
+
+  public async getUser(id: number): Promise<PlexUserAccount[]> {
+    try {
+      const response: PlexAccountsResponse =
+        await this.plexClient.query({
+          uri: `/accounts/${id}`,
           extraHeaders: {
             'X-Plex-Container-Start': `0`,
             'X-Plex-Container-Size': `1000`,
@@ -260,6 +284,19 @@ export class PlexApiService {
     } catch (err) {
       this.logger.warn(
         "Outbound call to discover.provider.plex.tv failed. Couldn't fetch userState",
+      );
+      return undefined;
+    }
+  }
+
+  public async getUserDataFromPlexTv(
+  ): Promise<any> {
+    try {
+      const response = await this.plexTvClient.getUsers();
+      return response.MediaContainer.User;
+    } catch (err) {
+      this.logger.warn(
+        "Outbound call to plex.tv failed. Couldn't fetch users",
       );
       return undefined;
     }
@@ -663,12 +700,12 @@ export class PlexApiService {
           // transform & add eps
           data
             ? handleMedia.push(
-                ...data.map((el) => {
-                  return {
-                    plexId: +el.ratingKey,
-                  };
-                }),
-              )
+              ...data.map((el) => {
+                return {
+                  plexId: +el.ratingKey,
+                };
+              }),
+            )
             : undefined;
           break;
         case EPlexDataType.EPISODES:
@@ -701,12 +738,12 @@ export class PlexApiService {
             // transform & add eps
             eps
               ? handleMedia.push(
-                  ...eps.map((el) => {
-                    return {
-                      plexId: +el.ratingKey,
-                    };
-                  }),
-                )
+                ...eps.map((el) => {
+                  return {
+                    plexId: +el.ratingKey,
+                  };
+                }),
+              )
               : undefined;
           }
           break;

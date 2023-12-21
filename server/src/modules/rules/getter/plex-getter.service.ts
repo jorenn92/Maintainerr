@@ -38,9 +38,18 @@ export class PlexGetterService {
           return libItem.addedAt ? new Date(+libItem.addedAt * 1000) : null;
         }
         case 'seenBy': {
+          const plexTvUsers = await this.plexApi.getUserDataFromPlexTv();
+
           const plexUsers = (await this.plexApi.getUsers()).map((el) => {
+            const plextv = plexTvUsers.find(tvEl => tvEl.$?.id == el.id)
+
+            // use the username from plex.tv if available, since Overseerr also does this
+            if (plextv && plextv.$) {
+              return { plexId: el.id, username: plextv.$.username } as PlexUser;
+            }
             return { plexId: el.id, username: el.name } as PlexUser;
           });
+
           const viewers: PlexSeenBy[] = await this.plexApi
             .getWatchHistory(libItem.ratingKey)
             .catch((_err) => {
@@ -74,17 +83,17 @@ export class PlexGetterService {
           // fetch metadata because collections in plexLibrary object are wrong
           return libItem.Collection
             ? (
-                await this.plexApi.getMetadata(libItem.ratingKey)
-              ).Collection.filter(
-                (el) =>
-                  el.tag.toLowerCase().trim() !==
-                  (ruleGroup.manualCollectionName
-                    ? ruleGroup.manualCollectionName
-                    : ruleGroup.name
-                  )
-                    .toLowerCase()
-                    .trim(),
-              ).length
+              await this.plexApi.getMetadata(libItem.ratingKey)
+            ).Collection.filter(
+              (el) =>
+                el.tag.toLowerCase().trim() !==
+                (ruleGroup.manualCollectionName
+                  ? ruleGroup.manualCollectionName
+                  : ruleGroup.name
+                )
+                  .toLowerCase()
+                  .trim(),
+            ).length
             : null;
         }
         case 'playlists': {
@@ -196,13 +205,13 @@ export class PlexGetterService {
           const item =
             libItem.type === 'episode'
               ? ((await this.plexApi.getMetadata(
-                  libItem.grandparentRatingKey,
-                )) as unknown as PlexLibraryItem)
+                libItem.grandparentRatingKey,
+              )) as unknown as PlexLibraryItem)
               : libItem.type === 'season'
-              ? ((await this.plexApi.getMetadata(
+                ? ((await this.plexApi.getMetadata(
                   libItem.parentRatingKey,
                 )) as unknown as PlexLibraryItem)
-              : libItem;
+                : libItem;
           return item.Genre ? item.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {
