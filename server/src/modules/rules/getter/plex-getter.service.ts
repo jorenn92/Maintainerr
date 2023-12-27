@@ -367,7 +367,7 @@ export class PlexGetterService {
     const plexTvUsers = await this.plexApi.getUserDataFromPlexTv();
 
     return (await this.plexApi.getUsers()).map((el) => {
-      const plextv = plexTvUsers.find(tvEl => tvEl.$?.id == el.id)
+      const plextv = plexTvUsers?.find(tvEl => tvEl.$?.id == el.id)
 
       // use the username from plex.tv if available, since Overseerr also does this
       if (plextv && plextv.$ && plextv.$.username) {
