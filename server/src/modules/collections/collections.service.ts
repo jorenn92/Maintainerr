@@ -498,7 +498,11 @@ export class CollectionsService {
           }
         }
 
-        if (collectionMedia.length <= 0 && !collection.manualCollection) {
+        if (
+          collectionMedia.length <= 0 &&
+          !collection.manualCollection &&
+          collection.plexId
+        ) {
           const resp = await this.plexApi.deleteCollection(
             collection.plexId.toString(),
           );
