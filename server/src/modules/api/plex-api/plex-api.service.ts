@@ -584,7 +584,7 @@ export class PlexApiService {
       return {
         status: 'NOK',
         code: 0,
-        message: e,
+        message: e.message,
       } as BasicResponseDto;
     }
   }
