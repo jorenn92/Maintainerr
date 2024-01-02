@@ -701,7 +701,10 @@ export class CollectionsService {
           collectionIds.plexId.toString(),
           childPlexId.toString(),
         );
-      if (responseColl.status === 'OK') {
+      if (
+        responseColl.status === 'OK' ||
+        responseColl.message.includes('404') // if media is not in collection
+      ) {
         await this.connection
           .createQueryBuilder()
           .delete()
