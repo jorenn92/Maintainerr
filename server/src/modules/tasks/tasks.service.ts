@@ -33,9 +33,11 @@ export class TasksService implements TaskScheduler {
         `Task ${name} created successfully`,
       );
     } catch (e) {
-      this.logger.error(
+      this.logger.warn(
         `An error occurred while creating the ${name} task. This is normal on first boot.`,
       );
+      this.logger.debug(e);
+
       return this.status.createStatus(
         false,
         `An error occurred while creating the ${name} task`,
@@ -63,9 +65,8 @@ export class TasksService implements TaskScheduler {
         `Task ${name} started successfully`,
       );
     } catch (e) {
-      this.logger.error(
-        `An error occurred while starting the ${name} task: ${e}`,
-      );
+      this.logger.error(`An error occurred while starting the ${name} task.`);
+      this.logger.debug(e);
       return this.status.createStatus(
         false,
         `An error occurred while starting the ${name} task`,
@@ -82,9 +83,8 @@ export class TasksService implements TaskScheduler {
         `Task ${name} removed successfully`,
       );
     } catch (e) {
-      this.logger.error(
-        `An error occurred while removing the ${name} task: ${e}`,
-      );
+      this.logger.error(`An error occurred while removing the ${name} task.`);
+      this.logger.debug(e);
       return this.status.createStatus(
         false,
         `An error occurred while removing the ${name} task`,

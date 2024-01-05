@@ -20,7 +20,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
       return response;
     } catch (e) {
-      this.logger.error(`Failed to retrieve movies`);
+      this.logger.warn(`Failed to retrieve movies`);
       this.logger.debug(`Failed to retrieve movies: ${e.message}`);
     }
   };
@@ -30,7 +30,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       const response = await this.get<RadarrMovie>(`/movie/${id}`);
       return response;
     } catch (e) {
-      this.logger.error(`[Radarr] Failed to retrieve movie with id ${id}`);
+      this.logger.warn(`[Radarr] Failed to retrieve movie with id ${id}`);
       this.logger.debug(`[Radarr] Failed to retrieve movie: ${e.message}`);
     }
   };
@@ -49,7 +49,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
       return response[0];
     } catch (e) {
-      this.logger.error(`Error retrieving movie by TMDb ID ${id}`);
+      this.logger.warn(`Error retrieving movie by TMDb ID ${id}`);
       this.logger.debug(e);
     }
   }
@@ -97,7 +97,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
           return response.data;
         } else {
-          this.logger.error('Failed to update existing movie in Radarr.');
+          this.logger.warn('Failed to update existing movie in Radarr.');
         }
       }
 
@@ -127,13 +127,14 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       if (response.data.id) {
         this.logger.log('Radarr accepted request');
       } else {
-        this.logger.error('Failed to add movie to Radarr');
+        this.logger.warn('Failed to add movie to Radarr');
       }
       return response.data;
     } catch (e) {
-      this.logger.error(
+      this.logger.warn(
         'Failed to add movie to Radarr. This might happen if the movie already exists, in which case you can safely ignore this error.',
       );
+      this.logger.debug(e);
     }
   };
 
@@ -143,9 +144,10 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
     try {
       await this.runCommand('MoviesSearch', { movieIds: [movieId] });
     } catch (e) {
-      this.logger.error(
+      this.logger.warn(
         'Something went wrong while executing Radarr movie search.',
       );
+      this.logger.debug(e);
     }
   }
 
@@ -160,6 +162,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       );
     } catch (e) {
       this.logger.log("Couldn't delete movie. Does it exist in radarr?");
+      this.logger.debug(e);
     }
   }
 
@@ -179,17 +182,21 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       }
     } catch (e) {
       this.logger.warn("Couldn't unmonitor movie. Does it exist in radarr?");
+      this.logger.debug(e);
     }
   }
 
   public async info(): Promise<RadarrInfo> {
     try {
-      const info: RadarrInfo = (await this.axios.get(`system/status`, {
-        signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
-      })).data;
+      const info: RadarrInfo = (
+        await this.axios.get(`system/status`, {
+          signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
+        })
+      ).data;
       return info ? info : null;
     } catch (e) {
       this.logger.warn("Couldn't fetch Radarr info.. Is Radarr up?");
+      this.logger.debug(e);
       return null;
     }
   }
