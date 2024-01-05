@@ -317,6 +317,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -332,6 +333,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -349,6 +351,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -389,6 +392,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -407,6 +411,7 @@ export class PlexApiService {
         errorMessage: e.message,
         plexId,
       });
+      this.logger.debug(e);
     }
   }
 
@@ -423,6 +428,7 @@ export class PlexApiService {
       return collection;
     } catch (err) {
       this.logger.warn(`Couldn't find collection with id ${+collectionId}`);
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -447,6 +453,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -466,6 +473,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -478,6 +486,7 @@ export class PlexApiService {
         uri: `/library/collections/${collectionId}`,
       });
     } catch (err) {
+      this.logger.debug(err);
       return {
         status: 'NOK',
         code: 0,
@@ -505,6 +514,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -521,6 +531,7 @@ export class PlexApiService {
       });
       return response.MediaContainer.Metadata[0] as PlexCollection;
     } catch (e) {
+      this.logger.debug(e);
       return {
         status: 'NOK',
         code: 0,
@@ -543,6 +554,7 @@ export class PlexApiService {
         message: `successfully deleted child with id ${childId}`,
       } as BasicResponseDto;
     } catch (e) {
+      this.logger.debug(e);
       return {
         status: 'NOK',
         code: 0,
@@ -565,6 +577,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -733,6 +746,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }

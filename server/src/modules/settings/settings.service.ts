@@ -240,7 +240,9 @@ export class SettingsService implements SettingDto {
       return resp !== null && resp.version !== undefined
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
-    } catch {
+    } catch (e) {
+      this.logger.debug(e);
+
       return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
@@ -251,7 +253,8 @@ export class SettingsService implements SettingDto {
       return resp !== null && resp.version !== undefined
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
-    } catch {
+    } catch (e) {
+      this.logger.debug(e);
       return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
@@ -280,7 +283,8 @@ export class SettingsService implements SettingDto {
       } else {
         return false;
       }
-    } catch {
+    } catch (e) {
+      this.logger.debug(e);
       return false;
     }
   }
@@ -309,7 +313,8 @@ export class SettingsService implements SettingDto {
         return true;
       }
       return false;
-    } catch {
+    } catch (e) {
+      this.logger.debug(e);
       return false;
     }
   }
