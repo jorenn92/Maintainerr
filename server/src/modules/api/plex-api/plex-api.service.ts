@@ -104,10 +104,11 @@ export class PlexApiService {
           "Plex API isn't fully initialized, required settings aren't set",
         );
       }
-    } catch (_err) {
+    } catch (err) {
       this.logger.error(
         `Couldn't connect to Plex.. Please check your settings`,
       );
+      this.logger.debug(err);
     }
   }
 
@@ -122,6 +123,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -153,6 +155,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -167,6 +170,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -181,6 +185,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -196,6 +201,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -223,6 +229,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -248,6 +255,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -271,6 +279,7 @@ export class PlexApiService {
       this.logger.warn(
         "Outbound call to discover.provider.plex.tv failed. Couldn't fetch userState",
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -281,6 +290,7 @@ export class PlexApiService {
       return response.MediaContainer.User;
     } catch (err) {
       this.logger.warn("Outbound call to plex.tv failed. Couldn't fetch users");
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -296,6 +306,7 @@ export class PlexApiService {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
