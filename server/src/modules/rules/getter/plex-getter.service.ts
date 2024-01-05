@@ -90,7 +90,7 @@ export class PlexGetterService {
                     .toLowerCase()
                     .trim(),
               ).length
-            : null;
+            : 0;
         }
         case 'playlists': {
           if (libItem.type !== 'episode' && libItem.type !== 'movie') {
