@@ -59,8 +59,14 @@ export class PlexGetterService {
             ? new Date(libItem.originallyAvailableAt)
             : null;
         }
-        case 'rating': {
+        case 'rating_critics': {
+          return libItem.rating ? +libItem.rating : 0;
+        }
+        case 'rating_audience': {
           return libItem.audienceRating ? +libItem.audienceRating : 0;
+        }
+        case 'rating_user': {
+          return libItem.userRating ? +libItem.userRating : 0;
         }
         case 'people': {
           return libItem.Role ? libItem.Role.map((el) => el.tag) : null;
