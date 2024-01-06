@@ -390,10 +390,10 @@ export class PlexApiService {
         });
 
         const filteredForRatingKey = (
-          itemResp.MediaContainer.Metadata as PlexLibraryItem[]
-        ).filter((i) => i.ratingKey === libraryId);
+          itemResp?.MediaContainer?.Metadata as PlexLibraryItem[]
+        )?.filter((i) => i.ratingKey === libraryId);
 
-        if (filteredForRatingKey.length > 0) {
+        if (filteredForRatingKey && filteredForRatingKey.length > 0) {
           filteredItems.push(item);
         }
       }
