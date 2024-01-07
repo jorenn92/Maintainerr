@@ -78,7 +78,18 @@ export class PlexGetterService {
           return count ? count.length : 0;
         }
         case 'labels': {
-          return metadata.Label ? metadata.Label.map(l => l.tag) : []
+          const item =
+            libItem.type === 'episode'
+              ? ((await this.plexApi.getMetadata(
+                libItem.grandparentRatingKey,
+              )) as unknown as PlexLibraryItem)
+              : libItem.type === 'season'
+                ? ((await this.plexApi.getMetadata(
+                  libItem.parentRatingKey,
+                )) as unknown as PlexLibraryItem)
+                : metadata;
+
+          return item.Label ? item.Label.map(l => l.tag) : []
         }
         case 'collections': {
           // fetch metadata because collections in plexLibrary object are wrong
