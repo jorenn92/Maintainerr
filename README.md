@@ -76,7 +76,7 @@ services:
   maintainerr:
     image: jorenn92/maintainerr:latest
     container_name: maintainerr
-    user: 1000:1000
+#    user: 1000:1000 # only use this with release 2.0 and up
     volumes:
       - <persistent-local-volume>:/opt/data
     environment:

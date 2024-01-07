@@ -37,7 +37,8 @@ You may alternatively use a third-party updating mechanism, such as Watchtower o
 
 Define the Maintainerr service in your docker-compose.yml as follows.
 
-> You have the option to define a User and Group ID for running the container. Maintainerr will operate using this specified UID:GID, and any files it generates within your data volume will also be associated with this designated user and group. If not explicitly specified, the default UID:GID is set to 1000:1000, representing the 'node' user inside the container.
+> Starting from release 2.0, you have the option to define a User and Group ID for running the container. Maintainerr will operate using this specified UID:GID, and any files it generates within your data volume will also be associated with this designated user and group. If not explicitly specified, the default UID:GID is set to 1000:1000, representing the 'node' user inside the container. Don't use this with 1.x releases, the container will fail to start.
+
 
 ```Yaml
 version: '3'
@@ -46,7 +47,7 @@ services:
   maintainerr:
     image: jorenn92/maintainerr:latest
     container_name: maintainerr
-    user: 1000:1000
+#    user: 1000:1000 # only use this with release 2.0 and up
     volumes:
       - ./data:/opt/data
     environment:
