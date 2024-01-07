@@ -10,7 +10,7 @@ COPY server/ /opt/server/
 COPY ui/ /opt/ui/
 COPY docs/ /opt/docs/
 COPY package.json /opt/package.json
-COPY yarn.lock /opt/yarn.lock 
+COPY yarn.lock /opt/yarn.lock
 COPY datasource-config.ts /opt/datasource-config.ts
 COPY ormconfig.json /opt/ormconfig.json
 COPY jsdoc.json /opt/jsdoc.json
@@ -60,9 +60,11 @@ COPY --from=BUILDER /opt ./
 COPY supervisord.conf /etc/supervisord.conf
 
 RUN apk add supervisor && \
-    rm -rf /tmp/* && \
-    mkdir /opt/data
+	  rm -rf /tmp/* && \
+    mkdir /opt/data && \
+    chown -R node:node /opt
+
+USER node
 
 VOLUME [ "/opt/data" ]
-
 ENTRYPOINT ["/opt/start.sh"]

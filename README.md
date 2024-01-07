@@ -50,7 +50,7 @@ Currently, <b>Maintainerr</b> supports rule parameters from these apps :
 
 # Installation
 
-Docker images for amd64, arm64 & armv7 are available under jorenn92/maintainerr. <br />
+Docker images for amd64 & arm64 are available under jorenn92/maintainerr. <br />
 Data is saved within the container under /opt/data, it is recommended to tie a persistent volume to this location in your docker command/compose file.
 
 For more information, visit the [installation guide](docs/2-getting-started/1-installation/Installation.md) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your <b>Maintainerr</b> container.
@@ -76,6 +76,7 @@ services:
   maintainerr:
     image: jorenn92/maintainerr:latest
     container_name: maintainerr
+    user: 1000:1000
     volumes:
       - <persistent-local-volume>:/opt/data
     environment:

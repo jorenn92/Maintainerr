@@ -1,6 +1,6 @@
 The easiest way to start Maintainerr is with Docker.
 
-images for amd64, arm64 & armv7 are available under jorenn92/maintainerr.
+images for amd64 & arm64 are available under jorenn92/maintainerr.
 Data is saved under /opt/data, a volume should be created to persist the configuration.
 
 # Run
@@ -35,7 +35,9 @@ You may alternatively use a third-party updating mechanism, such as Watchtower o
 
 # Compose
 
-Define the Maintainerr service in your docker-compose.yml as follows:
+Define the Maintainerr service in your docker-compose.yml as follows.
+
+> You have the option to define a User and Group ID for running the container. Maintainerr will operate using this specified UID:GID, and any files it generates within your data volume will also be associated with this designated user and group. If not explicitly specified, the default UID:GID is set to 1000:1000, representing the 'node' user inside the container.
 
 ```Yaml
 version: '3'
@@ -44,6 +46,7 @@ services:
   maintainerr:
     image: jorenn92/maintainerr:latest
     container_name: maintainerr
+    user: 1000:1000
     volumes:
       - ./data:/opt/data
     environment:
