@@ -5,6 +5,7 @@ export type AvailableCacheIds =
   | 'radarr'
   | 'sonarr'
   | 'plexguid'
+  | 'plextv'
   | 'overseerr';
 
 const DEFAULT_TTL = 300; // 5 min
@@ -46,6 +47,7 @@ class CacheManager {
     radarr: new Cache('radarr', 'Radarr API'),
     sonarr: new Cache('sonarr', 'Sonarr API'),
     plexguid: new Cache('plexguid', 'Plex GUID'),
+    plextv: new Cache('plextv', 'Plex.tv'),
     overseerr: new Cache('overseerr', 'Overseerr API'),
   };
 

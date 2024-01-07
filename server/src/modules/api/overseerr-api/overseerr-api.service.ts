@@ -144,6 +144,7 @@ export class OverseerrApiService {
       this.logger.warn(
         'Overseerr communication failed. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -164,6 +165,7 @@ export class OverseerrApiService {
       this.logger.warn(
         'Overseerr communication failed. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -179,6 +181,7 @@ export class OverseerrApiService {
         'Overseerr communication failed. Is the application running?',
         err,
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -218,6 +221,7 @@ export class OverseerrApiService {
         'Overseerr communication failed. Is the application running?',
         err,
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -234,6 +238,7 @@ export class OverseerrApiService {
         errorMessage: e.message,
         mediaId,
       });
+      this.logger.debug(e);
       return null;
     }
   }
@@ -266,20 +271,26 @@ export class OverseerrApiService {
       this.logger.warn(
         'Overseerr communication failed. Is the application running?',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
 
   public async status(): Promise<OverseerrStatus> {
     try {
-      const response: OverseerrStatus =
-        await this.api.getWithoutCache(`/status`);
+      const response: OverseerrStatus = await this.api.getWithoutCache(
+        `/status`,
+        {
+          signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
+        },
+      );
       return response;
     } catch (e) {
       this.logger.log("Couldn't fetch Overseerr status!", {
         label: 'Overseerr API',
         errorMessage: e.message,
       });
+      this.logger.debug(e);
       return null;
     }
   }

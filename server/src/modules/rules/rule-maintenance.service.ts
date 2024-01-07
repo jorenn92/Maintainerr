@@ -3,6 +3,9 @@ import { TasksService } from '../tasks/tasks.service';
 import { SettingsService } from '../settings/settings.service';
 import { RulesService } from './rules.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Collection } from '../collections/entities/collection.entities';
 
 @Injectable()
 export class RuleMaintenanceService implements OnApplicationBootstrap {
@@ -13,6 +16,8 @@ export class RuleMaintenanceService implements OnApplicationBootstrap {
     private readonly taskService: TasksService,
     private readonly settings: SettingsService,
     private readonly rulesService: RulesService,
+    @InjectRepository(Collection)
+    private readonly collectionRepo: Repository<Collection>,
     private readonly plexApi: PlexApiService,
   ) {}
 
@@ -20,7 +25,7 @@ export class RuleMaintenanceService implements OnApplicationBootstrap {
     this.jobCreationAttempts++;
     const state = this.taskService.createJob(
       'RuleMaintenance',
-      '30 3 * * 2',
+      '20 4 * * */1',
       this.execute.bind(this),
     );
     if (state.code === 0) {
@@ -45,6 +50,12 @@ export class RuleMaintenanceService implements OnApplicationBootstrap {
       if (appStatus) {
         // remove media exclusions that are no longer available
         this.removeLeftoverExclusions();
+        this.removeCollectionsWithoutRule();
+        this.logger.log('Maintenance done');
+      } else {
+        this.logger.error(
+          `Maintenance skipped, not all applications were reachable.`,
+        );
       }
     } catch (e) {
       this.logger.error(`RuleMaintenance failed : ${e.message}`);
@@ -62,6 +73,25 @@ export class RuleMaintenanceService implements OnApplicationBootstrap {
       if (!resp?.ratingKey) {
         this.rulesService.removeExclusion(exclusion.id);
       }
+    }
+  }
+
+  private async removeCollectionsWithoutRule() {
+    try {
+      const collections = await this.collectionRepo.find(); // get all collections
+      const rulegroups = await this.rulesService.getRuleGroups();
+
+      for (const collection of collections) {
+        if (
+          !rulegroups.find(
+            (rulegroup) => rulegroup.collection?.id === collection.id,
+          )
+        ) {
+          await this.collectionRepo.delete({ id: collection.id });
+        }
+      }
+    } catch (err) {
+      this.logger.warn("Couldn't remove collection without rule: " + err);
     }
   }
 }

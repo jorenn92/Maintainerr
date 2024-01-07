@@ -1,3 +1,38 @@
+## [1.7.1](https://github.com/jorenn92/Maintainerr/compare/v1.7.0...v1.7.1) (2024-01-06)
+
+
+### Bug Fixes
+
+* **maintenance:** Extended the maintenance task with an action to remove orphaned collection objects ([f5826cc](https://github.com/jorenn92/Maintainerr/commit/f5826cc1f4e2997586ec1fa2cc704d7a85d01e8e))
+* **plex:** Fixed an issue where fetching Plex users would fail if connection to plex.tv failed ([2458a8f](https://github.com/jorenn92/Maintainerr/commit/2458a8f62797d3122e2577493f73948c85ab4c9b))
+* **rules:** Extended the Plex - rating rule ([ef95481](https://github.com/jorenn92/Maintainerr/commit/ef95481d8653d0d84bf3c00a92bf046b8abc50e6))
+* **rules:** Fixed an issue where 'Plex - Present in amount of other collections' wouldn't work as expected ([1c4accd](https://github.com/jorenn92/Maintainerr/commit/1c4accdacf17738878cb60bde60bd176b3dc6426))
+* **rules:** Fixed an issue where an item would be stuck inside the internal collection when it was removed manually ([1eae15f](https://github.com/jorenn92/Maintainerr/commit/1eae15f094ad081d20829db638f3cb44789f2137))
+* **rules:** Fixed an issue where the "Plex - Last episode added at" rule order was affected by the library's Plex Episode Sorting setting ([67299c4](https://github.com/jorenn92/Maintainerr/commit/67299c4d6f94aa2f104694e4fab265fe4767af70))
+* **rules:** Resolved an issue where a nullpointer could occur when fetching playlists. ([a0400b8](https://github.com/jorenn92/Maintainerr/commit/a0400b865999a986cfdcef6bb8603f8f0483e62b))
+
+# [1.7.0](https://github.com/jorenn92/Maintainerr/compare/v1.6.10...v1.7.0) (2023-12-21)
+
+
+### Bug Fixes
+
+* **api:** added a 10s cancellation signal for outgoing status API calls ([3766b34](https://github.com/jorenn92/Maintainerr/commit/3766b3484b30310be64ce472adab502b1b08d2cd))
+* **collection handler:** Improved handling of movies without Tmdb ID's in Plex metadata. ([9df2cd4](https://github.com/jorenn92/Maintainerr/commit/9df2cd4da6e9bd8b322fc262297744f493af09aa))
+* **collectionHandler:** Fixed an issue where a media item without a tvdb id could crash te server ([c70bead](https://github.com/jorenn92/Maintainerr/commit/c70beadb6e5bd8b84220affeeb53861b8ccb94b4))
+* **overview:** Reworked the overview add popup. It's now possible to manually add & remove seasons and episodes ([99329b2](https://github.com/jorenn92/Maintainerr/commit/99329b259dfc69832672ad03a8d471daeb90f383))
+* **Plex:** Add container-size header to API calls that missed it ([069c281](https://github.com/jorenn92/Maintainerr/commit/069c281cd778b00f25aa9650eadda51ba18ba9ee))
+* **rules:** Fixed an issue where errors would be printed in the log when handling a show without a valid tvdb id ([e2ad5e1](https://github.com/jorenn92/Maintainerr/commit/e2ad5e195b1d1c844f15cfb3442a30f68b01ec41))
+* **rules:** Fixed an issue where Plex & Overseerr would use different usernames when the Plex display name was edited or contains special characters ([39c9529](https://github.com/jorenn92/Maintainerr/commit/39c952936cbeab8d9d43c4fe2e5fc531915c8e17))
+* **settings:** Resolved an issue where resetting the Plex authentication token would fail ([17333e4](https://github.com/jorenn92/Maintainerr/commit/17333e4f8a70e36ec64bfd0a0f614b643084dcd0))
+* **sonarr:** Fixed an issue where fetching series by TVDB ID could fail ([9866534](https://github.com/jorenn92/Maintainerr/commit/986653481735536d803d2c1dd373937d83451169))
+* **tmdb:** Fixed an issue where an error could occur while trying to fetch the TMDB ID from an item ([bc5b918](https://github.com/jorenn92/Maintainerr/commit/bc5b91882919e73feb83d119493bff405c867d13))
+
+
+### Features
+
+* **maintenance:** Added a job that performs system maintenance tasks ([15b0b19](https://github.com/jorenn92/Maintainerr/commit/15b0b19837d411ea56d9c5758c3ede2a8c3b8286))
+* **overview:** Reworked the exclusion feature to support season and episodes from the UI ([ee59907](https://github.com/jorenn92/Maintainerr/commit/ee59907e2a4478ee1f718237b9b2403dcc2feeb0))
+
 ## [1.6.10](https://github.com/jorenn92/Maintainerr/compare/v1.6.9...v1.6.10) (2023-11-23)
 
 

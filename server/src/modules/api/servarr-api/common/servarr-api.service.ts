@@ -13,9 +13,7 @@ import cacheManager, { AvailableCacheIds } from '../../lib/cache';
 
 export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
   static buildUrl(settings: DVRSettings, path?: string): string {
-    return `${settings.useSsl ? 'https' : 'http'}://${settings.hostname}:${
-      settings.port
-    }${settings.baseUrl ?? ''}${path}`;
+    return `${settings.useSsl ? 'https' : 'http'}://${settings.hostname}:${settings.port}${settings.baseUrl ?? ''}${path}`;
   }
 
   protected apiName: string;
@@ -34,7 +32,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     super(
       url,
       {
-        apikey: apiKey,
+        apikey: apiKey
       },
       {
         nodeCache: cacheManager.getCache(cacheName).data,

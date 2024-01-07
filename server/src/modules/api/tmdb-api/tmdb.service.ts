@@ -64,6 +64,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
+      this.logger.debug(e);
       return {
         page: 1,
         results: [],
@@ -88,6 +89,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch person details: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -135,6 +137,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch movie details: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -161,6 +164,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch TV show details: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -180,6 +184,7 @@ export class TmdbApiService extends ExternalApiService {
       }
     } catch (e) {
       warn(`[TMDb] Failed to fetch image path: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -206,6 +211,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch TV show details: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -232,6 +238,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch discover movies: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -258,6 +265,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch discover movies: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -284,6 +292,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch movies by keyword: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -310,6 +319,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch TV recommendations: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -333,6 +343,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch TV similar: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -366,6 +377,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch discover movies: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -399,6 +411,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch discover TV: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -425,6 +438,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch upcoming movies: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -452,6 +466,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch all trending: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -475,6 +490,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch all trending: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -498,6 +514,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch all trending: ${e.message}`);
+      this.logger.debug(e);
     }
   };
 
@@ -529,6 +546,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to find by external ID: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -557,6 +575,7 @@ export class TmdbApiService extends ExternalApiService {
       warn('[TMDb] Failed to find a title with the provided IMDB id');
     } catch (e) {
       warn(`[TMDb] Failed to get movie by external imdb ID: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -587,6 +606,7 @@ export class TmdbApiService extends ExternalApiService {
       warn(
         `[TMDb] Failed to get TV show using the external TVDB ID: ${e.message}`,
       );
+      this.logger.debug(e);
     }
   }
 
@@ -610,6 +630,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch collection: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -626,6 +647,7 @@ export class TmdbApiService extends ExternalApiService {
       return regions;
     } catch (e) {
       warn(`[TMDb] Failed to fetch countries: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -642,6 +664,7 @@ export class TmdbApiService extends ExternalApiService {
       return languages;
     } catch (e) {
       warn(`[TMDb] Failed to fetch langauges: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -654,6 +677,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch movie studio: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -664,6 +688,7 @@ export class TmdbApiService extends ExternalApiService {
       return data;
     } catch (e) {
       warn(`[TMDb] Failed to fetch TV network: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -715,6 +740,7 @@ export class TmdbApiService extends ExternalApiService {
       return movieGenres;
     } catch (e) {
       warn(`[TMDb] Failed to fetch movie genres: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -766,6 +792,7 @@ export class TmdbApiService extends ExternalApiService {
       return tvGenres;
     } catch (e) {
       warn(`[TMDb] Failed to fetch TV genres: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 }

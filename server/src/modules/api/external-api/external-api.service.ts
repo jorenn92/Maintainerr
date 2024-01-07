@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import axios, { AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import NodeCache from 'node-cache';
 
@@ -24,6 +25,7 @@ export class ExternalApiService {
     this.axios = axios.create({
       baseURL: baseUrl,
       params,
+      timeout: 5000, // timeout after 5s
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -52,6 +54,7 @@ export class ExternalApiService {
 
       return response.data;
     } catch (err) {
+      Logger.debug(`GET request failed: ${err}`);
       return undefined;
     }
   }
@@ -63,6 +66,7 @@ export class ExternalApiService {
     try {
       return (await this.axios.get<T>(endpoint, config)).data;
     } catch (err) {
+      Logger.debug(`GET request failed: ${err}`);
       return undefined;
     }
   }
@@ -75,6 +79,7 @@ export class ExternalApiService {
       const response = await this.axios.delete<T>(endpoint, config);
       return response.data;
     } catch (err) {
+      Logger.debug(`DELETE request failed: ${err}`);
       return undefined;
     }
   }
@@ -88,6 +93,7 @@ export class ExternalApiService {
       const response = await this.axios.put<T>(endpoint, data, config);
       return response.data;
     } catch (err) {
+      Logger.debug(`PUT request failed: ${err}`);
       return undefined;
     }
   }
@@ -101,6 +107,7 @@ export class ExternalApiService {
       const response = await this.axios.post<T>(endpoint, data, config);
       return response.data;
     } catch (err) {
+      Logger.debug(`POST request failed: ${err}`);
       return undefined;
     }
   }
@@ -137,6 +144,7 @@ export class ExternalApiService {
 
       return response.data;
     } catch (err) {
+      Logger.debug(`GET request failed: ${err}`);
       return undefined;
     }
   }
@@ -152,6 +160,7 @@ export class ExternalApiService {
 
       return `${this.baseUrl}${endpoint}${JSON.stringify(params)}`;
     } catch (err) {
+      Logger.debug(`Failed serializing cache key: ${err}`);
       return undefined;
     }
   }

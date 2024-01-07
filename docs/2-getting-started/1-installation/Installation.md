@@ -51,6 +51,7 @@ services:
       - ./data:/opt/data
     environment:
       - TZ=Europe/Brussels
+#      - DEBUG=true # uncomment to enable verbose logs
     ports:
       - 8154:80
     restart: unless-stopped
