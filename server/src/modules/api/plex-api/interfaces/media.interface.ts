@@ -21,6 +21,7 @@ export interface PlexMetadata {
   updatedAt: number;
   media: Media[];
   parentData?: PlexMetadata;
+  Label?: { tag: string }[];
 }
 
 export interface Media {
