@@ -1,14 +1,14 @@
-name: "Docker build image"
+name: "Build"
 
 on:
   push:
     branches:
-      - 'main'
+      - "main"
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
     branches:
-      - 'main'
+      - "main"
   workflow_dispatch:
 
 permissions:
