@@ -26,18 +26,18 @@ RUN yarn global add @nestjs/cli --network-timeout 99999999  && \
     yarn config set python /usr/bin/python3 && \
     yarn --force --non-interactive --frozen-lockfile --network-timeout 99999999
 
+RUN \
+case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
+yarn add --save --network-timeout 99999999 sharp  \
+;; \
+esac
+
 RUN yarn run build:server
 
 RUN yarn run build:ui
 
 RUN yarn run docs-generate && \
     rm -rf ./docs
-
-RUN \
-    case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-    yarn add --save --network-timeout 99999999 sharp  \
-    ;; \
-    esac
 
 RUN yarn --production --non-interactive --ignore-scripts --prefer-offline --frozen-lockfile --network-timeout 99999999
 
