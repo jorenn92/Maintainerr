@@ -68,7 +68,7 @@
     "@nestjs/schematics": "^10.0.3",
     "@nestjs/testing": "^10.2.10",
     "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^11.0.0",
+    "@semantic-release/commit-analyzer": "^11.1.0",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@svgr/webpack": "^8.1.0",
