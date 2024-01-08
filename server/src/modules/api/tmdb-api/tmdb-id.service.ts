@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { warn } from 'console';
 import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
@@ -10,7 +10,7 @@ export class TmdbIdService {
   constructor(
     private readonly tmdbApi: TmdbApiService,
     private readonly plexApi: PlexApiService,
-  ) { }
+  ) {}
   async getTmdbIdFromPlexRatingKey(
     ratingKey: string,
   ): Promise<{ type: 'movie' | 'tv'; id: number | undefined }> {
@@ -20,18 +20,21 @@ export class TmdbIdService {
         // fetch show in case of season / episode
         libItem = libItem.grandparentRatingKey
           ? await this.plexApi.getMetadata(
-            libItem.grandparentRatingKey.toString(),
-          )
+              libItem.grandparentRatingKey.toString(),
+            )
           : libItem.parentRatingKey
-            ? await this.plexApi.getMetadata(libItem.parentRatingKey.toString())
-            : libItem;
+          ? await this.plexApi.getMetadata(libItem.parentRatingKey.toString())
+          : libItem;
 
         return this.getTmdbIdFromPlexData(libItem);
       } else {
-        warn(`[TMDb] Failed to fetch metadata of Plex rating key : ${ratingKey}`);
+        warn(
+          `[TMDb] Failed to fetch metadata of Plex rating key : ${ratingKey}`,
+        );
       }
     } catch (e) {
       warn(`[TMDb] Failed to fetch id : ${e.message}`);
+      Logger.debug(e);
       return undefined;
     }
   }
@@ -89,6 +92,7 @@ export class TmdbIdService {
       };
     } catch (e) {
       warn(`[TMDb] Failed to fetch id : ${e.message}`);
+      Logger.debug(e);
       return undefined;
     }
   }

@@ -729,6 +729,7 @@ export class CollectionsService {
       this.logger.warn(
         'An error occurred while performing collection actions.',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -770,16 +771,18 @@ export class CollectionsService {
             ])
             .execute()
         ).generatedMaps[0] as addCollectionDbResponse;
-      } catch (_err) {
+      } catch (err) {
         // Log error
         this.infoLogger(
           `Something went wrong creating the collection in the Database..`,
         );
+        this.logger.debug(err);
       }
     } catch (err) {
       this.logger.warn(
         'An error occurred while performing collection actions.',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -794,14 +797,15 @@ export class CollectionsService {
         await this.collectionRepo.delete(collection.id);
 
         return { status: 'OK', code: 1, message: 'Success' };
-      } catch (_err) {
+      } catch (err) {
         this.infoLogger(
           `Something went wrong deleting the collection from the Database..`,
         );
-        this.logger.warn(_err);
+        this.logger.debug(err);
         return { status: 'NOK', code: 0, message: 'Removing from DB failed' };
       }
     } catch (err) {
+      this.logger.debug(err);
       return { status: 'NOK', code: 0, message: 'Removing from DB failed' };
     }
   }
@@ -821,6 +825,7 @@ export class CollectionsService {
       this.logger.warn(
         'An error occurred while performing collection actions.',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -842,6 +847,8 @@ export class CollectionsService {
       this.logger.warn(
         'An error occurred while searching for a specific Plex collection.',
       );
+      this.logger.debug(err);
+
       return undefined;
     }
   }
@@ -853,66 +860,10 @@ export class CollectionsService {
       this.logger.warn(
         'An error occurred while searching for a specific Plex collection.',
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
-
-  // TODO: verwijderen als effectief niet nodig
-  // async syncCollectionMediaChildren(
-  //   collectionDbId: number,
-  //   collectionMediaChildren: [{ parent: number; child: number }],
-  // ): Promise<Collection> {
-  //   const collection = await this.collectionRepo.findOne({
-  //   where: { id: collectionDbId },
-  // });
-  //   if (collectionMediaChildren) {
-  //     if (collection) {
-  //       // add missing children
-  //       collectionMediaChildren.forEach((el) => {
-  //         const media = collection.collectionMedia.find(
-  //           (media) => media.plexId === el.parent,
-  //         );
-  //         if (media) {
-  //           if (
-  //             !media.collectionMediaChild.find(
-  //               (child) => child.plexId === el.child,
-  //             )
-  //           ) {
-  //             this.collectionMediaChildRepo.save({
-  //               plexId: el.child,
-  //               collectionMediaId: media.id,
-  //             });
-  //           }
-  //         } else {
-  //           this.infoLogger(
-  //             `Couldn't find media with plexId ${el.parent}, this means the child with plexId ${el.child} could not be synced`,
-  //           );
-  //         }
-  //       });
-
-  //       // remove deleted children
-  //       collection.collectionMedia.forEach((media) => {
-  //         media.collectionMediaChild.forEach((child) => {
-  //           if (
-  //             !collectionMediaChildren.find(
-  //               (el) => el.parent === media.plexId && el.child === child.plexId,
-  //             )
-  //           ) {
-  //             this.collectionMediaChildRepo.delete(child.id);
-  //           }
-  //         });
-  //       });
-
-  //       // update & return collection
-  //       return await this.collectionRepo.findOne({
-  //   where: { id: collectionDbId },
-  // });
-  //     } else {
-  //       this.infoLogger(`Couldn't find collection with id ${collectionDbId}`);
-  //     }
-  //   }
-  //   return collection;
-  // }
 
   private infoLogger(message: string) {
     this.logger.log(message);

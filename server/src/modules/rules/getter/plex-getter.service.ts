@@ -59,8 +59,14 @@ export class PlexGetterService {
             ? new Date(libItem.originallyAvailableAt)
             : null;
         }
-        case 'rating': {
+        case 'rating_critics': {
+          return libItem.rating ? +libItem.rating : 0;
+        }
+        case 'rating_audience': {
           return libItem.audienceRating ? +libItem.audienceRating : 0;
+        }
+        case 'rating_user': {
+          return libItem.userRating ? +libItem.userRating : 0;
         }
         case 'people': {
           return libItem.Role ? libItem.Role.map((el) => el.tag) : null;
@@ -73,18 +79,18 @@ export class PlexGetterService {
           // fetch metadata because collections in plexLibrary object are wrong
           return libItem.Collection
             ? (
-              await this.plexApi.getMetadata(libItem.ratingKey)
-            ).Collection.filter(
-              (el) =>
-                el.tag.toLowerCase().trim() !==
-                (ruleGroup.manualCollectionName
-                  ? ruleGroup.manualCollectionName
-                  : ruleGroup.name
-                )
-                  .toLowerCase()
-                  .trim(),
-            ).length
-            : null;
+                await this.plexApi.getMetadata(libItem.ratingKey)
+              ).Collection.filter(
+                (el) =>
+                  el.tag.toLowerCase().trim() !==
+                  (ruleGroup.manualCollectionName
+                    ? ruleGroup.manualCollectionName
+                    : ruleGroup.name
+                  )
+                    .toLowerCase()
+                    .trim(),
+              ).length
+            : 0;
         }
         case 'playlists': {
           if (libItem.type !== 'episode' && libItem.type !== 'movie') {
@@ -195,13 +201,13 @@ export class PlexGetterService {
           const item =
             libItem.type === 'episode'
               ? ((await this.plexApi.getMetadata(
-                libItem.grandparentRatingKey,
-              )) as unknown as PlexLibraryItem)
+                  libItem.grandparentRatingKey,
+                )) as unknown as PlexLibraryItem)
               : libItem.type === 'season'
-                ? ((await this.plexApi.getMetadata(
+              ? ((await this.plexApi.getMetadata(
                   libItem.parentRatingKey,
                 )) as unknown as PlexLibraryItem)
-                : libItem;
+              : libItem;
           return item.Genre ? item.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {
@@ -340,12 +346,15 @@ export class PlexGetterService {
         case 'sw_lastEpisodeAddedAt': {
           const seasons =
             libItem.type !== 'season'
-              ? await this.plexApi.getChildrenMetadata(libItem.ratingKey)
+              ? (
+                  await this.plexApi.getChildrenMetadata(libItem.ratingKey)
+                ).sort((a, b) => a.index - b.index)
               : [libItem];
 
           const lastEpDate = await this.plexApi
             .getChildrenMetadata(seasons[seasons.length - 1].ratingKey)
             .then((eps) => {
+              eps.sort((a, b) => a.index - b.index);
               return eps[eps.length - 1]?.addedAt
                 ? +eps[eps.length - 1].addedAt
                 : null;
@@ -367,7 +376,7 @@ export class PlexGetterService {
     const plexTvUsers = await this.plexApi.getUserDataFromPlexTv();
 
     return (await this.plexApi.getUsers()).map((el) => {
-      const plextv = plexTvUsers?.find(tvEl => tvEl.$?.id == el.id)
+      const plextv = plexTvUsers?.find((tvEl) => tvEl.$?.id == el.id);
 
       // use the username from plex.tv if available, since Overseerr also does this
       if (plextv && plextv.$ && plextv.$.username) {
@@ -375,6 +384,5 @@ export class PlexGetterService {
       }
       return { plexId: el.id, username: el.name } as PlexUser;
     });
-
   }
 }
