@@ -63,7 +63,7 @@ COPY --from=BUILDER /opt ./
 COPY supervisord.conf /etc/supervisord.conf
 
 RUN apk add supervisor && \
-	  rm -rf /tmp/* && \
+	rm -rf /tmp/* && \
     mkdir /opt/data && \
     chown -R node:node /opt
 

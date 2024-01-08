@@ -6,10 +6,10 @@
   <a href="https://discord.gg/WP4ZW2QYwk"><img src="https://dcbadge.vercel.app/api/server/WP4ZW2QYwk?style=flat&theme=default-inverted" width="25%" alt="Discord link"/></a>
   &nbsp; 
   <picture>
-  <img src="https://github.com/jorenn92/maintainerr/workflows/Build/badge.svg?branch=main" width="17%" alt="Build" /> </picture>
+  <img src="https://github.com/jorenn92/Maintainerr/actions/workflows/build.yml/badge.svg?branch=main" width="17%" alt="Build" /> </picture>
     &nbsp; 
   <picture>  
-  <img src="https://github.com/jorenn92/maintainerr/workflows/Release/badge.svg?branch=main" width="19%" alt="Release" /> </picture>
+  <img src="https://github.com/jorenn92/Maintainerr/actions/workflows/release.yml/badge.svg?branch=main" width="19%" alt="Release" /> </picture>
   &nbsp; 
   <a href="https://hub.docker.com/r/jorenn92/maintainerr"><img src="https://img.shields.io/docker/pulls/jorenn92/maintainerr" alt="Docker pulls" width="16.5%"></a>
 </p>
