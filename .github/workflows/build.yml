@@ -1,4 +1,4 @@
-name: "Build and push Docker image"
+name: "Docker build image"
 
 on:
   push:
@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build_docker_image:
-    name: Build and push Docker image
+    name: ${{ github.event_name == 'pull_request' && 'Build' || 'Build & Push' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -51,7 +51,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME  }}
           password: ${{ secrets.DOCKERHUB_TOKEN  }}
 
-      - name: Build & Push image
+      - name: ${{ github.event_name == 'pull_request' && 'Build image' || 'Build & Push image' }}
         uses: docker/build-push-action@v5
         with:
           context: .
