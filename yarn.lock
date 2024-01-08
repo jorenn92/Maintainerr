@@ -4395,13 +4395,13 @@ cron@2.4.3:
     "@types/luxon" "~3.3.0"
     luxon "~3.3.0"
 
-cron@^2.4.4:
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/cron/-/cron-2.4.4.tgz#988c1757b3f288d1dfcc360ee6d80087448916dc"
-  integrity sha512-MHlPImXJj3K7x7lyUHjtKEOl69CSlTOWxS89jiFgNkzXfvhVjhMz/nc7/EIfN9vgooZp8XTtXJ1FREdmbyXOiQ==
+cron@^3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/cron/-/cron-3.1.6.tgz#e7e1798a468e017c8d31459ecd7c2d088f97346c"
+  integrity sha512-cvFiQCeVzsA+QPM6fhjBtlKGij7tLLISnTSvFxVdnFGLdz+ZdXN37kNe0i2gefmdD17XuZA6n2uPVwzl4FxW/w==
   dependencies:
     "@types/luxon" "~3.3.0"
-    luxon "~3.3.0"
+    luxon "~3.4.0"
 
 cross-spawn@^7.0.0, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
   version "7.0.3"
@@ -7738,6 +7738,11 @@ luxon@~3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.3.0.tgz#d73ab5b5d2b49a461c47cedbc7e73309b4805b48"
   integrity sha512-An0UCfG/rSiqtAIiBPO0Y9/zAnHUZxAMiCpTd5h2smgsj7GGmcenvrvww2cqNA8/4A5ZrD1gJpHN2mIHZQF+Mg==
+
+luxon@~3.4.0:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.4.4.tgz#cf20dc27dc532ba41a169c43fdcc0063601577af"
+  integrity sha512-zobTr7akeGHnv7eBOXcRgMeCP6+uyYsczwmeRCauvpvaAltgNyTbLH/+VaEAPUeWBT+1GuNmz4wC/6jtQzbbVA==
 
 macos-release@^2.5.0:
   version "2.5.1"
