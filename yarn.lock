@@ -2458,10 +2458,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/cookiejar@*":
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/@types/cookiejar/-/cookiejar-2.1.3.tgz#c54976fb8f3a32ea8da844f59f0374dd39656e13"
-  integrity sha512-LZ8SD3LpNmLMDLkG2oCBjZg+ETnx6XdCjydUE0HwojDmnDfDUnhMKKbtth1TZh+hzcqb03azrYWoXLS8sMXdqg==
+"@types/cookiejar@^2.1.5":
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/@types/cookiejar/-/cookiejar-2.1.5.tgz#14a3e83fa641beb169a2dd8422d91c3c345a9a78"
+  integrity sha512-he+DHOWReW0nghN24E1WUqM0efK4kI9oTqDm6XmK8ZPe2djZ90BSNdGnIyCLzCPw7/pogPlGbzI2wHGGmi4O/Q==
 
 "@types/eslint-scope@^3.7.3":
   version "3.7.6"
@@ -2581,6 +2581,11 @@
   resolved "https://registry.yarnpkg.com/@types/mdurl/-/mdurl-1.0.4.tgz#574bfbec51eb41ab5f444116c8555bc4347feba5"
   integrity sha512-ARVxjAEX5TARFRzpDRVC6cEk0hUIXCCwaMhz8y7S1/PxU6zZS1UMjyobz7q4w/D/R552r4++EhwmXK1N2rAy0A==
 
+"@types/methods@^1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@types/methods/-/methods-1.1.4.tgz#d3b7ac30ac47c91054ea951ce9eed07b1051e547"
+  integrity sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==
+
 "@types/mime@*":
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-3.0.3.tgz#886674659ce55fe7c6c06ec5ca7c0eb276a08f91"
@@ -2680,20 +2685,22 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.2.tgz#01284dde9ef4e6d8cef6422798d9a3ad18a66f8b"
   integrity sha512-g7CK9nHdwjK2n0ymT2CW698FuWJRIx+RP6embAzZ2Qi8/ilIrA1Imt2LVSeHUzKvpoi7BhmmQcXz95eS0f2JXw==
 
-"@types/superagent@*":
-  version "4.1.20"
-  resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-4.1.20.tgz#9248f55ac588794568f02fe9cac6d6ff2650b660"
-  integrity sha512-GfpwJgYSr3yO+nArFkmyqv3i0vZavyEG5xPd/o95RwpKYpsOKJYI5XLdxLpdRbZI3YiGKKdIOFIf/jlP7A0Jxg==
+"@types/superagent@^8.1.0":
+  version "8.1.1"
+  resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-8.1.1.tgz#dbc620c5df3770b0c3092f947d6d5e808adae2bc"
+  integrity sha512-YQyEXA4PgCl7EVOoSAS3o0fyPFU6erv5mMixztQYe1bqbWmmn8c+IrqoxjQeZe4MgwXikgcaZPiI/DsbmOVlzA==
   dependencies:
-    "@types/cookiejar" "*"
+    "@types/cookiejar" "^2.1.5"
+    "@types/methods" "^1.1.4"
     "@types/node" "*"
 
-"@types/supertest@^2.0.15":
-  version "2.0.15"
-  resolved "https://registry.yarnpkg.com/@types/supertest/-/supertest-2.0.15.tgz#3d032865048c84c6a3bbbf1f949145b917d2ff65"
-  integrity sha512-jUCZZ/TMcpGzoSaed9Gjr8HCf3HehExdibyw3OHHEL1als1KmyzcOZZH4MjbObI8TkWsEr7bc7gsW0WTDni+qQ==
+"@types/supertest@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@types/supertest/-/supertest-6.0.2.tgz#2af1c466456aaf82c7c6106c6b5cbd73a5e86588"
+  integrity sha512-137ypx2lk/wTQbW6An6safu9hXmajAifU/s7szAHLN/FeIm5w7yR0Wkl9fdJMRSHwOn4HLAI0DaB2TOORuhPDg==
   dependencies:
-    "@types/superagent" "*"
+    "@types/methods" "^1.1.4"
+    "@types/superagent" "^8.1.0"
 
 "@types/web-push@^3.6.3":
   version "3.6.3"
