@@ -86,4 +86,6 @@ jobs:
           tags: |
             ghcr.io/jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
             ghcr.io/jorenn92/maintainerr:latest
+            jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
+            jorenn92/maintainerr:latest
           labels: ${{ steps.meta.outputs.labels }}
