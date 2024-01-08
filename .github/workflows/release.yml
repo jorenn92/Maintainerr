@@ -14,7 +14,7 @@ on:
 
 jobs:
   semantic-release:
-    if: github.triggering_actor == github.repository_owner
+    if: ${{ github.triggering_actor == github.repository_owner }}
     name: Tag and release latest version
     runs-on: ubuntu-22.04
     steps:
@@ -39,7 +39,7 @@ jobs:
           fi
 
   build-docker-image:
-    if: github.triggering_actor == github.repository_owner && github.event.inputs.with-docker-images == true
+    if: ${{ github.triggering_actor == github.repository_owner && github.event.inputs.with-docker-images == 'true' }}
     name: Build and push docker images
     needs: semantic-release
     runs-on: ubuntu-latest
