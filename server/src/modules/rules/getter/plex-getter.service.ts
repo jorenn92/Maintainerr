@@ -34,7 +34,9 @@ export class PlexGetterService {
   ) {
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
-      const metadata: PlexMetadata = await this.plexApi.getMetadata(libItem.ratingKey) // fetch metadata from cache, this data is more complete
+      const metadata: PlexMetadata = await this.plexApi.getMetadata(
+        libItem.ratingKey,
+      ); // fetch metadata from cache, this data is more complete
       switch (prop.name) {
         case 'addDate': {
           return libItem.addedAt ? new Date(+libItem.addedAt * 1000) : null;
@@ -81,29 +83,29 @@ export class PlexGetterService {
           const item =
             libItem.type === 'episode'
               ? ((await this.plexApi.getMetadata(
-                libItem.grandparentRatingKey,
-              )) as unknown as PlexLibraryItem)
+                  libItem.grandparentRatingKey,
+                )) as unknown as PlexLibraryItem)
               : libItem.type === 'season'
-                ? ((await this.plexApi.getMetadata(
+              ? ((await this.plexApi.getMetadata(
                   libItem.parentRatingKey,
                 )) as unknown as PlexLibraryItem)
-                : metadata;
+              : metadata;
 
-          return item.Label ? item.Label.map(l => l.tag) : []
+          return item.Label ? item.Label.map((l) => l.tag) : [];
         }
         case 'collections': {
           // fetch metadata because collections in plexLibrary object are wrong
           return metadata.Collection
             ? metadata.Collection.filter(
-              (el) =>
-                el.tag.toLowerCase().trim() !==
-                (ruleGroup.manualCollectionName
-                  ? ruleGroup.manualCollectionName
-                  : ruleGroup.name
-                )
-                  .toLowerCase()
-                  .trim(),
-            ).length
+                (el) =>
+                  el.tag.toLowerCase().trim() !==
+                  (ruleGroup.manualCollectionName
+                    ? ruleGroup.manualCollectionName
+                    : ruleGroup.name
+                  )
+                    .toLowerCase()
+                    .trim(),
+              ).length
             : 0;
         }
         case 'playlists': {
@@ -213,13 +215,13 @@ export class PlexGetterService {
           const item =
             libItem.type === 'episode'
               ? ((await this.plexApi.getMetadata(
-                libItem.grandparentRatingKey,
-              )) as unknown as PlexLibraryItem)
+                  libItem.grandparentRatingKey,
+                )) as unknown as PlexLibraryItem)
               : libItem.type === 'season'
-                ? ((await this.plexApi.getMetadata(
+              ? ((await this.plexApi.getMetadata(
                   libItem.parentRatingKey,
                 )) as unknown as PlexLibraryItem)
-                : libItem;
+              : libItem;
           return item.Genre ? item.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {
@@ -359,8 +361,8 @@ export class PlexGetterService {
           const seasons =
             libItem.type !== 'season'
               ? (
-                await this.plexApi.getChildrenMetadata(libItem.ratingKey)
-              ).sort((a, b) => a.index - b.index)
+                  await this.plexApi.getChildrenMetadata(libItem.ratingKey)
+                ).sort((a, b) => a.index - b.index)
               : [libItem];
 
           const lastEpDate = await this.plexApi

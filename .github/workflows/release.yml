@@ -31,7 +31,12 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ${{ github.event.inputs.dry-run-semantic-release == true && 'npx semantic-release --dry-run' || 'npx semantic-release' }}
+        run: |
+          if [ "${{ github.event.inputs.dry-run-semantic-release }}" == "true" ]; then
+          npx semantic-release --dry-run
+          else
+          npx semantic-release
+          fi
 
   build-docker-image:
     if: github.triggering_actor == github.repository_owner && github.event.inputs.with-docker-images == true
