@@ -2,9 +2,19 @@ name: "Release"
 
 on:
   workflow_dispatch:
+    inputs:
+      dry-run-semantic-release:
+        type: boolean
+        description: Dry-run semantic-release
+        default: false
+      with-docker-images:
+        type: boolean
+        description: Build and push docker images
+        default: true
 
 jobs:
   semantic-release:
+    if: github.triggering_actor == github.repository_owner
     name: Tag and release latest version
     runs-on: ubuntu-22.04
     steps:
@@ -21,10 +31,11 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release --dry-run
+        run: ${{ github.event.inputs.dry-run-semantic-release == true && 'npx semantic-release --dry-run' || 'npx semantic-release' }}
 
   build-docker-image:
-    name: Build docker images
+    if: github.triggering_actor == github.repository_owner && github.event.inputs.with-docker-images == true
+    name: Build and push docker images
     needs: semantic-release
     runs-on: ubuntu-latest
     steps:
@@ -70,6 +81,6 @@ jobs:
           tags: |
             ghcr.io/jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
             ghcr.io/jorenn92/maintainerr:latest
-          #   jorenn92/maintainerr:latest
-          #   jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
+            jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
+            jorenn92/maintainerr:latest
           labels: ${{ steps.meta.outputs.labels }}
