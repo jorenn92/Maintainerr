@@ -25,7 +25,8 @@ export class SonarrApi extends ServarrApi<{
 
       return response;
     } catch (e) {
-      this.logger.error(`[Sonarr] Failed to retrieve series: ${e.message}`);
+      this.logger.warn(`[Sonarr] Failed to retrieve series: ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -36,15 +37,17 @@ export class SonarrApi extends ServarrApi<{
   ): Promise<SonarrEpisode[]> {
     try {
       const response = await this.get<SonarrEpisode[]>(
-        `/episode?seriesId=${seriesID}${seasonNumber ? `&seasonNumber=${seasonNumber}` : ''
+        `/episode?seriesId=${seriesID}${
+          seasonNumber ? `&seasonNumber=${seasonNumber}` : ''
         }${episodeIds ? `&episodeIds=${episodeIds}` : ''}`,
       );
 
       return response.filter((el) => episodeIds.includes(el.episodeNumber));
     } catch (e) {
-      this.logger.error(
+      this.logger.warn(
         `[Sonarr] Failed to retrieve show ${seriesID}'s episodes ${episodeIds}: ${e.message}`,
       );
+      this.logger.debug(e);
     }
   }
   public async getEpisodeFile(episodeFileId: number): Promise<SonarrEpisode> {
@@ -55,10 +58,11 @@ export class SonarrApi extends ServarrApi<{
 
       return response;
     } catch (e) {
-      this.logger.error(
+      this.logger.warn(
         `[Sonarr] Failed to retrieve episode file id ${episodeFileId}`,
         e.message,
       );
+      this.logger.debug(e);
     }
   }
 
@@ -71,17 +75,17 @@ export class SonarrApi extends ServarrApi<{
       });
 
       if (!response[0]) {
-        this.logger.error(`Series not found`);
+        this.logger.warn(`Series not found`);
       }
 
       return response;
     } catch (e) {
-      this.logger.error('Error retrieving series by series title', {
+      this.logger.warn('Error retrieving series by series title', {
         label: 'Sonarr API',
         errorMessage: e.message,
         title,
       });
-      this.logger.error(`Series not found`);
+      this.logger.debug(e);
     }
   }
 
@@ -102,6 +106,7 @@ export class SonarrApi extends ServarrApi<{
       return response[0];
     } catch (e) {
       this.logger.warn(`Error retrieving show by tvdb ID ${id}. ${e.message}`);
+      this.logger.debug(e);
     }
   }
 
@@ -134,11 +139,11 @@ export class SonarrApi extends ServarrApi<{
 
           return newSeriesResponse.data;
         } else {
-          this.logger.error('Failed to update series in Sonarr', {
+          this.logger.warn('Failed to update series in Sonarr', {
             label: 'Sonarr',
             options,
           });
-          this.logger.error(`Failed to update series in Sonarr`);
+          this.logger.warn(`Failed to update series in Sonarr`);
         }
       }
 
@@ -176,16 +181,16 @@ export class SonarrApi extends ServarrApi<{
           movie: createdSeriesResponse.data,
         });
       } else {
-        this.logger.error('Failed to add movie to Sonarr', {
+        this.logger.warn('Failed to add movie to Sonarr', {
           label: 'Sonarr',
           options,
         });
-        this.logger.error(`Failed to add series to Sonarr`);
+        this.logger.warn(`Failed to add series to Sonarr`);
       }
 
       return createdSeriesResponse.data;
     } catch (e) {
-      this.logger.error(
+      this.logger.warn(
         'Something went wrong while adding a series to Sonarr.',
         {
           label: 'Sonarr API',
@@ -194,7 +199,7 @@ export class SonarrApi extends ServarrApi<{
           response: e?.response?.data,
         },
       );
-      this.logger.error(`Failed to add series`);
+      this.logger.debug(e);
     }
   }
 
@@ -208,14 +213,14 @@ export class SonarrApi extends ServarrApi<{
 
       return data;
     } catch (e) {
-      this.logger.error(
+      this.logger.warn(
         'Something went wrong while retrieving Sonarr language profiles.',
         {
           label: 'Sonarr API',
           errorMessage: e.message,
         },
       );
-      this.logger.error(`Failed to get language profiles`);
+      this.logger.debug(e);
     }
   }
 
@@ -236,6 +241,7 @@ export class SonarrApi extends ServarrApi<{
           seriesId,
         },
       );
+      this.logger.debug(e);
     }
   }
 
@@ -255,6 +261,7 @@ export class SonarrApi extends ServarrApi<{
         errorMessage: e.message,
         seriesId,
       });
+      this.logger.debug(e);
     }
   }
 
@@ -265,7 +272,8 @@ export class SonarrApi extends ServarrApi<{
     deleteFiles = true,
   ) {
     this.logger.log(
-      `${!deleteFiles ? 'Unmonitoring' : 'Deleting'} ${episodeIds.length
+      `${!deleteFiles ? 'Unmonitoring' : 'Deleting'} ${
+        episodeIds.length
       } episode(s) from show with ID ${seriesId} from Sonarr.`,
     );
     try {
@@ -291,6 +299,7 @@ export class SonarrApi extends ServarrApi<{
         errorMessage: e.message,
         seriesId,
       });
+      this.logger.debug(e);
     }
   }
 
@@ -344,9 +353,11 @@ export class SonarrApi extends ServarrApi<{
         seriesId,
         type,
       });
+      this.logger.debug(e);
     }
     this.logger.log(
-      `Unmonitored season(s) ${typeof type === 'number' ? type : ''
+      `Unmonitored season(s) ${
+        typeof type === 'number' ? type : ''
       } from Sonarr show with ID ${seriesId}`,
     );
   }
@@ -378,12 +389,15 @@ export class SonarrApi extends ServarrApi<{
 
   public async info(): Promise<SonarrInfo> {
     try {
-      const info: SonarrInfo = (await this.axios.get(`system/status`, {
-        signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
-      })).data;
+      const info: SonarrInfo = (
+        await this.axios.get(`system/status`, {
+          signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
+        })
+      ).data;
       return info ? info : null;
     } catch (e) {
       this.logger.warn("Couldn't fetch Sonarr info.. Is Sonarr up?");
+      this.logger.debug(e);
       return null;
     }
   }

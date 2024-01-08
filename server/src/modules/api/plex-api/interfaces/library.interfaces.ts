@@ -37,6 +37,7 @@ export interface PlexLibraryItem {
   index?: number;
   parentIndex?: number;
   Collection?: { tag: string }[];
+  Label?: { tag: string }[];
 }
 
 export interface PlexLibraryResponse {

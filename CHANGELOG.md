@@ -1,3 +1,16 @@
+## [1.7.1](https://github.com/jorenn92/Maintainerr/compare/v1.7.0...v1.7.1) (2024-01-06)
+
+
+### Bug Fixes
+
+* **maintenance:** Extended the maintenance task with an action to remove orphaned collection objects ([f5826cc](https://github.com/jorenn92/Maintainerr/commit/f5826cc1f4e2997586ec1fa2cc704d7a85d01e8e))
+* **plex:** Fixed an issue where fetching Plex users would fail if connection to plex.tv failed ([2458a8f](https://github.com/jorenn92/Maintainerr/commit/2458a8f62797d3122e2577493f73948c85ab4c9b))
+* **rules:** Extended the Plex - rating rule ([ef95481](https://github.com/jorenn92/Maintainerr/commit/ef95481d8653d0d84bf3c00a92bf046b8abc50e6))
+* **rules:** Fixed an issue where 'Plex - Present in amount of other collections' wouldn't work as expected ([1c4accd](https://github.com/jorenn92/Maintainerr/commit/1c4accdacf17738878cb60bde60bd176b3dc6426))
+* **rules:** Fixed an issue where an item would be stuck inside the internal collection when it was removed manually ([1eae15f](https://github.com/jorenn92/Maintainerr/commit/1eae15f094ad081d20829db638f3cb44789f2137))
+* **rules:** Fixed an issue where the "Plex - Last episode added at" rule order was affected by the library's Plex Episode Sorting setting ([67299c4](https://github.com/jorenn92/Maintainerr/commit/67299c4d6f94aa2f104694e4fab265fe4767af70))
+* **rules:** Resolved an issue where a nullpointer could occur when fetching playlists. ([a0400b8](https://github.com/jorenn92/Maintainerr/commit/a0400b865999a986cfdcef6bb8603f8f0483e62b))
+
 # [1.7.0](https://github.com/jorenn92/Maintainerr/compare/v1.6.10...v1.7.0) (2023-12-21)
 
 

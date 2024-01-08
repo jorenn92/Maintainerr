@@ -97,6 +97,7 @@ export class RulesService {
         .getMany();
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
+      this.logger.debug(e);
       return undefined;
     }
   }
@@ -126,6 +127,7 @@ export class RulesService {
       return rulegroups as RulesDto[];
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
+      this.logger.debug(e);
       return undefined;
     }
   }
@@ -137,6 +139,7 @@ export class RulesService {
       });
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
+      this.logger.debug(e);
       return undefined;
     }
   }
@@ -159,7 +162,8 @@ export class RulesService {
       );
       return this.createReturnStatus(true, 'Success');
     } catch (err) {
-      this.logger.error(err);
+      this.logger.warn('Rulegroup deletion failed');
+      this.logger.debug(err);
       return this.createReturnStatus(false, 'Delete Failed');
     }
   }
@@ -241,6 +245,7 @@ export class RulesService {
       }
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
+      this.logger.debug(e);
       return undefined;
     }
   }
@@ -304,8 +309,9 @@ export class RulesService {
       return this.createReturnStatus(true, 'Success');
     } catch (e) {
       this.logger.warn(
-        `Adding exclusion for Plex ID ${data.mediaId} and rulegroup ID ${data.ruleGroupId} failed with error : ${e}`,
+        `Adding exclusion for Plex ID ${data.mediaId} and rulegroup ID ${data.ruleGroupId} failed.`,
       );
+      this.logger.debug(e);
       return this.createReturnStatus(false, 'Failed');
     }
   }
@@ -315,9 +321,8 @@ export class RulesService {
       await this.exclusionRepo.delete(id);
       return this.createReturnStatus(true, 'Success');
     } catch (e) {
-      this.logger.warn(
-        `Removing exclusion with ID ${id} failed with error : ${e}`,
-      );
+      this.logger.warn(`Removing exclusion with ID ${id} failed.`);
+      this.logger.debug(e);
       return this.createReturnStatus(false, 'Failed');
     }
   }
@@ -367,8 +372,9 @@ export class RulesService {
       return this.createReturnStatus(true, 'Success');
     } catch (e) {
       this.logger.warn(
-        `Removing exclusion for media with ID ${data.mediaId} failed with error : ${e}`,
+        `Removing exclusion for media with ID ${data.mediaId} failed.`,
       );
+      this.logger.debug(e);
       return this.createReturnStatus(false, 'Failed');
     }
   }
@@ -393,9 +399,8 @@ export class RulesService {
       }
       return this.createReturnStatus(true, 'Success');
     } catch (e) {
-      this.logger.warn(
-        `Removing all exclusions with plexId ${plexId} failed with error : ${e}`,
-      );
+      this.logger.warn(`Removing all exclusions with plexId ${plexId} failed.`);
+      this.logger.debug(e);
       return this.createReturnStatus(false, 'Failed');
     }
   }
@@ -433,6 +438,7 @@ export class RulesService {
       return [];
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
+      this.logger.debug(e);
       return undefined;
     }
   }
@@ -442,6 +448,7 @@ export class RulesService {
       return await this.exclusionRepo.find();
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
+      this.logger.debug(e);
       return [];
     }
   }
@@ -490,7 +497,8 @@ export class RulesService {
       } else {
         return this.createReturnStatus(false, 'No second value found');
       }
-    } catch {
+    } catch (e) {
+      this.logger.debug(e);
       return this.createReturnStatus(false, 'Unexpected error occurred');
     }
   }
@@ -528,6 +536,7 @@ export class RulesService {
       return groupId.identifiers[0].id;
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
+      this.logger.debug(e);
       return undefined;
     }
   }
@@ -546,6 +555,7 @@ export class RulesService {
         this.logger.warn(
           `Rules - Loading community rules failed : ${e.message}`,
         );
+        this.logger.debug(e);
         return this.createReturnStatus(false, 'Failed');
       });
   }

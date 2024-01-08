@@ -279,6 +279,13 @@ export class RuleConstants {
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
         } as Property,
+        {
+          id: 24,
+          name: 'labels',
+          humanName: '[list] Labels',
+          mediaType: MediaType.BOTH,
+          type: RuleType.TEXT,
+        } as Property,
       ],
     },
     {
