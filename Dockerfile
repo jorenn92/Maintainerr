@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS BUILDER
+FROM node:20-alpine3.19 AS BUILDER
 LABEL Description="Contains the Maintainerr Docker image"
 
 WORKDIR /opt
@@ -41,13 +41,16 @@ esac
 
 RUN yarn --production --non-interactive --ignore-scripts --prefer-offline --frozen-lockfile --network-timeout 99999999
 
-FROM node:lts-alpine
+FROM node:20-alpine3.19
 
 ARG TARGETPLATFORM
 ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+
+# Temporary workaround for https://github.com/libuv/libuv/pull/4141
+ENV UV_USE_IO_URING=0
 
 EXPOSE 80
 
