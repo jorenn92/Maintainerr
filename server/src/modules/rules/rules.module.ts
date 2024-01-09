@@ -22,6 +22,7 @@ import { Exclusion } from './entities/exclusion.entities';
 import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Settings } from '../settings/entities/settings.entities';
 import { RuleMaintenanceService } from './rule-maintenance.service';
+import { RuleYamlService } from './helpers/yaml.service';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { RuleMaintenanceService } from './rule-maintenance.service';
     SonarrGetterService,
     OverseerrGetterService,
     ValueGetterService,
+    RuleYamlService,
   ],
   controllers: [RulesController],
 })

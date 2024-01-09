@@ -25,6 +25,7 @@ import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { Settings } from '../settings/entities/settings.entities';
 import _ from 'lodash';
 import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
+import { RuleYamlService } from './helpers/yaml.service';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -57,6 +58,7 @@ export class RulesService {
     private readonly collectionService: CollectionsService,
     private readonly plexApi: PlexApiService,
     private readonly connection: Connection,
+    private readonly ruleYamlService: RuleYamlService,
   ) {
     this.ruleConstants = new RuleConstants();
   }
@@ -119,8 +121,8 @@ export class RulesService {
           libraryId !== undefined
             ? `rg.libraryId = ${libraryId}`
             : typeId !== undefined
-            ? `c.type = ${typeId}`
-            : 'rg.libraryId != -1',
+              ? `c.type = ${typeId}`
+              : 'rg.libraryId != -1',
         )
         // .where(typeId !== undefined ? `c.type = ${typeId}` : '')
         .getMany();
@@ -189,8 +191,8 @@ export class RulesService {
               lib.type === 'movie'
                 ? EPlexDataType.MOVIES
                 : params.dataType !== undefined
-                ? params.dataType
-                : EPlexDataType.SHOWS,
+                  ? params.dataType
+                  : EPlexDataType.SHOWS,
             title: params.name,
             description: params.description,
             arrAction: params.arrAction ? params.arrAction : 0,
@@ -698,5 +700,13 @@ export class RulesService {
         'Already updated Karma for this rule',
       );
     }
+  }
+
+  public encodeToYaml(rules: RuleDto[]): ReturnStatus {
+    return this.ruleYamlService.encode(rules);
+  }
+
+  public decodeFromYaml(yaml: string): ReturnStatus {
+    return this.ruleYamlService.decode(yaml);
   }
 }
