@@ -493,9 +493,8 @@ export class RuleConstants {
         } as Property,
         {
           id: 6,
-          name: 'status (continuing, ended)',
-          humanName: 'Status',
-          hashedValue: '8df4a15a8a624b7a01e4d12bdaa1f14ca3068983',
+          name: 'status',
+          humanName: 'Status (continuing, ended)',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT,
           showType: [EPlexDataType.SHOWS],
