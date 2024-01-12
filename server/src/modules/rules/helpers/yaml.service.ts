@@ -11,7 +11,7 @@ import YAML from 'yaml';
 import {
   EPlexDataType,
   PlexDataTypeStrings,
-} from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+} from '../../..//modules/api/plex-api/enums/plex-data-type-enum';
 
 interface IRuleYamlParent {
   mediaType: string;
