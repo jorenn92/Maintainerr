@@ -314,13 +314,7 @@ export class RuleConstants {
           mediaType: MediaType.MOVIE,
           type: RuleType.DATE,
         } as Property,
-        {
-          id: 1,
-          name: 'fileDate',
-          humanName: 'Date file downloaded',
-          mediaType: MediaType.MOVIE,
-          type: RuleType.DATE,
-        } as Property,
+        // Don't use ID 1, It was once used for an old rule value. Changing the id's messes up existing rules.
         {
           id: 2,
           name: 'tags',
