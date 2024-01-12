@@ -27,6 +27,7 @@ import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 import CachedImage from '../../../Common/CachedImage'
 import YamlImporterModal from '../../../Common/YamlImporterModal'
 import { CloudDownloadIcon } from '@heroicons/react/outline'
+import { useToasts } from 'react-toast-notifications'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -83,6 +84,8 @@ const AddModal = (props: AddModal) => {
   const [manualCollectionName, setManualCollectionName] = useState<string>(
     'My custom collection',
   )
+
+  const { addToast } = useToasts()
 
   const [useRules, setUseRules] = useState<boolean>(
     props.editData ? props.editData.useRules : true,
@@ -153,13 +156,21 @@ const AddModal = (props: AddModal) => {
   }
 
   const importRulesFromYaml = async (yaml: string) => {
-    console.log(yaml)
     const response = await PostApiHandler('/rules/yaml/decode', {
       yaml: yaml,
     })
 
     if (response && response.code === 1) {
       handleLoadRules(JSON.parse(response.result))
+      addToast('Successfully imported yaml', {
+        autoDismiss: true,
+        appearance: 'success',
+      })
+    } else {
+      addToast('Import failed, please check your yaml', {
+        autoDismiss: true,
+        appearance: 'error',
+      })
     }
   }
 
@@ -458,31 +469,31 @@ const AddModal = (props: AddModal) => {
                         },
                       ]
                     : +selectedType === EPlexDataType.SEASONS
-                    ? [
-                        {
-                          id: 0,
-                          name: 'Unmonitor and delete season',
-                        },
-                        {
-                          id: 2,
-                          name: 'Unmonitor and Delete existing episodes',
-                        },
-                        {
-                          id: 3,
-                          name: 'Unmonitor season and keep files',
-                        },
-                      ]
-                    : // episodes
-                      [
-                        {
-                          id: 0,
-                          name: 'Unmonitor and delete episode',
-                        },
-                        {
-                          id: 3,
-                          name: 'Unmonitor and keep file',
-                        },
-                      ]
+                      ? [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete season',
+                          },
+                          {
+                            id: 2,
+                            name: 'Unmonitor and Delete existing episodes',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor season and keep files',
+                          },
+                        ]
+                      : // episodes
+                        [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete episode',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor and keep file',
+                          },
+                        ]
                 }
               />
             </>
@@ -490,7 +501,11 @@ const AddModal = (props: AddModal) => {
 
           <div className="form-row">
             <label htmlFor="collection_deleteDays" className="text-label">
-              Media deleted after days*
+              Take action after days*
+              <p className="text-xs font-normal">
+                Duration of days media remains in the collection before
+                deletion/unmonitor
+              </p>
             </label>
             <div className="form-input">
               <div className="form-input-field">

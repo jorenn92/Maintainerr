@@ -82,7 +82,7 @@ export class RuleType {
     [RulePossibility.EQUALS, RulePossibility.NOT_EQUALS],
     'boolean',
   );
-  private constructor(
+  public constructor(
     private readonly key: string,
     public readonly possibilities: number[],
     public readonly humanName: string,

@@ -74,7 +74,7 @@ export class RuleYamlService {
         message: 'success',
       };
     } catch (e) {
-      this.logger.warn(`Transforming rules to YAML failed : ${e.message}`);
+      this.logger.warn(`Yaml export failed : ${e.message}`);
       this.logger.debug(e);
       return {
         code: 0,
@@ -115,7 +115,7 @@ export class RuleYamlService {
         message: 'success',
       };
     } catch (e) {
-      this.logger.warn(`Transforming YAML to rules failed : ${e.message}`);
+      this.logger.warn(`Yaml import failed. Is the yaml valid?`);
       this.logger.debug(e);
       return {
         code: 0,
@@ -154,8 +154,15 @@ export class RuleYamlService {
     let value: string | number;
     switch (customValue.ruleTypeId) {
       case 0:
-        ruleType = RuleType.NUMBER;
-        value = +customValue.value;
+        if (+customValue.value % 86400 === 0 && +customValue.value != 0) {
+          // when it's custom_days, translate to custom_days
+          ruleType = new RuleType('4', [], 'custom_days');
+          value = (+customValue.value / 86400).toString();
+        } else {
+          // otherwise, it's a normal number
+          ruleType = RuleType.NUMBER;
+          value = +customValue.value;
+        }
         break;
       case 1:
         ruleType = RuleType.DATE;
@@ -198,6 +205,9 @@ export class RuleYamlService {
         ruleType = RuleType.BOOL;
         value = identifier.value == 'true' ? '1' : '0';
         break;
+      case 'CUSTOM_DAYS':
+        ruleType = RuleType.NUMBER;
+        value = (+identifier.value * 86400).toString();
     }
 
     return {
