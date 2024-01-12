@@ -141,9 +141,14 @@ export class RulesController {
    * @return {Promise<ReturnStatus>} A Promise that resolves to a ReturnStatus object.
    */
   @Post('/yaml/encode')
-  async yamlEncode(@Body() body: { rules: string }): Promise<ReturnStatus> {
+  async yamlEncode(
+    @Body() body: { rules: string; mediaType: number },
+  ): Promise<ReturnStatus> {
     try {
-      return this.rulesService.encodeToYaml(JSON.parse(body.rules));
+      return this.rulesService.encodeToYaml(
+        JSON.parse(body.rules),
+        body.mediaType,
+      );
     } catch (err) {
       return {
         code: 0,
@@ -159,9 +164,11 @@ export class RulesController {
    * @return {Promise<ReturnStatus>} - A Promise that resolves to the decoded ReturnStatus object.
    */
   @Post('/yaml/decode')
-  async yamlDecode(@Body() body: { yaml: string }): Promise<ReturnStatus> {
+  async yamlDecode(
+    @Body() body: { yaml: string; mediaType: number },
+  ): Promise<ReturnStatus> {
     try {
-      return this.rulesService.decodeFromYaml(body.yaml);
+      return this.rulesService.decodeFromYaml(body.yaml, body.mediaType);
     } catch (err) {
       return {
         code: 0,

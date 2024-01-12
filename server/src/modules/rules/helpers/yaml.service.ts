@@ -8,6 +8,15 @@ import {
   RuleType,
 } from '../constants/rules.constants';
 import YAML from 'yaml';
+import {
+  EPlexDataType,
+  PlexDataTypeStrings,
+} from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+
+interface IRuleYamlParent {
+  mediaType: string;
+  rules: ISectionYaml[];
+}
 
 interface ISectionYaml {
   [key: number]: IRuleYaml[];
@@ -34,7 +43,7 @@ export class RuleYamlService {
   constructor() {
     this.ruleConstants = new RuleConstants();
   }
-  public encode(rules: RuleDto[]): ReturnStatus {
+  public encode(rules: RuleDto[], mediaType: number): ReturnStatus {
     try {
       let workingSection = { id: 0, rules: [] };
       const sections: ISectionYaml[] = [];
@@ -64,9 +73,12 @@ export class RuleYamlService {
 
       // push last workingsection to sections
       sections.push({ [+workingSection.id]: workingSection.rules });
-
+      const fullObject: IRuleYamlParent = {
+        mediaType: PlexDataTypeStrings[+mediaType - 1],
+        rules: sections,
+      };
       // Transform to yaml
-      const yaml = YAML.stringify(sections);
+      const yaml = YAML.stringify(fullObject);
 
       return {
         code: 1,
@@ -78,25 +90,49 @@ export class RuleYamlService {
       this.logger.debug(e);
       return {
         code: 0,
-        message: 'failed',
+        message: 'Yaml export failed. Please check logs',
       };
     }
   }
 
-  public decode(yaml: string): ReturnStatus {
+  public decode(yaml: string, mediaType: number): ReturnStatus {
     try {
-      const decoded = YAML.parse(yaml);
+      const decoded: IRuleYamlParent = YAML.parse(yaml);
       const rules: RuleDto[] = [];
       let idRef = 0;
-      for (const section of decoded) {
+
+      // Break when media types are incompatible
+      if (+mediaType !== +EPlexDataType[decoded.mediaType.toUpperCase()]) {
+        this.logger.warn(`Yaml import failed. Incompatible media types`);
+        this.logger.debug(
+          `media type with ID ${+mediaType} is not compatible with media type with ID ${
+            EPlexDataType[decoded.mediaType.toUpperCase()]
+          } `,
+        );
+
+        return {
+          code: 0,
+          message: 'Yaml import failed. Incompatible media types',
+        };
+      }
+
+      for (const section of decoded.rules) {
         for (const rule of section[idRef]) {
           rules.push({
-            operator: rule.operator ? +RuleOperators[rule.operator] : null,
-            action: +RulePossibility[rule.action],
+            operator: rule.operator
+              ? +RuleOperators[rule.operator.toUpperCase()]
+              : null,
+            action: +RulePossibility[rule.action.toUpperCase()],
             section: idRef,
-            firstVal: this.getValueFromIdentifier(rule.firstValue),
+            firstVal: this.getValueFromIdentifier(
+              rule.firstValue.toLowerCase(),
+            ),
             ...(rule.lastValue
-              ? { lastVal: this.getValueFromIdentifier(rule.lastValue) }
+              ? {
+                  lastVal: this.getValueFromIdentifier(
+                    rule.lastValue.toLowerCase(),
+                  ),
+                }
               : {}),
             ...(rule.customValue
               ? {
@@ -109,9 +145,15 @@ export class RuleYamlService {
         }
         idRef++;
       }
+
+      const returnObj: { mediaType: number; rules: RuleDto[] } = {
+        mediaType: EPlexDataType[decoded.mediaType],
+        rules: rules,
+      };
+
       return {
         code: 1,
-        result: JSON.stringify(rules),
+        result: JSON.stringify(returnObj),
         message: 'success',
       };
     } catch (e) {
@@ -119,10 +161,9 @@ export class RuleYamlService {
       this.logger.debug(e);
       return {
         code: 0,
-        message: 'failed',
+        message: 'Import failed, please check your yaml',
       };
     }
-    return undefined;
   }
   private getValueIdentifier(location: [number, number]) {
     const application = this.ruleConstants.applications[location[0]].name;
@@ -137,11 +178,11 @@ export class RuleYamlService {
     const rule = identifier.split('.')[1];
 
     const applicationConstant = this.ruleConstants.applications.find(
-      (el) => el.name === application,
+      (el) => el.name.toLowerCase() === application.toLowerCase(),
     );
 
     const ruleConstant = applicationConstant.props.find(
-      (el) => el.name === rule,
+      (el) => el.name.toLowerCase() === rule.toLowerCase(),
     );
     return [applicationConstant.id, ruleConstant.id];
   }
@@ -200,6 +241,10 @@ export class RuleYamlService {
       case 'TEXT':
         ruleType = RuleType.TEXT;
         value = identifier.value.toString();
+        break;
+      case 'BOOLEAN':
+        ruleType = RuleType.BOOL;
+        value = identifier.value == 'true' ? '1' : '0';
         break;
       case 'BOOL':
         ruleType = RuleType.BOOL;

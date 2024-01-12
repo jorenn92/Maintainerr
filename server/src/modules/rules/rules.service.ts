@@ -702,11 +702,11 @@ export class RulesService {
     }
   }
 
-  public encodeToYaml(rules: RuleDto[]): ReturnStatus {
-    return this.ruleYamlService.encode(rules);
+  public encodeToYaml(rules: RuleDto[], mediaType: number): ReturnStatus {
+    return this.ruleYamlService.encode(rules, mediaType);
   }
 
-  public decodeFromYaml(yaml: string): ReturnStatus {
-    return this.ruleYamlService.decode(yaml);
+  public decodeFromYaml(yaml: string, mediaType: number): ReturnStatus {
+    return this.ruleYamlService.decode(yaml, mediaType);
   }
 }

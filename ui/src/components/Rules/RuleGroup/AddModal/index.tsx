@@ -132,6 +132,7 @@ const AddModal = (props: AddModal) => {
     e.preventDefault()
     const response = await PostApiHandler('/rules/yaml/encode', {
       rules: JSON.stringify(rules),
+      mediaType: selectedType,
     })
 
     if (response.code === 1) {
@@ -158,16 +159,20 @@ const AddModal = (props: AddModal) => {
   const importRulesFromYaml = async (yaml: string) => {
     const response = await PostApiHandler('/rules/yaml/decode', {
       yaml: yaml,
+      mediaType: selectedType,
     })
 
     if (response && response.code === 1) {
-      handleLoadRules(JSON.parse(response.result))
-      addToast('Successfully imported yaml', {
+      const result: { mediaType: string; rules: IRule[] } = JSON.parse(
+        response.result,
+      )
+      handleLoadRules(result.rules)
+      addToast('Successfully imported rules from Yaml', {
         autoDismiss: true,
         appearance: 'success',
       })
     } else {
-      addToast('Import failed, please check your yaml', {
+      addToast(response.message, {
         autoDismiss: true,
         appearance: 'error',
       })
