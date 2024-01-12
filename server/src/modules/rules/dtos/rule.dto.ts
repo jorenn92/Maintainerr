@@ -6,4 +6,5 @@ export class RuleDto {
   firstVal: [number, number];
   lastVal?: [number, number];
   customVal?: { ruleTypeId: number; value: string };
+  section: number;
 }

@@ -17,6 +17,7 @@ import {
   DownloadIcon,
   QuestionMarkCircleIcon,
   SaveIcon,
+  UploadIcon,
 } from '@heroicons/react/solid'
 import Router from 'next/router'
 import Link from 'next/link'
@@ -24,6 +25,9 @@ import Button from '../../../Common/Button'
 import CommunityRuleModal from '../../../Common/CommunityRuleModal'
 import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 import CachedImage from '../../../Common/CachedImage'
+import YamlImporterModal from '../../../Common/YamlImporterModal'
+import { CloudDownloadIcon } from '@heroicons/react/outline'
+import { useToasts } from 'react-toast-notifications'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -52,15 +56,19 @@ interface ICreateApiObject {
 
 const AddModal = (props: AddModal) => {
   const [selectedLibraryId, setSelectedLibraryId] = useState<string>(
-    props.editData ? props.editData.libraryId.toString() : '1'
+    props.editData ? props.editData.libraryId.toString() : '1',
   )
   const [selectedType, setSelectedType] = useState<string>(
-    props.editData && props.editData.type ? props.editData.type.toString() : '1'
+    props.editData && props.editData.type
+      ? props.editData.type.toString()
+      : '1',
   )
   const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
   const [collection, setCollection] = useState<ICollection>()
   const [isLoading, setIsLoading] = useState(true)
   const [CommunityModal, setCommunityModal] = useState(false)
+  const [yamlImporterModal, setYamlImporterModal] = useState(false)
+  const yaml = useRef<string>()
 
   const nameRef = useRef<any>()
   const descriptionRef = useRef<any>()
@@ -74,20 +82,22 @@ const AddModal = (props: AddModal) => {
 
   const [manualCollection, setManualCollection] = useState<boolean>(false)
   const [manualCollectionName, setManualCollectionName] = useState<string>(
-    'My custom collection'
+    'My custom collection',
   )
 
+  const { addToast } = useToasts()
+
   const [useRules, setUseRules] = useState<boolean>(
-    props.editData ? props.editData.useRules : true
+    props.editData ? props.editData.useRules : true,
   )
   const [arrOption, setArrOption] = useState<number>()
   const [active, setActive] = useState<boolean>(
-    props.editData ? props.editData.isActive : true
+    props.editData ? props.editData.isActive : true,
   )
   const [rules, setRules] = useState<IRule[]>(
     props.editData
       ? props.editData.rules.map((r) => JSON.parse(r.ruleJson) as IRule)
-      : []
+      : [],
   )
   const [error, setError] = useState<boolean>(false)
   const [formIncomplete, setFormIncomplete] = useState<boolean>(false)
@@ -118,18 +128,61 @@ const AddModal = (props: AddModal) => {
     }
   }
 
+  const toggleYamlExporter = async (e: any) => {
+    e.preventDefault()
+    const response = await PostApiHandler('/rules/yaml/encode', {
+      rules: JSON.stringify(rules),
+      mediaType: selectedType,
+    })
+
+    if (response.code === 1) {
+      yaml.current = response.result
+
+      if (!yamlImporterModal) {
+        setYamlImporterModal(true)
+      } else {
+        setYamlImporterModal(false)
+      }
+    }
+  }
+
+  const toggleYamlImporter = (e: any) => {
+    e.preventDefault()
+    yaml.current = undefined
+    if (!yamlImporterModal) {
+      setYamlImporterModal(true)
+    } else {
+      setYamlImporterModal(false)
+    }
+  }
+
+  const importRulesFromYaml = async (yaml: string) => {
+    const response = await PostApiHandler('/rules/yaml/decode', {
+      yaml: yaml,
+      mediaType: selectedType,
+    })
+
+    if (response && response.code === 1) {
+      const result: { mediaType: string; rules: IRule[] } = JSON.parse(
+        response.result,
+      )
+      handleLoadRules(result.rules)
+      addToast('Successfully imported rules from Yaml', {
+        autoDismiss: true,
+        appearance: 'success',
+      })
+    } else {
+      addToast(response.message, {
+        autoDismiss: true,
+        appearance: 'error',
+      })
+    }
+  }
+
   const handleLoadRules = (rules: IRule[]) => {
     updateRules(rules)
     ruleCreatorVersion.current = ruleCreatorVersion.current + 1
     setCommunityModal(false)
-  }
-
-  const loadJsonRules = (rules: string[]) => {
-    const transformedRules: IRule[] = rules
-      ? rules.map((r) => JSON.parse(r) as IRule)
-      : []
-    updateRules(transformedRules)
-    ruleCreatorVersion.current = ruleCreatorVersion.current + 1
   }
 
   const cancel = () => {
@@ -138,7 +191,7 @@ const AddModal = (props: AddModal) => {
 
   useEffect(() => {
     const lib = LibrariesCtx.libraries.find(
-      (el: ILibrary) => +el.key === +selectedLibraryId
+      (el: ILibrary) => +el.key === +selectedLibraryId,
     )
     setSelectedLibrary(lib)
     setSelectedType(lib?.type === 'movie' ? '1' : '2')
@@ -157,7 +210,7 @@ const AddModal = (props: AddModal) => {
     }
     if (props.editData) {
       GetApiHandler(
-        `/collections/collection/${props.editData.collectionId}`
+        `/collections/collection/${props.editData.collectionId}`,
       ).then((resp: ICollection) => {
         resp ? setCollection(resp) : undefined
         resp ? setShowHome(resp.visibleOnHome!) : undefined
@@ -421,31 +474,31 @@ const AddModal = (props: AddModal) => {
                         },
                       ]
                     : +selectedType === EPlexDataType.SEASONS
-                    ? [
-                        {
-                          id: 0,
-                          name: 'Unmonitor and delete season',
-                        },
-                        {
-                          id: 2,
-                          name: 'Unmonitor and Delete existing episodes',
-                        },
-                        {
-                          id: 3,
-                          name: 'Unmonitor season and keep files',
-                        },
-                      ]
-                    : // episodes
-                      [
-                        {
-                          id: 0,
-                          name: 'Unmonitor and delete episode',
-                        },
-                        {
-                          id: 3,
-                          name: 'Unmonitor and keep file',
-                        },
-                      ]
+                      ? [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete season',
+                          },
+                          {
+                            id: 2,
+                            name: 'Unmonitor and Delete existing episodes',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor season and keep files',
+                          },
+                        ]
+                      : // episodes
+                        [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete episode',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor and keep file',
+                          },
+                        ]
                 }
               />
             </>
@@ -453,7 +506,11 @@ const AddModal = (props: AddModal) => {
 
           <div className="form-row">
             <label htmlFor="collection_deleteDays" className="text-label">
-              Media deleted after days*
+              Take action after days*
+              <p className="text-xs font-normal">
+                Duration of days media remains in the collection before
+                deletion/unmonitor
+              </p>
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -636,17 +693,40 @@ const AddModal = (props: AddModal) => {
                 </div>
                 <div className="ml-auto ">
                   <button
-                    className="ml-auto flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
+                    className="ml-3 flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
                     onClick={toggleCommunityRuleModal}
                   >
                     {
-                      <DownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
+                      <CloudDownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
                     }
                     <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
                       Community Rules
                     </p>
                   </button>
                 </div>
+              </div>
+              <div className="mt-4 flex items-center justify-left">
+                <button
+                  className="ml-3 flex  h-fit rounded bg-amber-600 p-1 text-zinc-900 shadow-md hover:bg-amber-500 md:h-10"
+                  onClick={toggleYamlImporter}
+                >
+                  {
+                    <DownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
+                  }
+                  <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
+                    Import
+                  </p>
+                </button>
+
+                <button
+                  className="ml-3 flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
+                  onClick={toggleYamlExporter}
+                >
+                  {<UploadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />}
+                  <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
+                    Export
+                  </p>
+                </button>
               </div>
             </div>
             {CommunityModal ? (
@@ -655,6 +735,18 @@ const AddModal = (props: AddModal) => {
                 type={selectedLibrary ? selectedLibrary.type : 'movie'}
                 onUpdate={handleLoadRules}
                 onCancel={() => setCommunityModal(false)}
+              />
+            ) : undefined}
+            {yamlImporterModal ? (
+              <YamlImporterModal
+                yaml={yaml.current ? yaml.current : undefined}
+                onImport={(yaml: string) => {
+                  importRulesFromYaml(yaml)
+                  setYamlImporterModal(false)
+                }}
+                onCancel={() => {
+                  setYamlImporterModal(false)
+                }}
               />
             ) : undefined}
             <ConstantsContextProvider>
@@ -674,7 +766,6 @@ const AddModal = (props: AddModal) => {
               />
             </ConstantsContextProvider>
           </div>
-
           <div className="mt-5 flex h-full w-full">
             {/* <AddButton text="Create" onClick={create} /> */}
             <div className="m-auto flex xl:m-0">

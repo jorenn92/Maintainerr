@@ -13,6 +13,7 @@ import { ExclusionAction, ExclusionContextDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleExecutorService } from './rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
+import { RuleDto } from './dtos/rule.dto';
 
 @Controller('api/rules')
 export class RulesController {
@@ -126,6 +127,49 @@ export class RulesController {
         body.karma,
       );
     } else {
+      return {
+        code: 0,
+        result: 'Invalid input',
+      };
+    }
+  }
+
+  /**
+   * Encodes an array of RuleDto objects to YAML format.
+   *
+   * @param {RuleDto[]} rules - The array of RuleDto objects to be encoded.
+   * @return {Promise<ReturnStatus>} A Promise that resolves to a ReturnStatus object.
+   */
+  @Post('/yaml/encode')
+  async yamlEncode(
+    @Body() body: { rules: string; mediaType: number },
+  ): Promise<ReturnStatus> {
+    try {
+      return this.rulesService.encodeToYaml(
+        JSON.parse(body.rules),
+        body.mediaType,
+      );
+    } catch (err) {
+      return {
+        code: 0,
+        result: 'Invalid input',
+      };
+    }
+  }
+
+  /**
+   * Decodes a YAML-encoded string and returns an array of RuleDto objects.
+   *
+   * @param {string} body - The YAML-encoded string to decode.
+   * @return {Promise<ReturnStatus>} - A Promise that resolves to the decoded ReturnStatus object.
+   */
+  @Post('/yaml/decode')
+  async yamlDecode(
+    @Body() body: { yaml: string; mediaType: number },
+  ): Promise<ReturnStatus> {
+    try {
+      return this.rulesService.decodeFromYaml(body.yaml, body.mediaType);
+    } catch (err) {
       return {
         code: 0,
         result: 'Invalid input',

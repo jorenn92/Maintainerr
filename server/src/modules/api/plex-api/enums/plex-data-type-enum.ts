@@ -6,3 +6,11 @@ export enum EPlexDataType {
   SEASONS = 3,
   EPISODES = 4,
 }
+
+// EPlexDataType values as strings
+export const PlexDataTypeStrings: string[] = [
+  'MOVIES',
+  'SHOWS',
+  'SEASONS',
+  'EPISODES',
+];

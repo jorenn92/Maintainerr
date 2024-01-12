@@ -1,6 +1,6 @@
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 
-export const enum RulePossibility {
+export enum RulePossibility {
   BIGGER,
   SMALLER,
   EQUALS,
@@ -15,7 +15,7 @@ export const enum RulePossibility {
   NOT_CONTAINS_PARTIAL,
 }
 
-export const enum RuleOperators {
+export enum RuleOperators {
   AND,
   OR,
 }
@@ -41,37 +41,51 @@ export const enum MediaType {
 }
 
 export class RuleType {
-  static readonly NUMBER = new RuleType('0', [
-    RulePossibility.BIGGER,
-    RulePossibility.SMALLER,
-    RulePossibility.EQUALS,
-    RulePossibility.NOT_EQUALS,
-    RulePossibility.CONTAINS,
-    RulePossibility.NOT_CONTAINS,
-  ]);
-  static readonly DATE = new RuleType('1', [
-    RulePossibility.EQUALS,
-    RulePossibility.NOT_EQUALS,
-    RulePossibility.BEFORE,
-    RulePossibility.AFTER,
-    RulePossibility.IN_LAST,
-    RulePossibility.IN_NEXT,
-  ]);
-  static readonly TEXT = new RuleType('2', [
-    RulePossibility.EQUALS,
-    RulePossibility.NOT_EQUALS,
-    RulePossibility.CONTAINS,
-    RulePossibility.NOT_CONTAINS,
-    RulePossibility.CONTAINS_PARTIAL,
-    RulePossibility.NOT_CONTAINS_PARTIAL,
-  ]);
-  static readonly BOOL = new RuleType('3', [
-    RulePossibility.EQUALS,
-    RulePossibility.NOT_EQUALS,
-  ]);
-  private constructor(
+  static readonly NUMBER = new RuleType(
+    '0',
+    [
+      RulePossibility.BIGGER,
+      RulePossibility.SMALLER,
+      RulePossibility.EQUALS,
+      RulePossibility.NOT_EQUALS,
+      RulePossibility.CONTAINS,
+      RulePossibility.NOT_CONTAINS,
+    ],
+    'number',
+  );
+  static readonly DATE = new RuleType(
+    '1',
+    [
+      RulePossibility.EQUALS,
+      RulePossibility.NOT_EQUALS,
+      RulePossibility.BEFORE,
+      RulePossibility.AFTER,
+      RulePossibility.IN_LAST,
+      RulePossibility.IN_NEXT,
+    ],
+    'date',
+  );
+  static readonly TEXT = new RuleType(
+    '2',
+    [
+      RulePossibility.EQUALS,
+      RulePossibility.NOT_EQUALS,
+      RulePossibility.CONTAINS,
+      RulePossibility.NOT_CONTAINS,
+      RulePossibility.CONTAINS_PARTIAL,
+      RulePossibility.NOT_CONTAINS_PARTIAL,
+    ],
+    'text',
+  );
+  static readonly BOOL = new RuleType(
+    '3',
+    [RulePossibility.EQUALS, RulePossibility.NOT_EQUALS],
+    'boolean',
+  );
+  public constructor(
     private readonly key: string,
     public readonly possibilities: number[],
+    public readonly humanName: string,
   ) {}
   toString() {
     return this.key;
@@ -300,13 +314,7 @@ export class RuleConstants {
           mediaType: MediaType.MOVIE,
           type: RuleType.DATE,
         } as Property,
-        {
-          id: 1,
-          name: 'fileDate',
-          humanName: 'Date file downloaded',
-          mediaType: MediaType.MOVIE,
-          type: RuleType.DATE,
-        } as Property,
+        // Don't use ID 1, It was once used for an old rule value. Changing the id's messes up existing rules.
         {
           id: 2,
           name: 'tags',
