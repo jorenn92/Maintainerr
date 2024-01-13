@@ -705,7 +705,7 @@ const AddModal = (props: AddModal) => {
                   </button>
                 </div>
               </div>
-              <div className="mt-4 flex items-center justify-left">
+              <div className="mt-4 flex items-center justify-center sm:justify-end max-width-form-head">
                 <button
                   className="ml-3 flex  h-fit rounded bg-amber-600 p-1 text-zinc-900 shadow-md hover:bg-amber-500 md:h-10"
                   onClick={toggleYamlImporter}

@@ -26,6 +26,8 @@ import { Settings } from '../settings/entities/settings.entities';
 import _ from 'lodash';
 import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
 import { RuleYamlService } from './helpers/yaml.service';
+import { RuleComparatorService } from './helpers/rule.comparator.service';
+import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -59,6 +61,7 @@ export class RulesService {
     private readonly plexApi: PlexApiService,
     private readonly connection: Connection,
     private readonly ruleYamlService: RuleYamlService,
+    private readonly RuleComparatorService: RuleComparatorService,
   ) {
     this.ruleConstants = new RuleConstants();
   }
@@ -121,8 +124,8 @@ export class RulesService {
           libraryId !== undefined
             ? `rg.libraryId = ${libraryId}`
             : typeId !== undefined
-              ? `c.type = ${typeId}`
-              : 'rg.libraryId != -1',
+            ? `c.type = ${typeId}`
+            : 'rg.libraryId != -1',
         )
         // .where(typeId !== undefined ? `c.type = ${typeId}` : '')
         .getMany();
@@ -191,8 +194,8 @@ export class RulesService {
               lib.type === 'movie'
                 ? EPlexDataType.MOVIES
                 : params.dataType !== undefined
-                  ? params.dataType
-                  : EPlexDataType.SHOWS,
+                ? params.dataType
+                : EPlexDataType.SHOWS,
             title: params.name,
             description: params.description,
             arrAction: params.arrAction ? params.arrAction : 0,
@@ -708,5 +711,23 @@ export class RulesService {
 
   public decodeFromYaml(yaml: string, mediaType: number): ReturnStatus {
     return this.ruleYamlService.decode(yaml, mediaType);
+  }
+
+  public async testRuleGroupWithData(
+    rulegroupId: number,
+    mediaId: string,
+  ): Promise<any> {
+    const mediaResp = await this.plexApi.getMetadata(mediaId);
+    const group = await this.getRuleGroupById(rulegroupId);
+    if (group && mediaResp) {
+      group.rules = await this.getRules(group.id.toString());
+      const result = await this.RuleComparatorService.executeRulesWithData(
+        group as RulesDto,
+        [mediaResp as unknown as PlexLibraryItem],
+        true,
+      );
+      return { code: 1, result: result.stats };
+    }
+    return { code: 0, result: 'Invalid input' };
   }
 }

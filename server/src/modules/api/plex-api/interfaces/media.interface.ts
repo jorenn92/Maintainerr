@@ -1,8 +1,10 @@
+import { PlexActor, PlexGenre } from './library.interfaces';
+
 export interface PlexMetadata {
   ratingKey: string;
   parentRatingKey?: string;
   guid: string;
-  type: 'movie' | 'show' | 'season';
+  type: 'movie' | 'show' | 'season' | 'episode' | 'collection';
   title: string;
   Guid: {
     id: string;
@@ -15,13 +17,20 @@ export interface PlexMetadata {
   parentIndex?: number;
   Collection?: { tag: string }[];
   leafCount: number;
-  grandparentRatingKey?: number;
+  grandparentRatingKey?: string;
   viewedLeafCount: number;
   addedAt: number;
   updatedAt: number;
   media: Media[];
   parentData?: PlexMetadata;
   Label?: { tag: string }[];
+  rating?: number;
+  audienceRating?: number;
+  userRating?: number;
+  Role?: PlexActor[];
+  originallyAvailableAt: string;
+  Media: Media[];
+  Genre?: PlexGenre[];
 }
 
 export interface Media {

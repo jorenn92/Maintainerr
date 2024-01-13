@@ -23,6 +23,8 @@ import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Settings } from '../settings/entities/settings.entities';
 import { RuleMaintenanceService } from './rule-maintenance.service';
 import { RuleYamlService } from './helpers/yaml.service';
+import { RuleComparatorService } from './helpers/rule.comparator.service';
+import { RuleConstanstService } from './constants/constants.service';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { RuleYamlService } from './helpers/yaml.service';
     OverseerrGetterService,
     ValueGetterService,
     RuleYamlService,
+    RuleComparatorService,
+    RuleConstanstService
   ],
   controllers: [RulesController],
 })
