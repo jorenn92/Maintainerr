@@ -141,7 +141,7 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
       </div>
 
       <button
-        className="edit-button flex  rounded h-9 text-zinc-200 shadow-md"
+        className="edit-button mb-4 flex  rounded h-9 text-zinc-200 shadow-md"
         onClick={() => setMediaTestModalOpen(true)}
       >
         {<PlayIcon className="m-auto h-5 ml-5" />}{' '}
