@@ -48,6 +48,7 @@ const YamlImporterModal = (props: IYamlImporterModal) => {
         iconSvg={''}
       >
         <Editor
+          options={props.yaml ? { readOnly: true } : undefined}
           height="70vh"
           defaultLanguage="yaml"
           theme="vs-dark"

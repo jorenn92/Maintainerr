@@ -124,8 +124,8 @@ export class RulesService {
           libraryId !== undefined
             ? `rg.libraryId = ${libraryId}`
             : typeId !== undefined
-            ? `c.type = ${typeId}`
-            : 'rg.libraryId != -1',
+              ? `c.type = ${typeId}`
+              : 'rg.libraryId != -1',
         )
         // .where(typeId !== undefined ? `c.type = ${typeId}` : '')
         .getMany();
@@ -141,6 +141,18 @@ export class RulesService {
     try {
       return await this.ruleGroupRepository.findOne({
         where: { id: ruleGroupId },
+      });
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      this.logger.debug(e);
+      return undefined;
+    }
+  }
+
+  async getRuleGroupByCollectionId(id: number) {
+    try {
+      return await this.ruleGroupRepository.findOne({
+        where: { collectionId: id },
       });
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
@@ -194,8 +206,8 @@ export class RulesService {
               lib.type === 'movie'
                 ? EPlexDataType.MOVIES
                 : params.dataType !== undefined
-                ? params.dataType
-                : EPlexDataType.SHOWS,
+                  ? params.dataType
+                  : EPlexDataType.SHOWS,
             title: params.name,
             description: params.description,
             arrAction: params.arrAction ? params.arrAction : 0,

@@ -49,6 +49,11 @@ export class RulesController {
     return this.rulesService.getRules(id);
   }
 
+  @Get('/collection/:id')
+  getRuleGroupByCollectionId(@Param('id') id: string) {
+    return this.rulesService.getRuleGroupByCollectionId(+id);
+  }
+
   @Get()
   getRuleGroups(
     @Query()

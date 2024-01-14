@@ -90,7 +90,6 @@
   .collection-cards-vertical {
     grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
     @apply grid gap-4;
-
   }
 
   .collection {
@@ -544,6 +543,12 @@
 
   .react-select-container .react-select__input-container {
     @apply text-white;
+  }
+
+  .react-select-container .react-select__input-container,
+  .react-select-container .react-select__placeholder,
+  .react-select-container .react-select__single-value {
+    @apply text-white font-semibold;
   }
 }
 
