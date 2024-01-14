@@ -7,6 +7,7 @@ import GetApiHandler, { PostApiHandler } from '../../../../utils/ApiHandler'
 import { IRuleGroup } from '../../../Rules/RuleGroup'
 import { Editor } from '@monaco-editor/react'
 import YAML from 'yaml'
+import Alert from '../../../Common/Alert'
 
 interface ITestMediaItem {
   onCancel: () => void
@@ -148,6 +149,12 @@ const TestMediaItem = (props: ITestMediaItem) => {
         title={'Test media item'}
         iconSvg={''}
       >
+        <div className="mt-1">
+          <Alert
+            title={`Search for media items and validate them against your rule. Will return a YAML document containing the validated steps.`}
+            type="info"
+          />
+        </div>
         <FormItem label="Media">
           <SearchMediaItem
             onChange={(el) => {
