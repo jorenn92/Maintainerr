@@ -15,6 +15,7 @@ import { RuleConstanstService } from '../constants/constants.service';
 
 interface IComparisonStatistics {
   plexId: number;
+  result: boolean;
   sectionResults: ISectionComparisonResults[];
 }
 
@@ -111,6 +112,14 @@ export class RuleComparatorService {
       // handle last section
       this.handleSectionAction(sectionActionAnd);
 
+      // update statistics results when needed
+      this.updateStatisticResults();
+
+      // update result for matched media
+      this.statistics.forEach((el) => {
+        el.result = this.resultData.some((i) => +i.ratingKey === +el.plexId);
+      });
+
       // return comparatorReturnValue
       return { stats: this.statistics, data: this.resultData };
     } catch (e) {
@@ -118,6 +127,14 @@ export class RuleComparatorService {
         `Something went wrong while running rule ${rulegroup.name}`,
       );
       this.logger.debug(e);
+    }
+  }
+
+  updateStatisticResults() {
+    if (this.enabledStats) {
+      this.statistics.forEach((el) => {
+        el.result = this.resultData.some((i) => +i.ratingKey === +el.plexId);
+      });
     }
   }
 
@@ -271,6 +288,7 @@ export class RuleComparatorService {
       this.plexData.forEach((data) => {
         this.statistics.push({
           plexId: +data.ratingKey,
+          result: false,
           sectionResults: [
             {
               id: 0,
