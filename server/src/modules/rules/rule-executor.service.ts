@@ -94,6 +94,10 @@ export class RuleExecutorService implements OnApplicationBootstrap {
             this.resultData = [];
             this.plexData = { page: 0, finished: false, data: [] };
 
+            this.plexDataType = rulegroup.dataType
+              ? rulegroup.dataType
+              : undefined;
+
             // Run rules data shunks of 50
             while (!this.plexData.finished) {
               await this.getPlexData(rulegroup.libraryId);

@@ -12,6 +12,7 @@ import {
 } from '../constants/rules.constants';
 import { RulesDto } from '../dtos/rules.dto';
 import { PlexMetadata } from 'src/modules/api/plex-api/interfaces/media.interface';
+import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
 
 @Injectable()
 export class PlexGetterService {
@@ -25,7 +26,12 @@ export class PlexGetterService {
     ).props;
   }
 
-  async get(id: number, libItem: PlexLibraryItem, ruleGroup?: RulesDto) {
+  async get(
+    id: number,
+    libItem: PlexLibraryItem,
+    dataType?: EPlexDataType,
+    ruleGroup?: RulesDto,
+  ) {
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
       // fetch metadata from cache, this data is more complete
@@ -81,10 +87,10 @@ export class PlexGetterService {
                   metadata.grandparentRatingKey,
                 )) as unknown as PlexLibraryItem)
               : metadata.type === 'season'
-              ? ((await this.plexApi.getMetadata(
-                  metadata.parentRatingKey,
-                )) as unknown as PlexLibraryItem)
-              : metadata;
+                ? ((await this.plexApi.getMetadata(
+                    metadata.parentRatingKey,
+                  )) as unknown as PlexLibraryItem)
+                : metadata;
 
           return item.Label ? item.Label.map((l) => l.tag) : [];
         }
@@ -213,10 +219,10 @@ export class PlexGetterService {
                   metadata.grandparentRatingKey,
                 )) as unknown as PlexLibraryItem)
               : metadata.type === 'season'
-              ? ((await this.plexApi.getMetadata(
-                  metadata.parentRatingKey,
-                )) as unknown as PlexLibraryItem)
-              : metadata;
+                ? ((await this.plexApi.getMetadata(
+                    metadata.parentRatingKey,
+                  )) as unknown as PlexLibraryItem)
+                : metadata;
           return item.Genre ? item.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {

@@ -161,7 +161,12 @@ export class RuleComparatorService {
     // loop media items
     for (let i = data.length - 1; i >= 0; i--) {
       // fetch values
-      firstVal = await this.valueGetter.get(rule.firstVal, data[i], ruleGroup);
+      firstVal = await this.valueGetter.get(
+        rule.firstVal,
+        data[i],
+        ruleGroup,
+        this.plexDataType,
+      );
       secondVal = await this.getSecondValue(rule, data[i], ruleGroup, firstVal);
 
       if (
@@ -213,7 +218,12 @@ export class RuleComparatorService {
   ): Promise<any> {
     let secondVal;
     if (rule.lastVal) {
-      secondVal = await this.valueGetter.get(rule.lastVal, data, rulegroup);
+      secondVal = await this.valueGetter.get(
+        rule.lastVal,
+        data,
+        rulegroup,
+        this.plexDataType,
+      );
     } else {
       secondVal =
         rule.customVal.ruleTypeId === +RuleType.DATE
@@ -221,11 +231,11 @@ export class RuleComparatorService {
             ? new Date(rule.customVal.value)
             : new Date(+rule.customVal.value * 1000)
           : rule.customVal.ruleTypeId === +RuleType.TEXT
-          ? rule.customVal.value
-          : rule.customVal.ruleTypeId === +RuleType.NUMBER ||
-            rule.customVal.ruleTypeId === +RuleType.BOOL
-          ? +rule.customVal.value
-          : null;
+            ? rule.customVal.value
+            : rule.customVal.ruleTypeId === +RuleType.NUMBER ||
+                rule.customVal.ruleTypeId === +RuleType.BOOL
+              ? +rule.customVal.value
+              : null;
       if (
         firstVal instanceof Date &&
         rule.customVal.ruleTypeId === +RuleType.NUMBER
@@ -424,8 +434,8 @@ export class RuleComparatorService {
                   String(val2).length > 0
                   ? line.includes(String(val2))
                   : line == val2
-                  ? true
-                  : false;
+                    ? true
+                    : false;
               },
             ) || false
           );
@@ -440,8 +450,8 @@ export class RuleComparatorService {
                     el.length > 0
                     ? line.includes(String(el))
                     : line == el
-                    ? true
-                    : false;
+                      ? true
+                      : false;
                 }) || false
               );
             });
