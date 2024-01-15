@@ -10,9 +10,9 @@ import {
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
-import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
 import { RulesDto } from '../dtos/rules.dto';
 import { PlexMetadata } from 'src/modules/api/plex-api/interfaces/media.interface';
+import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
 
 @Injectable()
 export class PlexGetterService {
@@ -34,18 +34,19 @@ export class PlexGetterService {
   ) {
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
+      // fetch metadata from cache, this data is more complete
       const metadata: PlexMetadata = await this.plexApi.getMetadata(
         libItem.ratingKey,
-      ); // fetch metadata from cache, this data is more complete
+      );
       switch (prop.name) {
         case 'addDate': {
-          return libItem.addedAt ? new Date(+libItem.addedAt * 1000) : null;
+          return metadata.addedAt ? new Date(+metadata.addedAt * 1000) : null;
         }
         case 'seenBy': {
           const plexUsers = await this.getCorrectedUsers();
 
           const viewers: PlexSeenBy[] = await this.plexApi
-            .getWatchHistory(libItem.ratingKey)
+            .getWatchHistory(metadata.ratingKey)
             .catch((_err) => {
               return null;
             });
@@ -59,37 +60,37 @@ export class PlexGetterService {
           }
         }
         case 'releaseDate': {
-          return new Date(libItem.originallyAvailableAt)
-            ? new Date(libItem.originallyAvailableAt)
+          return new Date(metadata.originallyAvailableAt)
+            ? new Date(metadata.originallyAvailableAt)
             : null;
         }
         case 'rating_critics': {
-          return libItem.rating ? +libItem.rating : 0;
+          return metadata.rating ? +metadata.rating : 0;
         }
         case 'rating_audience': {
-          return libItem.audienceRating ? +libItem.audienceRating : 0;
+          return metadata.audienceRating ? +metadata.audienceRating : 0;
         }
         case 'rating_user': {
-          return libItem.userRating ? +libItem.userRating : 0;
+          return metadata.userRating ? +metadata.userRating : 0;
         }
         case 'people': {
-          return libItem.Role ? libItem.Role.map((el) => el.tag) : null;
+          return metadata.Role ? metadata.Role.map((el) => el.tag) : null;
         }
         case 'viewCount': {
-          const count = await this.plexApi.getWatchHistory(libItem.ratingKey);
+          const count = await this.plexApi.getWatchHistory(metadata.ratingKey);
           return count ? count.length : 0;
         }
         case 'labels': {
           const item =
-            libItem.type === 'episode'
+            metadata.type === 'episode'
               ? ((await this.plexApi.getMetadata(
-                  libItem.grandparentRatingKey,
+                  metadata.grandparentRatingKey,
                 )) as unknown as PlexLibraryItem)
-              : libItem.type === 'season'
-              ? ((await this.plexApi.getMetadata(
-                  libItem.parentRatingKey,
-                )) as unknown as PlexLibraryItem)
-              : metadata;
+              : metadata.type === 'season'
+                ? ((await this.plexApi.getMetadata(
+                    metadata.parentRatingKey,
+                  )) as unknown as PlexLibraryItem)
+                : metadata;
 
           return item.Label ? item.Label.map((l) => l.tag) : [];
         }
@@ -109,13 +110,13 @@ export class PlexGetterService {
             : 0;
         }
         case 'playlists': {
-          if (libItem.type !== 'episode' && libItem.type !== 'movie') {
+          if (metadata.type !== 'episode' && metadata.type !== 'movie') {
             const filtered = [];
 
             const seasons =
-              libItem.type !== 'season'
-                ? await this.plexApi.getChildrenMetadata(libItem.ratingKey)
-                : [libItem];
+              metadata.type !== 'season'
+                ? await this.plexApi.getChildrenMetadata(metadata.ratingKey)
+                : [metadata];
             for (const season of seasons) {
               const episodes = await this.plexApi.getChildrenMetadata(
                 season.ratingKey,
@@ -136,19 +137,19 @@ export class PlexGetterService {
             return filtered.length;
           } else {
             const playlists = await this.plexApi.getPlaylists(
-              libItem.ratingKey,
+              metadata.ratingKey,
             );
             return playlists.length;
           }
         }
         case 'playlist_names': {
-          if (libItem.type !== 'episode' && libItem.type !== 'movie') {
+          if (metadata.type !== 'episode' && metadata.type !== 'movie') {
             const filtered = [];
 
             const seasons =
-              libItem.type !== 'season'
-                ? await this.plexApi.getChildrenMetadata(libItem.ratingKey)
-                : [libItem];
+              metadata.type !== 'season'
+                ? await this.plexApi.getChildrenMetadata(metadata.ratingKey)
+                : [metadata];
             for (const season of seasons) {
               const episodes = await this.plexApi.getChildrenMetadata(
                 season.ratingKey,
@@ -169,7 +170,7 @@ export class PlexGetterService {
             return filtered ? filtered.map((el) => el.title.trim()) : [];
           } else {
             const playlists = await this.plexApi.getPlaylists(
-              libItem.ratingKey,
+              metadata.ratingKey,
             );
             return playlists ? playlists.map((el) => el.title.trim()) : [];
           }
@@ -181,7 +182,7 @@ export class PlexGetterService {
         }
         case 'lastViewedAt': {
           return await this.plexApi
-            .getWatchHistory(libItem.ratingKey)
+            .getWatchHistory(metadata.ratingKey)
             .then((seenby) => {
               if (seenby.length > 0) {
                 return new Date(
@@ -199,38 +200,38 @@ export class PlexGetterService {
             });
         }
         case 'fileVideoResolution': {
-          return libItem.Media[0].videoResolution
-            ? libItem.Media[0].videoResolution
+          return metadata.Media[0].videoResolution
+            ? metadata.Media[0].videoResolution
             : null;
         }
         case 'fileBitrate': {
-          return libItem.Media[0].bitrate ? libItem.Media[0].bitrate : 0;
+          return metadata.Media[0].bitrate ? metadata.Media[0].bitrate : 0;
         }
         case 'fileVideoCodec': {
-          return libItem.Media[0].videoCodec
-            ? libItem.Media[0].videoCodec
+          return metadata.Media[0].videoCodec
+            ? metadata.Media[0].videoCodec
             : null;
         }
         case 'genre': {
           const item =
-            libItem.type === 'episode'
+            metadata.type === 'episode'
               ? ((await this.plexApi.getMetadata(
-                  libItem.grandparentRatingKey,
+                  metadata.grandparentRatingKey,
                 )) as unknown as PlexLibraryItem)
-              : libItem.type === 'season'
-              ? ((await this.plexApi.getMetadata(
-                  libItem.parentRatingKey,
-                )) as unknown as PlexLibraryItem)
-              : libItem;
+              : metadata.type === 'season'
+                ? ((await this.plexApi.getMetadata(
+                    metadata.parentRatingKey,
+                  )) as unknown as PlexLibraryItem)
+                : metadata;
           return item.Genre ? item.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {
           const plexUsers = await this.getCorrectedUsers();
 
           const seasons =
-            libItem.type !== 'season'
-              ? await this.plexApi.getChildrenMetadata(libItem.ratingKey)
-              : [libItem];
+            metadata.type !== 'season'
+              ? await this.plexApi.getChildrenMetadata(metadata.ratingKey)
+              : [metadata];
           const allViewers = plexUsers.slice();
           for (const season of seasons) {
             const episodes = await this.plexApi.getChildrenMetadata(
@@ -271,7 +272,7 @@ export class PlexGetterService {
           const plexUsers = await this.getCorrectedUsers();
 
           const watchHistory = await this.plexApi.getWatchHistory(
-            libItem.ratingKey,
+            metadata.ratingKey,
           );
 
           const viewers = watchHistory
@@ -288,7 +289,7 @@ export class PlexGetterService {
         }
         case 'sw_lastWatched': {
           let watchHistory = await this.plexApi.getWatchHistory(
-            libItem.ratingKey,
+            metadata.ratingKey,
           );
           watchHistory?.sort((a, b) => a.parentIndex - b.parentIndex).reverse();
           watchHistory = watchHistory?.filter(
@@ -300,21 +301,21 @@ export class PlexGetterService {
             : null;
         }
         case 'sw_episodes': {
-          if (libItem.type === 'season') {
+          if (metadata.type === 'season') {
             const eps = await this.plexApi.getChildrenMetadata(
-              libItem.ratingKey,
+              metadata.ratingKey,
             );
             return eps.length ? eps.length : 0;
           }
 
-          return libItem.leafCount ? +libItem.leafCount : 0;
+          return metadata.leafCount ? +metadata.leafCount : 0;
         }
         case 'sw_viewedEpisodes': {
           let viewCount = 0;
           const seasons =
-            libItem.type !== 'season'
-              ? await this.plexApi.getChildrenMetadata(libItem.ratingKey)
-              : [libItem];
+            metadata.type !== 'season'
+              ? await this.plexApi.getChildrenMetadata(metadata.ratingKey)
+              : [metadata];
           for (const season of seasons) {
             const episodes = await this.plexApi.getChildrenMetadata(
               season.ratingKey,
@@ -332,16 +333,18 @@ export class PlexGetterService {
           let viewCount = 0;
 
           // for episodes
-          if (libItem.type === 'episode') {
-            const views = await this.plexApi.getWatchHistory(libItem.ratingKey);
+          if (metadata.type === 'episode') {
+            const views = await this.plexApi.getWatchHistory(
+              metadata.ratingKey,
+            );
             viewCount =
               views?.length > 0 ? viewCount + views.length : viewCount;
           } else {
             // for seasons & shows
             const seasons =
-              libItem.type !== 'season'
-                ? await this.plexApi.getChildrenMetadata(libItem.ratingKey)
-                : [libItem];
+              metadata.type !== 'season'
+                ? await this.plexApi.getChildrenMetadata(metadata.ratingKey)
+                : [metadata];
             for (const season of seasons) {
               const episodes = await this.plexApi.getChildrenMetadata(
                 season.ratingKey,
@@ -359,11 +362,11 @@ export class PlexGetterService {
         }
         case 'sw_lastEpisodeAddedAt': {
           const seasons =
-            libItem.type !== 'season'
+            metadata.type !== 'season'
               ? (
-                  await this.plexApi.getChildrenMetadata(libItem.ratingKey)
+                  await this.plexApi.getChildrenMetadata(metadata.ratingKey)
                 ).sort((a, b) => a.index - b.index)
-              : [libItem];
+              : [metadata];
 
           const lastEpDate = await this.plexApi
             .getChildrenMetadata(seasons[seasons.length - 1].ratingKey)

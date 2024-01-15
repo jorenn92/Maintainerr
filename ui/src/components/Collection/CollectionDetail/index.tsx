@@ -1,11 +1,11 @@
-import { RewindIcon } from '@heroicons/react/solid'
+import { PlayIcon } from '@heroicons/react/solid'
 import Router from 'next/router'
-import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ICollection, ICollectionMedia } from '..'
 import GetApiHandler from '../../../utils/ApiHandler'
 import OverviewContent, { IPlexMetadata } from '../../Overview/Content'
 import _ from 'lodash'
-import { SmallLoadingSpinner } from '../../Common/LoadingSpinner'
+import TestMediaItem from './TestMediaItem'
 
 interface ICollectionDetail {
   libraryId: number
@@ -16,10 +16,11 @@ interface ICollectionDetail {
 
 const CollectionDetail: React.FC<ICollectionDetail> = (
   // TODO: this component uses it's own lazy loading mechanism instead of the one from OverviewContent. Update this.
-  props: ICollectionDetail
+  props: ICollectionDetail,
 ) => {
   const [data, setData] = useState<IPlexMetadata[]>([])
   const [media, setMedia] = useState<ICollectionMedia[]>([])
+  const [mediaTestModalOpen, setMediaTestModalOpen] = useState<boolean>(false)
   // paging
   const pageData = useRef<number>(0)
   const fetchAmount = 25
@@ -60,7 +61,7 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
     return () => {
       window.removeEventListener(
         'scroll',
-        _.debounce(handleScroll.bind(this), 200)
+        _.debounce(handleScroll.bind(this), 200),
       )
     }
   }, [])
@@ -77,7 +78,7 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
     // setLoading(true)
     const resp: { totalSize: number; items: ICollectionMedia[] } =
       await GetApiHandler(
-        `/collections/media/${props.collection.id}/content/${pageData.current}?size=${fetchAmount}`
+        `/collections/media/${props.collection.id}/content/${pageData.current}?size=${fetchAmount}`,
       )
 
     setTotalSize(resp.totalSize)
@@ -87,7 +88,7 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
     setData([
       ...dataRef.current,
       ...resp.items.map((el) =>
-        el.plexData ? el.plexData : ({} as IPlexMetadata)
+        el.plexData ? el.plexData : ({} as IPlexMetadata),
       ),
     ])
     loadingRef.current = false
@@ -138,15 +139,14 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
           {`${props.title}`}
         </h1>
       </div>
-      {/* 
-      <div className="m-auto mb-3 flex ">
-        <div className="m-auto sm:m-0 ">
-          <ExecuteButton
-            onClick={debounce(() => {}, 5000)}
-            text="Handle collection"
-          />
-        </div>
-      </div> */}
+
+      <button
+        className="edit-button mb-4 flex  rounded h-9 text-zinc-200 shadow-md"
+        onClick={() => setMediaTestModalOpen(true)}
+      >
+        {<PlayIcon className="m-auto h-5 ml-5" />}{' '}
+        <p className="m-auto rules-button-text ml-1 mr-5">Test Media</p>
+      </button>
       <div>
         <OverviewContent
           dataFinished={true}
@@ -173,6 +173,16 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
           })}
         />
       </div>
+
+      {mediaTestModalOpen && props.collection?.id ? (
+        <TestMediaItem
+          collectionId={+props.collection.id}
+          onCancel={() => {
+            setMediaTestModalOpen(false)
+          }}
+          onSubmit={() => {}}
+        />
+      ) : undefined}
     </div>
   )
 }

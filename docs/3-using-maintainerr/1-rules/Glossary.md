@@ -1,6 +1,6 @@
 ## Rule glossary
 
-This glossary describes the available rules that can be used in the maintainerr.
+This glossary describes the available rules that can be used in maintainerr.
 Each rule contains the media type it applies to, the key and the data type of the returned value.
 
 The key is used for identification in Yaml rule files.

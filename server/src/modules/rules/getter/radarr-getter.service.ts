@@ -104,10 +104,10 @@ export class RadarrGetterService {
                 ? new Date(movieResponse.digitalRelease)
                 : new Date(movieResponse.physicalRelease)
               : movieResponse.physicalRelease
-              ? new Date(movieResponse.physicalRelease)
-              : movieResponse.digitalRelease
-              ? new Date(movieResponse.digitalRelease)
-              : null;
+                ? new Date(movieResponse.physicalRelease)
+                : movieResponse.digitalRelease
+                  ? new Date(movieResponse.digitalRelease)
+                  : null;
           }
           case 'inCinemas': {
             return movieResponse?.inCinemas

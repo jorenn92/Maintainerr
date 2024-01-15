@@ -13,7 +13,6 @@ import { ExclusionAction, ExclusionContextDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
 import { RuleExecutorService } from './rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
-import { RuleDto } from './dtos/rule.dto';
 
 @Controller('api/rules')
 export class RulesController {
@@ -48,6 +47,11 @@ export class RulesController {
   @Get('/:id')
   getRules(@Param('id') id: string) {
     return this.rulesService.getRules(id);
+  }
+
+  @Get('/collection/:id')
+  getRuleGroupByCollectionId(@Param('id') id: string) {
+    return this.rulesService.getRuleGroupByCollectionId(+id);
   }
 
   @Get()
@@ -175,5 +179,13 @@ export class RulesController {
         result: 'Invalid input',
       };
     }
+  }
+
+  @Post('/test')
+  async testRuleGroup(@Body() body: { mediaId: string; rulegroupId: number }) {
+    return this.rulesService.testRuleGroupWithData(
+      body.rulegroupId,
+      body.mediaId,
+    );
   }
 }

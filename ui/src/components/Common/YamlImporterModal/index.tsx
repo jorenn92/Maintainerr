@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import Modal from '../Modal'
 import Editor from '@monaco-editor/react'
+import Alert from '../Alert'
 
 export interface IYamlImporterModal {
   onImport: (yaml: string) => void
@@ -44,10 +45,21 @@ const YamlImporterModal = (props: IYamlImporterModal) => {
         }
         okText={props.yaml ? 'Download' : 'Import'}
         okButtonType={'primary'}
-        title={'Rule Yaml editor'}
+        title={'Yaml Rule Editor'}
         iconSvg={''}
       >
+        <Alert type="info">
+          {`${
+            props.yaml
+              ? 'Export your rules to a YAML document'
+              : 'Import rules from a YAML document. This will override your current rules'
+          }`}
+        </Alert>
         <Editor
+          options={{
+            minimap: { enabled: false },
+            ...(props.yaml ? { readOnly: true } : undefined),
+          }}
           height="70vh"
           defaultLanguage="yaml"
           theme="vs-dark"

@@ -113,7 +113,7 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
             title={'Upload Successful'}
             iconSvg={''}
           >
-            <Alert title={`Thank you for contributing <3`} type="info" />
+            <Alert title={`Thank you for contributing.`} type="info" />
           </Modal>
         ) : undefined}
       </Modal>

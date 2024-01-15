@@ -700,12 +700,12 @@ const AddModal = (props: AddModal) => {
                       <CloudDownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
                     }
                     <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
-                      Community Rules
+                      Community
                     </p>
                   </button>
                 </div>
               </div>
-              <div className="mt-4 flex items-center justify-left">
+              <div className="mt-4 flex items-center justify-center sm:justify-end max-width-form-head">
                 <button
                   className="ml-3 flex  h-fit rounded bg-amber-600 p-1 text-zinc-900 shadow-md hover:bg-amber-500 md:h-10"
                   onClick={toggleYamlImporter}
