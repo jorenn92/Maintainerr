@@ -19,16 +19,23 @@ export class RuleConstanstService {
   }
 
   public getValueIdentifier(location: [number, number]) {
-    const application = this.ruleConstants.applications[location[0]].name;
-    const rule =
-      this.ruleConstants.applications[location[0]].props[location[1]].name;
+    const application = this.ruleConstants.applications.find(
+      (el) => el.id === location[0],
+    )?.name;
+
+    const rule = this.ruleConstants.applications
+      .find((el) => el.id === location[0])
+      ?.props.find((el) => el.id === location[1])?.name;
 
     return application + '.' + rule;
   }
 
   public getValueHumanName(location: [number, number]) {
-    return `${this.ruleConstants.applications[location[0]].name} - ${this
-      .ruleConstants.applications[location[0]].props[location[1]]?.humanName}`;
+    return `${this.ruleConstants.applications.find(
+      (el) => el.id === location[0],
+    )?.name} - ${this.ruleConstants.applications
+      .find((el) => el.id === location[0])
+      ?.props.find((el) => el.id === location[1])?.humanName}`;
   }
 
   public getValueFromIdentifier(identifier: string): [number, number] {
