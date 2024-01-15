@@ -285,7 +285,7 @@ const RuleCreator = (props: iRuleCreator) => {
             >
               {<ClipboardListIcon className="m-auto ml-5 h-5" />}
               <p className="button-text m-auto ml-1 mr-5  text-zinc-200">
-                New section
+                New Section
               </p>
             </button>
           </div>

@@ -145,7 +145,7 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
         onClick={() => setMediaTestModalOpen(true)}
       >
         {<PlayIcon className="m-auto h-5 ml-5" />}{' '}
-        <p className="m-auto rules-button-text ml-1 mr-5">Test media</p>
+        <p className="m-auto rules-button-text ml-1 mr-5">Test Media</p>
       </button>
       <div>
         <OverviewContent
