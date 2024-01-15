@@ -181,101 +181,98 @@ const TestMediaItem = (props: ITestMediaItem) => {
         title={'Test Media'}
         iconSvg={''}
       >
-        <div className="mt-1">
-          <Alert type="info">
-            {`Search for media items and validate them against the specified rule. The result will be a YAML document containing the validated steps.
+        <div className="h-[80vh] overflow-hidden">
+          <div className="mt-1">
+            <Alert type="info">
+              {`Search for media items and validate them against the specified rule. The result will be a YAML document containing the validated steps.
             `}
-            <br />
-            <br />
-            {`The rule group is of type ${
-              ruleGroup.dataType === EPlexDataType.MOVIES
-                ? 'movies'
-                : ruleGroup.dataType === EPlexDataType.SEASONS
-                  ? 'seasons'
-                  : ruleGroup.dataType === EPlexDataType.EPISODES
-                    ? 'episodes'
-                    : 'series'
-            }, as a result only media of type ${
-              ruleGroup.dataType === EPlexDataType.MOVIES ? 'movies' : 'series'
-            } will be displayed in the searchbar.`}
-          </Alert>
-        </div>
-        <FormItem label="Media">
-          <SearchMediaItem
-            mediatype={ruleGroup.dataType}
-            onChange={(el) => {
-              setMediaItem(el as unknown as IMediaOptions)
-            }}
-          />
-        </FormItem>
+              <br />
+              <br />
+              {`The rule group is of type ${
+                ruleGroup.dataType === EPlexDataType.MOVIES
+                  ? 'movies'
+                  : ruleGroup.dataType === EPlexDataType.SEASONS
+                    ? 'seasons'
+                    : ruleGroup.dataType === EPlexDataType.EPISODES
+                      ? 'episodes'
+                      : 'series'
+              }, as a result only media of type ${
+                ruleGroup.dataType === EPlexDataType.MOVIES
+                  ? 'movies'
+                  : 'series'
+              } will be displayed in the searchbar.`}
+            </Alert>
+          </div>
+          <FormItem label="Media">
+            <SearchMediaItem
+              mediatype={ruleGroup.dataType}
+              onChange={(el) => {
+                setMediaItem(el as unknown as IMediaOptions)
+              }}
+            />
+          </FormItem>
 
-        {/* seasons */}
-        <div className="w-full">
-          {ruleGroup.dataType === EPlexDataType.SEASONS ||
-          ruleGroup.dataType === EPlexDataType.EPISODES ? (
-            <FormItem label="Season">
-              <select
-                name={`Seasons-field`}
-                id={`Seasons-field`}
-                value={selectedSeasons}
-                onChange={(e: { target: { value: string } }) => {
-                  setSelectedSeasons(+e.target.value)
-                }}
-              >
-                {seasonOptions.map((e: IOptions) => {
-                  return (
-                    <option key={e.id} value={e.id}>
-                      {e.title}
-                    </option>
-                  )
-                })}
-              </select>
-            </FormItem>
-          ) : undefined}
+          {/* seasons */}
+          <div className="w-full">
+            {ruleGroup.dataType === EPlexDataType.SEASONS ||
+            ruleGroup.dataType === EPlexDataType.EPISODES ? (
+              <FormItem label="Season">
+                <select
+                  name={`Seasons-field`}
+                  id={`Seasons-field`}
+                  value={selectedSeasons}
+                  onChange={(e: { target: { value: string } }) => {
+                    setSelectedSeasons(+e.target.value)
+                  }}
+                >
+                  {seasonOptions.map((e: IOptions) => {
+                    return (
+                      <option key={e.id} value={e.id}>
+                        {e.title}
+                      </option>
+                    )
+                  })}
+                </select>
+              </FormItem>
+            ) : undefined}
 
-          {ruleGroup.dataType === EPlexDataType.EPISODES ? (
-            // episodes
-            <FormItem label="Episode">
-              <select
-                name={`episode-field`}
-                id={`episode-field`}
-                value={selectedEpisodes}
-                onChange={(e: { target: { value: string } }) => {
-                  setSelectedEpisodes(+e.target.value)
-                }}
-              >
-                {episodeOptions.map((e: IOptions) => {
-                  return (
-                    <option key={e.id} value={e.id}>
-                      {e.title}
-                    </option>
-                  )
-                })}
-              </select>
-            </FormItem>
-          ) : undefined}
-        </div>
+            {ruleGroup.dataType === EPlexDataType.EPISODES ? (
+              // episodes
+              <FormItem label="Episode">
+                <select
+                  name={`episode-field`}
+                  id={`episode-field`}
+                  value={selectedEpisodes}
+                  onChange={(e: { target: { value: string } }) => {
+                    setSelectedEpisodes(+e.target.value)
+                  }}
+                >
+                  {episodeOptions.map((e: IOptions) => {
+                    return (
+                      <option key={e.id} value={e.id}>
+                        {e.title}
+                      </option>
+                    )
+                  })}
+                </select>
+              </FormItem>
+            ) : undefined}
+          </div>
 
-        <label htmlFor={`editor-field`} className="text-label">
-          {'Output'}
-        </label>
-        <div className="editor-field mt-3 h-full">
-          <Editor
-            options={{ readOnly: true, minimap: { enabled: false } }}
-            height={
-              ruleGroup.dataType === EPlexDataType.EPISODES
-                ? '40vh'
-                : ruleGroup.dataType === EPlexDataType.SEASONS
-                  ? '50vh'
-                  : '60vh'
-            }
-            defaultLanguage="yaml"
-            theme="vs-dark"
-            {...(comparisonResult
-              ? { value: YAML.stringify(comparisonResult.result) }
-              : undefined)}
-            onMount={handleEditorDidMount}
-          />
+          <label htmlFor={`editor-field`} className="text-label mb-3">
+            {'Output'}
+          </label>
+          <div className="editor-container h-full">
+            <Editor
+              options={{ readOnly: true, minimap: { enabled: false } }}
+              defaultLanguage="yaml"
+              theme="vs-dark"
+              {...(comparisonResult
+                ? { value: YAML.stringify(comparisonResult.result) }
+                : undefined)}
+              onMount={handleEditorDidMount}
+            />
+          </div>
         </div>
       </Modal>
     </div>
