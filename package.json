@@ -33,7 +33,7 @@
     "@headlessui/react": "1.7.12",
     "@heroicons/react": "^1.0.6",
     "@monaco-editor/react": "^4.6.0",
-    "@nestjs/common": "^10.2.7",
+    "@nestjs/common": "^10.3.0",
     "@nestjs/core": "^10.3.0",
     "@nestjs/platform-express": "^10.3.0",
     "@nestjs/schedule": "^4.0.0",
