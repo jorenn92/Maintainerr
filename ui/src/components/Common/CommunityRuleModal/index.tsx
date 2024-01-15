@@ -55,7 +55,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
           resp = resp.filter(
             (e) =>
               e.appVersion!.replaceAll('.', '') <=
-                appVersion.current.replaceAll('.', '') && e.type === props.type
+                appVersion.current.replaceAll('.', '') && e.type === props.type,
           )
           resp = resp.sort((a, b) => b.karma! - a.karma!)
           setCommunityRules(resp)
@@ -64,7 +64,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         } else {
           setCommunityRules([])
           console.log(
-            'An error occurred fetching community rules. Does Maintainerr have privileges to access the internet?'
+            'An error occurred fetching community rules. Does Maintainerr have privileges to access the internet?',
           )
         }
       } else {
@@ -100,7 +100,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         } else {
           console.log(`Couldn't fetch community rule Karma history.`)
         }
-      }
+      },
     )
   }
 
@@ -137,8 +137,8 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         originalRules.filter(
           (el) =>
             el.name.toLowerCase().includes(input.trim().toLowerCase()) ||
-            el.description.toLowerCase().includes(input.trim().toLowerCase())
-        )
+            el.description.toLowerCase().includes(input.trim().toLowerCase()),
+        ),
       )
     }
   }
@@ -154,7 +154,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
             e.karma += 10
           }
           return e
-        })
+        }),
       )
       setHistory([{ id: history.length, community_rule_id: id }, ...history])
     }
@@ -171,7 +171,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
             e.karma -= 10
           }
           return e
-        })
+        }),
       )
       setHistory([{ id: history.length, community_rule_id: id }, ...history])
     }
@@ -212,10 +212,9 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         iconSvg={''}
       >
         <div className="mt-6">
-          <Alert
-            title={`Import rules made by the community. WARNING: This will override your current rules`}
-            type="info"
-          />
+          <Alert type="info">
+            {`Import rules made by the community. This will override your current rules`}
+          </Alert>
         </div>
         <SearchBar onSearch={handleSearch} />
         {originalRules.length > 0 ? (
@@ -242,7 +241,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
                             onDoubleClick={handleInfo}
                             thumbsActive={
                               history.find(
-                                (e) => e.community_rule_id === cr.id
+                                (e) => e.community_rule_id === cr.id,
                               ) === undefined
                             }
                             onThumbsUp={handleThumbsUp}

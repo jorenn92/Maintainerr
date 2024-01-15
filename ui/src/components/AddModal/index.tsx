@@ -221,7 +221,7 @@ const AddModal = (props: IAddModal) => {
       onCancel={handleCancel}
       onOk={handleOk}
       okDisabled={false}
-      title={props.modalType === 'add' ? 'Add / Remove media' : 'Exclude media'}
+      title={props.modalType === 'add' ? 'Add / Remove Media' : 'Exclude Media'}
       okText={'Submit'}
       okButtonType={'primary'}
       onSecondary={() => {}}
@@ -244,7 +244,7 @@ const AddModal = (props: IAddModal) => {
           onCancel={() => setForceRemovalCheck(false)}
           onOk={handleForceRemoval}
           okDisabled={false}
-          title={'Confirmation required'}
+          title={'Confirmation Required'}
           okText={'Submit'}
         >
           Are you certain you want to proceed? This action will remove the{' '}

@@ -4,6 +4,7 @@ import GetApiHandler from '../../../utils/ApiHandler'
 import { IPlexMetadata } from '../../Overview/Content'
 import { EPlexDataType } from '../../../utils/PlexDataType-enum'
 import { SingleValue } from 'react-select/dist/declarations/src'
+import { MediaType } from '../../../contexts/constants-context'
 
 export interface IMediaOptions {
   id: string
@@ -13,6 +14,7 @@ export interface IMediaOptions {
 
 interface ISearchMediaITem {
   onChange: (item: SingleValue<IMediaOptions>) => void
+  mediatype?: EPlexDataType
 }
 
 const SearchMediaItem = (props: ISearchMediaITem) => {
@@ -26,6 +28,16 @@ const SearchMediaItem = (props: ISearchMediaITem) => {
         type: el.type === 'movie' ? 1 : 2,
       } as unknown as IMediaOptions
     })
+
+    if (props.mediatype) {
+      const type =
+        props.mediatype !== EPlexDataType.MOVIES &&
+        props.mediatype !== EPlexDataType.SHOWS
+          ? 2
+          : props.mediatype
+      return output.filter((el) => el.type === type)
+    }
+
     return output
   }
 
@@ -40,7 +52,7 @@ const SearchMediaItem = (props: ISearchMediaITem) => {
         defaultValue={[]}
         defaultOptions={undefined}
         loadOptions={loadData}
-        placeholder='Search... '
+        placeholder="Start typing... "
         onChange={(selectedItem) => {
           props.onChange(selectedItem)
         }}

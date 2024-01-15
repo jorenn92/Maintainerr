@@ -700,7 +700,7 @@ const AddModal = (props: AddModal) => {
                       <CloudDownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
                     }
                     <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
-                      Community Rules
+                      Community
                     </p>
                   </button>
                 </div>
