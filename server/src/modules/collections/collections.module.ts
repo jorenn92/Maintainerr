@@ -11,11 +11,17 @@ import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { TasksModule } from '../tasks/tasks.module';
+import { Exclusion } from '../rules/entities/exclusion.entities';
 
 @Module({
   imports: [
     PlexApiModule,
-    TypeOrmModule.forFeature([Collection, CollectionMedia, RuleGroup]),
+    TypeOrmModule.forFeature([
+      Collection,
+      CollectionMedia,
+      RuleGroup,
+      Exclusion,
+    ]),
     OverseerrApiModule,
     TmdbApiModule,
     ServarrApiModule,
