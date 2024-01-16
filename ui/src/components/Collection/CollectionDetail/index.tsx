@@ -22,6 +22,7 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
 ) => {
   const [data, setData] = useState<IPlexMetadata[]>([])
   const [media, setMedia] = useState<ICollectionMedia[]>([])
+
   const [selectedTab, setSelectedTab] = useState<string>('media')
   const [mediaTestModalOpen, setMediaTestModalOpen] = useState<boolean>(false)
   // paging
@@ -153,7 +154,7 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
           {`${props.title}`}
         </h1>
       </div>
-
+      
       <div>
         <div className="flex justify-center items-center h-full">
           <div className="mt-0 mb-4 w-fit sm:w-full">
