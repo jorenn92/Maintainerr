@@ -23,6 +23,7 @@ import {
 } from './interfaces/collection-media.interface';
 import { ICollection } from './interfaces/collection.interface';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
+import { Exclusion } from '../rules/entities/exclusion.entities';
 
 interface addCollectionDbResponse {
   id: number;
@@ -41,6 +42,8 @@ export class CollectionsService {
     private readonly CollectionMediaRepo: Repository<CollectionMedia>,
     @InjectRepository(RuleGroup)
     private readonly ruleGroupRepo: Repository<RuleGroup>,
+    @InjectRepository(Exclusion)
+    private readonly exclusionRepo: Repository<Exclusion>,
     private readonly connection: Connection,
     private readonly plexApi: PlexApiService,
     private readonly tmdbApi: TmdbApiService,
@@ -120,14 +123,67 @@ export class CollectionsService {
     }
   }
 
+  public async getCollectionExclusionsWithPlexDataAndhPaging(
+    id: number,
+    { offset = 0, size = 25 }: { offset?: number; size?: number } = {},
+  ): Promise<{ totalSize: number; items: Exclusion[] }> {
+    try {
+      const rulegroup = await this.ruleGroupRepo.findOne({
+        where: {
+          collectionId: id,
+        },
+      });
+
+      const groupId = rulegroup.id;
+
+      const queryBuilder = this.exclusionRepo.createQueryBuilder('exclusion');
+
+      queryBuilder
+        .where(`exclusion.ruleGroupId = ${groupId}`)
+        .orWhere(`exclusion.ruleGroupId is null`)
+        .orderBy('id', 'DESC')
+        .skip(offset)
+        .take(size);
+
+      const itemCount = await queryBuilder.getCount();
+      let { entities } = await queryBuilder.getRawAndEntities();
+
+      entities = await Promise.all(
+        entities.map(async (el) => {
+          el.plexData = await this.plexApi.getMetadata(el.plexId.toString());
+          if (el.plexData?.grandparentRatingKey) {
+            el.plexData.parentData = await this.plexApi.getMetadata(
+              el.plexData.grandparentRatingKey.toString(),
+            );
+          } else if (el.plexData?.parentRatingKey) {
+            el.plexData.parentData = await this.plexApi.getMetadata(
+              el.plexData.parentRatingKey.toString(),
+            );
+          }
+          return el;
+        }),
+      );
+
+      return {
+        totalSize: itemCount,
+        items: entities ?? [],
+      };
+    } catch (err) {
+      this.logger.warn(
+        'An error occurred while performing collection actions: ' + err,
+      );
+      return undefined;
+    }
+  }
+
   async getCollections(libraryId?: number, typeId?: 1 | 2 | 3 | 4) {
     try {
       const collections = await this.collectionRepo.find(
         libraryId
           ? { where: { libraryId: libraryId } }
           : typeId
-          ? { where: { type: typeId } }
-          : undefined,
+            ? { where: { type: typeId } }
+            : undefined,
       );
 
       return await Promise.all(

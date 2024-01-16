@@ -6,6 +6,8 @@ import GetApiHandler from '../../../utils/ApiHandler'
 import OverviewContent, { IPlexMetadata } from '../../Overview/Content'
 import _ from 'lodash'
 import TestMediaItem from './TestMediaItem'
+import TabbedLinks, { TabbedRoute } from '../../Common/TabbedLinks'
+import CollectionExcludions from './Exclusions'
 
 interface ICollectionDetail {
   libraryId: number
@@ -20,6 +22,8 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
 ) => {
   const [data, setData] = useState<IPlexMetadata[]>([])
   const [media, setMedia] = useState<ICollectionMedia[]>([])
+
+  const [selectedTab, setSelectedTab] = useState<string>('media')
   const [mediaTestModalOpen, setMediaTestModalOpen] = useState<boolean>(false)
   // paging
   const pageData = useRef<number>(0)
@@ -132,6 +136,17 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
     }
   }, [])
 
+  const tabbedRoutes: TabbedRoute[] = [
+    {
+      text: 'Media',
+      route: 'media',
+    },
+    {
+      text: 'Exclusions',
+      route: 'exclusions',
+    },
+  ]
+
   return (
     <div className="w-full">
       <div className="m-auto mb-3 flex w-full">
@@ -139,39 +154,58 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
           {`${props.title}`}
         </h1>
       </div>
-
-      <button
-        className="edit-button mb-4 flex  rounded h-9 text-zinc-200 shadow-md"
-        onClick={() => setMediaTestModalOpen(true)}
-      >
-        {<PlayIcon className="m-auto h-5 ml-5" />}{' '}
-        <p className="m-auto rules-button-text ml-1 mr-5">Test Media</p>
-      </button>
+      
       <div>
-        <OverviewContent
-          dataFinished={true}
-          fetchData={() => {}}
-          loading={loadingRef.current}
-          data={data}
-          libraryId={props.libraryId}
-          collectionPage={true}
-          extrasLoading={
-            loadingExtraRef &&
-            !loadingRef.current &&
-            totalSize >= pageData.current * fetchAmount
-          }
-          onRemove={(id: string) =>
-            setTimeout(() => {
-              setData(dataRef.current.filter((el) => +el.ratingKey !== +id))
-              setMedia(mediaRef.current.filter((el) => +el.plexId !== +id))
-            }, 500)
-          }
-          collectionInfo={media.map((el) => {
-            props.collection.media = []
-            el.collection = props.collection
-            return el
-          })}
-        />
+        <div className="flex justify-center items-center h-full">
+          <div className="mt-0 mb-4 w-fit sm:w-full">
+            <TabbedLinks
+              onChange={(t) => setSelectedTab(t)}
+              routes={tabbedRoutes}
+              currentRoute={selectedTab}
+              allEnabled={true}
+            />
+          </div>
+        </div>
+
+        <button
+          className="edit-button mb-4 flex  rounded h-9 text-zinc-200 shadow-md"
+          onClick={() => setMediaTestModalOpen(true)}
+        >
+          {<PlayIcon className="m-auto h-5 ml-5" />}{' '}
+          <p className="m-auto rules-button-text ml-1 mr-5">Test Media</p>
+        </button>
+
+        {selectedTab === 'media' ? (
+          <OverviewContent
+            dataFinished={true}
+            fetchData={() => {}}
+            loading={loadingRef.current}
+            data={data}
+            libraryId={props.libraryId}
+            collectionPage={true}
+            extrasLoading={
+              loadingExtraRef &&
+              !loadingRef.current &&
+              totalSize >= pageData.current * fetchAmount
+            }
+            onRemove={(id: string) =>
+              setTimeout(() => {
+                setData(dataRef.current.filter((el) => +el.ratingKey !== +id))
+                setMedia(mediaRef.current.filter((el) => +el.plexId !== +id))
+              }, 500)
+            }
+            collectionInfo={media.map((el) => {
+              props.collection.media = []
+              el.collection = props.collection
+              return el
+            })}
+          />
+        ) : selectedTab === 'exclusions' ? (
+          <CollectionExcludions
+            collection={props.collection}
+            libraryId={props.libraryId}
+          />
+        ) : undefined}
       </div>
 
       {mediaTestModalOpen && props.collection?.id ? (
