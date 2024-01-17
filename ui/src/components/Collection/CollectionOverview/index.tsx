@@ -33,7 +33,10 @@ const CollectionOverview = (props: ICollectionOverview) => {
         </div>
         <ul className="xs:collection-cards-vertical">
           {props.collections?.map((col) => (
-            <li key={+col.id!} className="collection relative mb-5 flex h-fit flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:mb-0 sm:mr-5 xs:w-full">
+            <li
+              key={+col.id!}
+              className="collection relative mb-5 flex h-fit flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:mb-0 sm:mr-5 xs:w-full"
+            >
               <CollectionItem
                 key={col.id}
                 collection={col}

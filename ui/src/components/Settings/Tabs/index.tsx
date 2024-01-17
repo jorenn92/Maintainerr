@@ -33,8 +33,8 @@ const SettingsLink: React.FC<ISettingsLink> = (props: ISettingsLink) => {
 
   let linkClasses =
     (props.disabled ? 'pointer-events-none touch-none ' : '') +
-    'px-1 py-4 ml-8 text-sm font-medium leading-5 transition duration-300 border-b-2 border-transparent whitespace-nowrap first:ml-0'
-  let activeLinkColor = 'text-amber-500 border-amber-600'
+    'px-1 py-4 ml-8 text-sm font-medium leading-5 transition duration-300 border-b-2  whitespace-nowrap first:ml-0'
+  let activeLinkColor = 'text-amber-500 border-amber-600 border-b'
   let inactiveLinkColor =
     'text-zinc-500 border-transparent hover:text-zinc-300 hover:border-zinc-400 focus:text-zinc-300 focus:border-zinc-400'
 

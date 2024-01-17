@@ -24,6 +24,8 @@ interface IMediaCard {
   type?: 1 | 2 | 3 | 4
   collectionPage: boolean
   daysLeft?: number
+  exclusionId?: number
+  exclusionType?: 'global' | 'specific' | undefined
   collectionId?: number
   onRemove?: (id: string) => void
 }
@@ -36,11 +38,13 @@ const MediaCard: React.FC<IMediaCard> = ({
   title,
   libraryId,
   type,
-  daysLeft = 999,
   collectionId = 0,
+  daysLeft = 999,
+  exclusionId = undefined,
   tmdbid = undefined,
   canExpand = false,
   collectionPage = false,
+  exclusionType = undefined,
   onRemove = (id: string) => {},
 }) => {
   const isTouch = useIsTouch()
@@ -141,10 +145,10 @@ const MediaCard: React.FC<IMediaCard> = ({
                 mediaType === 'movie'
                   ? 'bg-zinc-900'
                   : mediaType === 'show'
-                  ? 'bg-amber-900'
-                  : mediaType === 'season'
-                  ? 'bg-yellow-700'
-                  : 'bg-rose-900'
+                    ? 'bg-amber-900'
+                    : mediaType === 'season'
+                      ? 'bg-yellow-700'
+                      : 'bg-rose-900'
               }`}
             >
               <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
@@ -160,10 +164,10 @@ const MediaCard: React.FC<IMediaCard> = ({
                   mediaType === 'movie'
                     ? 'bg-zinc-900'
                     : mediaType === 'show'
-                    ? 'bg-amber-900'
-                    : mediaType === 'season'
-                    ? 'bg-yellow-700'
-                    : 'bg-rose-900'
+                      ? 'bg-amber-900'
+                      : mediaType === 'season'
+                        ? 'bg-yellow-700'
+                        : 'bg-rose-900'
                 }`}
               >
                 <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
@@ -173,21 +177,43 @@ const MediaCard: React.FC<IMediaCard> = ({
             </div>
           ) : undefined}
 
-          {collectionPage && daysLeft !== 999 ? (
+          {/* on collection page and for the media items */}
+          {collectionPage && !exclusionType && daysLeft !== 999 ? (
             <div className="absolute right-0 flex items-center justify-between p-2">
               <div
                 className={`pointer-events-none z-40 rounded-full shadow ${
                   mediaType === 'movie'
                     ? 'bg-zinc-900'
                     : mediaType === 'show'
-                    ? 'bg-amber-900'
-                    : mediaType === 'season'
-                    ? 'bg-yellow-700'
-                    : 'bg-rose-900'
+                      ? 'bg-amber-900'
+                      : mediaType === 'season'
+                        ? 'bg-yellow-700'
+                        : 'bg-rose-900'
                 }`}
               >
                 <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
                   {daysLeft > 0 ? daysLeft : 0}
+                </div>
+              </div>
+            </div>
+          ) : undefined}
+
+          {/* on collection page and for the exclusions */}
+          {collectionPage && exclusionType === 'global' ? (
+            <div className="absolute right-0 flex items-center justify-between p-2">
+              <div
+                className={`pointer-events-none z-40 rounded-full shadow ${
+                  mediaType === 'movie'
+                    ? 'bg-zinc-900'
+                    : mediaType === 'show'
+                      ? 'bg-amber-900'
+                      : mediaType === 'season'
+                        ? 'bg-yellow-700'
+                        : 'bg-rose-900'
+                }`}
+              >
+                <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
+                  {exclusionType.toUpperCase()}
                 </div>
               </div>
             </div>
@@ -293,8 +319,10 @@ const MediaCard: React.FC<IMediaCard> = ({
                     ) : (
                       <RemoveFromCollectionBtn
                         plexId={id}
+                        popup={exclusionType && exclusionType === 'global'}
                         onRemove={() => onRemove(id.toString())}
                         collectionId={collectionId}
+                        exclusionId={exclusionId}
                       />
                     )}
                   </div>

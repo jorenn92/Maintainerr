@@ -153,4 +153,21 @@ export class CollectionsController {
       size: size,
     });
   }
+
+  @Get('/exclusions/:id/content/:page')
+  getExclusions(
+    @Param('id') id: number,
+    @Param('page', new ParseIntPipe()) page: number,
+    @Query('size') amount: number,
+  ) {
+    const size = amount ? amount : 25;
+    const offset = (page - 1) * size;
+    return this.collectionService.getCollectionExclusionsWithPlexDataAndhPaging(
+      id,
+      {
+        offset: offset,
+        size: size,
+      },
+    );
+  }
 }

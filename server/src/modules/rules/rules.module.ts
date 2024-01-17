@@ -4,7 +4,7 @@ import { RulesController } from './rules.controller';
 import { PlexApiModule } from '../api/plex-api/plex-api.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Rules } from './entities/rules.entities';
-import { RuleExecutorService } from './rule-executor.service';
+import { RuleExecutorService } from './tasks/rule-executor.service';
 import { RuleGroup } from './entities/rule-group.entities';
 import { PlexGetterService } from './getter/plex-getter.service';
 import { ValueGetterService } from './getter/getter.service';
@@ -21,10 +21,11 @@ import { CollectionMedia } from '../collections/entities/collection_media.entiti
 import { Exclusion } from './entities/exclusion.entities';
 import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Settings } from '../settings/entities/settings.entities';
-import { RuleMaintenanceService } from './rule-maintenance.service';
+import { RuleMaintenanceService } from './tasks/rule-maintenance.service';
 import { RuleYamlService } from './helpers/yaml.service';
 import { RuleComparatorService } from './helpers/rule.comparator.service';
 import { RuleConstanstService } from './constants/constants.service';
+import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.service';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { RuleConstanstService } from './constants/constants.service';
     RulesService,
     RuleExecutorService,
     RuleMaintenanceService,
+    ExclusionTypeCorrectorService,
     PlexGetterService,
     RadarrGetterService,
     SonarrGetterService,
@@ -55,7 +57,7 @@ import { RuleConstanstService } from './constants/constants.service';
     ValueGetterService,
     RuleYamlService,
     RuleComparatorService,
-    RuleConstanstService
+    RuleConstanstService,
   ],
   controllers: [RulesController],
 })

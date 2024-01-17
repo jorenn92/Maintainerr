@@ -2,23 +2,38 @@ import { TrashIcon } from '@heroicons/react/solid'
 import { useState } from 'react'
 import { DeleteApiHandler, PostApiHandler } from '../../../../utils/ApiHandler'
 import Button from '../../../Common/Button'
+import Modal from '../../../Common/Modal'
+
 interface IRemoveFromCollectionBtn {
   plexId: number
   collectionId: number
+  exclusionId?: number
+  popup?: boolean
   onRemove: () => void
 }
 const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
   const [sure, setSure] = useState<boolean>(false)
+  const [popup, setppopup] = useState<boolean>(false)
+
+  const handlePopup = () => {
+    if (props.popup) {
+      setppopup(!popup)
+    }
+  }
 
   const handle = () => {
-    DeleteApiHandler(
-      `/collections/media?mediaId=${props.plexId}&collectionId=${props.collectionId}`,
-    )
-    PostApiHandler('/rules/exclusion', {
-      collectionId: props.collectionId,
-      mediaId: props.plexId,
-      action: 0,
-    })
+    if (!props.exclusionId) {
+      DeleteApiHandler(
+        `/collections/media?mediaId=${props.plexId}&collectionId=${props.collectionId}`,
+      )
+      PostApiHandler('/rules/exclusion', {
+        collectionId: props.collectionId,
+        mediaId: props.plexId,
+        action: 0,
+      })
+    } else {
+      DeleteApiHandler(`/rules/exclusion/${props.exclusionId}`)
+    }
     props.onRemove()
   }
 
@@ -39,11 +54,20 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
           buttonType="primary"
           buttonSize="md"
           className="mt-2 mb-1 h-6 w-full text-zinc-200 shadow-md"
-          onClick={handle}
+          onClick={props.popup ? handlePopup : handle}
         >
           <p className="rules-button-text m-auto mr-2">{'Are you sure?'}</p>
         </Button>
       )}
+
+      {popup ? (
+        <Modal title="Warning" onOk={handle} onCancel={handlePopup}>
+          <p>
+            This item is excluded <b>globally</b>. Removing this exclusion will
+            apply the change to all collections
+          </p>
+        </Modal>
+      ) : undefined}
     </div>
   )
 }

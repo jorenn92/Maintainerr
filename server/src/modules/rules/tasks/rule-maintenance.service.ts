@@ -1,11 +1,11 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { TasksService } from '../tasks/tasks.service';
-import { SettingsService } from '../settings/settings.service';
-import { RulesService } from './rules.service';
-import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { TasksService } from '../../tasks/tasks.service';
+import { SettingsService } from '../../settings/settings.service';
+import { RulesService } from '../rules.service';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Collection } from '../collections/entities/collection.entities';
+import { Collection } from '../../collections/entities/collection.entities';
 
 @Injectable()
 export class RuleMaintenanceService implements OnApplicationBootstrap {
