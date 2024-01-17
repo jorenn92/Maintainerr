@@ -225,7 +225,7 @@ export class RulesService {
           })
         ).dbCollection;
         // create group
-        const groupId = await this.createNewGroup(
+        const groupId = await this.createOrUpdateGroup(
           params.name,
           params.description,
           params.libraryId,
@@ -267,6 +267,124 @@ export class RulesService {
     }
   }
 
+  async updateRules(params: RulesDto) {
+    try {
+      let state: ReturnStatus = this.createReturnStatus(true, 'Success');
+      params.rules.forEach((rule) => {
+        if (state.code === 1) {
+          state = this.validateRule(rule);
+        }
+      }, this);
+
+      if (state.code === 1) {
+        // get current group
+        const group = await this.ruleGroupRepository.findOne({
+          where: { id: params.id },
+        });
+
+        const dbCollection = await this.collectionService.getCollection(
+          group.collectionId,
+        );
+
+        // if datatype or manual collection settings changed then remove the collection media and specific exclusions. The Plex collection will be removed later by updateCollection()
+        if (
+          group.dataType !== params.dataType ||
+          params.collection.manualCollection !==
+            dbCollection.manualCollection ||
+          params.collection.manualCollectionName !==
+            dbCollection.manualCollectionName
+        ) {
+          this.logger.log(
+            `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media & specific exclusions`,
+          );
+          await this.collectionMediaRepository.delete({
+            collectionId: group.collectionId,
+          });
+          await this.exclusionRepo.delete({ ruleGroupId: params.id });
+        }
+
+        // update the collection
+        const lib = (await this.plexApi.getLibraries()).find(
+          (el) => +el.key === +params.libraryId,
+        );
+
+        const collection = (
+          await this.collectionService.updateCollection({
+            id: group.id ? group.id : undefined,
+            libraryId: +params.libraryId,
+            type:
+              lib.type === 'movie'
+                ? EPlexDataType.MOVIES
+                : params.dataType !== undefined
+                  ? params.dataType
+                  : EPlexDataType.SHOWS,
+            title: params.name,
+            description: params.description,
+            arrAction: params.arrAction ? params.arrAction : 0,
+            isActive: params.isActive,
+            listExclusions: params.listExclusions
+              ? params.listExclusions
+              : false,
+            forceOverseerr: params.forceOverseerr
+              ? params.forceOverseerr
+              : false,
+            visibleOnHome: params.collection?.visibleOnHome,
+            deleteAfterDays: +params.collection?.deleteAfterDays,
+            manualCollection: params.collection?.manualCollection,
+            manualCollectionName: params.collection?.manualCollectionName,
+          })
+        ).dbCollection;
+
+        // update or create group
+        const groupId = await this.createOrUpdateGroup(
+          params.name,
+          params.description,
+          params.libraryId,
+          collection.id,
+          params.useRules !== undefined ? params.useRules : true,
+          params.isActive !== undefined ? params.isActive : true,
+          params.dataType !== undefined ? params.dataType : undefined,
+          group.id,
+        );
+
+        // remove previous rules
+        this.rulesRepository.delete({
+          ruleGroupId: groupId,
+        });
+
+        // create rules
+        if (params.useRules) {
+          for (const rule of params.rules) {
+            const ruleJson = JSON.stringify(rule);
+            await this.rulesRepository.save([
+              {
+                ruleJson: ruleJson,
+                ruleGroupId: groupId,
+                section: (rule as RuleDbDto).section,
+              },
+            ]);
+          }
+        } else {
+          // empty rule if not using rules
+          await this.rulesRepository.save([
+            {
+              ruleJson: JSON.stringify(''),
+              ruleGroupId: groupId,
+              section: 0,
+            },
+          ]);
+        }
+        this.logger.log(`Successfully updated rulegroup '${params.name}'.`);
+        return state;
+      } else {
+        return state;
+      }
+    } catch (e) {
+      this.logger.warn(`Rules - Action failed : ${e.message}`);
+      this.logger.debug(e);
+      return undefined;
+    }
+  }
   async setExclusion(data: ExclusionContextDto) {
     let handleMedia: AddCollectionMedia[] = [];
 
@@ -553,7 +671,7 @@ export class RulesService {
     return { code: succes ? 1 : 0, result: result };
   }
 
-  private async createNewGroup(
+  private async createOrUpdateGroup(
     name: string,
     description: string,
     libraryId: number,
@@ -561,25 +679,35 @@ export class RulesService {
     useRules = true,
     isActive = true,
     dataType = undefined,
+    id?: number,
   ): Promise<number> {
     try {
-      const groupId = await this.connection
-        .createQueryBuilder()
-        .insert()
-        .into(RuleGroup)
-        .values([
-          {
-            name: name,
-            description: description,
-            libraryId: +libraryId,
-            collectionId: +collectionId,
-            isActive: isActive,
-            useRules: useRules,
-            dataType: dataType,
-          },
-        ])
-        .execute();
-      return groupId.identifiers[0].id;
+      const values = {
+        name: name,
+        description: description,
+        libraryId: +libraryId,
+        collectionId: +collectionId,
+        isActive: isActive,
+        useRules: useRules,
+        dataType: dataType,
+      };
+      const connection = this.connection.createQueryBuilder();
+
+      if (!id) {
+        const groupId = await connection
+          .insert()
+          .into(RuleGroup)
+          .values(values)
+          .execute();
+        return groupId.identifiers[0].id;
+      } else {
+        const groupId = await connection
+          .update(RuleGroup)
+          .set(values)
+          .where({ id: id })
+          .execute();
+        return id;
+      }
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       this.logger.debug(e);

@@ -317,7 +317,9 @@ export class CollectionsService {
       const dbCollection = await this.collectionRepo.findOne({
         where: { id: +collection.id },
       });
+
       let plexColl: PlexCollection;
+
       if (dbCollection?.plexId) {
         const collectionObj: CreateUpdateCollection = {
           libraryId: collection.libraryId.toString(),
@@ -326,14 +328,36 @@ export class CollectionsService {
           collectionId: +dbCollection.plexId,
           summary: collection?.description,
         };
-        plexColl = await this.plexApi.updateCollection(collectionObj);
-        await this.plexApi.UpdateCollectionSettings({
-          libraryId: dbCollection.libraryId,
-          collectionId: dbCollection.plexId,
-          recommended: false,
-          ownHome: collection.visibleOnHome,
-          sharedHome: collection.visibleOnHome,
-        });
+
+        // is the type the same & is it an automatic collection, then update
+        if (
+          collection.type === dbCollection.type &&
+          !dbCollection.manualCollection &&
+          !collection.manualCollection
+        ) {
+          plexColl = await this.plexApi.updateCollection(collectionObj);
+          await this.plexApi.UpdateCollectionSettings({
+            libraryId: dbCollection.libraryId,
+            collectionId: dbCollection.plexId,
+            recommended: false,
+            ownHome: collection.visibleOnHome,
+            sharedHome: collection.visibleOnHome,
+          });
+        } else {
+          // if the type changed, or the manual collection changed
+          if (
+            collection.manualCollection !== dbCollection.manualCollection ||
+            collection.type !== dbCollection.type ||
+            collection.manualCollectionName !==
+              dbCollection.manualCollectionName
+          ) {
+            if (!dbCollection.manualCollection) {
+              // Don't remove the collections if it was a manual one
+              this.plexApi.deleteCollection(dbCollection.plexId.toString());
+            }
+            dbCollection.plexId = null;
+          }
+        }
       }
       const dbResp: ICollection = await this.collectionRepo.save({
         ...dbCollection,

@@ -101,8 +101,7 @@ export class RulesController {
   }
   @Put()
   async updateRule(@Body() body: RulesDto): Promise<ReturnStatus> {
-    this.rulesService.deleteRuleGroup(body.id);
-    return await this.rulesService.setRules(body);
+    return await this.rulesService.updateRules(body);
   }
   @Post()
   async updateJob(@Body() body: { cron: string }): Promise<ReturnStatus> {
