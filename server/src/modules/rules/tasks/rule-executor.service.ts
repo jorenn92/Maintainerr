@@ -1,19 +1,19 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import _ from 'lodash';
-import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
-import { PlexApiService } from '../api/plex-api/plex-api.service';
-import { CollectionsService } from '../collections/collections.service';
-import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
-import { SettingsService } from '../settings/settings.service';
-import { TasksService } from '../tasks/tasks.service';
-import { RuleConstants } from './constants/rules.constants';
+import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
+import { CollectionsService } from '../../collections/collections.service';
+import { AddCollectionMedia } from '../../collections/interfaces/collection-media.interface';
+import { SettingsService } from '../../settings/settings.service';
+import { TasksService } from '../../tasks/tasks.service';
+import { RuleConstants } from '../constants/rules.constants';
 
-import { RulesDto } from './dtos/rules.dto';
-import { RuleGroup } from './entities/rule-group.entities';
-import { RulesService } from './rules.service';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
-import cacheManager, { Cache } from '../api/lib/cache';
-import { RuleComparatorService } from './helpers/rule.comparator.service';
+import { RulesDto } from '../dtos/rules.dto';
+import { RuleGroup } from '../entities/rule-group.entities';
+import { RulesService } from '../rules.service';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import cacheManager from '../../api/lib/cache';
+import { RuleComparatorService } from '../helpers/rule.comparator.service';
 
 interface PlexData {
   page: number;

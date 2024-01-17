@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import OverviewContent, { IPlexMetadata } from '../../../Overview/Content'
 import _ from 'lodash'
-import { ICollection, ICollectionMedia } from '../..'
+import { ICollection } from '../..'
 import GetApiHandler from '../../../../utils/ApiHandler'
 
 interface ICollectionExclusions {
@@ -9,16 +9,23 @@ interface ICollectionExclusions {
   libraryId: number
 }
 
+export interface IExclusionMedia {
+  id: number
+  plexId: number
+  ruleGroupId: number
+  parent: number
+  type: number
+  plexData?: IPlexMetadata
+}
+
 const CollectionExcludions = (props: ICollectionExclusions) => {
   const [data, setData] = useState<IPlexMetadata[]>([])
-  const [media, setMedia] = useState<ICollectionMedia[]>([])
   // paging
   const pageData = useRef<number>(0)
   const fetchAmount = 25
   const [totalSize, setTotalSize] = useState<number>(999)
   const totalSizeRef = useRef<number>(999)
   const dataRef = useRef<IPlexMetadata[]>([])
-  const mediaRef = useRef<ICollectionMedia[]>([])
   const loadingRef = useRef<boolean>(true)
   const loadingExtraRef = useRef<boolean>(false)
   const [page, setPage] = useState(0)
@@ -66,20 +73,23 @@ const CollectionExcludions = (props: ICollectionExclusions) => {
       loadingExtraRef.current = true
     }
     // setLoading(true)
-    const resp: { totalSize: number; items: ICollectionMedia[] } =
+    const resp: { totalSize: number; items: IExclusionMedia[] } =
       await GetApiHandler(
         `/collections/exclusions/${props.collection.id}/content/${pageData.current}?size=${fetchAmount}`,
       )
 
     setTotalSize(resp.totalSize)
     // pageData.current = pageData.current + 1
-    setMedia([...mediaRef.current, ...resp.items])
 
     setData([
       ...dataRef.current,
-      ...resp.items.map((el) =>
-        el.plexData ? el.plexData : ({} as IPlexMetadata),
-      ),
+      ...resp.items.map((el) => {
+        el.plexData!.maintainerrExclusionId = el.id
+        el.plexData!.maintainerrExclusionType = el.ruleGroupId
+          ? 'specific'
+          : 'global'
+        return el.plexData ? el.plexData : ({} as IPlexMetadata)
+      }),
     ])
     loadingRef.current = false
     loadingExtraRef.current = false
@@ -101,10 +111,6 @@ const CollectionExcludions = (props: ICollectionExclusions) => {
   }, [data])
 
   useEffect(() => {
-    mediaRef.current = media
-  }, [media])
-
-  useEffect(() => {
     totalSizeRef.current = totalSize
   }, [totalSize])
 
@@ -116,6 +122,7 @@ const CollectionExcludions = (props: ICollectionExclusions) => {
       data={data}
       libraryId={props.libraryId}
       collectionPage={true}
+      collectionId={props.collection.id}
       extrasLoading={
         loadingExtraRef &&
         !loadingRef.current &&
@@ -124,14 +131,8 @@ const CollectionExcludions = (props: ICollectionExclusions) => {
       onRemove={(id: string) =>
         setTimeout(() => {
           setData(dataRef.current.filter((el) => +el.ratingKey !== +id))
-          setMedia(mediaRef.current.filter((el) => +el.plexId !== +id))
         }, 500)
       }
-      collectionInfo={media.map((el) => {
-        props.collection.media = []
-        el.collection = props.collection
-        return el
-      })}
     />
   )
 }

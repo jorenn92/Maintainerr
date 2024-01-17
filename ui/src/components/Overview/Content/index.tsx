@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { ICollection, ICollectionMedia } from '../../Collection'
+import { ICollectionMedia } from '../../Collection'
 import LoadingSpinner, {
   SmallLoadingSpinner,
 } from '../../Common/LoadingSpinner'
@@ -16,6 +16,7 @@ interface IOverviewContent {
   libraryId: number
   collectionPage?: boolean
   collectionInfo?: ICollectionMedia[]
+  collectionId?: number
 }
 
 export interface IPlexMetadata {
@@ -67,6 +68,8 @@ export interface IPlexMetadata {
   parentYear?: number
   grandParentYear?: number
   index?: number
+  maintainerrExclusionType?: 'specific' | 'global' // this is added by Maintainerr, not a Plex type
+  maintainerrExclusionId?: number // this is added by Maintainerr, not a Plex type
 }
 
 const OverviewContent = (props: IOverviewContent) => {
@@ -132,76 +135,83 @@ const OverviewContent = (props: IOverviewContent) => {
       <ul className="cards-vertical">
         {props.data.map((el) => (
           <li key={+el.ratingKey}>
-              <MediaCard
-                id={+el.ratingKey}
-                libraryId={props.libraryId}
-                type={
-                  el.type === 'movie'
-                    ? 1
-                    : el.type === 'show'
+            <MediaCard
+              id={+el.ratingKey}
+              libraryId={props.libraryId}
+              type={
+                el.type === 'movie'
+                  ? 1
+                  : el.type === 'show'
                     ? 2
                     : el.type === 'season'
-                    ? 3
-                    : 4
-                }
-                image={''}
-                summary={
-                  el.type === 'movie' || el.type === 'show'
-                    ? el.summary
-                    : el.type === 'season'
+                      ? 3
+                      : 4
+              }
+              image={''}
+              summary={
+                el.type === 'movie' || el.type === 'show'
+                  ? el.summary
+                  : el.type === 'season'
                     ? el.title
                     : el.type === 'episode'
-                    ? 'Episode ' + el.index + ' - ' + el.title
-                    : ''
-                }
-                year={
-                  el.type === 'episode'
-                    ? el.parentTitle
-                    : el.parentYear
+                      ? 'Episode ' + el.index + ' - ' + el.title
+                      : ''
+              }
+              year={
+                el.type === 'episode'
+                  ? el.parentTitle
+                  : el.parentYear
                     ? el.parentYear.toString()
                     : el.year?.toString()
-                }
-                mediaType={
-                  el.type === 'movie'
-                    ? 'movie'
-                    : el.type === 'show'
+              }
+              mediaType={
+                el.type === 'movie'
+                  ? 'movie'
+                  : el.type === 'show'
                     ? 'show'
                     : el.type === 'season'
-                    ? 'season'
-                    : 'episode'
-                }
-                title={
-                  el.grandparentTitle
-                    ? el.grandparentTitle
-                    : el.parentTitle
+                      ? 'season'
+                      : 'episode'
+              }
+              title={
+                el.grandparentTitle
+                  ? el.grandparentTitle
+                  : el.parentTitle
                     ? el.parentTitle
                     : el.title
-                }
-                userScore={el.audienceRating ? el.audienceRating : 0}
-                tmdbid={
-                  el.parentData
-                    ? el.parentData.Guid.find((e) =>
-                        e.id.includes('tmdb'),
-                      )?.id.split('tmdb://')[1]
-                    : el.Guid
+              }
+              userScore={el.audienceRating ? el.audienceRating : 0}
+              exclusionId={
+                el.maintainerrExclusionId
+                  ? el.maintainerrExclusionId
+                  : undefined
+              }
+              tmdbid={
+                el.parentData
+                  ? el.parentData.Guid.find((e) =>
+                      e.id.includes('tmdb'),
+                    )?.id.split('tmdb://')[1]
+                  : el.Guid
                     ? el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
                         'tmdb://',
                       )[1]
                     : undefined
-                }
-                collectionPage={
-                  props.collectionPage ? props.collectionPage : false
-                }
-                onRemove={props.onRemove}
-                {...(props.collectionInfo
-                  ? {
-                      daysLeft: getDaysLeft(+el.ratingKey),
-                      collectionId: props.collectionInfo.find(
-                        (colEl) => colEl.plexId === +el.ratingKey,
-                      )?.collectionId,
-                    }
-                  : {})}
-              />
+              }
+              collectionPage={
+                props.collectionPage ? props.collectionPage : false
+              }
+              exclusionType={el.maintainerrExclusionType}
+              onRemove={props.onRemove}
+              collectionId={props.collectionId}
+              {...(props.collectionInfo
+                ? {
+                    daysLeft: getDaysLeft(+el.ratingKey),
+                    collectionId: props.collectionInfo.find(
+                      (colEl) => colEl.plexId === +el.ratingKey,
+                    )?.collectionId,
+                  }
+                : undefined)}
+            />
           </li>
         ))}
         {props.extrasLoading ? <SmallLoadingSpinner /> : undefined}

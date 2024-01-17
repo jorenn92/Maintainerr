@@ -11,7 +11,7 @@ import {
 import { CommunityRule } from './dtos/communityRule.dto';
 import { ExclusionAction, ExclusionContextDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
-import { RuleExecutorService } from './rule-executor.service';
+import { RuleExecutorService } from './tasks/rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
 
 @Controller('api/rules')

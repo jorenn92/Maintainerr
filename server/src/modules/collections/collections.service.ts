@@ -141,6 +141,7 @@ export class CollectionsService {
       queryBuilder
         .where(`exclusion.ruleGroupId = ${groupId}`)
         .orWhere(`exclusion.ruleGroupId is null`)
+        .andWhere(`exclusion.type = ${rulegroup.dataType}`)
         .orderBy('id', 'DESC')
         .skip(offset)
         .take(size);
