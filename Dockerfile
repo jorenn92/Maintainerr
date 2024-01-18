@@ -66,10 +66,6 @@ RUN rm -rf .yarn && \
     chown -R node:node /opt && \
     chmod +x /opt/start.sh
 
-# node-prune
-RUN curl -sf https://gobinaries.com/tj/node-prune | ash && \
-    node-prune
-
 # Final build
 FROM node:20-alpine3.19
 
