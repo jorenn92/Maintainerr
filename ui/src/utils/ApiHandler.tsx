@@ -1,5 +1,4 @@
 import axios from 'axios'
-import useSWR, { SWRResponse } from 'swr'
 
 const ApiHandler = async (
   url: string,
@@ -23,7 +22,6 @@ const ApiHandler = async (
     }
   }
   const data = await fetcher(url, payload, method)
-  // const { data, error } = useSWR(`http://localhost:3001/api${url}`, fetcher)
 
   if (data) {
     return data

@@ -1,3 +1,4 @@
 data/maintainerr.sqlite
 docs-output/
 node_modules
+.yarn
