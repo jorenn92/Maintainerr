@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ExternalApiService } from '../external-api/external-api.service';
 import cacheManager from './cache';
-import xml2js from 'xml2js';
+import { parseStringPromise } from 'xml2js';
 
 interface PlexAccountResponse {
   user: PlexUser;
@@ -167,7 +167,7 @@ export class PlexTvApi extends ExternalApiService {
       responseType: 'text',
     });
 
-    const parsedXml = (await xml2js.parseStringPromise(
+    const parsedXml = (await parseStringPromise(
       response,
     )) as UsersResponse;
     return parsedXml;

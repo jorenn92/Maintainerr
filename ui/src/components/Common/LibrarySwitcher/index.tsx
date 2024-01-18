@@ -33,7 +33,7 @@ const LibrarySwitcher = (props: ILibrarySwitcher) => {
     <>
       <div className="mb-5 w-full">
         <form >
-          <select className='border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0' placeholder="Libraries" onChange={onSwitchLibrary}>
+          <select className='border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0' onChange={onSwitchLibrary}>
             {props.allPossible === undefined || props.allPossible ? (
               <option value={9999}>All</option>
             ) : undefined}
