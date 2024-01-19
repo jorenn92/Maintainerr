@@ -167,9 +167,7 @@ export class PlexTvApi extends ExternalApiService {
       responseType: 'text',
     });
 
-    const parsedXml = (await parseStringPromise(
-      response,
-    )) as UsersResponse;
+    const parsedXml = (await parseStringPromise(response)) as UsersResponse;
     return parsedXml;
   }
 

@@ -6,6 +6,7 @@ import CollectionDetail from './CollectionDetail'
 import CollectionOverview from './CollectionOverview'
 import { EPlexDataType } from '../../utils/PlexDataType-enum'
 import { IPlexMetadata } from '../Overview/Content'
+import { useToasts } from 'react-toast-notifications'
 
 export interface ICollection {
   id?: number
@@ -47,6 +48,7 @@ const Collection = () => {
   }>({ open: false, collection: undefined })
   const [library, setLibrary] = useState<ILibrary>()
   const [collections, setCollections] = useState<ICollection[]>()
+  const { addToast } = useToasts()
 
   useEffect(() => {
     document.title = 'Maintainerr - Collections'
@@ -74,6 +76,13 @@ const Collection = () => {
 
   const doActions = () => {
     PostApiHandler('/collections/handle', {})
+    addToast(
+      'Initiated collection handling in the background, Consult the logs for status updates.',
+      {
+        autoDismiss: true,
+        appearance: 'success',
+      },
+    )
   }
 
   const openDetail = (collection: ICollection) => {

@@ -1,8 +1,5 @@
-import { RefreshIcon } from '@heroicons/react/outline'
-import { PlayIcon } from '@heroicons/react/solid'
 import { debounce } from 'lodash'
-import React, { useContext, useEffect, useState } from 'react'
-import LibrariesContext from '../../contexts/libraries-context'
+import React, { useEffect, useState } from 'react'
 import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
 import AddButton from '../Common/AddButton'
 import ExecuteButton from '../Common/ExecuteButton'
@@ -10,15 +7,16 @@ import LibrarySwitcher from '../Common/LibrarySwitcher'
 import LoadingSpinner from '../Common/LoadingSpinner'
 import RuleGroup, { IRuleGroup } from './RuleGroup'
 import AddModal from './RuleGroup/AddModal'
+import { useToasts } from 'react-toast-notifications'
 
 const Rules: React.FC = () => {
   const [addModalActive, setAddModal] = useState(false)
   const [editModalActive, setEditModal] = useState(false)
   const [data, setData] = useState()
   const [editData, setEditData] = useState<IRuleGroup>()
-  const LibrariesCtx = useContext(LibrariesContext)
   const [selectedLibrary, setSelectedLibrary] = useState<number>(9999)
   const [isLoading, setIsLoading] = useState(true)
+  const { addToast } = useToasts()
 
   const fetchData = async () => {
     if (selectedLibrary === 9999) return await GetApiHandler('/rules')
@@ -58,6 +56,13 @@ const Rules: React.FC = () => {
 
   const sync = () => {
     PostApiHandler(`/rules/execute`, {})
+    addToast(
+      'Initiated rule execution in the background. Consult the logs for status updates.',
+      {
+        autoDismiss: true,
+        appearance: 'success',
+      },
+    )
   }
 
   if (!data || isLoading) {

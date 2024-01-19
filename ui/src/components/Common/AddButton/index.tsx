@@ -11,8 +11,8 @@ const AddButton = (props: IAddButton) => {
       className="add-button bg-amber-600 hover:bg-amber-500 flex m-auto h-9 rounded text-zinc-200 shadow-md"
       onClick={props.onClick}
     >
-      {<PlusCircleIcon className="m-auto h-5 ml-5" />}
-      <p className="m-auto rules-button-text ml-1 mr-5">{props.text}</p>
+      {<PlusCircleIcon className="m-auto h-5 ml-4" />}
+      <p className="m-auto rules-button-text ml-1 mr-4">{props.text}</p>
     </button>
   )
 }
