@@ -26,8 +26,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20.x
+      - name: Activate corepack
+        run: |
+            corepack install
+            corepack enable
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
