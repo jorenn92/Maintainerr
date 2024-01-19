@@ -77,7 +77,7 @@ const Collection = () => {
   const doActions = () => {
     PostApiHandler('/collections/handle', {})
     addToast(
-      'Initiated collection handling in the background, Consult the logs for status updates.',
+      'Initiated collection handling in the background, consult the logs for status updates.',
       {
         autoDismiss: true,
         appearance: 'success',

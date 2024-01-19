@@ -167,7 +167,7 @@ const AddModal = (props: AddModal) => {
         response.result,
       )
       handleLoadRules(result.rules)
-      addToast('Successfully imported rules from Yaml', {
+      addToast('Successfully imported rules from Yaml.', {
         autoDismiss: true,
         appearance: 'success',
       })

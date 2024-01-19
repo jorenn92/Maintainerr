@@ -57,7 +57,7 @@ const Rules: React.FC = () => {
   const sync = () => {
     PostApiHandler(`/rules/execute`, {})
     addToast(
-      'Initiated rule execution in the background. Consult the logs for status updates.',
+      'Initiated rule execution in the background, consult the logs for status updates.',
       {
         autoDismiss: true,
         appearance: 'success',
