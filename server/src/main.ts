@@ -4,6 +4,7 @@ import { WinstonModule } from 'nest-winston';
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import chalk from 'chalk';
+import path from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -47,13 +48,16 @@ async function bootstrap() {
       transports: [
         new winston.transports.Console(),
         new DailyRotateFile({
-          filename: '../data/logs/maintainerr-%DATE%.log',
+          filename: path.join(
+            __dirname,
+            `${process.env.NODE_ENV !== 'production' ? '../' : ''}../data/logs/maintainerr-%DATE%.log`,
+          ),
           datePattern: 'YYYY-MM-DD',
           zippedArchive: true,
           maxSize: '20m',
           maxFiles: '7d',
           format: winston.format.combine(
-            winston.format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }), // winston.format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
+            winston.format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }),
             winston.format.printf(({ level, message, timestamp, context }) => {
               return `[maintainerr]  |  ${timestamp}  [${level.toUpperCase()}] [${context}] ${message}`;
             }),
