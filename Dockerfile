@@ -20,28 +20,29 @@ COPY .yarnrc.yml /opt/.yarnrc.yml
 
 WORKDIR /opt/
 
-RUN export YARN_VERSION=$(corepack yarn --version)
+# enable correct yarn version
+RUN corepack install && \
+    corepack enable
 
 RUN apk --update --no-cache add python3 make g++ curl
 
 RUN chmod +x /opt/start.sh
 
-RUN corepack install && \
-    sed -i 's/\/server\/dist\//\/server\//g' /opt/datasource-config.ts
+RUN sed -i 's/\/server\/dist\//\/server\//g' /opt/datasource-config.ts
 
-RUN corepack yarn --immutable --network-timeout 99999999
+RUN yarn --immutable --network-timeout 99999999
 
 RUN \
     case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-    corepack yarn add sharp \
+    yarn add sharp \
     ;; \
     esac
 
-RUN corepack yarn build:server
+RUN yarn build:server
 
-RUN corepack yarn build:ui
+RUN yarn build:ui
 
-RUN corepack yarn docs-generate && \
+RUN yarn docs-generate && \
     rm -rf ./docs
 
 # copy standalone UI 
@@ -59,7 +60,7 @@ RUN mv ./server/dist ./standalone-server && \
 
 RUN rm -rf node_modules .yarn 
 
-RUN corepack yarn workspaces focus --production
+RUN yarn workspaces focus --production
 
 RUN rm -rf .yarn && \
     mkdir /opt/data && \
@@ -81,18 +82,20 @@ ENV DEBUG=${DEBUG}
 # Temporary workaround for https://github.com/libuv/libuv/pull/4141
 ENV UV_USE_IO_URING=0
 
-EXPOSE 80
-
 WORKDIR /opt
 
 COPY --from=builder --chown=node:node /opt /opt
 COPY supervisord.conf /etc/supervisord.conf
 
-RUN export YARN_VERSION=$(corepack yarn --version) && \
+# enable correct yarn version, add supervisor & chown root /opt dir
+RUN corepack install && \
+    corepack enable && \
     apk add supervisor && \
-    chown node:node /opt
+    chown node:node /opt    
 
 USER node
+
+EXPOSE 80
 
 VOLUME [ "/opt/data" ]
 ENTRYPOINT ["/opt/start.sh"]

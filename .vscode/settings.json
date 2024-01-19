@@ -1,0 +1,23 @@
+{
+    "eslint.enable": true,
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ],
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "driver": "SQLite",
+        "name": "Local SQLite",
+        "database": "./data/maintainerr.sqlite"
+      }
+    ],
+    "editor.formatOnSave": true,
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "files.associations": {
+      "globals.css": "tailwindcss"
+    }
+  }
