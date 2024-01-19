@@ -10350,6 +10350,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jsdoc: "npm:^4.0.2"
     lodash: "npm:^4.17.21"
+    monaco-editor: "npm:0.45.0"
     next: "npm:14.0.4"
     node-cache: "npm:^5.1.2"
     path: "npm:^0.12.7"
@@ -10858,6 +10859,13 @@ __metadata:
   bin:
     mkdirp: dist/cjs/src/bin.js
   checksum: 96f551c651dd8f5f9435d53df1a7b9bfc553be769ee6da5192c37c1f303a376ef1c6996f96913d4a8d357060451d4526a346031d1919f92c58806a5fa3cd8dfe
+  languageName: node
+  linkType: hard
+
+"monaco-editor@npm:0.45.0":
+  version: 0.45.0
+  resolution: "monaco-editor@npm:0.45.0"
+  checksum: 77b1522dbbf06b582f143a7be22f48ad82e5cade3f22c26fc19086446e473c720b2147f8a1ac6edf2172abf5d6bc92a5e858f62fb60df8617f8532f1fa1119ab
   languageName: node
   linkType: hard
 
