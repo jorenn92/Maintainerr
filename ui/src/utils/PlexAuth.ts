@@ -1,7 +1,5 @@
 import axios from 'axios'
-import Bowser from 'bowser'
-import { useContext } from 'react'
-import SettingsContext from '../contexts/settings-context'
+import { getParser } from 'bowser'
 
 interface PlexHeaders extends Record<string, string> {
   Accept: string
@@ -36,7 +34,7 @@ class PlexOAuth {
         'Window is not defined. Are you calling this in the browser?'
       )
     }
-    const browser = Bowser.getParser(window.navigator.userAgent)
+    const browser = getParser(window.navigator.userAgent)
     this.plexHeaders = {
       Accept: 'application/json',
       'X-Plex-Product': 'Maintainerr',
