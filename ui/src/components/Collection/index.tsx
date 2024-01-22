@@ -24,6 +24,9 @@ export interface ICollection {
   media: ICollectionMedia[]
   manualCollection: boolean
   manualCollectionName: string
+  addDate: Date
+  handledMediaAmount: number
+  lastDurationInSeconds: number
 }
 
 export interface ICollectionMedia {

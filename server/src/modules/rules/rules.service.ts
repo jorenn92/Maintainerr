@@ -28,6 +28,7 @@ import { AddCollectionMedia } from '../collections/interfaces/collection-media.i
 import { RuleYamlService } from './helpers/yaml.service';
 import { RuleComparatorService } from './helpers/rule.comparator.service';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
+import { CollectionLog } from 'src/modules/collections/entities/collection_log.entities';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -292,14 +293,19 @@ export class RulesService {
           params.collection.manualCollection !==
             dbCollection.manualCollection ||
           params.collection.manualCollectionName !==
-            dbCollection.manualCollectionName
+            dbCollection.manualCollectionName ||
+          params.libraryId !== dbCollection.libraryId
         ) {
           this.logger.log(
-            `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media & specific exclusions`,
+            `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media, logs & specific exclusions`,
           );
           await this.collectionMediaRepository.delete({
             collectionId: group.collectionId,
           });
+
+          await this.collectionService.removeAllCollectionLogs(
+            group.collectionId,
+          );
           await this.exclusionRepo.delete({ ruleGroupId: params.id });
         }
 

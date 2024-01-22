@@ -8,6 +8,7 @@ import _ from 'lodash'
 import TestMediaItem from './TestMediaItem'
 import TabbedLinks, { TabbedRoute } from '../../Common/TabbedLinks'
 import CollectionExcludions from './Exclusions'
+import CollectionInfo from './CollectionInfo'
 
 interface ICollectionDetail {
   libraryId: number
@@ -145,6 +146,10 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
       text: 'Exclusions',
       route: 'exclusions',
     },
+    {
+      text: 'Info',
+      route: 'info',
+    },
   ]
 
   return (
@@ -206,6 +211,8 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
             collection={props.collection}
             libraryId={props.libraryId}
           />
+        ) : selectedTab === 'info' ? (
+          <CollectionInfo collection={props.collection} />
         ) : undefined}
       </div>
 

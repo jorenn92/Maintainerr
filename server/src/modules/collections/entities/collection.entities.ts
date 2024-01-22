@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { CollectionMedia } from './collection_media.entities';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import { CollectionLog } from 'src/modules/collections/entities/collection_log.entities';
 
 @Entity()
 export class Collection {
@@ -57,10 +58,26 @@ export class Collection {
   @OneToOne(() => RuleGroup, (rg) => rg.collection)
   ruleGroup: RulesDto;
 
+  @Column({ type: 'date', nullable: true, default: () => 'CURRENT_TIMESTAMP' }) // nullable = true for old collections
+  addDate: Date;
+
+  @Column({ nullable: false, default: 0 })
+  handledMediaAmount: number;
+
+  @Column({ nullable: false, default: 0 })
+  lastDurationInSeconds: number;
+
   @OneToMany(
     (type) => CollectionMedia,
     (collectionMedia) => collectionMedia.collectionId,
     { onDelete: 'CASCADE' },
   )
   collectionMedia: CollectionMedia[];
+
+  @OneToMany(
+    (type) => CollectionLog,
+    (collectionLog) => collectionLog.collection,
+    { onDelete: 'CASCADE' },
+  )
+  collectionLog: CollectionLog[];
 }

@@ -137,6 +137,10 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
       },
     ]);
 
+    // update handled media amount
+    collection.handledMediaAmount++;
+    this.collectionService.saveCollection(collection);
+
     if (plexLibrary.type === 'movie') {
       if (this.settings.radarrConfigured()) {
         // find tmdbid
@@ -465,8 +469,8 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
             plexData.grandparentRatingKey.toString(),
           )
         : plexData.parentRatingKey
-        ? await this.plexApi.getMetadata(plexData.parentRatingKey.toString())
-        : plexData;
+          ? await this.plexApi.getMetadata(plexData.parentRatingKey.toString())
+          : plexData;
 
       const tvdbidPlex = plexData?.Guid?.find((el) => el.id.includes('tvdb'));
       if (tvdbidPlex) {

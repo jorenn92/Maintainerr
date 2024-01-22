@@ -22,8 +22,9 @@ import {
   IAlterableMediaDto,
 } from './interfaces/collection-media.interface';
 import { ICollection } from './interfaces/collection.interface';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { Exclusion } from '../rules/entities/exclusion.entities';
+import { CollectionLog } from '../../modules/collections/entities/collection_log.entities';
+import { ECollectionLogType } from '../../modules/collections/entities/collection_log.entities';
 
 interface addCollectionDbResponse {
   id: number;
@@ -40,6 +41,8 @@ export class CollectionsService {
     private readonly collectionRepo: Repository<Collection>,
     @InjectRepository(CollectionMedia)
     private readonly CollectionMediaRepo: Repository<CollectionMedia>,
+    @InjectRepository(CollectionLog)
+    private readonly CollectionLogRepo: Repository<CollectionLog>,
     @InjectRepository(RuleGroup)
     private readonly ruleGroupRepo: Repository<RuleGroup>,
     @InjectRepository(Exclusion)
@@ -758,6 +761,9 @@ export class CollectionsService {
             },
           ])
           .execute();
+
+        // log record
+        this.CollectionLogRecordForChildAdd(childId, collectionIds.dbId);
       } else {
         this.logger.warn(
           `Couldn't add media to collection: `,
@@ -770,6 +776,26 @@ export class CollectionsService {
       );
       return undefined;
     }
+  }
+
+  private async CollectionLogRecordForChildAdd(
+    plexId: number,
+    collectionId: number,
+  ) {
+    // log record
+    const plexData = await this.plexApi.getMetadata(plexId.toString()); // fetch data from cache
+
+    const subject =
+      plexData.type === 'episode'
+        ? `${plexData.grandparentTitle} - season ${plexData.parentIndex} - episode ${plexData.index}`
+        : plexData.type === 'season'
+          ? `${plexData.parentTitle} - season ${plexData.index}`
+          : plexData.title;
+    this.addLogRecordForCollection(
+      { id: collectionId } as Collection,
+      `Added "${subject}"`,
+      ECollectionLogType.MEDIA_ADD,
+    );
   }
 
   private async removeChildFromCollection(
@@ -822,7 +848,7 @@ export class CollectionsService {
     try {
       this.infoLogger(`Adding collection to the Database..`);
       try {
-        return (
+        const dbCol = (
           await this.connection
             .createQueryBuilder()
             .insert()
@@ -852,6 +878,13 @@ export class CollectionsService {
             ])
             .execute()
         ).generatedMaps[0] as addCollectionDbResponse;
+
+        this.addLogRecordForCollection(
+          dbCol as Collection,
+          'Collection Created',
+          ECollectionLogType.COLLECTION,
+        );
+        return dbCol;
       } catch (err) {
         // Log error
         this.infoLogger(
@@ -874,7 +907,8 @@ export class CollectionsService {
     try {
       this.infoLogger(`Removing collection from Database..`);
       try {
-        await this.CollectionMediaRepo.delete({ collectionId: collection.id });
+        await this.CollectionMediaRepo.delete({ collectionId: collection.id }); // cascade delete doesn't work for some reason..
+        await this.CollectionLogRepo.delete({ collection: collection }); // cascade delete doesn't work for some reason..
         await this.collectionRepo.delete(collection.id);
 
         return { status: 'OK', code: 1, message: 'Success' };
@@ -944,6 +978,33 @@ export class CollectionsService {
       this.logger.debug(err);
       return undefined;
     }
+  }
+
+  public async addLogRecordForCollection(
+    collection: Collection,
+    message: string,
+    type: ECollectionLogType,
+  ) {
+    await this.connection
+      .createQueryBuilder()
+      .insert()
+      .into(CollectionLog)
+      .values([
+        {
+          collection: collection,
+          timestamp: new Date().toLocaleString(),
+          message: message,
+          type: type,
+        },
+      ])
+      .execute();
+  }
+
+  public async removeAllCollectionLogs(collectionId: number) {
+    const collection = await this.collectionRepo.findOne({
+      where: { id: collectionId },
+    });
+    this.CollectionLogRepo.delete({ collection: collection });
   }
 
   private infoLogger(message: string) {
