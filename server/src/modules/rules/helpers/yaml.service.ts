@@ -109,14 +109,14 @@ export class RuleYamlService {
       if (+mediaType !== +EPlexDataType[decoded.mediaType.toUpperCase()]) {
         this.logger.warn(`Yaml import failed. Incompatible media types`);
         this.logger.debug(
-          `media type with ID ${+mediaType} is not compatible with media type with ID ${
+          `Media type with ID ${+mediaType} is not compatible with media type with ID ${
             EPlexDataType[decoded.mediaType.toUpperCase()]
           } `,
         );
 
         return {
           code: 0,
-          message: 'Yaml import failed. Incompatible media types',
+          message: 'Yaml import failed. Incompatible media types.',
         };
       }
 
