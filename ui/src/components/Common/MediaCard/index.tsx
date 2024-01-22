@@ -27,6 +27,7 @@ interface IMediaCard {
   exclusionId?: number
   exclusionType?: 'global' | 'specific' | undefined
   collectionId?: number
+  isManual?: boolean
   onRemove?: (id: string) => void
 }
 
@@ -45,6 +46,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   canExpand = false,
   collectionPage = false,
   exclusionType = undefined,
+  isManual = false,
   onRemove = (id: string) => {},
 }) => {
   const isTouch = useIsTouch()
@@ -172,6 +174,27 @@ const MediaCard: React.FC<IMediaCard> = ({
               >
                 <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
                   {'EXCL'}
+                </div>
+              </div>
+            </div>
+          ) : undefined}
+
+          {/* on collection page and for manually added */}
+          {collectionPage && isManual && !showDetail ? (
+            <div className="absolute left-1/2 transform -translate-x-1/2 bottom-0 flex items-center justify-between p-2">
+              <div
+                className={`pointer-events-none z-40 rounded-full shadow ${
+                  mediaType === 'movie'
+                    ? 'bg-zinc-900'
+                    : mediaType === 'show'
+                      ? 'bg-amber-900'
+                      : mediaType === 'season'
+                        ? 'bg-yellow-700'
+                        : 'bg-rose-900'
+                }`}
+              >
+                <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
+                  {'MANUAL'}
                 </div>
               </div>
             </div>

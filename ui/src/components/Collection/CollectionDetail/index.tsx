@@ -90,9 +90,10 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
 
     setData([
       ...dataRef.current,
-      ...resp.items.map((el) =>
-        el.plexData ? el.plexData : ({} as IPlexMetadata),
-      ),
+      ...resp.items.map((el) => {
+        el.plexData!.maintainerrIsManual = el.isManual ? el.isManual : false
+        return el.plexData ? el.plexData : ({} as IPlexMetadata)
+      }),
     ])
     loadingRef.current = false
     loadingExtraRef.current = false
