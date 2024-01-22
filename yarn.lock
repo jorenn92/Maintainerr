@@ -10449,7 +10449,7 @@ __metadata:
     react-select: "npm:^5.8.0"
     react-toast-notifications: "npm:^2.5.1"
     react-transition-group: "npm:^4.4.5"
-    reflect-metadata: "npm:^0.1.13"
+    reflect-metadata: "npm:^0.2.1"
     rxjs: "npm:^7.8.1"
     semantic-release: "npm:^23.0.0"
     source-map-support: "npm:^0.5.21"
@@ -12877,6 +12877,13 @@ __metadata:
   version: 0.1.14
   resolution: "reflect-metadata@npm:0.1.14"
   checksum: 3a6190c7f6cb224f26a012d11f9e329360c01c1945e2cbefea23976a8bacf9db6b794aeb5bf18adcb673c448a234fbc06fc41853c00a6c206b30f0777ecf019e
+  languageName: node
+  linkType: hard
+
+"reflect-metadata@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "reflect-metadata@npm:0.2.1"
+  checksum: 6ca3c674bb43cf8ec3a3f5f38c8730a6116335f8e562fcdcdf3a492af168c5a7f0e8f17476a5710c3fe6bf9b5d22e8a463f14c0e26e326339cab65e099900ef7
   languageName: node
   linkType: hard
 
