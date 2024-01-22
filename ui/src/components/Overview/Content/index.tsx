@@ -70,6 +70,7 @@ export interface IPlexMetadata {
   index?: number
   maintainerrExclusionType?: 'specific' | 'global' // this is added by Maintainerr, not a Plex type
   maintainerrExclusionId?: number // this is added by Maintainerr, not a Plex type
+  maintainerrIsManual?: boolean // this is added by Maintainerr, not a Plex type
 }
 
 const OverviewContent = (props: IOverviewContent) => {
@@ -203,6 +204,7 @@ const OverviewContent = (props: IOverviewContent) => {
               exclusionType={el.maintainerrExclusionType}
               onRemove={props.onRemove}
               collectionId={props.collectionId}
+              isManual={el.maintainerrIsManual ? el.maintainerrIsManual : false}
               {...(props.collectionInfo
                 ? {
                     daysLeft: getDaysLeft(+el.ratingKey),
