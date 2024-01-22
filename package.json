@@ -98,7 +98,7 @@
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
-    "autoprefixer": "10.4.16",
+    "autoprefixer": "10.4.17",
     "clean-jsdoc-theme": "^4.2.14",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0",
