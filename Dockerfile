@@ -8,14 +8,10 @@ ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
 
 COPY server/ /opt/server/
 COPY ui/ /opt/ui/
-COPY tools/ /opt/tools/
 COPY docs/ /opt/docs/
 COPY package.json /opt/package.json
 COPY yarn.lock /opt/yarn.lock
-COPY datasource-config.ts /opt/datasource-config.ts
-COPY ormconfig.json /opt/ormconfig.json
 COPY jsdoc.json /opt/jsdoc.json
-COPY start.sh /opt/start.sh
 COPY .yarnrc.yml /opt/.yarnrc.yml
 
 WORKDIR /opt/
@@ -25,10 +21,6 @@ RUN corepack install && \
     corepack enable
 
 RUN apk --update --no-cache add python3 make g++ curl
-
-RUN chmod +x /opt/start.sh
-
-RUN sed -i 's/\/server\/dist\//\/server\//g' /opt/datasource-config.ts
 
 RUN yarn --immutable --network-timeout 99999999
 
@@ -64,8 +56,7 @@ RUN yarn workspaces focus --production
 
 RUN rm -rf .yarn && \
     mkdir /opt/data && \
-    chown -R node:node /opt && \
-    chmod +x /opt/start.sh
+    chown -R node:node /opt
 
 # Final build
 FROM node:20-alpine3.19
@@ -98,4 +89,4 @@ USER node
 EXPOSE 80
 
 VOLUME [ "/opt/data" ]
-ENTRYPOINT ["/opt/start.sh"]
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

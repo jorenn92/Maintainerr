@@ -24,20 +24,20 @@ export class RuleMaintenanceService implements OnApplicationBootstrap {
   onApplicationBootstrap() {
     this.jobCreationAttempts++;
     const state = this.taskService.createJob(
-      'RuleMaintenance',
-      '20 4 * * */1',
+      'Rule Maintenance',
+      '20 4 * * *',
       this.execute.bind(this),
     );
     if (state.code === 0) {
       if (this.jobCreationAttempts <= 3) {
         this.logger.log(
-          'Creation of job RuleMaintenance failed. Retrying in 10s..',
+          'Creation of job Rule Maintenance failed. Retrying in 10s..',
         );
         setTimeout(() => {
           this.onApplicationBootstrap();
         }, 10000);
       } else {
-        this.logger.error(`Creation of job RuleMaintenance failed.`);
+        this.logger.error(`Creation of job Rule Maintenance failed.`);
       }
     }
   }
@@ -58,7 +58,7 @@ export class RuleMaintenanceService implements OnApplicationBootstrap {
         );
       }
     } catch (e) {
-      this.logger.error(`RuleMaintenance failed : ${e.message}`);
+      this.logger.error(`Rule Maintenance failed : ${e.message}`);
     }
   }
 
@@ -91,7 +91,8 @@ export class RuleMaintenanceService implements OnApplicationBootstrap {
         }
       }
     } catch (err) {
-      this.logger.warn("Couldn't remove collection without rule: " + err);
+      this.logger.warn("Couldn't remove collection without rule: ");
+      this.logger.debug(err);
     }
   }
 }

@@ -7,7 +7,6 @@ import { RulesModule } from '../modules/rules/rules.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { getConnectionOptions } from 'typeorm';
 import { OverseerrApiModule } from '../modules/api/overseerr-api/overseerr-api.module';
 import { CollectionsModule } from '../modules/collections/collections.module';
 import { SettingsModule } from '../modules/settings/settings.module';
@@ -15,15 +14,11 @@ import { SettingsService } from '../modules/settings/settings.service';
 import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
 import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.service';
 import { ServarrService } from '../modules/api/servarr-api/servarr.service';
+import ormConfig from './config/typeOrmConfig';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      useFactory: async () =>
-        Object.assign(await getConnectionOptions(), {
-          autoLoadEntities: true,
-        }),
-    }),
+    TypeOrmModule.forRoot(ormConfig),
     SettingsModule,
     PlexApiModule,
     ExternalApiModule,

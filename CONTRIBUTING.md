@@ -57,12 +57,7 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
     yarn
    ```
 
-6. Initialise the database
-    ```bash
-    yarn migration:run
-    ```
-
-7. Run the development environments:
+6. Run the development commands:
    ```bash
    yarn dev:server
    yarn dev:ui
@@ -70,7 +65,7 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
 
    - If the build fails with Windows Powershell, try to use cmd instead.
 
-8. Create your patch and test your changes.
+7. Create your patch and test your changes.
 
    - Be sure to follow both the [code](#contributing-code) and [UI text](#ui-text-style) guidelines.
    - Should you need to update your fork, you can do so by rebasing from `upstream`:

@@ -263,18 +263,18 @@
     @apply pt-2 text-sm text-zinc-400 sm:text-base;
   }
 
-  ul.media-crew {
+  ul.collection-info {
     @apply mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3;
   }
 
-  ul.media-crew > li {
+  ul.collection-info > li {
     @apply col-span-1 flex flex-col font-bold text-zinc-300;
   }
 
-  a.crew-name,
+  .collection-info-item,
   .media-fact-value a,
   .media-fact-value button {
-    @apply font-normal text-zinc-400 transition duration-300 hover:text-zinc-100 hover:underline;
+    @apply font-normal text-zinc-400;
   }
 
   .media-overview-right {

@@ -14,6 +14,7 @@ import { RulesService } from '../rules.service';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import cacheManager from '../../api/lib/cache';
 import { RuleComparatorService } from '../helpers/rule.comparator.service';
+import { Collection } from 'src/modules/collections/entities/collection.entities';
 
 interface PlexData {
   page: number;
@@ -32,6 +33,8 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   plexDataType: EPlexDataType;
   workerData: PlexLibraryItem[];
   resultData: PlexLibraryItem[];
+  startTime: Date;
+
   constructor(
     private readonly rulesService: RulesService,
     private readonly plexApi: PlexApiService,
@@ -47,27 +50,27 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   onApplicationBootstrap() {
     this.jobCreationAttempts++;
     const state = this.taskService.createJob(
-      'RuleHandler',
+      'Rule Handler',
       this.settings.rules_handler_job_cron,
       this.executeAllRules.bind(this),
     );
     if (state.code === 0) {
       if (this.jobCreationAttempts <= 3) {
         this.logger.log(
-          'Creation of job RuleHandler failed. Retrying in 10s..',
+          'Creation of job Rule Handler failed. Retrying in 10s..',
         );
         setTimeout(() => {
           this.onApplicationBootstrap();
         }, 10000);
       } else {
-        this.logger.error(`Creation of job RuleHandler failed.`);
+        this.logger.error(`Creation of job Rule Handler failed.`);
       }
     }
   }
 
   public updateJob(cron: string) {
     return this.taskService.updateJob(
-      'RuleHandler',
+      'Rule Handler',
       cron,
       this.executeAllRules.bind(this),
     );
@@ -88,6 +91,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         for (const rulegroup of ruleGroups) {
           if (rulegroup.useRules) {
             this.logger.log(`Executing rules for '${rulegroup.name}'`);
+            this.startTime = new Date();
 
             // prepare
             this.workerData = [];
@@ -198,10 +202,6 @@ export class RuleExecutorService implements OnApplicationBootstrap {
 
       const exclusions = await this.rulesService.getExclusions(rulegroup.id);
 
-      // keep a record of parent/child ratingKeys for seasons & episodes
-      const collectionMediaCHildren: [{ parent: number; child: number }] =
-        undefined;
-
       // filter exclusions out of results & get correct ratingKey
       const data = this.resultData
         .filter((el) => !exclusions.find((e) => +e.plexId === +el.ratingKey))
@@ -296,6 +296,9 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           dataToRemove,
         );
 
+        // add the run duration to the collection
+        this.AddCollectionRunDuration(collection);
+
         return collection;
       } else {
         this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
@@ -317,6 +320,14 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         uniqueArr.push({ plexId: item.plexId }),
     );
     return uniqueArr;
+  }
+
+  private AddCollectionRunDuration(collection: Collection) {
+    // add the run duration to the collection
+    collection.lastDurationInSeconds = Math.floor(
+      (new Date().getTime() - this.startTime.getTime()) / 1000,
+    );
+    this.collectionService.saveCollection(collection);
   }
 
   private async getPlexData(libraryId: number): Promise<void> {
