@@ -78,7 +78,7 @@
     "@babel/core": "^7.23.2",
     "@nestjs/cli": "^10.3.0",
     "@nestjs/schematics": "^10.1.0",
-    "@nestjs/testing": "^10.2.10",
+    "@nestjs/testing": "^10.3.1",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^11.1.0",
     "@semantic-release/exec": "^6.0.3",
