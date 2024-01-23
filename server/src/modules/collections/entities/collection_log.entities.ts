@@ -9,11 +9,8 @@ import {
 
 export enum ECollectionLogType {
   COLLECTION,
-  MEDIA_ADD,
-  MEDIA_REMOVE,
-  RULES_CHANGED,
-  CLEARED_MAJOR_CHANGE,
-  MEDIA_REMOVE_FAILED,
+  MEDIA,
+  RULES,
 }
 
 @Entity()
@@ -27,7 +24,11 @@ export class CollectionLog {
   })
   collection: Collection;
 
-  @Column({ type: 'date', nullable: false, default: () => 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'datetime',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   timestamp: Date;
 
   @Column()

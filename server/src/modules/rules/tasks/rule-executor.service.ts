@@ -50,27 +50,27 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   onApplicationBootstrap() {
     this.jobCreationAttempts++;
     const state = this.taskService.createJob(
-      'RuleHandler',
+      'Rule Handler',
       this.settings.rules_handler_job_cron,
       this.executeAllRules.bind(this),
     );
     if (state.code === 0) {
       if (this.jobCreationAttempts <= 3) {
         this.logger.log(
-          'Creation of job RuleHandler failed. Retrying in 10s..',
+          'Creation of job Rule Handler failed. Retrying in 10s..',
         );
         setTimeout(() => {
           this.onApplicationBootstrap();
         }, 10000);
       } else {
-        this.logger.error(`Creation of job RuleHandler failed.`);
+        this.logger.error(`Creation of job Rule Handler failed.`);
       }
     }
   }
 
   public updateJob(cron: string) {
     return this.taskService.updateJob(
-      'RuleHandler',
+      'Rule Handler',
       cron,
       this.executeAllRules.bind(this),
     );

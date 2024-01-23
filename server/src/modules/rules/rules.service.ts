@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
-import { Connection, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
 import { Collection } from '../collections/entities/collection.entities';
@@ -28,7 +28,7 @@ import { AddCollectionMedia } from '../collections/interfaces/collection-media.i
 import { RuleYamlService } from './helpers/yaml.service';
 import { RuleComparatorService } from './helpers/rule.comparator.service';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
-import { CollectionLog } from 'src/modules/collections/entities/collection_log.entities';
+import { ECollectionLogType } from 'src/modules/collections/entities/collection_log.entities';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -60,7 +60,7 @@ export class RulesService {
     private readonly settingsRepo: Repository<Settings>,
     private readonly collectionService: CollectionsService,
     private readonly plexApi: PlexApiService,
-    private readonly connection: Connection,
+    private readonly connection: DataSource,
     private readonly ruleYamlService: RuleYamlService,
     private readonly RuleComparatorService: RuleComparatorService,
   ) {
@@ -223,6 +223,7 @@ export class RulesService {
             deleteAfterDays: +params.collection?.deleteAfterDays,
             manualCollection: params.collection?.manualCollection,
             manualCollectionName: params.collection?.manualCollectionName,
+            keepLogsForMonths: +params.collection?.keepLogsForMonths,
           })
         ).dbCollection;
         // create group
@@ -297,15 +298,18 @@ export class RulesService {
           params.libraryId !== dbCollection.libraryId
         ) {
           this.logger.log(
-            `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media, logs & specific exclusions`,
+            `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media & specific exclusions`,
           );
           await this.collectionMediaRepository.delete({
             collectionId: group.collectionId,
           });
 
-          await this.collectionService.removeAllCollectionLogs(
-            group.collectionId,
+          await this.collectionService.addLogRecord(
+            { id: group.collectionId } as Collection,
+            'A crucial setting of the collection was updated. As a result all media and specific exclusions were removed',
+            ECollectionLogType.COLLECTION,
           );
+
           await this.exclusionRepo.delete({ ruleGroupId: params.id });
         }
 
@@ -316,7 +320,7 @@ export class RulesService {
 
         const collection = (
           await this.collectionService.updateCollection({
-            id: group.id ? group.id : undefined,
+            id: group.collectionId ? group.collectionId : undefined,
             libraryId: +params.libraryId,
             type:
               lib.type === 'movie'
@@ -338,6 +342,7 @@ export class RulesService {
             deleteAfterDays: +params.collection?.deleteAfterDays,
             manualCollection: params.collection?.manualCollection,
             manualCollectionName: params.collection?.manualCollectionName,
+            keepLogsForMonths: +params.collection?.keepLogsForMonths,
           })
         ).dbCollection;
 
@@ -460,6 +465,16 @@ export class RulesService {
                       : undefined,
           },
         ]);
+
+        // add collection log record if needed
+        if (data.collectionId) {
+          await this.collectionService.CollectionLogRecordForChild(
+            media.plexId,
+            data.collectionId,
+            'exclude',
+          );
+        }
+
         this.logger.log(
           `Added ${
             data.ruleGroupId === undefined ? 'global ' : ''
@@ -483,6 +498,28 @@ export class RulesService {
 
   async removeExclusion(id: number) {
     try {
+      const exclcusion = await this.exclusionRepo.findOne({
+        where: {
+          id: id,
+        },
+      });
+
+      // add collection log record if needed
+      if (exclcusion.ruleGroupId !== undefined) {
+        const rulegroup = await this.ruleGroupRepository.findOne({
+          where: {
+            id: exclcusion.ruleGroupId,
+          },
+        });
+        // add collection log record
+        await this.collectionService.CollectionLogRecordForChild(
+          exclcusion.plexId,
+          rulegroup.collectionId,
+          'include',
+        );
+      }
+
+      // do delete
       await this.exclusionRepo.delete(id);
       this.logger.log(`Removed exclusion with id ${id}`);
       return this.createReturnStatus(true, 'Success');
@@ -529,6 +566,15 @@ export class RulesService {
             ? { ruleGroupId: data.ruleGroupId }
             : {}),
         });
+
+        // add collection log record if needed
+        if (data.collectionId) {
+          await this.collectionService.CollectionLogRecordForChild(
+            media.plexId,
+            data.collectionId,
+            'include',
+          );
+        }
         this.logger.log(
           `Removed ${
             data.ruleGroupId === undefined ? 'global ' : ''

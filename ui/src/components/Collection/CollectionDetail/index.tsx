@@ -155,7 +155,7 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
   return (
     <div className="w-full">
       <div className="m-auto mb-3 flex w-full">
-        <h1 className="w-full whitespace-nowrap overflow-hidden overflow-ellipsis flex text-lg font-bold text-zinc-200 sm:m-0 xl:m-0">
+        <h1 className="w-full whitespace-nowrap overflow-hidden overflow-ellipsis flex text-lg font-bold text-zinc-200 sm:m-0 xl:m-0 justify-center sm:justify-start">
           {`${props.title}`}
         </h1>
       </div>

@@ -27,6 +27,7 @@ export interface ICollection {
   addDate: Date
   handledMediaAmount: number
   lastDurationInSeconds: number
+  keepLogsForMonths: number
 }
 
 export interface ICollectionMedia {

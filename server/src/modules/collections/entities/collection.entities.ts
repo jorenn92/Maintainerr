@@ -55,6 +55,9 @@ export class Collection {
   @Column({ nullable: false, default: 1 })
   type: EPlexDataType;
 
+  @Column({ nullable: false, default: 6 })
+  keepLogsForMonths: number;
+
   @OneToOne(() => RuleGroup, (rg) => rg.collection)
   ruleGroup: RulesDto;
 

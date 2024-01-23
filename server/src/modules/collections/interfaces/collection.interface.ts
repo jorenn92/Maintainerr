@@ -17,6 +17,7 @@ export interface ICollection {
   media?: CollectionMedia[];
   manualCollection?: boolean;
   manualCollectionName?: string;
+  keepLogsForMonths?: number;
 }
 
 export enum ServarrAction {
