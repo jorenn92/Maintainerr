@@ -6163,6 +6163,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cron@npm:^3.1.6":
+  version: 3.1.6
+  resolution: "cron@npm:3.1.6"
+  dependencies:
+    "@types/luxon": "npm:~3.3.0"
+    luxon: "npm:~3.4.0"
+  checksum: f8328ce1052531bc14372acbfbddb38db33b30b29ac878d574b317779160b2947c9315c81dccb8a33724418cd86440a92269055037c96a2e917c867d57274009
+  languageName: node
+  linkType: hard
+
 "cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
   version: 7.0.3
   resolution: "cross-spawn@npm:7.0.3"
@@ -10412,7 +10422,7 @@ __metadata:
     bowser: "npm:^2.11.0"
     chalk: "npm:^4.1.2"
     clean-jsdoc-theme: "npm:^4.2.14"
-    cron: "npm:3.1.3"
+    cron: "npm:^3.1.6"
     cron-validator: "npm:^1.3.1"
     crypto: "npm:^1.0.1"
     eslint: "npm:^8.56.0"
