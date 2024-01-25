@@ -1,20 +1,18 @@
 FROM node:20-alpine3.19 as BUILDER
 LABEL Description="Contains the Maintainerr Docker image"
 
-WORKDIR /opt
+WORKDIR /opt/app/
 
 ARG TARGETPLATFORM
 ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
 
-COPY server/ /opt/server/
-COPY ui/ /opt/ui/
-COPY docs/ /opt/docs/
-COPY package.json /opt/package.json
-COPY yarn.lock /opt/yarn.lock
-COPY jsdoc.json /opt/jsdoc.json
-COPY .yarnrc.yml /opt/.yarnrc.yml
-
-WORKDIR /opt/
+COPY server/ ./server/
+COPY ui/ ./ui/
+COPY docs/ ./docs/
+COPY package.json ./package.json
+COPY yarn.lock ./yarn.lock
+COPY jsdoc.json ./jsdoc.json
+COPY .yarnrc.yml ./.yarnrc.yml
 
 # enable correct yarn version
 RUN corepack install && \
@@ -55,14 +53,14 @@ RUN rm -rf node_modules .yarn
 RUN yarn workspaces focus --production
 
 RUN rm -rf .yarn && \
-    mkdir /opt/data && \
-    chown -R node:node /opt
+    rm -rf /opt/yarn-* && \
+    chown -R node:node /opt/ && \
+    chmod -R 755 /opt/ && \
+    mkdir -m 777 /opt/data && \
+    mkdir -m 777 /opt/data/logs
 
 # Final build
 FROM node:20-alpine3.19
-
-ARG TARGETPLATFORM
-ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -70,19 +68,27 @@ ENV NODE_ENV=${NODE_ENV}
 ARG DEBUG=false
 ENV DEBUG=${DEBUG}
 
+# set global yarn vars to a folder read/write able for all users
+ENV YARN_INSTALL_STATE_PATH=/tmp/.yarn/install-state.gz
+ENV YARN_GLOBAL_FOLDER=/tmp/.yarn/global
+ENV YARN_CACHE_FOLDER=/tmp/.yarn/cache
+
 # Temporary workaround for https://github.com/libuv/libuv/pull/4141
 ENV UV_USE_IO_URING=0
 
-WORKDIR /opt
-
 COPY --from=builder --chown=node:node /opt /opt
+
+WORKDIR /opt/app
+
 COPY supervisord.conf /etc/supervisord.conf
 
 # enable correct yarn version, add supervisor & chown root /opt dir
 RUN corepack install && \
     corepack enable && \
     apk add supervisor && \
-    chown node:node /opt    
+    chown node:node /opt && \
+    chmod 755 /opt && \
+    mkdir -m 777 /.cache 
 
 USER node
 
