@@ -3773,12 +3773,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^20.10.7":
+"@types/node@npm:*":
   version: 20.11.5
   resolution: "@types/node@npm:20.11.5"
   dependencies:
     undici-types: "npm:~5.26.4"
   checksum: 6d18cec852f5cfbed3ec42b5c01c026e7a3f9da540d6e3d6738d4cee9979fb308cf27b6df7ba40a6553e7bc82e678f0ef53ba6e6ad52e5b86bd97b7783c2a42c
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.11.6":
+  version: 20.11.6
+  resolution: "@types/node@npm:20.11.6"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 922bc1e78076bb79fd168902c80321b54487181e3be3386e183fc535d102d91c8902da25148eaec841410fab7fb872fd4a93ec9ac9299cedf0ebcbf16b442aa1
   languageName: node
   linkType: hard
 
@@ -10399,7 +10408,7 @@ __metadata:
     "@types/express": "npm:^4.17.20"
     "@types/jest": "npm:^29.5.6"
     "@types/lodash": "npm:^4.14.200"
-    "@types/node": "npm:^20.10.7"
+    "@types/node": "npm:^20.11.6"
     "@types/react": "npm:^18.2.31"
     "@types/react-dom": "npm:^18.2.18"
     "@types/react-transition-group": "npm:^4.4.10"
