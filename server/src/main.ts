@@ -5,6 +5,7 @@ import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import chalk from 'chalk';
 import path from 'path';
+import * as fs from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -50,7 +51,7 @@ async function bootstrap() {
         new DailyRotateFile({
           filename: path.join(
             __dirname,
-            `${process.env.NODE_ENV !== 'production' ? '../' : ''}../data/logs/maintainerr-%DATE%.log`,
+            `../../data/logs/maintainerr-%DATE%.log`,
           ),
           datePattern: 'YYYY-MM-DD',
           zippedArchive: true,
@@ -70,4 +71,24 @@ async function bootstrap() {
   app.enableCors();
   await app.listen(3001);
 }
+
+function createDataDirectoryStructure(): void {
+  try {
+    const dir = path.join(__dirname, `../../data/logs`);
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, {
+        recursive: true,
+        mode: 0o777,
+      });
+    }
+  } catch (err) {
+    console.error(
+      'Could not create data directory. Make sure your permissions are set correctly.',
+    );
+    process.exit(0);
+  }
+}
+
+createDataDirectoryStructure();
 bootstrap();
