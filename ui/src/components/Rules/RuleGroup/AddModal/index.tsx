@@ -49,6 +49,7 @@ interface ICreateApiObject {
     deleteAfterDays: number
     manualCollection?: boolean
     manualCollectionName?: String
+    keepLogsForMonths?: number
   }
   rules: IRule[]
   dataType: EPlexDataType
@@ -75,6 +76,7 @@ const AddModal = (props: AddModal) => {
   const libraryRef = useRef<any>()
   const collectionTypeRef = useRef<any>(EPlexDataType.MOVIES)
   const deleteAfterRef = useRef<any>()
+  const keepLogsForMonthsRef = useRef<any>()
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showHome, setShowHome] = useState<boolean>(true)
   const [listExclusion, setListExclusion] = useState<boolean>(true)
@@ -265,6 +267,7 @@ const AddModal = (props: AddModal) => {
           deleteAfterDays: +deleteAfterRef.current.value,
           manualCollection: manualCollection,
           manualCollectionName: manualCollectionNameRef.current.value,
+          keepLogsForMonths: +keepLogsForMonthsRef.current.value,
         },
         rules: useRules ? rules : [],
       }
@@ -520,6 +523,27 @@ const AddModal = (props: AddModal) => {
                   id="collection_deleteDays"
                   defaultValue={collection ? collection.deleteAfterDays : 30}
                   ref={deleteAfterRef}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="collection_logs_months" className="text-label">
+              Keep logs for months*
+              <p className="text-xs font-normal">
+                Duration for which collection logs should be retained, measured
+                in months (0 = forever)
+              </p>
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  type="number"
+                  name="collection_logs_months"
+                  id="collection_logs_months"
+                  defaultValue={collection ? collection.keepLogsForMonths : 6}
+                  ref={keepLogsForMonthsRef}
                 />
               </div>
             </div>

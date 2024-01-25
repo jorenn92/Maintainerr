@@ -39,27 +39,27 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
   onApplicationBootstrap() {
     this.jobCreationAttempts++;
     const state = this.taskService.createJob(
-      'CollectionHandler',
+      'Collection Handler',
       this.settings.collection_handler_job_cron,
       this.handle.bind(this),
     );
     if (state.code === 0) {
       if (this.jobCreationAttempts <= 3) {
         this.logger.log(
-          'Creation of job CollectionHandler failed. Retrying in 10s..',
+          'Creation of job Collection Handler failed. Retrying in 10s..',
         );
         setTimeout(() => {
           this.onApplicationBootstrap();
         }, 10000);
       } else {
-        this.logger.error(`Creation of job CollectionHandler failed.`);
+        this.logger.error(`Creation of job Collection Handler failed.`);
       }
     }
   }
 
   public updateJob(cron: string) {
     return this.taskService.updateJob(
-      'CollectionHandler',
+      'Collection Handler',
       cron,
       this.handle.bind(this),
     );
@@ -100,6 +100,7 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
             handledCollections++;
           }
         }
+
         this.infoLogger(`Handling collection '${collection.title}' finished`);
       }
       if (handledCollections > 0) {
@@ -136,6 +137,18 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         plexId: media.plexId,
       },
     ]);
+
+    // update handled media amount
+    collection.handledMediaAmount++;
+
+    // save a log record for the handled media item
+    this.collectionService.CollectionLogRecordForChild(
+      media.plexId,
+      collection.id,
+      'handle',
+    );
+
+    this.collectionService.saveCollection(collection);
 
     if (plexLibrary.type === 'movie') {
       if (this.settings.radarrConfigured()) {
@@ -465,8 +478,8 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
             plexData.grandparentRatingKey.toString(),
           )
         : plexData.parentRatingKey
-        ? await this.plexApi.getMetadata(plexData.parentRatingKey.toString())
-        : plexData;
+          ? await this.plexApi.getMetadata(plexData.parentRatingKey.toString())
+          : plexData;
 
       const tvdbidPlex = plexData?.Guid?.find((el) => el.id.includes('tvdb'));
       if (tvdbidPlex) {

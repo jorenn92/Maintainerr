@@ -15,6 +15,7 @@ import {
   AddCollectionMedia,
   IAlterableMediaDto,
 } from './interfaces/collection-media.interface';
+import { ECollectionLogType } from 'src/modules/collections/entities/collection_log.entities';
 
 @Controller('api/collections')
 export class CollectionsController {
@@ -168,6 +169,29 @@ export class CollectionsController {
         offset: offset,
         size: size,
       },
+    );
+  }
+
+  @Get('/logs/:id/content/:page')
+  getCollectionLogs(
+    @Param('id') id: number,
+    @Param('page', new ParseIntPipe()) page: number,
+    @Query('size') amount: number,
+    @Query('search') search: string,
+    @Query('sort') sort: 'ASC' | 'DESC' = 'DESC',
+    @Query('filter') filter: ECollectionLogType,
+  ) {
+    const size = amount ? amount : 25;
+    const offset = (page - 1) * size;
+    return this.collectionService.getCollectionLogsWithhPaging(
+      id,
+      {
+        offset: offset,
+        size: size,
+      },
+      search,
+      sort,
+      filter,
     );
   }
 }

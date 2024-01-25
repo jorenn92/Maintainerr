@@ -1,8 +1,15 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  Index,
+} from 'typeorm';
 import { Collection } from './collection.entities';
 import { PlexMetadata } from '../../api/plex-api/interfaces/media.interface';
 
 @Entity()
+@Index('idx_collection_media_collection_id', ['collectionId'])
 export class CollectionMedia {
   @PrimaryGeneratedColumn()
   id: number;

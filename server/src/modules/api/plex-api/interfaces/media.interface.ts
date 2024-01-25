@@ -31,6 +31,8 @@ export interface PlexMetadata {
   originallyAvailableAt: string;
   Media: Media[];
   Genre?: PlexGenre[];
+  parentTitle?: string;
+  grandparentTitle?: string;
 }
 
 export interface Media {

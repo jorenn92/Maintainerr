@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { DataSource, LessThan, Repository } from 'typeorm';
 
 import { BasicResponseDto } from '../api/plex-api/dto/basic-response.dto';
 import {
@@ -22,8 +22,9 @@ import {
   IAlterableMediaDto,
 } from './interfaces/collection-media.interface';
 import { ICollection } from './interfaces/collection.interface';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { Exclusion } from '../rules/entities/exclusion.entities';
+import { CollectionLog } from '../../modules/collections/entities/collection_log.entities';
+import { ECollectionLogType } from '../../modules/collections/entities/collection_log.entities';
 
 interface addCollectionDbResponse {
   id: number;
@@ -40,11 +41,13 @@ export class CollectionsService {
     private readonly collectionRepo: Repository<Collection>,
     @InjectRepository(CollectionMedia)
     private readonly CollectionMediaRepo: Repository<CollectionMedia>,
+    @InjectRepository(CollectionLog)
+    private readonly CollectionLogRepo: Repository<CollectionLog>,
     @InjectRepository(RuleGroup)
     private readonly ruleGroupRepo: Repository<RuleGroup>,
     @InjectRepository(Exclusion)
     private readonly exclusionRepo: Repository<Exclusion>,
-    private readonly connection: Connection,
+    private readonly connection: DataSource,
     private readonly plexApi: PlexApiService,
     private readonly tmdbApi: TmdbApiService,
     private readonly tmdbIdHelper: TmdbIdService,
@@ -204,7 +207,18 @@ export class CollectionsService {
       this.logger.warn(
         'An error occurred while performing collection actions.',
       );
+      this.logger.debug(err);
       return undefined;
+    }
+  }
+
+  async getAllCollections() {
+    try {
+      return await this.collectionRepo.find();
+    } catch (err) {
+      this.logger.warn('An error occurred while fetching collections.');
+      this.logger.debug(err);
+      return [];
     }
   }
 
@@ -274,6 +288,7 @@ export class CollectionsService {
       this.logger.error(
         `An error occurred while creating or fetching a collection: ${err}`,
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -359,15 +374,27 @@ export class CollectionsService {
           }
         }
       }
+
       const dbResp: ICollection = await this.collectionRepo.save({
         ...dbCollection,
         ...collection,
       });
 
+      this.addLogRecord(
+        { id: dbResp.id } as Collection,
+        "Successfully updated the collection's settings",
+        ECollectionLogType.COLLECTION,
+      );
+
       return { plexCollection: plexColl, dbCollection: dbResp };
     } catch (err) {
       this.logger.warn(
         'An error occurred while performing collection actions.',
+      );
+      this.addLogRecord(
+        { id: collection.id } as Collection,
+        "Failed to update the collection's settings",
+        ECollectionLogType.COLLECTION,
       );
       return undefined;
     }
@@ -391,9 +418,20 @@ export class CollectionsService {
       if (plexColl) {
         collection.plexId = +plexColl.ratingKey;
         collection = await this.saveCollection(collection);
+
+        this.addLogRecord(
+          { id: collection.id } as Collection,
+          'Successfully relinked the manual Plex collection',
+          ECollectionLogType.COLLECTION,
+        );
       } else {
         this.logger.error(
           'Manual Plex collection not found.. Is it still available in Plex?',
+        );
+        this.addLogRecord(
+          { id: collection.id } as Collection,
+          'Failed to relink the manual Plex collection',
+          ECollectionLogType.COLLECTION,
         );
       }
     }
@@ -666,6 +704,12 @@ export class CollectionsService {
         plexId: null,
       });
 
+      this.addLogRecord(
+        { id: collectionDbId } as Collection,
+        'Collection deactivated',
+        ECollectionLogType.COLLECTION,
+      );
+
       const rulegroup = await this.ruleGroupRepo.findOne({
         where: {
           collectionId: collection.id,
@@ -695,6 +739,12 @@ export class CollectionsService {
         ...collection,
         isActive: true,
       });
+
+      this.addLogRecord(
+        { id: collectionDbId } as Collection,
+        'Collection activated',
+        ECollectionLogType.COLLECTION,
+      );
 
       const rulegroup = await this.ruleGroupRepo.findOne({
         where: {
@@ -758,6 +808,9 @@ export class CollectionsService {
             },
           ])
           .execute();
+
+        // log record
+        this.CollectionLogRecordForChild(childId, collectionIds.dbId, 'add');
       } else {
         this.logger.warn(
           `Couldn't add media to collection: `,
@@ -772,19 +825,38 @@ export class CollectionsService {
     }
   }
 
+  public async CollectionLogRecordForChild(
+    plexId: number,
+    collectionId: number,
+    type: 'add' | 'remove' | 'handle' | 'exclude' | 'include',
+  ) {
+    // log record
+    const plexData = await this.plexApi.getMetadata(plexId.toString()); // fetch data from cache
+
+    const subject =
+      plexData.type === 'episode'
+        ? `${plexData.grandparentTitle} - season ${plexData.parentIndex} - episode ${plexData.index}`
+        : plexData.type === 'season'
+          ? `${plexData.parentTitle} - season ${plexData.index}`
+          : plexData.title;
+    this.addLogRecord(
+      { id: collectionId } as Collection,
+      `${type === 'add' ? 'Added' : type === 'handle' ? 'Successfully handled' : type === 'exclude' ? 'Added a specific exclusion for' : type === 'include' ? 'Removed specific exclusion of' : 'Removed'} "${subject}"`,
+      ECollectionLogType.MEDIA,
+    );
+  }
+
   private async removeChildFromCollection(
     collectionIds: { plexId: number; dbId: number },
-    childPlexId: number,
+    childId: number,
   ) {
     try {
-      this.infoLogger(
-        `Removing media with id ${childPlexId} from collection..`,
-      );
+      this.infoLogger(`Removing media with id ${childId} from collection..`);
 
       const responseColl: BasicResponseDto =
         await this.plexApi.deleteChildFromCollection(
           collectionIds.plexId.toString(),
-          childPlexId.toString(),
+          childId.toString(),
         );
       if (
         responseColl.status === 'OK' ||
@@ -797,10 +869,12 @@ export class CollectionsService {
           .where([
             {
               collectionId: collectionIds.dbId,
-              plexId: childPlexId,
+              plexId: childId,
             },
           ])
           .execute();
+
+        this.CollectionLogRecordForChild(childId, collectionIds.dbId, 'remove');
       } else {
         this.infoLogger(
           `Couldn't remove media from collection: ` + responseColl.message,
@@ -822,7 +896,7 @@ export class CollectionsService {
     try {
       this.infoLogger(`Adding collection to the Database..`);
       try {
-        return (
+        const dbCol = (
           await this.connection
             .createQueryBuilder()
             .insert()
@@ -840,6 +914,7 @@ export class CollectionsService {
                 deleteAfterDays: collection?.deleteAfterDays,
                 listExclusions: collection?.listExclusions,
                 forceOverseerr: collection?.forceOverseerr,
+                keepLogsForMonths: collection?.keepLogsForMonths,
                 manualCollection:
                   collection?.manualCollection !== undefined
                     ? collection?.manualCollection
@@ -852,6 +927,13 @@ export class CollectionsService {
             ])
             .execute()
         ).generatedMaps[0] as addCollectionDbResponse;
+
+        this.addLogRecord(
+          dbCol as Collection,
+          'Collection Created',
+          ECollectionLogType.COLLECTION,
+        );
+        return dbCol;
       } catch (err) {
         // Log error
         this.infoLogger(
@@ -874,8 +956,15 @@ export class CollectionsService {
     try {
       this.infoLogger(`Removing collection from Database..`);
       try {
-        await this.CollectionMediaRepo.delete({ collectionId: collection.id });
+        await this.CollectionMediaRepo.delete({ collectionId: collection.id }); // cascade delete doesn't work for some reason..
+        await this.CollectionLogRepo.delete({ collection: collection }); // cascade delete doesn't work for some reason..
         await this.collectionRepo.delete(collection.id);
+
+        this.addLogRecord(
+          { id: collection.id } as Collection,
+          'Collection Removed',
+          ECollectionLogType.COLLECTION,
+        );
 
         return { status: 'OK', code: 1, message: 'Success' };
       } catch (err) {
@@ -898,6 +987,11 @@ export class CollectionsService {
       this.infoLogger(`Creating collection in Plex..`);
       const resp = await this.plexApi.createCollection(collectionData);
       if (resp?.ratingKey) {
+        this.addLogRecord(
+          { id: collectionData.collectionId } as Collection,
+          'Plex collection created',
+          ECollectionLogType.COLLECTION,
+        );
         return resp;
       } else {
         return resp[0];
@@ -943,6 +1037,127 @@ export class CollectionsService {
       );
       this.logger.debug(err);
       return undefined;
+    }
+  }
+
+  async getCollectionLogsWithhPaging(
+    id: number,
+    { offset = 0, size = 25 }: { offset?: number; size?: number } = {},
+    search: string = undefined,
+    sort: 'ASC' | 'DESC' = 'DESC',
+    filter: ECollectionLogType = undefined,
+  ) {
+    const queryBuilder =
+      this.CollectionLogRepo.createQueryBuilder('collection_log');
+
+    queryBuilder
+      .where(`collection_log.collectionId = ${id}`)
+      .orderBy('id', sort)
+      .skip(offset)
+      .take(size);
+
+    if (search !== undefined) {
+      queryBuilder.andWhere(`collection_log.message like '%${search}%'`);
+    }
+    if (filter !== undefined) {
+      queryBuilder.andWhere(`collection_log.type like '%${filter}%'`);
+    }
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    return {
+      totalSize: itemCount,
+      items: entities ?? [],
+    };
+  }
+
+  public async addLogRecord(
+    collection: Collection,
+    message: string,
+    type: ECollectionLogType,
+  ) {
+    await this.connection
+      .createQueryBuilder()
+      .insert()
+      .into(CollectionLog)
+      .values([
+        {
+          collection: collection,
+          timestamp: new Date(),
+          message: message,
+          type: type,
+        },
+      ])
+      .execute();
+  }
+
+  public async removeAllCollectionLogs(collectionId: number) {
+    const collection = await this.collectionRepo.findOne({
+      where: { id: collectionId },
+    });
+    this.CollectionLogRepo.delete({ collection: collection });
+  }
+
+  /**
+   * Remove old collection logs based on the provided collection ID and months.
+   *
+   * @param {number} collectionId - The ID of the collection to remove logs from
+   * @param {number} months - The number of months to go back for log removal
+   */
+  async removeOldCollectionLogs(collection: Collection) {
+    try {
+      // If keepLogsForMonths is 0, no need to remove logs. User explicitly configured it to keep logs forever
+      if (collection.keepLogsForMonths !== 0) {
+        const currentDate = new Date();
+        const configuredMonths = new Date(currentDate);
+
+        // Calculate the target month and year
+        let targetMonth = currentDate.getMonth() - collection.keepLogsForMonths;
+        let targetYear = currentDate.getFullYear();
+
+        // Adjust for negative months
+        while (targetMonth < 0) {
+          targetMonth += 12;
+          targetYear -= 1;
+        }
+
+        // Ensure the day is within bounds for the target month
+        const targetDay = Math.min(
+          currentDate.getDate(),
+          new Date(targetYear, targetMonth + 1, 0).getDate(),
+        );
+
+        configuredMonths.setMonth(targetMonth);
+        configuredMonths.setFullYear(targetYear);
+        configuredMonths.setDate(targetDay);
+
+        // get all logs older than param
+        const logs = await this.CollectionLogRepo.find({
+          where: {
+            collection: collection,
+            timestamp: LessThan(configuredMonths),
+          },
+        });
+
+        if (logs.length > 0) {
+          // delete all old logs
+          this.CollectionLogRepo.remove(logs);
+          this.infoLogger(
+            `Removed ${logs.length} old collection log ${logs.length === 1 ? 'record' : 'records'} from collection '${collection.title}'`,
+          );
+          this.addLogRecord(
+            collection,
+            `Removed ${logs.length} log ${logs.length === 1 ? 'record' : 'records'} older than ${collection.keepLogsForMonths} months`,
+            ECollectionLogType.COLLECTION,
+          );
+        }
+      }
+    } catch (e) {
+      this.logger.warn(
+        `An error occurred while removing old collection logs for collection '${collection?.title}'`,
+      );
+      this.logger.debug(e);
     }
   }
 
