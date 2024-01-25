@@ -8,3 +8,4 @@ updates:
     open-pull-requests-limit: 10
     ignore:
       - dependency-name: "@heroicons/react"
+      - dependency-name: "chalk"
