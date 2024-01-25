@@ -46,9 +46,10 @@ Currently, <b>Maintainerr</b> supports rule parameters from these apps :
 
 # Preview
 
-![image](https://github.com/ydkmlt84/Maintainerr/assets/2887742/8edabd29-ed98-4a9f-b41f-251b2e7d309c)
-![image](https://github.com/ydkmlt84/Maintainerr/assets/2887742/c9916c90-4c67-4341-a0c1-32613518aa20)
-![image](https://github.com/ydkmlt84/Maintainerr/assets/2887742/00740a16-e4fe-4429-a769-64ffcd568cba)
+![image](./ui/public/screenshots/overview_screenshot.png)
+![image](./ui/public/screenshots/rules_screenshot.png)
+![image](./ui/public/screenshots/collections_screenshot.png)
+![image](./ui/public/screenshots/rule_example_screenshot.png)
 
 # Installation
 
