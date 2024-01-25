@@ -73,14 +73,20 @@ async function bootstrap() {
 }
 
 function createDataDirectoryStructure(): void {
-  const dir = path.join(__dirname, `../../data/logs`);
+  try {
+    const dir = path.join(__dirname, `../../data/logs`);
 
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, {
-      recursive: true,
-      mode: 0o777,
-    });
-    console.log(`Data directory structure created.`);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, {
+        recursive: true,
+        mode: 0o777,
+      });
+    }
+  } catch (err) {
+    console.error(
+      'Could not create data directory. Make sure your permissions are set correctly.',
+    );
+    process.exit(0);
   }
 }
 

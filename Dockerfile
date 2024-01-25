@@ -56,8 +56,10 @@ RUN rm -rf .yarn && \
     rm -rf /opt/yarn-* && \
     chown -R node:node /opt/ && \
     chmod -R 755 /opt/ && \
+    # data dir
     mkdir -m 777 /opt/data && \
-    mkdir -m 777 /opt/data/logs
+    mkdir -m 777 /opt/data/logs && \
+    chown -R node:node /opt/data
 
 # Final build
 FROM node:20-alpine3.19
@@ -87,7 +89,8 @@ RUN corepack install && \
     corepack enable && \
     apk add supervisor && \
     chown node:node /opt && \
-    chmod 755 /opt && \
+    # This is required for docker user directive  to work
+    chmod 777 /opt && \
     mkdir -m 777 /.cache 
 
 USER node
