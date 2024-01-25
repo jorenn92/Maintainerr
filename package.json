@@ -44,7 +44,7 @@
     "@nestjs/schedule": "^4.0.0",
     "@nestjs/typeorm": "^10.0.1",
     "@types/node": "^20.10.7",
-    "axios": "^1.6.5",
+    "axios": "^1.6.6",
     "bowser": "^2.11.0",
     "chalk": "^4.1.2",
     "cron": "3.1.3",
