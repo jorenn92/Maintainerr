@@ -50,7 +50,7 @@ async function bootstrap() {
         new DailyRotateFile({
           filename: path.join(
             __dirname,
-            `${process.env.NODE_ENV !== 'production' ? '../' : ''}../data/logs/maintainerr-%DATE%.log`,
+            `../../data/logs/maintainerr-%DATE%.log`,
           ),
           datePattern: 'YYYY-MM-DD',
           zippedArchive: true,
