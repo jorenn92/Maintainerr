@@ -92,7 +92,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
             this.startTime = new Date();
 
             // reset Plex cache if group uses a rule that requires it (collection rules for example)
-            this.rulesService.resetPlexCacheIfgroupUsesRuleThatRequiresIt(
+            await this.rulesService.resetPlexCacheIfgroupUsesRuleThatRequiresIt(
               rulegroup,
             );
 
