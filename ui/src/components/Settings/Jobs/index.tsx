@@ -1,5 +1,5 @@
 import { SaveIcon } from '@heroicons/react/solid'
-import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
@@ -42,6 +42,12 @@ const JobSettings = () => {
       if (Boolean(resp.code)) {
         setError(false)
         setChanged(true)
+
+        // set context values
+        settingsCtx.settings.rules_handler_job_cron =
+          payload.rules_handler_job_cron
+        settingsCtx.settings.collection_handler_job_cron =
+          payload.collection_handler_job_cron
       } else {
         setError(true)
         setErrorMessage(resp.message.length > 0 ? resp.message : '')
