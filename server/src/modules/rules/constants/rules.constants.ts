@@ -98,6 +98,7 @@ export interface Property {
   type: RuleType;
   mediaType: MediaType;
   humanName: string;
+  cacheReset?: boolean; // for properties that require a cache reset between group executions
 }
 
 export interface ApplicationProperties {
@@ -163,6 +164,7 @@ export class RuleConstants {
           humanName: 'Present in amount of other collections',
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
+          cacheReset: true,
         } as Property,
         {
           id: 7,
@@ -264,6 +266,7 @@ export class RuleConstants {
           humanName: '[list] Collections media is present in (titles)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
+          cacheReset: true,
         } as Property,
         {
           id: 20,

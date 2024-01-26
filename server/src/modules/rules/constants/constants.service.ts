@@ -31,11 +31,13 @@ export class RuleConstanstService {
   }
 
   public getValueHumanName(location: [number, number]) {
-    return `${this.ruleConstants.applications.find(
-      (el) => el.id === location[0],
-    )?.name} - ${this.ruleConstants.applications
-      .find((el) => el.id === location[0])
-      ?.props.find((el) => el.id === location[1])?.humanName}`;
+    return `${
+      this.ruleConstants.applications.find((el) => el.id === location[0])?.name
+    } - ${
+      this.ruleConstants.applications
+        .find((el) => el.id === location[0])
+        ?.props.find((el) => el.id === location[1])?.humanName
+    }`;
   }
 
   public getValueFromIdentifier(identifier: string): [number, number] {
