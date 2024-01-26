@@ -1,4 +1,4 @@
-import { IAlterableMediaDto } from 'src/modules/collections/interfaces/collection-media.interface';
+import { IAlterableMediaDto } from '../../collections/interfaces/collection-media.interface';
 
 export class ExclusionDto {
   plexId: number;

@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import _ from 'lodash';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
@@ -14,7 +14,8 @@ import { RulesService } from '../rules.service';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import cacheManager from '../../api/lib/cache';
 import { RuleComparatorService } from '../helpers/rule.comparator.service';
-import { Collection } from 'src/modules/collections/entities/collection.entities';
+import { Collection } from '../../collections/entities/collection.entities';
+import { TaskBase } from '../../tasks/task.base';
 
 interface PlexData {
   page: number;
@@ -23,9 +24,11 @@ interface PlexData {
 }
 
 @Injectable()
-export class RuleExecutorService implements OnApplicationBootstrap {
-  private readonly logger = new Logger(RuleExecutorService.name);
-  private jobCreationAttempts = 0;
+export class RuleExecutorService extends TaskBase {
+  protected logger = new Logger(RuleExecutorService.name);
+
+  protected name = 'Rule Handler';
+  protected cronSchedule = ''; // overriden in onBootstrapHook
 
   ruleConstants: RuleConstants;
   userId: string;
@@ -39,44 +42,30 @@ export class RuleExecutorService implements OnApplicationBootstrap {
     private readonly rulesService: RulesService,
     private readonly plexApi: PlexApiService,
     private readonly collectionService: CollectionsService,
-    private readonly taskService: TasksService,
+    protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
     private readonly comparator: RuleComparatorService,
   ) {
+    super(taskService);
     this.ruleConstants = new RuleConstants();
     this.plexData = { page: 1, finished: false, data: [] };
   }
 
-  onApplicationBootstrap() {
-    this.jobCreationAttempts++;
-    const state = this.taskService.createJob(
-      'Rule Handler',
-      this.settings.rules_handler_job_cron,
-      this.executeAllRules.bind(this),
-    );
-    if (state.code === 0) {
-      if (this.jobCreationAttempts <= 3) {
-        this.logger.log(
-          'Creation of job Rule Handler failed. Retrying in 10s..',
-        );
-        setTimeout(() => {
-          this.onApplicationBootstrap();
-        }, 10000);
-      } else {
-        this.logger.error(`Creation of job Rule Handler failed`);
-      }
+  protected onBootstrapHook(): void {
+    this.cronSchedule = this.settings.rules_handler_job_cron;
+  }
+
+  public async execute() {
+    // check if another instance of this task is already running
+    if (await this.isRunning()) {
+      this.logger.log(
+        `Another instance of the ${this.name} task is currently running. Skipping this execution`,
+      );
+      return;
     }
-  }
 
-  public updateJob(cron: string) {
-    return this.taskService.updateJob(
-      'Rule Handler',
-      cron,
-      this.executeAllRules.bind(this),
-    );
-  }
+    await super.execute();
 
-  public async executeAllRules() {
     this.logger.log('Starting Execution of all active rules');
     const appStatus = await this.settings.testConnections();
 
@@ -131,6 +120,8 @@ export class RuleExecutorService implements OnApplicationBootstrap {
         'Not all applications are reachable.. Skipped rule execution.',
       );
     }
+    // clean up
+    this.finish();
   }
 
   private async syncManualPlexMediaToCollectionDB(rulegroup: RuleGroup) {

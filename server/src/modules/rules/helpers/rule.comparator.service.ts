@@ -6,10 +6,10 @@ import {
 } from '../constants/rules.constants';
 import { RuleDto } from '../dtos/rule.dto';
 import _ from 'lodash';
-import { PlexLibraryItem } from 'src/modules/api/plex-api/interfaces/library.interfaces';
+import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { RulesDto } from '../dtos/rules.dto';
 import { ValueGetterService } from '../getter/getter.service';
-import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { RuleDbDto } from '../dtos/ruleDb.dto';
 import { RuleConstanstService } from '../constants/constants.service';
 

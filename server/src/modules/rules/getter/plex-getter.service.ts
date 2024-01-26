@@ -11,8 +11,8 @@ import {
   RuleConstants,
 } from '../constants/rules.constants';
 import { RulesDto } from '../dtos/rules.dto';
-import { PlexMetadata } from 'src/modules/api/plex-api/interfaces/media.interface';
-import { EPlexDataType } from 'src/modules/api/plex-api/enums/plex-data-type-enum';
+import { PlexMetadata } from '../../api/plex-api/interfaces/media.interface';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 
 @Injectable()
 export class PlexGetterService {
