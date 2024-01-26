@@ -55,7 +55,8 @@ Currently, <b>Maintainerr</b> supports rule parameters from these apps :
 
 Docker images for amd64 & arm64 are available under jorenn92/maintainerr and ghcri.io/jorenn92/maintainerr. <br />
 
-Data is saved within the container under /opt/data, it is recommended to tie a persistent volume to this location in your docker command/compose file.
+Data is saved within the container under /opt/data, it is recommended to tie a persistent volume to this location in your docker command/compose file. 
+Make sure this directory is read/writeable by the user specified in the 'user' instruction. If no 'user' instruction is configured, the volume should be accessible by PID:GID 1000:1000.
 
 For more information, visit the [installation guide](docs/2-getting-started/1-installation/Installation.md) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your <b>Maintainerr</b> container.
 
@@ -65,7 +66,8 @@ Docker run:
 docker run -d \
 --name maintainerr \
 -e TZ=Europe/Brussels \
--v <persistent-local-volume>:/opt/data \
+-v ./data:/opt/data \
+-u 1000:1000 \
 -p 8154:80 \
 --restart unless-stopped \
 jorenn92/maintainerr
@@ -77,18 +79,20 @@ Docker-compose:
 version: '3'
 
 services:
-  maintainerr:
-    image: jorenn92/maintainerr:latest # or ghcr.io/jorenn92/maintainerr:latest
-    container_name: maintainerr
-#    user: 1000:1000 # only use this with release 2.0 and up
-    volumes:
-      - <persistent-local-volume>:/opt/data
-    environment:
-      - TZ=Europe/Brussels
-#      - DEBUG=true # uncomment to enable verbose logs
-    ports:
-      - 8154:80
-    restart: unless-stopped
+    maintainerr:
+        image: ghcr.io/jorenn92/maintainerr:latest # or jorenn92/maintainerr:latest
+        container_name: maintainerr
+        user: 1000:1000
+        volumes:
+          - type: bind
+            source: ./data
+            target: /opt/data
+        environment:
+          - TZ=Europe/Brussels
+#      - DEBUG=true # uncomment to enable debug logs
+        ports:
+          - 8154:80
+        restart: unless-stopped
 ```
 
 # Credits

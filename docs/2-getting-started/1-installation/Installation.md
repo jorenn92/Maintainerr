@@ -1,17 +1,21 @@
 The easiest way to start Maintainerr is with Docker.
 
 images for amd64 & arm64 are available under jorenn92/maintainerr and ghcri.io/jorenn92/maintainerr.
-Data is saved under /opt/data, a volume should be created to persist the configuration.
+Data is saved under /opt/data, a volume should be created to persist the configuration. 
 
-> Starting from release 2.0, you have the option to define a User and Group ID for running the container. Maintainerr will operate using this specified UID:GID, and any files it generates within your data volume will also be associated with this designated user and group. If not explicitly specified, the default UID:GID is set to 1000:1000, representing the 'node' user inside the container. Don't use this with 1.x releases, the container will fail to start.
+Make sure the data volume is read/writeable by the user specified in the 'user' instruction. If no 'user' instruction is configured, the volume should be accessible by PID:GID 1000:1000.
+
+> Starting with release 2.0, you have the option to define a User and Group ID for running the container. Maintainerr will operate using this specified UID:GID, and any files it generates within your data volume will be associated with this designated user and group. If not explicitly specified, the default UID:GID is set to 1000:1000, representing the 'node' user inside the container. Don't use this with 1.x releases, the container will fail to start.
 
 # Run
+Before running this command, create the ./data directory and make sure it's read/writeable by the user specified in the 'user' instruction.
 
 ```bash
 docker run -d \
 --name maintainerr \
 -e TZ=Europe/Brussels \
 -v ./data:/opt/data \
+-u 1000:1000 \
 -p 8154:80 \
 --restart unless-stopped \
 jorenn92/maintainerr
@@ -37,24 +41,27 @@ You may alternatively use a third-party updating mechanism, such as Watchtower o
 
 # Compose
 
-Define the Maintainerr service in your docker-compose.yml as follows.
+Define the Maintainerr service in your docker-compose.yml as follows. 
+Create the ./data directory and make sure it's read/writeable by the user specified in the 'user' instruction.
 
 ```Yaml
 version: '3'
 
 services:
-  maintainerr:
-    image: jorenn92/maintainerr:latest # or ghcr.io/jorenn92/maintainerr:latest
-    container_name: maintainerr
-#    user: 1000:1000 # only use this with release 2.0 and up
-    volumes:
-      - ./data:/opt/data
-    environment:
-      - TZ=Europe/Brussels
-#      - DEBUG=true # uncomment to enable verbose logs
-    ports:
-      - 8154:80
-    restart: unless-stopped
+    maintainerr:
+        image: ghcr.io/jorenn92/maintainerr:latest # or jorenn92/maintainerr:latest
+        container_name: maintainerr
+        user: 1000:1000
+        volumes:
+          - type: bind
+            source: ./data
+            target: /opt/data
+        environment:
+          - TZ=Europe/Brussels
+#      - DEBUG=true # uncomment to enable debug logs
+        ports:
+          - 8154:80
+        restart: unless-stopped
 ```
 
 Then, start all services defined in your Compose file:
