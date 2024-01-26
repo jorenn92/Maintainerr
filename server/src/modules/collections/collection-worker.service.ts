@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
@@ -14,12 +14,15 @@ import { ServarrAction } from './interfaces/collection.interface';
 import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
-import cacheManager from '../api/lib/cache';
+import { TaskBase } from '../tasks/task.base';
 
 @Injectable()
-export class CollectionWorkerService implements OnApplicationBootstrap {
-  private readonly logger = new Logger(CollectionWorkerService.name);
-  private jobCreationAttempts = 0;
+export class CollectionWorkerService extends TaskBase {
+  protected logger = new Logger(CollectionWorkerService.name);
+
+  protected name = 'Collection Handler';
+  protected cronSchedule = ''; // overriden in onBootstrapHook
+
   constructor(
     @InjectRepository(Collection)
     private readonly collectionRepo: Repository<Collection>,
@@ -30,50 +33,38 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
     private readonly overseerrApi: OverseerrApiService,
     private readonly servarrApi: ServarrService,
     private readonly tmdbApi: TmdbApiService,
-    private readonly taskService: TasksService,
+    protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
     private readonly tmdbIdService: TmdbIdService,
     private readonly tmdbIdHelper: TmdbIdService,
-  ) {}
+  ) {
+    super(taskService);
+  }
 
-  onApplicationBootstrap() {
-    this.jobCreationAttempts++;
-    const state = this.taskService.createJob(
-      'Collection Handler',
-      this.settings.collection_handler_job_cron,
-      this.handle.bind(this),
-    );
-    if (state.code === 0) {
-      if (this.jobCreationAttempts <= 3) {
-        this.logger.log(
-          'Creation of job Collection Handler failed. Retrying in 10s..',
-        );
-        setTimeout(() => {
-          this.onApplicationBootstrap();
-        }, 10000);
-      } else {
-        this.logger.error(`Creation of job Collection Handler failed.`);
-      }
+  protected onBootstrapHook(): void {
+    this.cronSchedule = this.settings.collection_handler_job_cron;
+  }
+
+  public async execute() {
+    // check if another instance of this task is already running
+    if (await this.isRunning()) {
+      this.logger.log(
+        `Another instance of the ${this.name} task is currently running. Skipping this execution`,
+      );
+      return;
     }
-  }
 
-  public updateJob(cron: string) {
-    return this.taskService.updateJob(
-      'Collection Handler',
-      cron,
-      this.handle.bind(this),
-    );
-  }
+    await super.execute();
 
-  public async handle() {
+    // wait 5 seconds to make sure we're not executing together with the rule handler
+    setTimeout(() => {}, 5000);
+    // if we are, then wait..
+    await this.taskService.waitUntilTaskIsFinished('Rule Handler', this.name);
+
+    // Start actual task
     const appStatus = await this.settings.testConnections();
 
-    // reset API caches, make sure latest data is used
-    for (const [key, value] of Object.entries(cacheManager.getAllCaches())) {
-      value.flush();
-    }
-
-    this.logger.log('Start handling all collections.');
+    this.logger.log('Start handling all collections');
     let handledCollections = 0;
     if (appStatus) {
       // loop over all active collections
@@ -123,6 +114,7 @@ export class CollectionWorkerService implements OnApplicationBootstrap {
         'Not all applications are reachable.. Skipping collection handling',
       );
     }
+    this.finish();
   }
 
   private async handleMedia(collection: Collection, media: CollectionMedia) {

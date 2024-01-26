@@ -1,4 +1,4 @@
-import { Collection } from 'src/modules/collections/entities/collection.entities';
+import { Collection } from '../../collections/entities/collection.entities';
 import {
   Column,
   Entity,

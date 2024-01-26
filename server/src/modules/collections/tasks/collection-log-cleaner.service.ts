@@ -1,40 +1,27 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { CollectionsService } from 'src/modules/collections/collections.service';
-import { TasksService } from 'src/modules/tasks/tasks.service';
+import { Injectable, Logger } from '@nestjs/common';
+import { CollectionsService } from '../../collections/collections.service';
+import { TaskBase } from '../../tasks/task.base';
+import { TasksService } from '../..//tasks/tasks.service';
 
 @Injectable()
-export class CollectionLogCleanerService implements OnApplicationBootstrap {
-  private readonly logger = new Logger(CollectionLogCleanerService.name);
-  private jobCreationAttempts = 0;
+export class CollectionLogCleanerService extends TaskBase {
+  protected logger = new Logger(CollectionLogCleanerService.name);
+
+  protected name = 'Collection Log Cleaner';
+  protected cronSchedule = '45 5 * * *';
 
   constructor(
     private readonly collectionService: CollectionsService,
-    private readonly taskService: TasksService,
-  ) {}
-
-  onApplicationBootstrap() {
-    this.jobCreationAttempts++;
-    const state = this.taskService.createJob(
-      'Collection Log Cleaner',
-      '45 5 * * *',
-      this.execute.bind(this),
-    );
-    if (state.code === 0) {
-      if (this.jobCreationAttempts <= 3) {
-        this.logger.log(
-          'Creation of job Collection Log Cleaner failed. Retrying in 10s..',
-        );
-        setTimeout(() => {
-          this.onApplicationBootstrap();
-        }, 10000);
-      } else {
-        this.logger.error(`Creation of job Collection Log Cleaner failed.`);
-      }
-    }
+    protected readonly taskService: TasksService,
+  ) {
+    super(taskService);
   }
 
   public async execute() {
     try {
+      await super.execute();
+
+      // start execution
       // get all collections
       const collections = await this.collectionService.getAllCollections();
 
@@ -42,8 +29,12 @@ export class CollectionLogCleanerService implements OnApplicationBootstrap {
       for (const collection of collections) {
         this.collectionService.removeOldCollectionLogs(collection);
       }
+
+      // clean up
+      this.finish();
     } catch (e) {
       this.logger.debug(e);
+      this.finish();
     }
   }
 }

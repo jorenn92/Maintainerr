@@ -28,8 +28,8 @@ import { AddCollectionMedia } from '../collections/interfaces/collection-media.i
 import { RuleYamlService } from './helpers/yaml.service';
 import { RuleComparatorService } from './helpers/rule.comparator.service';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
-import { ECollectionLogType } from 'src/modules/collections/entities/collection_log.entities';
-import cacheManager from 'src/modules/api/lib/cache';
+import { ECollectionLogType } from '../collections/entities/collection_log.entities';
+import cacheManager from '../api/lib/cache';
 
 export interface ReturnStatus {
   code: 0 | 1;

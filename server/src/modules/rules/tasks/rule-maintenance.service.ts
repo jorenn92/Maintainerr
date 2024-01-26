@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { TasksService } from '../../tasks/tasks.service';
 import { SettingsService } from '../../settings/settings.service';
 import { RulesService } from '../rules.service';
@@ -6,43 +6,28 @@ import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Collection } from '../../collections/entities/collection.entities';
+import { TaskBase } from '../../tasks/task.base';
 
 @Injectable()
-export class RuleMaintenanceService implements OnApplicationBootstrap {
-  private readonly logger = new Logger(RuleMaintenanceService.name);
-  private jobCreationAttempts = 0;
+export class RuleMaintenanceService extends TaskBase {
+  protected logger = new Logger(RuleMaintenanceService.name);
+
+  protected name = 'Rule Maintenance';
+  protected cronSchedule = '20 4 * * *';
 
   constructor(
-    private readonly taskService: TasksService,
+    protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
     private readonly rulesService: RulesService,
     @InjectRepository(Collection)
     private readonly collectionRepo: Repository<Collection>,
     private readonly plexApi: PlexApiService,
-  ) {}
-
-  onApplicationBootstrap() {
-    this.jobCreationAttempts++;
-    const state = this.taskService.createJob(
-      'Rule Maintenance',
-      '20 4 * * *',
-      this.execute.bind(this),
-    );
-    if (state.code === 0) {
-      if (this.jobCreationAttempts <= 3) {
-        this.logger.log(
-          'Creation of job Rule Maintenance failed. Retrying in 10s..',
-        );
-        setTimeout(() => {
-          this.onApplicationBootstrap();
-        }, 10000);
-      } else {
-        this.logger.error(`Creation of job Rule Maintenance failed.`);
-      }
-    }
+  ) {
+    super(taskService);
   }
 
-  private async execute() {
+  public async execute() {
+    await super.execute();
     try {
       this.logger.log('Starting maintenance');
       const appStatus = await this.settings.testConnections();
@@ -60,6 +45,7 @@ export class RuleMaintenanceService implements OnApplicationBootstrap {
     } catch (e) {
       this.logger.error(`Rule Maintenance failed : ${e.message}`);
     }
+    this.finish();
   }
 
   private async removeLeftoverExclusions() {

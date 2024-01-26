@@ -15,7 +15,7 @@ import {
   AddCollectionMedia,
   IAlterableMediaDto,
 } from './interfaces/collection-media.interface';
-import { ECollectionLogType } from 'src/modules/collections/entities/collection_log.entities';
+import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 
 @Controller('api/collections')
 export class CollectionsController {
@@ -63,8 +63,8 @@ export class CollectionsController {
   }
 
   @Post('/handle')
-  handleCollection(@Body() request: any) {
-    return this.collectionWorkerService.handle();
+  handleCollection() {
+    return this.collectionWorkerService.execute();
   }
 
   @Put('/schedule/update')

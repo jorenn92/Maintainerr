@@ -12,8 +12,8 @@ import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { TasksModule } from '../tasks/tasks.module';
 import { Exclusion } from '../rules/entities/exclusion.entities';
-import { CollectionLog } from 'src/modules/collections/entities/collection_log.entities';
-import { CollectionLogCleanerService } from 'src/modules/collections/tasks/collection-log-cleaner.service';
+import { CollectionLog } from '../collections/entities/collection_log.entities';
+import { CollectionLogCleanerService } from '../collections/tasks/collection-log-cleaner.service';
 
 @Module({
   imports: [

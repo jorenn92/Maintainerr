@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { CollectionMedia } from './collection_media.entities';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
-import { CollectionLog } from 'src/modules/collections/entities/collection_log.entities';
+import { CollectionLog } from '../../collections/entities/collection_log.entities';
 
 @Entity()
 export class Collection {
