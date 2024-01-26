@@ -63,7 +63,7 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           this.onApplicationBootstrap();
         }, 10000);
       } else {
-        this.logger.error(`Creation of job Rule Handler failed.`);
+        this.logger.error(`Creation of job Rule Handler failed`);
       }
     }
   }
@@ -77,13 +77,11 @@ export class RuleExecutorService implements OnApplicationBootstrap {
   }
 
   public async executeAllRules() {
-    this.logger.log('Starting Execution of all active rules.');
+    this.logger.log('Starting Execution of all active rules');
     const appStatus = await this.settings.testConnections();
 
     // reset API caches, make sure latest data is used
-    for (const [key, value] of Object.entries(cacheManager.getAllCaches())) {
-      value.flush();
-    }
+    cacheManager.flushAll();
 
     if (appStatus) {
       const ruleGroups = await this.getAllActiveRuleGroups();
@@ -92,6 +90,11 @@ export class RuleExecutorService implements OnApplicationBootstrap {
           if (rulegroup.useRules) {
             this.logger.log(`Executing rules for '${rulegroup.name}'`);
             this.startTime = new Date();
+
+            // reset Plex cache if group uses a rule that requires it (collection rules for example)
+            this.rulesService.resetPlexCacheIfgroupUsesRuleThatRequiresIt(
+              rulegroup,
+            );
 
             // prepare
             this.workerData = [];

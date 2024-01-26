@@ -58,6 +58,12 @@ class CacheManager {
   public getAllCaches(): Record<string, Cache> {
     return this.availableCaches;
   }
+
+  public flushAll(): void {
+    for (const [key, value] of Object.entries(this.getAllCaches())) {
+      value.flush();
+    }
+  }
 }
 
 const cacheManager = new CacheManager();

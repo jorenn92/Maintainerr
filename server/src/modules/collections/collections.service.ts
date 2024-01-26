@@ -98,21 +98,23 @@ export class CollectionsService {
       const itemCount = await queryBuilder.getCount();
       let { entities } = await queryBuilder.getRawAndEntities();
 
-      entities = await Promise.all(
-        entities.map(async (el) => {
-          el.plexData = await this.plexApi.getMetadata(el.plexId.toString());
-          if (el.plexData?.grandparentRatingKey) {
-            el.plexData.parentData = await this.plexApi.getMetadata(
-              el.plexData.grandparentRatingKey.toString(),
-            );
-          } else if (el.plexData?.parentRatingKey) {
-            el.plexData.parentData = await this.plexApi.getMetadata(
-              el.plexData.parentRatingKey.toString(),
-            );
-          }
-          return el;
-        }),
-      );
+      entities = (
+        await Promise.all(
+          entities.map(async (el) => {
+            el.plexData = await this.plexApi.getMetadata(el.plexId.toString());
+            if (el.plexData?.grandparentRatingKey) {
+              el.plexData.parentData = await this.plexApi.getMetadata(
+                el.plexData.grandparentRatingKey.toString(),
+              );
+            } else if (el.plexData?.parentRatingKey) {
+              el.plexData.parentData = await this.plexApi.getMetadata(
+                el.plexData.parentRatingKey.toString(),
+              );
+            }
+            return el;
+          }),
+        )
+      ).filter((el) => el.plexData !== undefined);
 
       return {
         totalSize: itemCount,
@@ -152,21 +154,23 @@ export class CollectionsService {
       const itemCount = await queryBuilder.getCount();
       let { entities } = await queryBuilder.getRawAndEntities();
 
-      entities = await Promise.all(
-        entities.map(async (el) => {
-          el.plexData = await this.plexApi.getMetadata(el.plexId.toString());
-          if (el.plexData?.grandparentRatingKey) {
-            el.plexData.parentData = await this.plexApi.getMetadata(
-              el.plexData.grandparentRatingKey.toString(),
-            );
-          } else if (el.plexData?.parentRatingKey) {
-            el.plexData.parentData = await this.plexApi.getMetadata(
-              el.plexData.parentRatingKey.toString(),
-            );
-          }
-          return el;
-        }),
-      );
+      entities = (
+        await Promise.all(
+          entities.map(async (el) => {
+            el.plexData = await this.plexApi.getMetadata(el.plexId.toString());
+            if (el.plexData?.grandparentRatingKey) {
+              el.plexData.parentData = await this.plexApi.getMetadata(
+                el.plexData.grandparentRatingKey.toString(),
+              );
+            } else if (el.plexData?.parentRatingKey) {
+              el.plexData.parentData = await this.plexApi.getMetadata(
+                el.plexData.parentRatingKey.toString(),
+              );
+            }
+            return el;
+          }),
+        )
+      ).filter((el) => el.plexData !== undefined);
 
       return {
         totalSize: itemCount,
@@ -832,18 +836,21 @@ export class CollectionsService {
   ) {
     // log record
     const plexData = await this.plexApi.getMetadata(plexId.toString()); // fetch data from cache
+    // if there's no data.. skip logging
 
-    const subject =
-      plexData.type === 'episode'
-        ? `${plexData.grandparentTitle} - season ${plexData.parentIndex} - episode ${plexData.index}`
-        : plexData.type === 'season'
-          ? `${plexData.parentTitle} - season ${plexData.index}`
-          : plexData.title;
-    this.addLogRecord(
-      { id: collectionId } as Collection,
-      `${type === 'add' ? 'Added' : type === 'handle' ? 'Successfully handled' : type === 'exclude' ? 'Added a specific exclusion for' : type === 'include' ? 'Removed specific exclusion of' : 'Removed'} "${subject}"`,
-      ECollectionLogType.MEDIA,
-    );
+    if (plexData) {
+      const subject =
+        plexData.type === 'episode'
+          ? `${plexData.grandparentTitle} - season ${plexData.parentIndex} - episode ${plexData.index}`
+          : plexData.type === 'season'
+            ? `${plexData.parentTitle} - season ${plexData.index}`
+            : plexData.title;
+      this.addLogRecord(
+        { id: collectionId } as Collection,
+        `${type === 'add' ? 'Added' : type === 'handle' ? 'Successfully handled' : type === 'exclude' ? 'Added a specific exclusion for' : type === 'include' ? 'Removed specific exclusion of' : 'Removed'} "${subject}"`,
+        ECollectionLogType.MEDIA,
+      );
+    }
   }
 
   private async removeChildFromCollection(

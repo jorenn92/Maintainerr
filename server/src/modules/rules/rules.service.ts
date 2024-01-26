@@ -29,6 +29,7 @@ import { RuleYamlService } from './helpers/yaml.service';
 import { RuleComparatorService } from './helpers/rule.comparator.service';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { ECollectionLogType } from 'src/modules/collections/entities/collection_log.entities';
+import cacheManager from 'src/modules/api/lib/cache';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -950,5 +951,59 @@ export class RulesService {
       return { code: 1, result: result.stats };
     }
     return { code: 0, result: 'Invalid input' };
+  }
+
+  /**
+   * Reset the Plex cache if any rule in the rule group requires it.
+   *
+   * @param {RulesDto} rulegroup - The rule group to check for cache reset requirement.
+   * @return {Promise<boolean>} Whether the Plex cache was reset.
+   */
+  public async resetPlexCacheIfgroupUsesRuleThatRequiresIt(
+    rulegroup: RulesDto,
+  ): Promise<boolean> {
+    try {
+      let result = false;
+      const constant = await this.getRuleConstants();
+
+      // for all rules in group
+      for (const rule of rulegroup.rules) {
+        const parsedRule = JSON.parse((rule as RuleDbDto).ruleJson) as RuleDto;
+
+        //test first value
+        const first =
+          constant.applications[parsedRule.firstVal[0]].props[
+            parsedRule.firstVal[1]
+          ];
+
+        result = first?.cacheReset ? true : result;
+
+        // test second value
+        const second = parsedRule.lastVal
+          ? constant.applications[parsedRule.lastVal[0]].props[
+              parsedRule.lastVal[1]
+            ]
+          : undefined;
+
+        result = second?.cacheReset ? true : result;
+      }
+
+      // if any rule requires a cache reset
+      if (result) {
+        cacheManager.getCache('plextv').flush();
+        cacheManager.getCache('plexguid').flush();
+        this.logger.log(
+          `Flushed Plex cache because a rule in the group required it`,
+        );
+      }
+
+      return result;
+    } catch (e) {
+      this.logger.warn(
+        `Couldn't determine if rulegroup with id ${rulegroup.id} requires a cache reset`,
+      );
+      this.logger.debug(e);
+      return false;
+    }
   }
 }
