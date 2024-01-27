@@ -30,6 +30,7 @@ import { EPlexDataType } from './enums/plex-data-type-enum';
 import axios from 'axios';
 import PlexApi from '../lib/plexApi';
 import PlexTvApi from '../lib/plextvApi';
+import cacheManager from '../../api/lib/cache';
 
 @Injectable()
 export class PlexApiService {
@@ -237,6 +238,7 @@ export class PlexApiService {
   public async getMetadata(
     key: string,
     options: { includeChildren?: boolean } = {},
+    useCache: boolean = true,
   ): Promise<PlexMetadata> {
     try {
       const response = await this.plexClient.query<PlexMetadataResponse>(
@@ -245,6 +247,7 @@ export class PlexApiService {
             ? '?includeChildren=1&includeExternalMedia=1&asyncAugmentMetadata=1&asyncCheckFiles=1&asyncRefreshAnalysis=1'
             : ''
         }`,
+        useCache,
       );
       if (response) {
         return response.MediaContainer.Metadata[0];
@@ -258,6 +261,14 @@ export class PlexApiService {
       this.logger.debug(err);
       return undefined;
     }
+  }
+
+  public resetMetadataCache(mediaId: string) {
+    cacheManager.getCache('plexguid').data.del(
+      JSON.stringify({
+        uri: `/library/metadata/${mediaId}`,
+      }),
+    );
   }
 
   public async getDiscoverDataUserState(
