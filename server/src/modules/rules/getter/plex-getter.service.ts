@@ -100,8 +100,8 @@ export class PlexGetterService {
             ? metadata.Collection.filter(
                 (el) =>
                   el.tag.toLowerCase().trim() !==
-                  (ruleGroup.manualCollectionName
-                    ? ruleGroup.manualCollectionName
+                  (ruleGroup?.collection?.manualCollection
+                    ? ruleGroup.collection.manualCollectionName
                     : ruleGroup.name
                   )
                     .toLowerCase()

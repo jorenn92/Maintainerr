@@ -13,8 +13,8 @@ class PlexApi extends NodePlexAPI {
     this.cache = cacheManager.getCache('plexguid');
   }
 
-  async query<T>(options): Promise<T> {
-    return this.queryWithCache(options, true);
+  async query<T>(options, docache: boolean = true): Promise<T> {
+    return this.queryWithCache(options, docache);
   }
 
   /**
@@ -68,7 +68,7 @@ class PlexApi extends NodePlexAPI {
     return result as unknown as T;
   }
 
-  async queryWithCache<T>(options, doCache: boolean): Promise<T> {
+  async queryWithCache<T>(options, doCache: boolean = true): Promise<T> {
     if (typeof options === 'string') {
       options = {
         uri: options,

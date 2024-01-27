@@ -939,6 +939,7 @@ export class RulesService {
     rulegroupId: number,
     mediaId: string,
   ): Promise<any> {
+    this.plexApi.resetMetadataCache(mediaId);
     const mediaResp = await this.plexApi.getMetadata(mediaId);
     const group = await this.getRuleGroupById(rulegroupId);
     if (group && mediaResp) {
