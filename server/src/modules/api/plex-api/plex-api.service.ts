@@ -30,7 +30,7 @@ import { EPlexDataType } from './enums/plex-data-type-enum';
 import axios from 'axios';
 import PlexApi from '../lib/plexApi';
 import PlexTvApi from '../lib/plextvApi';
-import cacheManager from 'src/modules/api/lib/cache';
+import cacheManager from '../../api/lib/cache';
 
 @Injectable()
 export class PlexApiService {
