@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ExternalApiService } from 'src/modules/api/external-api/external-api.service';
+import { ExternalApiService } from '../modules/api/external-api/external-api.service';
 
 interface VersionResponse {
   status: 1 | 0;
