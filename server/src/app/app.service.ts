@@ -27,9 +27,9 @@ export class AppService {
       const calculatedVersion =
         versionTag !== 'stable'
           ? process.env.GIT_SHA
-            ? `${versionTag}-${process.env.GIT_SHA}`
+            ? `${versionTag}-${process.env.GIT_SHA.substring(0, 7)}`
             : `${versionTag}-`
-          : `${versionTag}-${packageVersion}`;
+          : `${packageVersion}`;
 
       const local = process.env.NODE_ENV !== 'production';
 
