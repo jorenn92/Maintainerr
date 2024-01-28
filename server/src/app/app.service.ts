@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ExternalApiService } from 'src/modules/api/external-api/external-api.service';
+import { ExternalApiService } from '../modules/api/external-api/external-api.service';
 
 interface VersionResponse {
   status: 1 | 0;
@@ -27,9 +27,9 @@ export class AppService {
       const calculatedVersion =
         versionTag !== 'stable'
           ? process.env.GIT_SHA
-            ? `${versionTag}-${process.env.GIT_SHA}`
+            ? `${versionTag}-${process.env.GIT_SHA.substring(0, 7)}`
             : `${versionTag}-`
-          : `${versionTag}-${packageVersion}`;
+          : `${packageVersion}`;
 
       const local = process.env.NODE_ENV !== 'production';
 
