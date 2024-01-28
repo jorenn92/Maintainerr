@@ -95,12 +95,27 @@ export class PlexGetterService {
           return item.Label ? item.Label.map((l) => l.tag) : [];
         }
         case 'collections': {
-          // fetch metadata because collections in plexLibrary object are wrong
           return metadata.Collection
             ? metadata.Collection.filter(
                 (el) =>
                   el.tag.toLowerCase().trim() !==
-                  (ruleGroup?.collection?.manualCollection
+                  (ruleGroup?.collection?.manualCollection &&
+                  ruleGroup?.collection?.manualCollectionName
+                    ? ruleGroup.collection.manualCollectionName
+                    : ruleGroup.name
+                  )
+                    .toLowerCase()
+                    .trim(),
+              ).length
+            : 0;
+        }
+        case 'collection_tags': {
+          return metadata.Collection
+            ? metadata.Collection.filter(
+                (el) =>
+                  el.tag.toLowerCase().trim() !==
+                  (ruleGroup?.collection?.manualCollection &&
+                  ruleGroup?.collection?.manualCollectionName
                     ? ruleGroup.collection.manualCollectionName
                     : ruleGroup.name
                   )
