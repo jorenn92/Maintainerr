@@ -28,8 +28,8 @@ jobs:
           node-version: 20.x
       - name: Activate corepack
         run: |
-            corepack install
-            corepack enable
+          corepack install
+          corepack enable
       - name: Install dependencies
         run: yarn --immutable
       - name: Release
@@ -87,6 +87,9 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+            VERSION_TAG=stable
           tags: |
             ghcr.io/jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
             ghcr.io/jorenn92/maintainerr:latest

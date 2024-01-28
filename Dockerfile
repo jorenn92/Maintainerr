@@ -14,7 +14,7 @@ COPY yarn.lock ./yarn.lock
 COPY jsdoc.json ./jsdoc.json
 COPY .yarnrc.yml ./.yarnrc.yml
 
-# enable correct yarn version
+# Enable correct yarn version
 RUN corepack install && \
     corepack enable
 
@@ -56,7 +56,7 @@ RUN rm -rf .yarn && \
     rm -rf /opt/yarn-* && \
     chown -R node:node /opt/ && \
     chmod -R 755 /opt/ && \
-    # data dir
+    # Data dir
     mkdir -m 777 /opt/data && \
     mkdir -m 777 /opt/data/logs && \
     chown -R node:node /opt/data
@@ -70,7 +70,15 @@ ENV NODE_ENV=${NODE_ENV}
 ARG DEBUG=false
 ENV DEBUG=${DEBUG}
 
-# set global yarn vars to a folder read/write able for all users
+# Hash of the last GIT commit
+ARG GIT_SHA
+ENV GIT_SHA=$GIT_SHA
+
+# container version type. develop, stable, edge,.. a release=stable
+ARG VERSION_TAG=develop
+ENV VERSION_TAG=$VERSION_TAG
+
+# Set global yarn vars to a folder read/write able for all users
 ENV YARN_INSTALL_STATE_PATH=/tmp/.yarn/install-state.gz
 ENV YARN_GLOBAL_FOLDER=/tmp/.yarn/global
 ENV YARN_CACHE_FOLDER=/tmp/.yarn/cache
@@ -84,12 +92,12 @@ WORKDIR /opt/app
 
 COPY supervisord.conf /etc/supervisord.conf
 
-# enable correct yarn version, add supervisor & chown root /opt dir
+# Enable correct yarn version, add supervisor & chown root /opt dir
 RUN corepack install && \
     corepack enable && \
     apk add supervisor && \
     chown node:node /opt && \
-    # This is required for docker user directive  to work
+    # This is required for docker user directive to work
     chmod 777 /opt && \
     mkdir -m 777 /.cache 
 

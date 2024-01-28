@@ -9,6 +9,8 @@ import Link from 'next/link'
 import { ReactNode, useContext, useEffect, useRef } from 'react'
 import SearchContext from '../../../contexts/search-context'
 import Transition from '../../Transition'
+import VersionStatus from '../../VersionStatus'
+import CachedImage from '../../Common/CachedImage'
 
 interface NavBarLink {
   key: string
@@ -163,6 +165,9 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                       })}
                     </nav>
                   </div>
+                  <span className="mb-4">
+                    <VersionStatus />
+                  </span>
                 </div>
                 <div className="w-14 flex-shrink-0">
                   {/* <!-- Force sidebar to shrink to fit close icon --> */}
@@ -179,15 +184,22 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
             <div className="flex flex-1 flex-col overflow-y-auto pt-4 pb-4">
               <div className="flex flex-shrink-0 items-center">
                 <span className="px-4 text-2xl text-zinc-50">
-                  <a href="/">
-                    <img src="/logo.svg" alt="Logo" />
-                  </a>
+                  <Link href="/">
+                    <CachedImage
+                      width={0}
+                      height={0}
+                      style={{ width: '100%', height: 'auto' }}
+                      src="/logo.svg"
+                      alt="Logo"
+                    />
+                  </Link>
                 </span>
               </div>
               <nav className="mt-12 flex-1 space-y-4 px-4">
                 {navBarItems.map((navBarLink) => {
                   return (
-                    <Link legacyBehavior
+                    <Link
+                      legacyBehavior
                       key={`desktop-${navBarLink.key}`}
                       href={navBarLink.href}
                     >
@@ -214,6 +226,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                   )
                 })}
               </nav>
+              <VersionStatus />
             </div>
           </div>
         </div>

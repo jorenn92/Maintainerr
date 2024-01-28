@@ -55,6 +55,8 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
+          build-args: |
+            GIT_SHA=${{ github.sha }}
           tags: |
             ${{ steps.meta.outputs.tags }}
             jorenn92/maintainerr:develop
