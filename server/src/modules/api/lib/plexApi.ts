@@ -155,6 +155,18 @@ class PlexApi extends NodePlexAPI {
     }
     return obj;
   }
+
+  public async getStatus(): Promise<boolean> {
+    try {
+      const status: { MediaContainer: any } = await this.query(
+        { uri: `/` },
+        false,
+      );
+      return status?.MediaContainer ? true : false;
+    } catch (err) {
+      return false;
+    }
+  }
 }
 
 export default PlexApi;

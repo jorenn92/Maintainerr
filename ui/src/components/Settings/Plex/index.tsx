@@ -1,13 +1,68 @@
 import { SaveIcon } from '@heroicons/react/solid'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
-import { DeleteApiHandler, PostApiHandler } from '../../../utils/ApiHandler'
+import GetApiHandler, {
+  DeleteApiHandler,
+  PostApiHandler,
+} from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import PlexLoginButton from '../../Login/Plex'
 import axios from 'axios'
 import TestButton from '../../Common/TestButton'
 import DocsButton from '../../Common/DocsButton'
+import { orderBy } from 'lodash'
+import { RefreshIcon } from '@heroicons/react/outline'
+import { useToasts } from 'react-toast-notifications'
+
+interface PresetServerDisplay {
+  name: string
+  ssl: boolean
+  uri: string
+  address: string
+  port: number
+  local: boolean
+  status?: boolean
+  message?: string
+}
+
+interface PlexConnection {
+  protocol: string
+  ssl: boolean
+  uri: string
+  address: string
+  port: number
+  local: boolean
+  status: number
+  message: string
+}
+
+export interface PlexDevice {
+  name: string
+  product: string
+  productVersion: string
+  platform: string
+  platformVersion: string
+  device: string
+  clientIdentifier: string
+  createdAt: Date
+  lastSeenAt: Date
+  provides: string[]
+  owned: boolean
+  accessToken?: string
+  publicAddress?: string
+  httpsRequired?: boolean
+  synced?: boolean
+  relay?: boolean
+  dnsRebindingProtection?: boolean
+  natLoopbackSupported?: boolean
+  publicAddressMatches?: boolean
+  presence?: boolean
+  ownerID?: string
+  home?: boolean
+  sourceTitle?: string
+  connection: PlexConnection[]
+}
 
 const PlexSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -15,6 +70,7 @@ const PlexSettings = () => {
   const nameRef = useRef<HTMLInputElement>(null)
   const portRef = useRef<HTMLInputElement>(null)
   const sslRef = useRef<HTMLInputElement>(null)
+  const serverPresetRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
   const [tokenValid, setTokenValid] = useState<Boolean>(false)
@@ -23,10 +79,14 @@ const PlexSettings = () => {
     status: Boolean
     version: string
   }>({ status: false, version: '0' })
+  const [availableServers, setAvailableServers] = useState<PlexDevice[]>()
+  const [isRefreshingPresets, setIsRefreshingPresets] = useState(false)
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Plex'
   }, [])
+
+  const { addToast, removeToast } = useToasts()
 
   const submit = async (
     e: React.FormEvent<HTMLFormElement> | undefined,
@@ -79,9 +139,44 @@ const PlexSettings = () => {
     }
   }
 
+  const submitPlexToken = async (
+    plex_token?: { plex_auth_token: string } | undefined,
+  ) => {
+    if (plex_token) {
+      const resp: { code: 0 | 1; message: string } = await PostApiHandler(
+        '/settings/plex/token',
+        {
+          plex_auth_token: plex_token.plex_auth_token,
+        },
+      )
+      if (resp.code === 1) {
+        settingsCtx.settings.plex_auth_token = plex_token.plex_auth_token
+      }
+    }
+  }
+
+  const availablePresets = useMemo(() => {
+    const finalPresets: PresetServerDisplay[] = []
+    availableServers?.forEach((dev) => {
+      dev.connection.forEach((conn) =>
+        finalPresets.push({
+          name: dev.name,
+          ssl: conn.protocol === 'https',
+          uri: conn.uri,
+          address: conn.address,
+          port: conn.port,
+          local: conn.local,
+          status: conn.status === 200,
+          message: conn.message,
+        }),
+      )
+    })
+    return orderBy(finalPresets, ['status', 'ssl'], ['desc', 'desc'])
+  }, [availableServers])
+
   const authsuccess = (token: string) => {
     verifyToken(token)
-    submit(undefined, { plex_auth_token: token })
+    submitPlexToken({ plex_auth_token: token })
   }
 
   const authFailed = () => {
@@ -134,6 +229,55 @@ const PlexSettings = () => {
     setTestbanner({ status: result.status, version: result.version })
   }
 
+  function setFieldValue(
+    ref: React.MutableRefObject<HTMLInputElement | null>,
+    value: string,
+  ) {
+    if (ref.current) {
+      ref.current.value = value.toString()
+    }
+  }
+
+  const refreshPresetServers = async () => {
+    setIsRefreshingPresets(true)
+    let toastId: string | undefined
+    try {
+      addToast(
+        'Retrieving server list from Plex…',
+        {
+          autoDismiss: false,
+          appearance: 'info',
+        },
+        (id) => {
+          toastId = id
+        },
+      )
+      const response: PlexDevice[] = await GetApiHandler(
+        '/settings/plex/devices/servers',
+      )
+      if (response) {
+        setAvailableServers(response)
+      }
+      if (toastId) {
+        removeToast(toastId)
+      }
+      addToast('Plex server list retrieved successfully!', {
+        autoDismiss: true,
+        appearance: 'success',
+      })
+    } catch (e) {
+      if (toastId) {
+        removeToast(toastId)
+      }
+      addToast('Failed to retrieve Plex server list.', {
+        autoDismiss: true,
+        appearance: 'error',
+      })
+    } finally {
+      setIsRefreshingPresets(false)
+    }
+  }
+
   return (
     <div className="h-full w-full">
       <div className="section h-full w-full">
@@ -172,6 +316,70 @@ const PlexSettings = () => {
 
       <div className="section">
         <form onSubmit={submit}>
+          {/* Load preset server list */}
+          <div className="form-row">
+            <label htmlFor="preset" className="text-label">
+              Server
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <select
+                  id="preset"
+                  name="preset"
+                  value={serverPresetRef?.current?.value}
+                  disabled={
+                    (!availableServers || isRefreshingPresets) &&
+                    tokenValid === true
+                  }
+                  className="rounded-l-only"
+                  onChange={async (e) => {
+                    const targPreset = availablePresets[Number(e.target.value)]
+
+                    if (targPreset) {
+                      setFieldValue(nameRef, targPreset.name)
+                      setFieldValue(hostnameRef, targPreset.address)
+                      setFieldValue(portRef, targPreset.port.toString())
+                      setFieldValue(sslRef, targPreset.ssl.toString())
+                    }
+                  }}
+                >
+                  <option value="manual">
+                    {availableServers || isRefreshingPresets
+                      ? isRefreshingPresets
+                        ? 'Retrieving servers...'
+                        : 'Manual configuration'
+                      : tokenValid === true
+                        ? 'Press the button to load available servers'
+                        : 'Authenticate to load servers'}
+                  </option>
+                  {availablePresets.map((server, index) => (
+                    <option key={`preset-server-${index}`} value={index}>
+                      {`
+                            ${server.name} (${server.address})
+                            [${server.local ? 'local' : 'remote'}]${
+                              server.ssl ? ` [secure]` : ''
+                            }
+                          `}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    refreshPresetServers()
+                  }}
+                  disabled={tokenValid !== true}
+                  className="input-action"
+                >
+                  <RefreshIcon
+                    className={isRefreshingPresets ? 'animate-spin' : ''}
+                    style={{ animationDirection: 'reverse' }}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* Name */}
           <div className="form-row">
             <label htmlFor="name" className="text-label">
               Name

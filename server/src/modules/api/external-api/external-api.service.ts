@@ -25,7 +25,7 @@ export class ExternalApiService {
     this.axios = axios.create({
       baseURL: baseUrl,
       params,
-      timeout: 5000, // timeout after 5s
+      timeout: 10000, // timeout after 10s
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
