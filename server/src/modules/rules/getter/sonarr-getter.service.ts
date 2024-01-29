@@ -112,6 +112,9 @@ export class SonarrGetterService {
                   : null;
               }
             }
+            case 'filePath': {
+              return showResponse?.path ? showResponse.path : null;
+            }
             case 'tags': {
               const tagIds = showResponse.tags;
               return (await this.servarrService.SonarrApi.getTags())
@@ -275,8 +278,8 @@ export class SonarrGetterService {
         epResp[0] && epResp[0].airDate === undefined
           ? false
           : s.statistics?.nextAiring !== undefined
-          ? s.statistics.previousAiring !== undefined
-          : true;
+            ? s.statistics.previousAiring !== undefined
+            : true;
 
       if (resp) return s;
     }
@@ -315,7 +318,7 @@ export class SonarrGetterService {
     return libItem.Guid
       ? +libItem.Guid.find((el) => el.id.includes(guiID))?.id?.split('://')[1]
       : libItem.guid.includes(guiID)
-      ? +libItem.guid.split('://')[1].split('?')[0]
-      : undefined;
+        ? +libItem.guid.split('://')[1].split('?')[0]
+        : undefined;
   }
 }
