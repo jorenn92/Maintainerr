@@ -29,6 +29,10 @@ export class SettingsController {
   updateSettings(@Body() payload: SettingDto) {
     return this.settingsService.updateSettings(payload);
   }
+  @Post('/plex/token')
+  updateAuthToken(@Body() payload: { plex_auth_token: string }) {
+    return this.settingsService.savePlexApiAuthToken(payload.plex_auth_token);
+  }
   @Get('/test/setup')
   testSetup() {
     return this.settingsService.testSetup();
@@ -48,6 +52,11 @@ export class SettingsController {
   @Get('/test/plex')
   testPlex() {
     return this.settingsService.testPlex();
+  }
+
+  @Get('/plex/devices/servers')
+  async getPlexServers() {
+    return await this.settingsService.getPlexServers();
   }
 
   @Post('/cron/validate')

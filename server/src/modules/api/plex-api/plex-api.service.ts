@@ -24,6 +24,7 @@ import {
 } from './interfaces/media.interface';
 import {
   PlexAccountsResponse,
+  PlexDevice,
   PlexStatusResponse,
 } from './interfaces/server.interface';
 import { EPlexDataType } from './enums/plex-data-type-enum';
@@ -31,6 +32,7 @@ import axios from 'axios';
 import PlexApi from '../lib/plexApi';
 import PlexTvApi from '../lib/plextvApi';
 import cacheManager from '../../api/lib/cache';
+import { Settings } from '../../settings/entities/settings.entities';
 
 @Injectable()
 export class PlexApiService {
@@ -44,6 +46,13 @@ export class PlexApiService {
   ) {
     this.initialize({});
   }
+
+  maintainerrClientOptions = {
+    identifier: '695b47f5-3c61-4cbd-8eb3-bcc3d6d06ac5',
+    product: 'Maintainerr',
+    deviceName: 'Maintainerr',
+    platform: 'Maintainerr',
+  };
 
   private async getDbSettings(): Promise<PlexSettings> {
     return {
@@ -89,12 +98,7 @@ export class PlexApiService {
           // requestOptions: {
           //   includeChildren: 1,
           // },
-          options: {
-            identifier: '695b47f5-3c61-4cbd-8eb3-bcc3d6d06ac5', // this.settings.clientId
-            product: 'Maintainerr', // this.settings.applicationTitle
-            deviceName: 'Maintainerr', // this.settings.applicationTitle
-            platform: 'Maintainerr', // this.settings.applicationTitle
-          },
+          options: this.maintainerrClientOptions,
         });
 
         this.plexTvClient = new PlexTvApi(plexToken);
@@ -601,6 +605,76 @@ export class PlexApiService {
       );
       this.logger.debug(err);
       return undefined;
+    }
+  }
+
+  public async getAvailableServers(): Promise<PlexDevice[]> {
+    try {
+      // reload requirements, auth token might have changed
+      const settings = (await this.settings.getSettings()) as Settings;
+      this.plexTvClient = new PlexTvApi(settings.plex_auth_token);
+
+      const devices = (await this.plexTvClient?.getDevices())?.filter(
+        (device) => {
+          return device.provides.includes('server') && device.owned;
+        },
+      );
+
+      if (devices) {
+        await Promise.all(
+          devices.map(async (device) => {
+            device.connection.map((connection) => {
+              const url = new URL(connection.uri);
+              if (url.hostname !== connection.address) {
+                const plexDirectConnection = {
+                  ...connection,
+                  address: url.hostname,
+                };
+                device.connection.push(plexDirectConnection);
+                connection.protocol = 'http';
+              }
+            });
+
+            const filteredConnectionPromises = device.connection.map(
+              async (connection) => {
+                const newClient = new PlexApi({
+                  hostname: connection.address,
+                  port: connection.port,
+                  https: connection.protocol === 'https',
+                  timeout: 5000,
+                  token: settings.plex_auth_token,
+                  authenticator: {
+                    authenticate: (
+                      _plexApi,
+                      cb: (err?: string, token?: string) => void,
+                    ) => {
+                      if (!settings.plex_auth_token) {
+                        return cb('Plex Token not found!');
+                      }
+                      cb(undefined, settings.plex_auth_token);
+                    },
+                  },
+                  options: this.maintainerrClientOptions,
+                });
+
+                // test connection
+                return (await newClient.getStatus()) ? connection : null;
+              },
+            );
+
+            device.connection = (
+              await Promise.all(filteredConnectionPromises)
+            ).filter(Boolean);
+          }),
+        );
+      }
+      return devices;
+    } catch (e) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      this.logger.debug(e);
+      return [];
     }
   }
 

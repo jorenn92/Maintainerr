@@ -2,6 +2,8 @@ import { Logger } from '@nestjs/common';
 import { ExternalApiService } from '../external-api/external-api.service';
 import cacheManager from './cache';
 import { parseStringPromise } from 'xml2js';
+import { PlexDevice } from '../../api/plex-api/interfaces/server.interface';
+import xml2js from 'xml2js';
 
 interface PlexAccountResponse {
   user: PlexUser;
@@ -243,6 +245,59 @@ export class PlexTvApi extends ExternalApiService {
         totalSize: 0,
         items: [],
       };
+    }
+  }
+
+  public async getDevices(): Promise<PlexDevice[]> {
+    try {
+      const devicesResp = await this.get('/api/resources?includeHttps=1', {
+        transformResponse: [],
+        responseType: 'text',
+      });
+      const parsedXml = await xml2js.parseStringPromise(
+        devicesResp as DeviceResponse,
+      );
+      return parsedXml?.MediaContainer?.Device?.map((pxml: DeviceResponse) => ({
+        name: pxml.$.name,
+        product: pxml.$.product,
+        productVersion: pxml.$.productVersion,
+        platform: pxml.$?.platform,
+        platformVersion: pxml.$?.platformVersion,
+        device: pxml.$?.device,
+        clientIdentifier: pxml.$.clientIdentifier,
+        createdAt: new Date(parseInt(pxml.$?.createdAt, 10) * 1000),
+        lastSeenAt: new Date(parseInt(pxml.$?.lastSeenAt, 10) * 1000),
+        provides: pxml.$.provides.split(','),
+        owned: pxml.$.owned == '1' ? true : false,
+        accessToken: pxml.$?.accessToken,
+        publicAddress: pxml.$?.publicAddress,
+        publicAddressMatches:
+          pxml.$?.publicAddressMatches == '1' ? true : false,
+        httpsRequired: pxml.$?.httpsRequired == '1' ? true : false,
+        synced: pxml.$?.synced == '1' ? true : false,
+        relay: pxml.$?.relay == '1' ? true : false,
+        dnsRebindingProtection:
+          pxml.$?.dnsRebindingProtection == '1' ? true : false,
+        natLoopbackSupported:
+          pxml.$?.natLoopbackSupported == '1' ? true : false,
+        presence: pxml.$?.presence == '1' ? true : false,
+        ownerID: pxml.$?.ownerID,
+        home: pxml.$?.home == '1' ? true : false,
+        sourceTitle: pxml.$?.sourceTitle,
+        connection: pxml?.Connection?.map((conn: ConnectionResponse) => ({
+          protocol: conn.$.protocol,
+          address: conn.$.address,
+          port: parseInt(conn.$.port, 10),
+          uri: conn.$.uri,
+          local: conn.$.local == '1' ? true : false,
+        })),
+      }));
+    } catch (e) {
+      this.logger.error(
+        'Something went wrong getting the devices from plex.tv',
+      );
+      this.logger.debug(e);
+      return [];
     }
   }
 }

@@ -125,6 +125,22 @@ export class SettingsService implements SettingDto {
     }
   }
 
+  public async savePlexApiAuthToken(plex_auth_token: string) {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        plex_auth_token: plex_auth_token,
+      });
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error while updating Plex auth token: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
   public async updateSettings(settings: Settings): Promise<BasicResponseDto> {
     try {
       settings.plex_hostname = settings.plex_hostname?.toLowerCase();
@@ -136,12 +152,13 @@ export class SettingsService implements SettingDto {
       // Plex SSL specifics
 
       settings.plex_ssl =
-        settings.plex_hostname.includes('https://') || settings.plex_port == 443
+        settings.plex_hostname?.includes('https://') ||
+        settings.plex_port == 443
           ? 1
           : 0;
       settings.plex_hostname = settings.plex_hostname
-        .replace('https://', '')
-        .replace('http://', '');
+        ?.replace('https://', '')
+        ?.replace('http://', '');
 
       if (
         this.cronIsValid(settings.collection_handler_job_cron) &&
@@ -330,5 +347,9 @@ export class SettingsService implements SettingDto {
       return true;
     }
     return false;
+  }
+
+  public async getPlexServers() {
+    return await this.plexApi.getAvailableServers();
   }
 }
