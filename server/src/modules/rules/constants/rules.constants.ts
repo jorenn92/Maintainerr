@@ -407,6 +407,13 @@ export class RuleConstants {
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
         } as Property,
+        {
+          id: 12,
+          name: 'filePath',
+          humanName: 'File - file path',
+          mediaType: MediaType.MOVIE,
+          type: RuleType.TEXT,
+        } as Property,
       ],
     },
     {
@@ -524,6 +531,13 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.BOOL,
           showType: [EPlexDataType.EPISODES, EPlexDataType.SEASONS],
+        } as Property,
+        {
+          id: 14,
+          name: 'filePath',
+          humanName: 'Base file path',
+          mediaType: MediaType.SHOW,
+          type: RuleType.TEXT,
         } as Property,
       ],
     },

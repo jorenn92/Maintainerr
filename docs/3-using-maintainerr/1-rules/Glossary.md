@@ -313,6 +313,14 @@ The key is used for identification in Yaml rule files.
 - Availability: movies
 - Type: number
 
+#### File - file path
+
+> The path of the file associated with the Radarr item. When using Docker, this will be the path inside the container.
+
+- Key: Radarr.filePath
+- Availability: movies
+- Type: text
+
 ### Sonarr
 
 #### Date added
@@ -418,6 +426,15 @@ The key is used for identification in Yaml rule files.
 - Key: Sonarr.part_of_latest_season
 - Availability: seasons, episodes
 - Type: boolean
+-
+
+#### Base file path
+
+> The base path on disk of the file associated with the Radarr item. When using Docker, this will be the path inside the container.
+
+- Key: Sonarr.filePath
+- Availability: movies, seasons, episodes
+- Type: text
 
 ### Overseerr
 

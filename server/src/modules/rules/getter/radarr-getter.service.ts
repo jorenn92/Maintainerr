@@ -53,8 +53,13 @@ export class RadarrGetterService {
               ? new Date(movieResponse.movieFile.dateAdded)
               : null;
           }
+          case 'filePath': {
+            return movieResponse?.movieFile?.path
+              ? movieResponse.movieFile.path
+              : null;
+          }
           case 'fileQuality': {
-            return movieResponse?.movieFile.quality.quality.resolution
+            return movieResponse?.movieFile?.quality?.quality?.resolution
               ? movieResponse.movieFile.quality.quality.resolution
               : null;
           }
@@ -64,7 +69,7 @@ export class RadarrGetterService {
               : null;
           }
           case 'runTime': {
-            if (movieResponse?.movieFile.mediaInfo.runTime) {
+            if (movieResponse?.movieFile?.mediaInfo?.runTime) {
               const hms = movieResponse.movieFile.mediaInfo.runTime;
               const splitted = hms.split(':');
               return +splitted[0] * 60 + +splitted[1];

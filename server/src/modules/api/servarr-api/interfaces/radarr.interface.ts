@@ -88,6 +88,7 @@ export interface RadarrMovieFile {
   quality: RadarrQualityContainer;
   size: number;
   mediaInfo: RadarrMediaInfo;
+  path: string;
 }
 
 export interface RadarrQualityContainer {
