@@ -34,10 +34,19 @@ export class PlexGetterService {
   ) {
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
-      // fetch metadata from cache, this data is more complete
+
+      // fetch metadata, parent & grandparent from cache, this data is more complete
       const metadata: PlexMetadata = await this.plexApi.getMetadata(
         libItem.ratingKey,
       );
+      const parent = metadata?.parentRatingKey
+        ? await this.plexApi.getMetadata(metadata.parentRatingKey)
+        : undefined;
+
+      const grandparent = metadata?.grandparentRatingKey
+        ? await this.plexApi.getMetadata(metadata.grandparentRatingKey)
+        : undefined;
+
       switch (prop.name) {
         case 'addDate': {
           return metadata.addedAt ? new Date(+metadata.addedAt * 1000) : null;
@@ -109,9 +118,15 @@ export class PlexGetterService {
               ).length
             : 0;
         }
-        case 'collection_tags': {
-          return metadata.Collection
-            ? metadata.Collection.filter(
+        case 'sw_collections_including_parent': {
+          const combinedCollections = [
+            ...(metadata?.Collection || []),
+            ...(parent?.Collection || []),
+            ...(grandparent?.Collection || []),
+          ];
+
+          return combinedCollections
+            ? combinedCollections.filter(
                 (el) =>
                   el.tag.toLowerCase().trim() !==
                   (ruleGroup?.collection?.manualCollection &&
@@ -193,6 +208,17 @@ export class PlexGetterService {
         case 'collection_names': {
           return metadata.Collection
             ? metadata.Collection.map((el) => el.tag.trim())
+            : null;
+        }
+        case 'sw_collection_names_including_parent': {
+          const combinedCollections = [
+            ...(metadata?.Collection || []),
+            ...(parent?.Collection || []),
+            ...(grandparent?.Collection || []),
+          ];
+
+          return combinedCollections
+            ? combinedCollections.map((el) => el.tag.trim())
             : null;
         }
         case 'lastViewedAt': {

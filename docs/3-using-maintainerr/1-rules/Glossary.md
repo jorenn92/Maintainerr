@@ -57,7 +57,7 @@ The key is used for identification in Yaml rule files.
 
 #### Present in amount of other collections
 
-> The number of collections the Plex item is present in.
+> The number of collections the Plex item is present in. For seasons and episodes, This wil **not** include the collections of the parent season and show.
 
 - Key: Plex.collections
 - Availability: movies, shows, seasons, episodes
@@ -161,7 +161,7 @@ The key is used for identification in Yaml rule files.
 
 #### Collections media is present in (titles)
 
-> List of collections that the Plex item is present in.
+> List of collections that the Plex item is present in. For seasons and episodes, This wil **not** include the collections of the parent season and show.
 
 - Key: Plex.collection_names
 - Availability: movies, shows, seasons, episodes
@@ -205,6 +205,22 @@ The key is used for identification in Yaml rule files.
 
 - Key: Plex.labels
 - Availability: movies, shows, seasons, episodes
+- Type: text[]
+
+#### Present in amount of other collections (incl. parents)
+
+> The number of collections the Plex item is present in. This will also include collections the parent season and/or episode is present in.
+
+- Key: Plex.sw_collections_including_parent
+- Availability: seasons, episodes
+- Type: number
+
+#### Collections media is present in (titles) (incl. parents)
+
+> List of collections that the Plex item is present in. This will also include collections the parent season and/or episode is present in.
+
+- Key: Plex.sw_collection_names_including_parent
+- Availability: seasons, episodes
 - Type: text[]
 
 ### Radarr

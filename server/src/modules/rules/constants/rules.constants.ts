@@ -303,6 +303,25 @@ export class RuleConstants {
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
         } as Property,
+        {
+          id: 25,
+          name: 'sw_collections_including_parent',
+          humanName: 'Present in amount of other collections (incl. parents)',
+          mediaType: MediaType.SHOW,
+          type: RuleType.NUMBER,
+          showType: [EPlexDataType.SEASONS, EPlexDataType.EPISODES],
+          cacheReset: true,
+        } as Property,
+        {
+          id: 26,
+          name: 'sw_collection_names_including_parent',
+          humanName:
+            '[list] Collections media is present in (titles) (incl. parents)',
+          mediaType: MediaType.SHOW,
+          showType: [EPlexDataType.SEASONS, EPlexDataType.EPISODES],
+          cacheReset: true,
+          type: RuleType.TEXT,
+        } as Property,
       ],
     },
     {
