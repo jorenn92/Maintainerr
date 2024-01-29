@@ -190,13 +190,20 @@ export class CollectionWorkerService extends TaskBase {
                 break;
             }
           } else {
-            this.infoLogger(
-              `Couldn't find movie with tmdbid ${tmdbid} in Radarr. No action taken for movie with Plex ID: ${media.plexId}`,
-            );
+            if (collection.arrAction !== ServarrAction.UNMONITOR) {
+              this.plexApi.deleteMediaFromDisk(media.plexId.toString());
+              this.infoLogger(
+                `Couldn't find movie with tmdb id ${tmdbid} in Radarr, so no Radarr action was taken for movie with Plex ID ${media.plexId}. But the movie was removed from the filesystem`,
+              );
+            } else {
+              this.infoLogger(
+                `Radarr unmonitor action was not possible, couldn't find movie with tmdb id ${tmdbid} in Radarr. No action was taken for movie with Plex ID ${media.plexId}`,
+              );
+            }
           }
         } else {
           this.infoLogger(
-            `Couldn't find correct tmdbid. No action taken for movie with Plex ID: ${media.plexId}`,
+            `Couldn't find correct tmdb id. No action taken for movie with Plex ID: ${media.plexId}. Please check this movie manually`,
           );
         }
       }
@@ -393,13 +400,20 @@ export class CollectionWorkerService extends TaskBase {
                 break;
             }
           } else {
-            this.infoLogger(
-              `Couldn't find correct tvdbid. No action taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
-            );
+            if (collection.arrAction !== ServarrAction.UNMONITOR) {
+              this.plexApi.deleteMediaFromDisk(plexData.ratingKey);
+              this.infoLogger(
+                `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. But media item was removed from Plex`,
+              );
+            } else {
+              this.infoLogger(
+                `Couldn't find correct tvdb id. No unmonitor action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
+              );
+            }
           }
         } else {
           this.infoLogger(
-            `Couldn't find correct tvdbid. No action taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
+            `Couldn't find correct tvdb id. No action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. Please check this show manually`,
           );
         }
       }
