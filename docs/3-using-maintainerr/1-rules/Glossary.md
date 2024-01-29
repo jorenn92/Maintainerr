@@ -315,7 +315,7 @@ The key is used for identification in Yaml rule files.
 
 #### File - file path
 
-> The path of the file associated with the Radarr item. When using docker Radarr, this will be the path in the Radarr container.
+> The path of the file associated with the Radarr item. When using Docker, this will be the path inside the container.
 
 - Key: Radarr.filePath
 - Availability: movies
@@ -426,10 +426,11 @@ The key is used for identification in Yaml rule files.
 - Key: Sonarr.part_of_latest_season
 - Availability: seasons, episodes
 - Type: boolean
-- 
+-
+
 #### Base file path
 
-> The base path on disk of the file associated with the Radarr item. When using docker Sonarr, this will be the path in the Sonarr container.
+> The base path on disk of the file associated with the Radarr item. When using Docker, this will be the path inside the container.
 
 - Key: Sonarr.filePath
 - Availability: movies, seasons, episodes
