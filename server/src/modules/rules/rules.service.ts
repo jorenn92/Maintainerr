@@ -939,7 +939,12 @@ export class RulesService {
     rulegroupId: number,
     mediaId: string,
   ): Promise<any> {
+    // flush caches
     this.plexApi.resetMetadataCache(mediaId);
+    cacheManager.getCache('overseerr').data.flushAll();
+    cacheManager.getCache('radarr').data.flushAll();
+    cacheManager.getCache('sonarr').data.flushAll();
+
     const mediaResp = await this.plexApi.getMetadata(mediaId);
     const group = await this.getRuleGroupById(rulegroupId);
     if (group && mediaResp) {

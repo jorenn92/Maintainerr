@@ -549,7 +549,7 @@ export class RuleConstants {
         {
           id: 0,
           name: 'addUser',
-          humanName: 'Requested by user (Plex username)',
+          humanName: 'Requested by user (Plex or local username)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
         } as Property, //  returns username[]

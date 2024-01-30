@@ -103,18 +103,24 @@ export class OverseerrGetterService {
                     );
                     if (includesSeason) {
                       userNames.push(
-                        plexUsers.find(
-                          (u) =>
-                            u.username === request.requestedBy?.plexUsername,
-                        )?.username,
+                        request.requestedBy?.userType === 2
+                          ? request.requestedBy?.username
+                          : plexUsers.find(
+                              (u) =>
+                                u.username ===
+                                request.requestedBy?.plexUsername,
+                            )?.username,
                       );
                     }
-                    // for shows, add every request user
                   } else {
+                    // for shows and movies, add every request user
                     userNames.push(
-                      plexUsers.find(
-                        (u) => u.username === request.requestedBy?.plexUsername,
-                      )?.username,
+                      request.requestedBy?.userType === 2
+                        ? request.requestedBy?.username
+                        : plexUsers.find(
+                            (u) =>
+                              u.username === request.requestedBy?.plexUsername,
+                          )?.username,
                     );
                   }
                 }
@@ -166,14 +172,14 @@ export class OverseerrGetterService {
                 return ep?.airDate
                   ? new Date(ep.airDate)
                   : ep?.firstAirDate
-                  ? new Date(ep.firstAirDate)
-                  : null;
+                    ? new Date(ep.firstAirDate)
+                    : null;
               } else if (EPlexDataType.SEASONS === dataType) {
                 return seasonMediaResponse?.airDate
                   ? new Date(seasonMediaResponse.airDate)
                   : seasonMediaResponse?.firstAirDate
-                  ? new Date(seasonMediaResponse.firstAirDate)
-                  : null;
+                    ? new Date(seasonMediaResponse.firstAirDate)
+                    : null;
               } else {
                 return mediaResponse?.firstAirDate
                   ? new Date(mediaResponse.firstAirDate)

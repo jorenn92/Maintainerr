@@ -438,9 +438,9 @@ The key is used for identification in Yaml rule files.
 
 ### Overseerr
 
-#### Requested by user (Plex username)
+#### Requested by user (Plex or local username)
 
-> The username of the Plex user who requested the media in Overseerr.
+> The username of the Plex user who requested the media in Overseerr. If a local user requested it, this will be the local username.
 
 - Key: Overseerr.addUser
 - Availability: movies, shows, seasons, episodes
