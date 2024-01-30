@@ -103,7 +103,7 @@ RUN corepack install && \
 
 USER node
 
-EXPOSE 80
+EXPOSE 6246
 
 VOLUME [ "/opt/data" ]
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
