@@ -68,9 +68,9 @@ docker run -d \
 -e TZ=Europe/Brussels \
 -v ./data:/opt/data \
 -u 1000:1000 \
--p 8154:80 \
+-p 6246:6246 \
 --restart unless-stopped \
-jorenn92/maintainerr
+ghcr.io/jorenn92/maintainerr:latest
 ```
 
 Docker-compose:
@@ -91,7 +91,7 @@ services:
           - TZ=Europe/Brussels
 #      - DEBUG=true # uncomment to enable debug logs
         ports:
-          - 8154:80
+          - 6246:6246
         restart: unless-stopped
 ```
 
