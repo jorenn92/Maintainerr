@@ -74,8 +74,14 @@ async function bootstrap() {
 
 function createDataDirectoryStructure() {
   try {
-    const dir = path.join(__dirname, `../../data/logs`);
+    // Check if data directory has read and write permissions
+    fs.accessSync(
+      path.join(__dirname, `../../data`),
+      fs.constants.R_OK | fs.constants.W_OK,
+    );
 
+    // create logs dir
+    const dir = path.join(__dirname, `../../data/logs`);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, {
         recursive: true,
@@ -83,17 +89,17 @@ function createDataDirectoryStructure() {
       });
     }
 
-    // Check if data directory has read and write permissions
-    fs.accessSync(
-      path.join(__dirname, `../../data`),
-      fs.constants.R_OK | fs.constants.W_OK,
-    );
+    // if db already exists, check r/w permissions
+    const db = path.join(__dirname, `../../data/maintainerr.sqlite`);
+    if (!fs.existsSync(db)) {
+      fs.accessSync(db, fs.constants.R_OK | fs.constants.W_OK);
+    }
   } catch (err) {
     console.warn(
       `THE CONTAINER NO LONGER OPERATES WITH PRIVILEGED USER PERMISSIONS. PLEASE UPDATE YOUR CONFIGURATION ACCORDINGLY: https://github.com/jorenn92/Maintainerr/releases/tag/v2.0.0`,
     );
     console.error(
-      'Could not create or access the data directory. Please make sure it has the necessary permissions',
+      'Could not create or access (files in) the data directory. Please make sure the necessary permissions are set',
     );
     process.exit(0);
   }
