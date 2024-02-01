@@ -72,7 +72,7 @@ async function bootstrap() {
   await app.listen(3001);
 }
 
-function createDataDirectoryStructure(): void {
+function createDataDirectoryStructure() {
   try {
     const dir = path.join(__dirname, `../../data/logs`);
 
@@ -82,9 +82,18 @@ function createDataDirectoryStructure(): void {
         mode: 0o777,
       });
     }
+
+    // Check if data directory has read and write permissions
+    fs.accessSync(
+      path.join(__dirname, `../../data`),
+      fs.constants.R_OK | fs.constants.W_OK,
+    );
   } catch (err) {
+    console.warn(
+      `THE CONTAINER NO LONGER OPERATES WITH PRIVILEGED USER PERMISSIONS. PLEASE UPDATE YOUR CONFIGURATION ACCORDINGLY: https://github.com/jorenn92/Maintainerr/releases/tag/v2.0.0`,
+    );
     console.error(
-      'Could not create data directory. Make sure your permissions are set correctly.',
+      'Could not create or access the data directory. Please make sure it has the necessary permissions',
     );
     process.exit(0);
   }
