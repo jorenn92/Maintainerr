@@ -158,6 +158,10 @@
         }
       ]
     ],
+    "branches": [
+      "main",
+      "1.x"
+    ],
     "npmPublish": false,
     "publish": [
       "@semantic-release/github"
