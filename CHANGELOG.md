@@ -1,3 +1,49 @@
+# [2.0.0](https://github.com/jorenn92/Maintainerr/compare/v1.7.1...v2.0.0) (2024-02-02)
+
+
+### Bug Fixes
+
+* **build:** Added a workaround for the 'Text file busy' error when using an old Linux kernel on the Docker host. ([19f75bd](https://github.com/jorenn92/Maintainerr/commit/19f75bd121412849b8fb86ff9b0d0d5d56bbc703))
+* **collection handling:** Ensure media not found in Starr apps is still deleted if required by the Starr action ([#812](https://github.com/jorenn92/Maintainerr/issues/812)) ([d55bfe2](https://github.com/jorenn92/Maintainerr/commit/d55bfe28cee4c8bcccd8ea53abf160e2183871aa))
+* **docker:** Improved flexibility by enabling custom users with the Docker 'user' directive. The previous implementation restricted this to the 'node' user ([496401f](https://github.com/jorenn92/Maintainerr/commit/496401fe6ff0a0c3167844f81d77af6a29858272))
+* Move the supervisord.log file to the data directory ([#777](https://github.com/jorenn92/Maintainerr/issues/777)) ([cd5df98](https://github.com/jorenn92/Maintainerr/commit/cd5df989d566808c286a85152b7a1489a7caec62))
+* **rules:** Addressed an issue where certain collection-related rules exhibited unexpected behavior when media was added to other groups in the same run ([56c133a](https://github.com/jorenn92/Maintainerr/commit/56c133ac6750dbad4a744e4d46ec2482fc58aba4))
+* **rules:** Fixed an issue where the 'Plex - present in amount of other collections' rule wouldn't work with custom collections ([493a3ea](https://github.com/jorenn92/Maintainerr/commit/493a3ea4ddab441c70f4b27a03bbe2b7a67af88b))
+* **rules:** Resolved an issue where the 'Overseerr - Requested by user' rule didn't work for local Overseerr users ([#822](https://github.com/jorenn92/Maintainerr/issues/822)) ([5391538](https://github.com/jorenn92/Maintainerr/commit/539153824cb8543f0d5b32576a86fe4892c62e01))
+* **rules:** Resolved an issue where the Sonarr status rule was incorrectly mapped and couldn't function ([a4bb4df](https://github.com/jorenn92/Maintainerr/commit/a4bb4df691ba791330e5ecbc93508a449ea42809))
+* **settings:** Resolved an issue where updated cron schedules were not visible on the UI until the application was reloaded ([87a2091](https://github.com/jorenn92/Maintainerr/commit/87a2091bdf975dd68a3de1397ba895292dac97c0))
+* **tasks:** Improved task management by limiting the simultaneous execution of rule and collection handler tasks to one. Additionally, ensured that collection handling cannot occur concurrently with rule handling ([bb3d16c](https://github.com/jorenn92/Maintainerr/commit/bb3d16cc23020b5988530e2d524cdb37965ad208))
+* **ui:** Added feedback to the manual rule & collection handling buttons ([f1183c0](https://github.com/jorenn92/Maintainerr/commit/f1183c0daa4ffd08d3e754a2f1db7cbec8138a31))
+
+
+### Code Refactoring
+
+* add data directory permission check ([bbced56](https://github.com/jorenn92/Maintainerr/commit/bbced56c64adb1ccb13f7d5bf05b5f5b34dc5fca))
+* Updated UI Docker port to use non-privileged port 6246 ([4751079](https://github.com/jorenn92/Maintainerr/commit/4751079d42b2e2a87d14f801564e0138c63104e7))
+
+
+### Features
+
+* Added the ability to test media items against a rule, returning a detailed execution breakdown ([72cf392](https://github.com/jorenn92/Maintainerr/commit/72cf3922055ca1ffbddaf65acb6307fc94a5fe77))
+* **collections:** Added a collection info screen with details and history logs & enhanced TypeORM Implementation, shifted running of migrations to the NestJS Process. ([e260985](https://github.com/jorenn92/Maintainerr/commit/e260985ffe15d27d3163957b1882ae6ff1e8bcfc))
+* **collections:** Added an indicator to the collection media card that an item was added manually ([12a4cb2](https://github.com/jorenn92/Maintainerr/commit/12a4cb242aa81832db96d22c40cb7b7fb3f5a010))
+* **collections:** Added exclusions to the collection detail screen ([76d29ef](https://github.com/jorenn92/Maintainerr/commit/76d29ef2522ee938b69d108727020b82bec59438))
+* Implemented Winston logger for improved logging. Daily log rotation has been introduced, and logs are now stored under the /opt/data/logs directory ([0e3ab51](https://github.com/jorenn92/Maintainerr/commit/0e3ab511b8e42743050f780685a660fff45e739b))
+* **rules:**  Introduced the capability to import and export rules using YAML. Additionally, included a rule glossary in the documentation. ([97c52d4](https://github.com/jorenn92/Maintainerr/commit/97c52d456b06c9f35c4d414fe9b79fe5a58f8abe))
+* **rules:** Added new rule: Plex - [list] Labels ([1c5a89a](https://github.com/jorenn92/Maintainerr/commit/1c5a89ab35a5c6b9d12119694dfc7977ec357784))
+* **rules:** Added new variants of the existing collection rules for seasons and episodes, these will include collection data of the parent season/show as well ([#813](https://github.com/jorenn92/Maintainerr/issues/813)) ([9d91b4a](https://github.com/jorenn92/Maintainerr/commit/9d91b4addcc1e4d675c9125daf52f479bf532274))
+* **rules:** Introduced Radarr & Sonarr rules to retrieve file locations ([#814](https://github.com/jorenn92/Maintainerr/issues/814)) ([5963c74](https://github.com/jorenn92/Maintainerr/commit/5963c7459fe3ea9a44120a1b8b84e99d5db8bd51))
+* Run application as non-root ([006a122](https://github.com/jorenn92/Maintainerr/commit/006a122ac391c29fe5c6440c37cb0b4d4f954dbe))
+* **settings:** Added the ability to find and load available Plex servers from the settings menu ([#811](https://github.com/jorenn92/Maintainerr/issues/811)) ([9c75917](https://github.com/jorenn92/Maintainerr/commit/9c75917f8c5db472bf7d4481e90a980f36edef7a))
+* **ui:** Added a version indicator ([#807](https://github.com/jorenn92/Maintainerr/issues/807)) ([a126561](https://github.com/jorenn92/Maintainerr/commit/a12656197e4222028beaf9582e57c5fcccda471b))
+* Upgraded to Yarn modern, improved the docker image size and added a contribution guide ([#770](https://github.com/jorenn92/Maintainerr/issues/770)) ([6233b71](https://github.com/jorenn92/Maintainerr/commit/6233b71f333ae83b26269c01e00d9072a18ea818))
+
+
+### BREAKING CHANGES
+
+* The container now runs as an unprivileged user. It is essential to ensure that the exposed data directory is read/writeable by either the user specified in the 'user' directive or, if no directive is provided, by the default UID:GID 1000:1000.
+* Previously, the UI port was set to port 80, which is privileged. This has been updated to non-privileged port 6246. Ensure to adjust your Dockerfile or docker run command to reflect this change.
+
 ## [1.7.1](https://github.com/jorenn92/Maintainerr/compare/v1.7.0...v1.7.1) (2024-01-06)
 
 
