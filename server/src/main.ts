@@ -91,7 +91,7 @@ function createDataDirectoryStructure() {
 
     // if db already exists, check r/w permissions
     const db = path.join(__dirname, `../../data/maintainerr.sqlite`);
-    if (!fs.existsSync(db)) {
+    if (fs.existsSync(db)) {
       fs.accessSync(db, fs.constants.R_OK | fs.constants.W_OK);
     }
   } catch (err) {
