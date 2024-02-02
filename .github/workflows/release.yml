@@ -47,6 +47,12 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
+      - name: Switch to 1.x branch
+        run: git checkout 1.x
+        
+      - name: Pull latest changes
+        run: git pull
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -85,7 +91,5 @@ jobs:
           push: true
           tags: |
             ghcr.io/jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
-            ghcr.io/jorenn92/maintainerr:latest
             jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
-            jorenn92/maintainerr:latest
           labels: ${{ steps.meta.outputs.labels }}
