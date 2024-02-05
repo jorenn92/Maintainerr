@@ -96,8 +96,8 @@ const PlexSettings = () => {
     if (
       hostnameRef.current?.value &&
       nameRef.current?.value &&
-      portRef.current?.value
-      // sslRef.current?.value
+      portRef.current?.value &&
+      sslRef.current !== null
     ) {
       let payload: {
         plex_hostname: string
@@ -106,10 +106,14 @@ const PlexSettings = () => {
         plex_ssl: number
         plex_auth_token?: string
       } = {
-        plex_hostname: hostnameRef.current.value,
+        plex_hostname: sslRef.current?.checked
+          ? `https://${hostnameRef.current.value.replace('http://', '').replace('https://', '')}`
+          : hostnameRef.current.value
+              .replace('http://', '')
+              .replace('https://', ''),
         plex_port: +portRef.current.value,
         plex_name: nameRef.current.value,
-        plex_ssl: 0, //sslRef.current.checked ? 1 : 0,
+        plex_ssl: +sslRef.current.checked, // not used, server derives this from https://
       }
 
       if (plex_token) {
@@ -234,7 +238,11 @@ const PlexSettings = () => {
     value: string,
   ) {
     if (ref.current) {
-      ref.current.value = value.toString()
+      if (ref.current.type === 'checkbox') {
+        ref.current.checked = Boolean(value)
+      } else {
+        ref.current.value = value.toString()
+      }
     }
   }
 
@@ -334,7 +342,6 @@ const PlexSettings = () => {
                   className="rounded-l-only"
                   onChange={async (e) => {
                     const targPreset = availablePresets[Number(e.target.value)]
-
                     if (targPreset) {
                       setFieldValue(nameRef, targPreset.name)
                       setFieldValue(hostnameRef, targPreset.address)
@@ -431,7 +438,7 @@ const PlexSettings = () => {
             </div>
           </div>
 
-          {/* <div className="form-row">
+          <div className="form-row">
             <label htmlFor="ssl" className="text-label">
               SSL
             </label>
@@ -446,7 +453,7 @@ const PlexSettings = () => {
                 ></input>
               </div>
             </div>
-          </div> */}
+          </div>
 
           <div className="form-row">
             <label htmlFor="ssl" className="text-label">
