@@ -239,9 +239,9 @@ const PlexSettings = () => {
   ) {
     if (ref.current) {
       if (ref.current.type === 'checkbox') {
-        ref.current.checked = Boolean(value)
+        ref.current.checked = value == 'true'
       } else {
-        ref.current.value = value.toString()
+        ref.current.value = value
       }
     }
   }
