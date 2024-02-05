@@ -107,7 +107,7 @@
     "jsdoc": "^4.0.2",
     "monaco-editor": "0.45.0",
     "postcss": "^8.4.34",
-    "prettier": "^3.1.1",
+    "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.6",
     "semantic-release": "^23.0.0",
     "source-map-support": "^0.5.21",
