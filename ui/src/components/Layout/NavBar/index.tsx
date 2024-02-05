@@ -128,7 +128,14 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                     <div className="flex flex-shrink-0 items-center px-2">
                       <span className="px-4 text-xl text-zinc-50">
                         <a href="/">
-                          <img src="/logo.svg" alt="Logo" />
+                          <CachedImage
+                            width={0}
+                            height={0}
+                            style={{ width: '100%', height: 'auto' }}
+                            src="/logo.svg"
+                            alt="Logo"
+                            priority
+                          />
                         </a>
                       </span>
                     </div>
@@ -191,6 +198,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                       style={{ width: '100%', height: 'auto' }}
                       src="/logo.svg"
                       alt="Logo"
+                      priority
                     />
                   </Link>
                 </span>
