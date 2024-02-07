@@ -994,11 +994,6 @@ export class CollectionsService {
       this.infoLogger(`Creating collection in Plex..`);
       const resp = await this.plexApi.createCollection(collectionData);
       if (resp?.ratingKey) {
-        this.addLogRecord(
-          { id: collectionData.collectionId } as Collection,
-          'Plex collection created',
-          ECollectionLogType.COLLECTION,
-        );
         return resp;
       } else {
         return resp[0];
