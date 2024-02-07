@@ -189,11 +189,11 @@ const OverviewContent = (props: IOverviewContent) => {
               }
               tmdbid={
                 el.parentData
-                  ? el.parentData.Guid.find((e) =>
-                      e.id.includes('tmdb'),
-                    )?.id.split('tmdb://')[1]
+                  ? el.parentData.Guid?.find((e) =>
+                      e.id?.includes('tmdb'),
+                    )?.id?.split('tmdb://')[1]
                   : el.Guid
-                    ? el.Guid.find((e) => e.id.includes('tmdb'))?.id.split(
+                    ? el.Guid.find((e) => e.id?.includes('tmdb'))?.id?.split(
                         'tmdb://',
                       )[1]
                     : undefined
