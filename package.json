@@ -74,7 +74,7 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
-    "@automock/jest": "^2.1.0",
+    "@automock/jest": "^1.4.0",
     "@babel/core": "^7.23.9",
     "@nestjs/cli": "^10.3.1",
     "@nestjs/schematics": "^10.1.0",
