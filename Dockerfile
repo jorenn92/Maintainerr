@@ -103,6 +103,9 @@ RUN corepack install && \
 
 USER node
 
+# Picked up for Node's .cache directory.
+ENV HOME=/
+
 EXPOSE 6246
 
 VOLUME [ "/opt/data" ]
