@@ -128,10 +128,8 @@ export class OverseerrGetterService {
               }
               return [];
             } catch (e) {
-              this.logger.warn("Couldn't get addUser from Overseerr", {
-                label: 'Overseerr API',
-                errorMessage: e.message,
-              });
+              this.logger.warn("Couldn't get addUser from Overseerr");
+              this.logger.debug(e);
             }
           }
           case 'amountRequested': {
@@ -256,6 +254,7 @@ export class OverseerrGetterService {
       }
     } catch (e) {
       warn(`Overseerr-Getter - Action failed : ${e.message}`);
+      this.logger.debug(e);
       return undefined;
     }
   }
