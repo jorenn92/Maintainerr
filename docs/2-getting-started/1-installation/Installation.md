@@ -1,6 +1,6 @@
 Docker is the easiest way to start Maintainerr.
 
-images for amd64 & arm64 are available under jorenn92/maintainerr and ghcri.io/jorenn92/maintainerr.
+images for amd64 & arm64 are available under jorenn92/maintainerr and ghcr.io/jorenn92/maintainerr.
 Data is saved under /opt/data, a volume should be created to persist the configuration. 
 
 
