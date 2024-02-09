@@ -1,3 +1,12 @@
+## [2.0.1](https://github.com/jorenn92/Maintainerr/compare/v2.0.0...v2.0.1) (2024-02-09)
+
+
+### Bug Fixes
+
+* **docker:** ensure $HOME is set consistently for all configs. ([f952bba](https://github.com/jorenn92/Maintainerr/commit/f952bbaf103aeb90cf088742cf46bd8ca61b1477))
+* Resolve SQL error during Plex collection recreation ([be1b801](https://github.com/jorenn92/Maintainerr/commit/be1b8017bd7d4c8387fa5cbea797e373d1f3e63b))
+* Resolved an issue where Plex's SSL flag would not be updated correctly on the settings page ([d65927a](https://github.com/jorenn92/Maintainerr/commit/d65927a761439e1e3df511c3a5d3ba7e287db35c))
+
 # [2.0.0](https://github.com/jorenn92/Maintainerr/compare/v1.7.1...v2.0.0) (2024-02-02)
 
 
