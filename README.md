@@ -53,7 +53,7 @@ Currently, <b>Maintainerr</b> supports rule parameters from these apps :
 
 # Installation
 
-Docker images for amd64 & arm64 are available under jorenn92/maintainerr and ghcri.io/jorenn92/maintainerr. <br />
+Docker images for amd64 & arm64 are available under jorenn92/maintainerr and ghcr.io/jorenn92/maintainerr. <br />
 
 Data is saved within the container under /opt/data, it is recommended to tie a persistent volume to this location in your docker command/compose file. 
 Make sure this directory is read/writeable by the user specified in the 'user' instruction. If no 'user' instruction is configured, the volume should be accessible by UID:GID 1000:1000.
