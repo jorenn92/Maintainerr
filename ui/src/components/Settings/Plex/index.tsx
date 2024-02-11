@@ -416,7 +416,7 @@ const PlexSettings = () => {
                   type="text"
                   ref={hostnameRef}
                   defaultValue={settingsCtx.settings.plex_hostname
-                    .replace('http://', '')
+                    ?.replace('http://', '')
                     .replace('https://', '')}
                 ></input>
               </div>

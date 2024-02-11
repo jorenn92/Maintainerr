@@ -85,7 +85,7 @@ const VersionStatus = ({ onClick }: VersionStatusProps) => {
                 messages.OUT_OF_DATE
               ) : (
                 <code className="bg-transparent p-0">
-                  {version.replace('develop-', '')}
+                  {version ? version.replace('develop-', '') : ''}
                 </code>
               )}
             </span>
