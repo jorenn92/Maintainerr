@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/jorenn92/Maintainerr/compare/v2.0.1...v2.0.2) (2024-02-11)
+
+
+### Bug Fixes
+
+* Failure to fetch latest GitHub version crashes the UI ([#891](https://github.com/jorenn92/Maintainerr/issues/891)) ([4ce9ac9](https://github.com/jorenn92/Maintainerr/commit/4ce9ac9b353669db31b1781edff5d66f3b1addee))
+
 ## [2.0.1](https://github.com/jorenn92/Maintainerr/compare/v2.0.0...v2.0.1) (2024-02-09)
 
 
