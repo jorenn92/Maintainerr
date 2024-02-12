@@ -2577,7 +2577,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/schematics@npm:^10.0.1, @nestjs/schematics@npm:^10.1.0":
+"@nestjs/schematics@npm:^10.0.1":
   version: 10.1.0
   resolution: "@nestjs/schematics@npm:10.1.0"
   dependencies:
@@ -2589,6 +2589,21 @@ __metadata:
   peerDependencies:
     typescript: ">=4.8.2"
   checksum: 249f27529be95f674c2dc41ba3ce10e86255b9940032067da8a339dbc8ba42ff466a6fb6bc26c38f0d72ddfed6471947a9e6578d392319de9eba1e428a76a413
+  languageName: node
+  linkType: hard
+
+"@nestjs/schematics@npm:^10.1.1":
+  version: 10.1.1
+  resolution: "@nestjs/schematics@npm:10.1.1"
+  dependencies:
+    "@angular-devkit/core": "npm:17.1.2"
+    "@angular-devkit/schematics": "npm:17.1.2"
+    comment-json: "npm:4.2.3"
+    jsonc-parser: "npm:3.2.1"
+    pluralize: "npm:8.0.0"
+  peerDependencies:
+    typescript: ">=4.8.2"
+  checksum: fa264dc1a4366876b47badbc895ee234ccc6de112484aa5ba45a0a03e67f429f73036d4e9108bb21ad1c30fe30652cbe9cc773c00b3a092c5f2a1499895241ca
   languageName: node
   linkType: hard
 
@@ -10007,6 +10022,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jsonc-parser@npm:3.2.1":
+  version: 3.2.1
+  resolution: "jsonc-parser@npm:3.2.1"
+  checksum: ada66dec143d7f9cb0e2d0d29c69e9ce40d20f3a4cb96b0c6efb745025ac7f9ba647d7ac0990d0adfc37a2d2ae084a12009a9c833dbdbeadf648879a99b9df89
+  languageName: node
+  linkType: hard
+
 "jsonfile@npm:^6.0.1":
   version: 6.1.0
   resolution: "jsonfile@npm:6.1.0"
@@ -10548,7 +10570,7 @@ __metadata:
     "@nestjs/core": "npm:^10.3.3"
     "@nestjs/platform-express": "npm:^10.3.1"
     "@nestjs/schedule": "npm:^4.0.0"
-    "@nestjs/schematics": "npm:^10.1.0"
+    "@nestjs/schematics": "npm:^10.1.1"
     "@nestjs/testing": "npm:^10.3.1"
     "@nestjs/typeorm": "npm:^10.0.1"
     "@semantic-release/changelog": "npm:^6.0.3"
