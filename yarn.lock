@@ -3985,14 +3985,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^18.2.54":
-  version: 18.2.54
-  resolution: "@types/react@npm:18.2.54"
+"@types/react@npm:^18.2.55":
+  version: 18.2.55
+  resolution: "@types/react@npm:18.2.55"
   dependencies:
     "@types/prop-types": "npm:*"
     "@types/scheduler": "npm:*"
     csstype: "npm:^3.0.2"
-  checksum: ad38193c30a063a481aeec2460de6396c80d8de2f1c7a8cbb80a4e8bc594f74c308ce93e165d743b38507c3ac0a491c24ce0efbd84c9ab21fd5fd38d2963d329
+  checksum: 6b1c73beafbbc582dc54ffd92b3779f6d850e8f6b5ce5d04b31e9498a3d77bfc416bb08f0d8d63ab4f4649ccd6639996472416871c01c74a528b16a55faeaf38
   languageName: node
   linkType: hard
 
@@ -10631,7 +10631,7 @@ __metadata:
     "@types/jest": "npm:^29.5.12"
     "@types/lodash": "npm:^4.14.200"
     "@types/node": "npm:^20.11.16"
-    "@types/react": "npm:^18.2.54"
+    "@types/react": "npm:^18.2.55"
     "@types/react-dom": "npm:^18.2.19"
     "@types/react-transition-group": "npm:^4.4.10"
     "@types/web-push": "npm:^3.6.3"
