@@ -10681,7 +10681,7 @@ __metadata:
     typescript: "npm:^5.3.3"
     web-push: "npm:^3.6.6"
     winston: "npm:^3.11.0"
-    winston-daily-rotate-file: "npm:^4.7.1"
+    winston-daily-rotate-file: "npm:^5.0.0"
     xml2js: "npm:^0.6.2"
     yaml: "npm:^2.3.4"
   languageName: unknown
@@ -11784,13 +11784,6 @@ __metadata:
   version: 4.1.1
   resolution: "object-assign@npm:4.1.1"
   checksum: 1f4df9945120325d041ccf7b86f31e8bcc14e73d29171e37a7903050e96b81323784ec59f93f102ec635bcf6fa8034ba3ea0a8c7e69fa202b87ae3b6cec5a414
-  languageName: node
-  linkType: hard
-
-"object-hash@npm:^2.0.1":
-  version: 2.2.0
-  resolution: "object-hash@npm:2.2.0"
-  checksum: 1527de843926c5442ed61f8bdddfc7dc181b6497f725b0e89fcf50a55d9c803088763ed447cac85a5aa65345f1e99c2469ba679a54349ef3c4c0aeaa396a3eb9
   languageName: node
   linkType: hard
 
@@ -14711,7 +14704,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"triple-beam@npm:^1.3.0":
+"triple-beam@npm:^1.3.0, triple-beam@npm:^1.4.1":
   version: 1.4.1
   resolution: "triple-beam@npm:1.4.1"
   checksum: 4bf1db71e14fe3ff1c3adbe3c302f1fdb553b74d7591a37323a7badb32dc8e9c290738996cbb64f8b10dc5a3833645b5d8c26221aaaaa12e50d1251c9aba2fea
@@ -15636,21 +15629,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston-daily-rotate-file@npm:^4.7.1":
-  version: 4.7.1
-  resolution: "winston-daily-rotate-file@npm:4.7.1"
+"winston-daily-rotate-file@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "winston-daily-rotate-file@npm:5.0.0"
   dependencies:
     file-stream-rotator: "npm:^0.6.1"
-    object-hash: "npm:^2.0.1"
-    triple-beam: "npm:^1.3.0"
-    winston-transport: "npm:^4.4.0"
+    object-hash: "npm:^3.0.0"
+    triple-beam: "npm:^1.4.1"
+    winston-transport: "npm:^4.7.0"
   peerDependencies:
     winston: ^3
-  checksum: 1fb6a6fc16a9f3b20caceea4b841f9966b7a38b429b3e16b4cdbbdfcc3bbf923e7c6a105dde552f78352045137cc1e5206040c2152fe50cd6850327e4a56cb6d
+  checksum: c6dfd8ceff8d3801ca702efabaf696bb82919a62c4fbeded8cbf7d2cb188960872eb7a412547af86f12f7257061088a25bac9e318af8932719a2ccba215d7d3f
   languageName: node
   linkType: hard
 
-"winston-transport@npm:^4.4.0, winston-transport@npm:^4.5.0":
+"winston-transport@npm:^4.5.0":
   version: 4.6.0
   resolution: "winston-transport@npm:4.6.0"
   dependencies:
@@ -15658,6 +15651,17 @@ __metadata:
     readable-stream: "npm:^3.6.0"
     triple-beam: "npm:^1.3.0"
   checksum: 43f7f03dfbaeb2a37ddcfadf5f03a6802c77fb8800a384e9aeecce8d233272ed8f18c50f377045a7e154fd6c951e31c9af1bbcd7a3db9246518af42b6f961cc1
+  languageName: node
+  linkType: hard
+
+"winston-transport@npm:^4.7.0":
+  version: 4.7.0
+  resolution: "winston-transport@npm:4.7.0"
+  dependencies:
+    logform: "npm:^2.3.2"
+    readable-stream: "npm:^3.6.0"
+    triple-beam: "npm:^1.3.0"
+  checksum: cd16f3d0ab56697f93c4899e0eb5f89690f291bb6cf309194819789326a7c7ed943ef00f0b2fab513b114d371314368bde1a7ae6252ad1516181a79f90199cd2
   languageName: node
   linkType: hard
 
