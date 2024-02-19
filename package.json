@@ -37,7 +37,7 @@
     "@headlessui/react": "1.7.18",
     "@heroicons/react": "^1.0.6",
     "@monaco-editor/react": "^4.6.0",
-    "@nestjs/cli": "^10.3.1",
+    "@nestjs/cli": "^10.3.2",
     "@nestjs/common": "^10.3.3",
     "@nestjs/core": "^10.3.3",
     "@nestjs/platform-express": "^10.3.3",
@@ -76,7 +76,7 @@
   "devDependencies": {
     "@automock/jest": "^1.4.0",
     "@babel/core": "^7.23.9",
-    "@nestjs/cli": "^10.3.1",
+    "@nestjs/cli": "^10.3.2",
     "@nestjs/schematics": "^10.1.1",
     "@nestjs/testing": "^10.3.3",
     "@semantic-release/changelog": "^6.0.3",
