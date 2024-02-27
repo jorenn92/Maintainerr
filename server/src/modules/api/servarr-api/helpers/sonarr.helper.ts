@@ -284,13 +284,14 @@ export class SonarrApi extends ServarrApi<{
       );
 
       for (const e of episodes) {
+        // unmonitor
+        await this.runPut(
+          `episode/${e.id}`,
+          JSON.stringify({ ...e, monitored: false }),
+        );
+        // also delete if required
         if (deleteFiles) {
           await this.runDelete(`episodefile/${e.episodeFileId}`);
-        } else {
-          await this.runPut(
-            `episode/${e.id}`,
-            JSON.stringify({ ...e, monitored: false }),
-          );
         }
       }
     } catch (e) {
