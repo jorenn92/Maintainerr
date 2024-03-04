@@ -110,6 +110,10 @@ export class SonarrApi extends ServarrApi<{
     }
   }
 
+  public async updateSeries(series: SonarrSeries) {
+    await this.axios.put<SonarrSeries>('/series', series);
+  }
+
   public async addSeries(options: AddSeriesOptions): Promise<SonarrSeries> {
     try {
       const series = await this.getSeriesByTvdbId(options.tvdbid);
