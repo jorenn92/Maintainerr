@@ -314,14 +314,29 @@ export class SonarrApi extends ServarrApi<{
       const data: SonarrSeries = (await this.axios.get(`series/${seriesId}`))
         .data;
 
+      const episodes: SonarrEpisode[] = await this.get(
+        `episodefile?seriesId=${seriesId}`,
+      );
+
+      // loop seasons
       data.seasons = data.seasons.map((s) => {
-        if (
-          type === 'all' ||
-          ((type === 'existing' ||
-            (forceExisting && type === s.seasonNumber)) &&
-            s.statistics?.episodeFileCount > 0)
-        ) {
+        if (type === 'all') {
           s.monitored = false;
+        } else if (
+          type === 'existing' ||
+          (forceExisting && type === s.seasonNumber)
+        ) {
+          // existing episodes only, so don't unmonitor season
+          episodes.forEach((e) => {
+            if (e.seasonNumber === s.seasonNumber) {
+              this.UnmonitorDeleteEpisodes(
+                +seriesId,
+                e.seasonNumber,
+                [e.id],
+                false,
+              );
+            }
+          });
         } else if (typeof type === 'number') {
           // specific season
           if (s.seasonNumber === type) {
@@ -334,10 +349,6 @@ export class SonarrApi extends ServarrApi<{
 
       // delete files
       if (deleteFiles) {
-        const episodes: SonarrEpisode[] = await this.get(
-          `episodefile?seriesId=${seriesId}`,
-        );
-
         for (const e of episodes) {
           if (typeof type === 'number') {
             if (e.seasonNumber === type) {
