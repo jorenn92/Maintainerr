@@ -173,14 +173,14 @@ export class CollectionWorkerService extends TaskBase {
                 );
                 this.infoLogger('Unmonitored movie in Radarr');
                 break;
-              case ServarrAction.DELETE_UNMONITOR_ALL:
+              case ServarrAction.UNMONITOR_DELETE_ALL:
                 await this.servarrApi.RadarrApi.unmonitorMovie(
                   radarrMedia.id,
                   true,
                 );
                 this.infoLogger('Unmonitored movie in Radarr & removed files');
                 break;
-              case ServarrAction.DELETE_UNMONITOR_EXISTING:
+              case ServarrAction.UNMONITOR_DELETE_EXISTING:
                 await this.servarrApi.RadarrApi.deleteMovie(
                   radarrMedia.id,
                   true,
@@ -321,13 +321,16 @@ export class CollectionWorkerService extends TaskBase {
                       'all',
                       false,
                     );
+                    // unmonitor show
+                    sonarrMedia.monitored = false;
+                    this.servarrApi.SonarrApi.updateSeries(sonarrMedia);
                     this.infoLogger(
                       `[Sonarr] Unmonitored show '${sonarrMedia.title}'`,
                     );
                     break;
                 }
                 break;
-              case ServarrAction.DELETE_UNMONITOR_ALL:
+              case ServarrAction.UNMONITOR_DELETE_ALL:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
                     await this.servarrApi.SonarrApi.unmonitorSeasons(
@@ -356,13 +359,16 @@ export class CollectionWorkerService extends TaskBase {
                       'all',
                       true,
                     );
+                    // unmonitor show
+                    sonarrMedia.monitored = false;
+                    this.servarrApi.SonarrApi.updateSeries(sonarrMedia);
                     this.infoLogger(
-                      `Removed show ${sonarrMedia.title}' from Sonarr`,
+                      `[Sonarr] Unmonitored show '${sonarrMedia.title}' and removed all episodes`,
                     );
                     break;
                 }
                 break;
-              case ServarrAction.DELETE_UNMONITOR_EXISTING:
+              case ServarrAction.UNMONITOR_DELETE_EXISTING:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
                     await this.servarrApi.SonarrApi.unmonitorSeasons(
@@ -392,8 +398,11 @@ export class CollectionWorkerService extends TaskBase {
                       'existing',
                       true,
                     );
+                    // unmonitor show
+                    sonarrMedia.monitored = false;
+                    this.servarrApi.SonarrApi.updateSeries(sonarrMedia);
                     this.infoLogger(
-                      `[Sonarr] Removed exisiting episodes from show '${sonarrMedia.title}'`,
+                      `[Sonarr] Unmonitored show '${sonarrMedia.title}' and Removed exisiting episodes`,
                     );
                     break;
                 }
@@ -458,7 +467,8 @@ export class CollectionWorkerService extends TaskBase {
       if (
         !(plexLibrary.type === 'movie'
           ? this.settings.radarrConfigured()
-          : this.settings.sonarrConfigured())
+          : this.settings.sonarrConfigured()) &&
+        collection.arrAction !== ServarrAction.UNMONITOR
       )
         await this.plexApi.deleteMediaFromDisk(media.plexId);
     }
