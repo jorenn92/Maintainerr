@@ -8,8 +8,4 @@ export class RadarrController {
   getMovie() {
     return this.servarr.RadarrApi.getMovie({ id: 2780 });
   }
-  @Get('/test')
-  testRadarr() {
-    this.servarr.SonarrApi.unmonitorSeasons(87, 'existing', false);
-  }
 }
