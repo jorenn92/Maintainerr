@@ -467,8 +467,8 @@ export class CollectionWorkerService extends TaskBase {
       if (
         !(plexLibrary.type === 'movie'
           ? this.settings.radarrConfigured()
-          : this.settings.sonarrConfigured() &&
-            collection.arrAction !== ServarrAction.UNMONITOR)
+          : this.settings.sonarrConfigured()) &&
+        collection.arrAction !== ServarrAction.UNMONITOR
       )
         await this.plexApi.deleteMediaFromDisk(media.plexId);
     }
