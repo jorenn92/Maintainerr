@@ -43,7 +43,7 @@
     "@nestjs/platform-express": "^10.3.3",
     "@nestjs/schedule": "^4.0.0",
     "@nestjs/typeorm": "^10.0.2",
-    "@types/node": "^20.11.24",
+    "@types/node": "^20.11.25",
     "axios": "^1.6.7",
     "bowser": "^2.11.0",
     "chalk": "^4.1.2",
