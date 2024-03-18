@@ -2607,9 +2607,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/testing@npm:^10.3.3":
-  version: 10.3.3
-  resolution: "@nestjs/testing@npm:10.3.3"
+"@nestjs/testing@npm:^10.3.4":
+  version: 10.3.4
+  resolution: "@nestjs/testing@npm:10.3.4"
   dependencies:
     tslib: "npm:2.6.2"
   peerDependencies:
@@ -2622,7 +2622,7 @@ __metadata:
       optional: true
     "@nestjs/platform-express":
       optional: true
-  checksum: 3e63abb62d3fe36d6a0f4c9bf24a3f7d719779d04430e1632c50a5af993e776e7606dbfa793e5965041ecf04f71cee237b272755bece692fd5cd9b9d47cbff1f
+  checksum: d91952801c54643cd9ef7c0925eee0dbdb04208cf43316c74a99fd4cb79cf856167db10a3ebce50dd0bd3cd621895821648f111f5c87c424ac05f40ed44b98c6
   languageName: node
   linkType: hard
 
@@ -10645,7 +10645,7 @@ __metadata:
     "@nestjs/platform-express": "npm:^10.3.3"
     "@nestjs/schedule": "npm:^4.0.0"
     "@nestjs/schematics": "npm:^10.1.1"
-    "@nestjs/testing": "npm:^10.3.3"
+    "@nestjs/testing": "npm:^10.3.4"
     "@nestjs/typeorm": "npm:^10.0.2"
     "@semantic-release/changelog": "npm:^6.0.3"
     "@semantic-release/commit-analyzer": "npm:^11.1.0"
