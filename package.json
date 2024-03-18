@@ -106,7 +106,7 @@
     "jest": "^29.7.0",
     "jsdoc": "^4.0.2",
     "monaco-editor": "0.46.0",
-    "postcss": "^8.4.35",
+    "postcss": "^8.4.36",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.12",
     "semantic-release": "^23.0.5",
