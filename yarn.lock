@@ -2498,9 +2498,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:^10.3.3":
-  version: 10.3.3
-  resolution: "@nestjs/common@npm:10.3.3"
+"@nestjs/common@npm:^10.3.4":
+  version: 10.3.4
+  resolution: "@nestjs/common@npm:10.3.4"
   dependencies:
     iterare: "npm:1.2.1"
     tslib: "npm:2.6.2"
@@ -2515,7 +2515,7 @@ __metadata:
       optional: true
     class-validator:
       optional: true
-  checksum: e0873b24169eb04d59ce95375740a73d2fc03c06799d7d316d462f4be798ccb4a68b3100bb704b7644e8c28deb3503612350cce8d25f4bf4a318a3ce01bbec0e
+  checksum: 38ccb4f993bf981522d3675ee9d87fd84924e339f580e5f3426e2fd4047704b35752cdb88e8d4190802e37026949f163e475b58db76bc5bba0541ed8561338df
   languageName: node
   linkType: hard
 
@@ -10657,7 +10657,7 @@ __metadata:
     "@heroicons/react": "npm:^1.0.6"
     "@monaco-editor/react": "npm:^4.6.0"
     "@nestjs/cli": "npm:^10.3.2"
-    "@nestjs/common": "npm:^10.3.3"
+    "@nestjs/common": "npm:^10.3.4"
     "@nestjs/core": "npm:^10.3.3"
     "@nestjs/platform-express": "npm:^10.3.4"
     "@nestjs/schedule": "npm:^4.0.0"
