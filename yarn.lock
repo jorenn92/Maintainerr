@@ -109,49 +109,42 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@automock/adapters.nestjs@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@automock/adapters.nestjs@npm:1.4.0"
+"@automock/common@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@automock/common@npm:3.1.0"
   dependencies:
-    "@automock/common": "npm:^2.2.0"
-  peerDependencies:
-    "@nestjs/common": ">= 8.x"
-  checksum: 94f6f0284ec7bbfb720910b1f64f30fe2de077765e7aa1e9843830c78cd1e6c894ffc8a7291d5dfdeb4340ec67463aec8f45f7489007ec376f6e1d3ac74b14ce
+    "@automock/types": "npm:^2.0.1"
+  checksum: 7f1f5efa0a8fdcbfe4d77bb5b14108c0aba12b6a359e719b99bf5df8570b91f0d5c32600b30957d25324bc0b1a7f35041e2b3bd3671297e3c0400f847be94efb
   languageName: node
   linkType: hard
 
-"@automock/common@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "@automock/common@npm:2.2.0"
-  checksum: 1c7625d509f5b7f53c89bfd74f6f26584411634105c230e48078af0b2c195a21454db6b7d4dd7dd7212ded410e7bec22b05ed64ef92fa93098a9fa8879225dd2
-  languageName: node
-  linkType: hard
-
-"@automock/core@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@automock/core@npm:1.4.0"
-  checksum: c9bca1ce7726232dd457b8fd6eb3d0c12e74b8b32d762a511d964ffb92423ea680839612564fcbb1e2beac41ed43aa75335538b0d832699077ad7e38664c0244
-  languageName: node
-  linkType: hard
-
-"@automock/jest@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@automock/jest@npm:1.4.0"
+"@automock/core@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@automock/core@npm:2.1.0"
   dependencies:
-    "@automock/adapters.nestjs": "npm:^1.4.0"
-    "@automock/core": "npm:^1.4.0"
-    "@automock/types": "npm:^1.2.0"
-    jest-mock-extended: "npm:^2.0.9"
-  peerDependencies:
-    jest: ">= 25.x"
-  checksum: 9a269732448bd50a6d8d2f88023f7ecb8d3b553fc3aab07a5fdd2296844e8fe1448b34e5cd5fb6d5666d347816a5e1cf839a2ebd943b1278521132dbcc6d139f
+    "@automock/common": "npm:^3.1.0"
+    "@automock/types": "npm:^2.0.1"
+    lodash.isequal: "npm:^4.5.0"
+  checksum: 805ca06c848a21f8a2440a233377c8705b6fde6d866cd383f6afa1f6537fe1ff5988ece8bb602d830348cd75826cd6e7b0cb3b70035fc3221578abdd061f7706
   languageName: node
   linkType: hard
 
-"@automock/types@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@automock/types@npm:1.2.0"
-  checksum: 0c6a93fdb1283d982cf27d7f9736299d9d7778656b7bbdf8abb0d58621470b8697353d5ad9966c7b21728ec2e50a4c05cf078abade279a0a040d06744be7427f
+"@automock/jest@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@automock/jest@npm:2.1.0"
+  dependencies:
+    "@automock/core": "npm:^2.1.0"
+    "@automock/types": "npm:^2.0.1"
+  peerDependencies:
+    jest: ^26 || ^27 || ^28 || ^29
+  checksum: 18a0b4ac24dbce19e739d8c85adff25f460f5beb675a95f00042cbf60484ad1c7bc336848c3a3b50aab7163ae9cb265b946093d523057d7f0c357fd3f4618005
+  languageName: node
+  linkType: hard
+
+"@automock/types@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@automock/types@npm:2.0.1"
+  checksum: 49709adb117d40a52b924b5fbe4d1d50556216aeceb27f2bdded639bb066e70aaf088a680ac0eb5e2747ad46f64d94169472f25aad5ab3033d99831fb8e45fda
   languageName: node
   linkType: hard
 
@@ -9676,18 +9669,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-mock-extended@npm:^2.0.9":
-  version: 2.0.9
-  resolution: "jest-mock-extended@npm:2.0.9"
-  dependencies:
-    ts-essentials: "npm:^7.0.3"
-  peerDependencies:
-    jest: ^24.0.0 || ^25.0.0 || ^26.0.0 || ^27.0.0 || ^28.0.0 || ^29.0.0
-    typescript: ^3.0.0 || ^4.0.0
-  checksum: d45fc359a2d2d1c64d41b8d511e298463190ea80cde434d3b620c371c0c76e8744291e29f63848276efdb5b208337298cd895733d02e3402458f967a411f8161
-  languageName: node
-  linkType: hard
-
 "jest-mock@npm:^29.7.0":
   version: 29.7.0
   resolution: "jest-mock@npm:29.7.0"
@@ -10520,6 +10501,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.isequal@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.isequal@npm:4.5.0"
+  checksum: dfdb2356db19631a4b445d5f37868a095e2402292d59539a987f134a8778c62a2810c2452d11ae9e6dcac71fc9de40a6fedcb20e2952a15b431ad8b29e50e28f
+  languageName: node
+  linkType: hard
+
 "lodash.isplainobject@npm:^4.0.6":
   version: 4.0.6
   resolution: "lodash.isplainobject@npm:4.0.6"
@@ -10651,7 +10639,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "maintainerr@workspace:."
   dependencies:
-    "@automock/jest": "npm:^1.4.0"
+    "@automock/jest": "npm:^2.1.0"
     "@babel/core": "npm:^7.24.0"
     "@headlessui/react": "npm:1.7.18"
     "@heroicons/react": "npm:^1.0.6"
@@ -14761,15 +14749,6 @@ __metadata:
   peerDependencies:
     typescript: ">=4.2.0"
   checksum: 9408338819c3aca2a709f0bc54e3f874227901506cacb1163612a6c8a43df224174feb965a5eafdae16f66fc68fd7bfee8d3275d0fa73fbb8699e03ed26520c9
-  languageName: node
-  linkType: hard
-
-"ts-essentials@npm:^7.0.3":
-  version: 7.0.3
-  resolution: "ts-essentials@npm:7.0.3"
-  peerDependencies:
-    typescript: ">=3.7.0"
-  checksum: ea1919534ec6ce4ca4d9cb0ff1ab8e053509237da8d4298762ab3bfba4e78ca5649a599ce78a5c7c2624f3a7a971f62b265b7b0c3c881336e4fa6acaf6f37544
   languageName: node
   linkType: hard
 
