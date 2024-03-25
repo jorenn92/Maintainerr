@@ -79,7 +79,10 @@ const OverseerrSettings = () => {
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https://')
           ? hostnameRef.current.value
-          : 'http://' + hostnameRef.current.value
+        : portRef.current.value == '443'
+        ? 'https://' + hostnameRef.current.value
+        : 'http://' + hostnameRef.current.value
+
       const payload = {
         overseerr_url: addPortToUrl(hostnameVal, +portRef.current.value),
         overseerr_api_key: apiKeyRef.current.value,

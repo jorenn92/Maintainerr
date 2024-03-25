@@ -74,10 +74,12 @@ const RadarrSettings = () => {
       portRef.current?.value &&
       apiKeyRef.current?.value
     ) {
-      const hostnameVal = hostnameRef.current.value.includes('http')
+      const hostnameVal = hostnameRef.current.value.includes('http://')
         ? hostnameRef.current.value
-        : hostnameRef.current.value.includes('https')
+        : hostnameRef.current.value.includes('https://')
           ? hostnameRef.current.value
+          : portRef.current.value == '443' ? 
+          'https://' + hostnameRef.current.value
           : 'http://' + hostnameRef.current.value
 
       let radarr_url = `${addPortToUrl(hostnameVal, +portRef.current.value)}`
