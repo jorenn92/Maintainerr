@@ -6,6 +6,13 @@ import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import DocsButton from '../../Common/DocsButton'
 import TestButton from '../../Common/TestButton'
+import {
+  getHostname,
+  getArrBaseUrl,
+  getPortFromUrl,
+  addPortToUrl,
+  handleSettingsInputChange,
+} from '../../../utils/SettingsUtils'
 
 const SonarrSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -27,8 +34,41 @@ const SonarrSettings = () => {
     document.title = 'Maintainerr - Settings - Sonarr'
   }, [])
 
+  useEffect(() => {
+    setHostname(getHostname(settingsCtx.settings.sonarr_url))
+    setBaseUrl(getArrBaseUrl(settingsCtx.settings.sonarr_url))
+    setPort(getPortFromUrl(settingsCtx.settings.sonarr_url))
+
+    // @ts-ignore
+    hostnameRef.current = {
+      value: getHostname(settingsCtx.settings.sonarr_url),
+    }
+    // @ts-ignore
+    baseUrlRef.current = {
+      value: getArrBaseUrl(settingsCtx.settings.sonarr_url),
+    }
+    // @ts-ignore
+    portRef.current = { value: getPortFromUrl(settingsCtx.settings.sonarr_url) }
+  }, [settingsCtx])
+
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    // if port not specified, but hostname is. Derive the port
+    if (!portRef.current?.value && hostnameRef.current?.value) {
+      const derivedPort = hostnameRef.current.value.includes('http://')
+        ? 80
+        : hostnameRef.current.value.includes('https://')
+          ? 443
+          : 80
+
+      if (derivedPort) {
+        setPort(derivedPort.toString())
+        // @ts-ignore
+        portRef.current = { value: derivedPort.toString() }
+      }
+    }
+
     if (
       hostnameRef.current?.value &&
       portRef.current?.value &&
@@ -37,10 +77,14 @@ const SonarrSettings = () => {
       const hostnameVal = hostnameRef.current.value.includes('http')
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https')
-        ? hostnameRef.current.value
-        : 'http://' + hostnameRef.current.value
+          ? hostnameRef.current.value
+          : 'http://' + hostnameRef.current.value
+
+      let url = `${addPortToUrl(hostnameVal, +portRef.current.value)}`
+      url = url.endsWith('/') ? url.slice(0, -1) : url
+
       const payload = {
-        sonarr_url: `${hostnameVal}:${portRef.current.value}${
+        sonarr_url: `${url}${
           baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
         }`,
         sonarr_api_key: apiKeyRef.current.value,
@@ -64,27 +108,6 @@ const SonarrSettings = () => {
       setError(true)
     }
   }
-
-  useEffect(() => {
-    const url = settingsCtx.settings.sonarr_url?.split(':')
-    if (url) setHostname(`${url[0]}:${url[1]}`)
-  }, [settingsCtx])
-
-  useEffect(() => {
-    const url = settingsCtx.settings.sonarr_url
-      ?.split('')
-      .reverse()
-      .join('')
-      .split(':')[0]
-      .split('')
-      .reverse()
-      .join('')
-
-    const splitted = url?.split('/')
-
-    if (splitted?.length > 0) setPort(`${splitted[0]}`)
-    if (splitted?.length > 1) setBaseUrl(`${splitted[1]}`)
-  }, [settingsCtx])
 
   const appTest = (result: { status: boolean; version: string }) => {
     setTestbanner({ status: result.status, version: result.version })
@@ -131,6 +154,10 @@ const SonarrSettings = () => {
                   type="text"
                   ref={hostnameRef}
                   defaultValue={hostname}
+                  value={hostnameRef.current?.value}
+                  onChange={(e) =>
+                    handleSettingsInputChange(e, hostnameRef, setHostname)
+                  }
                 ></input>
               </div>
             </div>
@@ -148,6 +175,10 @@ const SonarrSettings = () => {
                   type="number"
                   ref={portRef}
                   defaultValue={port}
+                  value={portRef.current?.value}
+                  onChange={(e) =>
+                    handleSettingsInputChange(e, portRef, setPort)
+                  }
                 ></input>
               </div>
             </div>
@@ -165,6 +196,10 @@ const SonarrSettings = () => {
                   type="text"
                   ref={baseUrlRef}
                   defaultValue={baseURl}
+                  value={baseUrlRef.current?.value}
+                  onChange={(e) =>
+                    handleSettingsInputChange(e, baseUrlRef, setBaseUrl)
+                  }
                 ></input>
               </div>
             </div>
