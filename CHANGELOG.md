@@ -1,3 +1,14 @@
+## [2.0.3](https://github.com/jorenn92/Maintainerr/compare/v2.0.2...v2.0.3) (2024-03-25)
+
+
+### Bug Fixes
+
+* Automatically prepend https for Overseerr, Sonarr and Radarr when choosing port 443 ([1616cfd](https://github.com/jorenn92/Maintainerr/commit/1616cfd0c4196b298fd5699621f17e07e68de768))
+* Ensure proper URL generation on the settings pages by handling the pathname in hostnames correctly ([f8a80a7](https://github.com/jorenn92/Maintainerr/commit/f8a80a7787105e1d9a8e01f02785796fbccc3853))
+* Fixed an issue where episodes would only be deleted, but not unmonitored when using the 'Unmonitor and delete episode' rule action ([#943](https://github.com/jorenn92/Maintainerr/issues/943)) ([070b381](https://github.com/jorenn92/Maintainerr/commit/070b381f05c1856e8789b32de8fef010350881c6))
+* **rules:** Season action 'unmonitor and delete existing episodes' will now correctly remove and unmonitor existing episodes. The season itself will stay monitored. ([#951](https://github.com/jorenn92/Maintainerr/issues/951)) ([c5a135b](https://github.com/jorenn92/Maintainerr/commit/c5a135b94b42e7d2faf2b91ecda61d6ccfefa682))
+* Shows will now be correctly unmonitored when using the 'unmonitor..' Sonarr action. Previously, only the seasons would be unmonitored ([e6bff13](https://github.com/jorenn92/Maintainerr/commit/e6bff13626a98852163cd7bf5c8ba921c78ec16b))
+
 ## [2.0.2](https://github.com/jorenn92/Maintainerr/compare/v2.0.1...v2.0.2) (2024-02-11)
 
 
