@@ -2519,9 +2519,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/core@npm:^10.3.3":
-  version: 10.3.3
-  resolution: "@nestjs/core@npm:10.3.3"
+"@nestjs/core@npm:^10.3.5":
+  version: 10.3.5
+  resolution: "@nestjs/core@npm:10.3.5"
   dependencies:
     "@nuxtjs/opencollective": "npm:0.3.2"
     fast-safe-stringify: "npm:2.1.1"
@@ -2543,7 +2543,7 @@ __metadata:
       optional: true
     "@nestjs/websockets":
       optional: true
-  checksum: 10c0/691b3e6dd1aa9bd6e4af56a6d434b05c492984a1d656810e987819f49c1565cc8a01276bf01c6d4baa4aefa74a94027335b892eb285c4c8d9d58e5a593632f4c
+  checksum: 10c0/c2348a2ffce0a6fd7b707b36f165b254e9567a671d5f70f4e745ab2ffa66e12ddfc9ac55e01f6fe2e2b8bece91e8c6daa72d538ae98e64cb87edd9305dd5d85a
   languageName: node
   linkType: hard
 
@@ -10612,7 +10612,7 @@ __metadata:
     "@monaco-editor/react": "npm:^4.6.0"
     "@nestjs/cli": "npm:^10.3.2"
     "@nestjs/common": "npm:^10.3.5"
-    "@nestjs/core": "npm:^10.3.3"
+    "@nestjs/core": "npm:^10.3.5"
     "@nestjs/platform-express": "npm:^10.3.4"
     "@nestjs/schedule": "npm:^4.0.0"
     "@nestjs/schematics": "npm:^10.1.1"
