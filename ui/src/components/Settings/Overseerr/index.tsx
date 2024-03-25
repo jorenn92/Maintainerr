@@ -1,11 +1,22 @@
 import { SaveIcon } from '@heroicons/react/solid'
-import { useContext, useEffect, useRef, useState } from 'react'
+import {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import DocsButton from '../../Common/DocsButton'
 import TestButton from '../../Common/TestButton'
+import {
+  addPortToUrl,
+  getPortFromUrl,
+  handleSettingsInputChange,
+  removePortFromUrl,
+} from '../../../utils/SettingsUtils'
 
 const OverseerrSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -26,36 +37,51 @@ const OverseerrSettings = () => {
   }, [])
 
   useEffect(() => {
-    const url = settingsCtx.settings.overseerr_url?.split(':')
-    if (url) setHostname(`${url[0]}:${url[1]}`)
-  }, [settingsCtx])
+    // hostname
+    setHostname(removePortFromUrl(settingsCtx.settings.overseerr_url))
+    // @ts-ignore
+    hostnameRef.current = {
+      value: removePortFromUrl(settingsCtx.settings.overseerr_url),
+    }
 
-  useEffect(() => {
-    const url = settingsCtx.settings.overseerr_url
-      ?.split('')
-      .reverse()
-      .join('')
-      .split(':')[0]
-      .split('')
-      .reverse()
-      .join('')
-    if (url) setPort(`${url}`)
+    // port
+    setPort(getPortFromUrl(settingsCtx.settings.overseerr_url))
+    // @ts-ignore
+    portRef.current = {
+      value: getPortFromUrl(settingsCtx.settings.overseerr_url),
+    }
   }, [settingsCtx])
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    // if port not specified, but hostname is. Derive the port
+    if (!portRef.current?.value && hostnameRef.current?.value) {
+      const derivedPort = hostnameRef.current.value.includes('http://')
+        ? 80
+        : hostnameRef.current.value.includes('https://')
+          ? 443
+          : 80
+
+      if (derivedPort) {
+        setPort(derivedPort.toString())
+        // @ts-ignore
+        portRef.current = { value: derivedPort.toString() }
+      }
+    }
+
     if (
       hostnameRef.current?.value &&
       apiKeyRef.current?.value &&
       portRef.current?.value
     ) {
-      const hostnameVal = hostnameRef.current.value.includes('http')
+      const hostnameVal = hostnameRef.current.value.includes('http://')
         ? hostnameRef.current.value
-        : hostnameRef.current.value.includes('https')
-        ? hostnameRef.current.value
-        : 'http://' + hostnameRef.current.value
+        : hostnameRef.current.value.includes('https://')
+          ? hostnameRef.current.value
+          : 'http://' + hostnameRef.current.value
       const payload = {
-        overseerr_url: `${hostnameVal}:${portRef.current.value}`,
+        overseerr_url: addPortToUrl(hostnameVal, +portRef.current.value),
         overseerr_api_key: apiKeyRef.current.value,
       }
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
@@ -122,6 +148,10 @@ const OverseerrSettings = () => {
                   type="text"
                   defaultValue={hostname}
                   ref={hostnameRef}
+                  value={hostnameRef.current?.value}
+                  onChange={(e) =>
+                    handleSettingsInputChange(e, hostnameRef, setHostname)
+                  }
                 ></input>
               </div>
             </div>
@@ -138,7 +168,9 @@ const OverseerrSettings = () => {
                   id="port"
                   type="number"
                   ref={portRef}
+                  value={portRef.current?.value}
                   defaultValue={port}
+                  onChange={(e) => handleSettingsInputChange(e, portRef, setPort)}
                 ></input>
               </div>
             </div>

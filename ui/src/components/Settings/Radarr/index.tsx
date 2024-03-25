@@ -6,6 +6,13 @@ import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import DocsButton from '../../Common/DocsButton'
 import TestButton from '../../Common/TestButton'
+import {
+  addPortToUrl,
+  getArrBaseUrl,
+  getHostname,
+  getPortFromUrl,
+  handleSettingsInputChange,
+} from '../../../utils/SettingsUtils'
 
 const RadarrSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -27,8 +34,41 @@ const RadarrSettings = () => {
     document.title = 'Maintainerr - Settings - Radarr'
   }, [])
 
+  useEffect(() => {
+    setHostname(getHostname(settingsCtx.settings.radarr_url))
+    setBaseUrl(getArrBaseUrl(settingsCtx.settings.radarr_url))
+    setPort(getPortFromUrl(settingsCtx.settings.radarr_url))
+
+    // @ts-ignore
+    hostnameRef.current = {
+      value: getHostname(settingsCtx.settings.radarr_url),
+    }
+    // @ts-ignore
+    baseUrlRef.current = {
+      value: getArrBaseUrl(settingsCtx.settings.radarr_url),
+    }
+    // @ts-ignore
+    portRef.current = { value: getPortFromUrl(settingsCtx.settings.radarr_url) }
+  }, [settingsCtx])
+
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    // if port not specified, but hostname is. Derive the port
+    if (!portRef.current?.value && hostnameRef.current?.value) {
+      const derivedPort = hostnameRef.current.value.includes('http://')
+        ? 80
+        : hostnameRef.current.value.includes('https://')
+          ? 443
+          : 80
+
+      if (derivedPort) {
+        setPort(derivedPort.toString())
+        // @ts-ignore
+        portRef.current = { value: derivedPort.toString() }
+      }
+    }
+
     if (
       hostnameRef.current?.value &&
       portRef.current?.value &&
@@ -37,10 +77,16 @@ const RadarrSettings = () => {
       const hostnameVal = hostnameRef.current.value.includes('http')
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https')
-        ? hostnameRef.current.value
-        : 'http://' + hostnameRef.current.value
+          ? hostnameRef.current.value
+          : 'http://' + hostnameRef.current.value
+
+      let radarr_url = `${addPortToUrl(hostnameVal, +portRef.current.value)}`
+      radarr_url = radarr_url.endsWith('/')
+        ? radarr_url.slice(0, -1)
+        : radarr_url
+
       const payload = {
-        radarr_url: `${hostnameVal}:${portRef.current.value}${
+        radarr_url: `${radarr_url}${
           baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
         }`,
         radarr_api_key: apiKeyRef.current.value,
@@ -64,27 +110,6 @@ const RadarrSettings = () => {
       setError(true)
     }
   }
-
-  useEffect(() => {
-    const url = settingsCtx.settings.radarr_url?.split(':')
-    if (url) setHostname(`${url[0]}:${url[1]}`)
-  }, [settingsCtx])
-
-  useEffect(() => {
-    const url = settingsCtx.settings.radarr_url
-      ?.split('')
-      .reverse()
-      .join('')
-      .split(':')[0]
-      .split('')
-      .reverse()
-      .join('')
-
-    const splitted = url?.split('/')
-
-    if (splitted?.length > 0) setPort(`${splitted[0]}`)
-    if (splitted?.length > 1) setBaseUrl(`${splitted[1]}`)
-  }, [settingsCtx])
 
   const appTest = (result: { status: boolean; version: string }) => {
     setTestbanner({ status: result.status, version: result.version })
@@ -131,6 +156,10 @@ const RadarrSettings = () => {
                   type="text"
                   ref={hostnameRef}
                   defaultValue={hostname}
+                  value={hostnameRef.current?.value}
+                  onChange={(e) =>
+                    handleSettingsInputChange(e, hostnameRef, setHostname)
+                  }
                 ></input>
               </div>
             </div>
@@ -148,6 +177,10 @@ const RadarrSettings = () => {
                   type="number"
                   ref={portRef}
                   defaultValue={port}
+                  value={portRef.current?.value}
+                  onChange={(e) =>
+                    handleSettingsInputChange(e, portRef, setPort)
+                  }
                 ></input>
               </div>
             </div>
@@ -165,6 +198,10 @@ const RadarrSettings = () => {
                   type="text"
                   ref={baseUrlRef}
                   defaultValue={baseURl}
+                  value={baseUrlRef.current?.value}
+                  onChange={(e) =>
+                    handleSettingsInputChange(e, baseUrlRef, setBaseUrl)
+                  }
                 ></input>
               </div>
             </div>
