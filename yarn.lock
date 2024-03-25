@@ -3956,12 +3956,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.11.25":
-  version: 20.11.25
-  resolution: "@types/node@npm:20.11.25"
+"@types/node@npm:^20.11.30":
+  version: 20.11.30
+  resolution: "@types/node@npm:20.11.30"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/3a65a0469309d503e572a3198d81c9248876236b1bcc0c9943e995cfa536df7ce9a9302638258984877420d1613167a8a82dbfb3a92197319fb79ebebf9abc83
+  checksum: 10c0/867cfaf969c6d8850d8d7304e7ab739898a50ecb1395b61ff2335644f5f48d7a46fbc4a14cee967aed65ec134b61a746edae70d1f32f11321ccf29165e3bc4e6
   languageName: node
   linkType: hard
 
@@ -10675,7 +10675,7 @@ __metadata:
     "@types/express": "npm:^4.17.20"
     "@types/jest": "npm:^29.5.12"
     "@types/lodash": "npm:^4.14.200"
-    "@types/node": "npm:^20.11.25"
+    "@types/node": "npm:^20.11.30"
     "@types/react": "npm:^18.2.67"
     "@types/react-dom": "npm:^18.2.21"
     "@types/react-transition-group": "npm:^4.4.10"
