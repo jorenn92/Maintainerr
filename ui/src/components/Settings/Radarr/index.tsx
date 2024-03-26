@@ -229,7 +229,7 @@ const RadarrSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
               <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
-                <DocsButton page="tutorial-Configuration" />
+                <DocsButton page="Configuration" />
               </span>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/radarr" />
