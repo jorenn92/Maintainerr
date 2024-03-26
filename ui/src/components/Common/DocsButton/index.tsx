@@ -10,8 +10,9 @@ interface IDocsButton {
 const DocsButton = (props: IDocsButton) => {
   return (
     <span className="h-full w-full inline-flex">
-      <Link legacyBehavior
-        href={`/docs/${props.page ? props.page : 'tutorial-Home'}.html`}
+      <Link
+        legacyBehavior
+        href={`https://docs.maintainerr.info/en/${props.page ? props.page : 'home'}`}
         passHref={true}
       >
         <a target="_blank" rel="noopener noreferrer">
