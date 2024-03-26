@@ -68,7 +68,8 @@ async function bootstrap() {
     }),
   });
   // End Winston logger config
-  app.enableCors();
+
+  app.enableCors({ origin: true });
   await app.listen(3001);
 }
 

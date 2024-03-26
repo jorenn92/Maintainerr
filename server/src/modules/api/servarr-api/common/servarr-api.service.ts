@@ -32,7 +32,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     super(
       url,
       {
-        apikey: apiKey
+        apikey: apiKey,
       },
       {
         nodeCache: cacheManager.getCache(cacheName).data,
