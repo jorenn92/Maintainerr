@@ -71,7 +71,7 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
    - Should you need to update your fork, you can do so by rebasing from `upstream`:
      ```bash
      git fetch upstream
-     git rebase upstream/develop
+     git rebase upstream/main
      git push origin BRANCH_NAME -f
      ```
 

@@ -308,7 +308,7 @@ const AddModal = (props: AddModal) => {
     <div className="h-full w-full">
       <div className="max-width-form-head flex">
         <div className="ml-0">
-          <h3 className="heading">General </h3>
+          <h3 className="heading">General</h3>
           <p className="description">
             General information about this group of rules
           </p>
@@ -316,7 +316,7 @@ const AddModal = (props: AddModal) => {
         <div className="ml-auto">
           <Link
             legacyBehavior
-            href={`/docs/tutorial-Rules.html`}
+            href={`https://docs.maintainerr.info/en/Rules`}
             passHref={true}
           >
             <a target="_blank" rel="noopener noreferrer">
