@@ -111,7 +111,7 @@
     "prettier-plugin-tailwindcss": "^0.5.12",
     "semantic-release": "^23.0.5",
     "source-map-support": "^0.5.21",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.3",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0"
