@@ -10757,7 +10757,6 @@ __metadata:
     web-push: "npm:^3.6.6"
     winston: "npm:^3.13.0"
     winston-daily-rotate-file: "npm:^5.0.0"
-    xml2js: "npm:^0.6.2"
     yaml: "npm:^2.4.1"
   languageName: unknown
   linkType: soft
@@ -15847,29 +15846,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xml2js@npm:^0.6.2":
-  version: 0.6.2
-  resolution: "xml2js@npm:0.6.2"
-  dependencies:
-    sax: "npm:>=0.6.0"
-    xmlbuilder: "npm:~11.0.0"
-  checksum: 10c0/e98a84e9c172c556ee2c5afa0fc7161b46919e8b53ab20de140eedea19903ed82f7cd5b1576fb345c84f0a18da1982ddf65908129b58fc3d7cbc658ae232108f
-  languageName: node
-  linkType: hard
-
 "xmlbuilder@npm:^4.1.0":
   version: 4.2.1
   resolution: "xmlbuilder@npm:4.2.1"
   dependencies:
     lodash: "npm:^4.0.0"
   checksum: 10c0/7862fe90e285c33f37481f49a71346fd332dd7162c3bbcf8a3093e44fb549e87175bfb675c5bab90939d5bb2cd285b2c08ba3cecdbd5bf4122d57eeafaa38930
-  languageName: node
-  linkType: hard
-
-"xmlbuilder@npm:~11.0.0":
-  version: 11.0.1
-  resolution: "xmlbuilder@npm:11.0.1"
-  checksum: 10c0/74b979f89a0a129926bc786b913459bdbcefa809afaa551c5ab83f89b1915bdaea14c11c759284bb9b931e3b53004dbc2181e21d3ca9553eeb0b2a7b4e40c35b
   languageName: node
   linkType: hard
 
