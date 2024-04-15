@@ -34,7 +34,7 @@
     "migration:generate": "ts-node node_modules/typeorm/cli.js migration:generate --dataSource ./datasource-config.ts -p"
   },
   "dependencies": {
-    "@headlessui/react": "1.7.18",
+    "@headlessui/react": "1.7.19",
     "@heroicons/react": "^1.0.6",
     "@monaco-editor/react": "^4.6.0",
     "@nestjs/cli": "^10.3.2",
