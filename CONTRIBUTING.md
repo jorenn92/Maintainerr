@@ -1,6 +1,6 @@
 # Contributing to Maintainerr
 
-All help is welcome and greatly appreciated! If you would like to contribute to the project, the following instructions should get you started...
+All help is welcome and greatly appreciated! If you would like to contribute to the project, the following instructions should get you started... (The below is specific to a Windows Development environment.)
 
 ## Development
 
@@ -13,7 +13,7 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
 
 ### Getting Started
 
-1. [Fork](https://help.github.com/articles/fork-a-repo/) the repository to your own GitHub account and [clone](https://help.github.com/articles/cloning-a-repository/) it to your local device:
+1. [Fork](https://help.github.com/articles/fork-a-repo/) the repository to your own GitHub account and [clone](https://help.github.com/articles/cloning-a-repository/) the fork to your local device:
 
    ```bash
    git clone https://github.com/YOUR_USERNAME/Maintainerr.git
@@ -29,7 +29,7 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
 3. Create a new branch:
 
    ```bash
-   git checkout -b BRANCH_NAME main
+   git checkout -b <YOUR_NEW_BRANCH_NAME> main
    ```
 
    - It is recommended to give your branch a meaningful name, relevant to the feature or fix you are working on.
@@ -43,32 +43,41 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
        - `docs`
        - `feature`
        - `fix`
-       - `patch`
+       - `patch`  
 
+4. Activate the correct Yarn version. (*Note: In order to run `corepack enable`, you will need to be running cmd or Powershell as an Administrator.*)
 
-4. Activate the correct Yarn version
     ```bash
    corepack install
    corepack enable
    ```
 
 5. Install dependencies
+
     ```bash
     yarn
    ```
 
-6. Run the development commands:
+6. As of Maintainerr v2.0, the project looks to ensure you have read/write permissions on the `data` directory. This `data` directory does not exist when you first clone your fork. Before running the below commands, create a folder inside of your main Maintainerr directory named `data`, and ensure it has full permissions to the `Everyone` user.
+
+    ```bash
+    example ->  C:\Users\You\Documents\GitRepos\Maintainerr\data
+    ```
+
+7. Run the development commands (you will need two different cmd/Powershell terminals. One for each command.)
+
    ```bash
    yarn dev:server
    yarn dev:ui
    ```
 
-   - If the build fails with Windows Powershell, try to use cmd instead.
+   - If the build fails with Powershell, try to use cmd instead.
 
-7. Create your patch and test your changes.
+8. Make your code changes/improvements and test that they work as intended.
 
    - Be sure to follow both the [code](#contributing-code) and [UI text](#ui-text-style) guidelines.
-   - Should you need to update your fork, you can do so by rebasing from `upstream`:
+   - Should you need to update your fork (from any recent ORIGIN changes), you can do so by rebasing from `upstream`:
+
      ```bash
      git fetch upstream
      git rebase upstream/develop
@@ -104,7 +113,6 @@ When adding new UI text, please try to adhere to the following guidelines:
 9. In full sentences, abbreviations like "info" or "auto" should not be used in place of full words, unless referencing the name/label of a specific setting or option which has an abbreviation in its name.
 10. Do your best to check for spelling errors and grammatical mistakes.
 11. Do not misspell "Maintainerr."
-
 
 ## Attribution
 
