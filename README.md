@@ -3,15 +3,19 @@
 </p>
 
 <p align="center" >
-  <a href="https://discord.gg/WP4ZW2QYwk"><img src="https://dcbadge.vercel.app/api/server/WP4ZW2QYwk?style=flat&theme=default-inverted" width="25%" alt="Discord link"/></a>
-  &nbsp; 
-  <picture>
-  <img src="https://github.com/jorenn92/Maintainerr/actions/workflows/build.yml/badge.svg?branch=main" width="17%" alt="Build" /> </picture>
-    &nbsp; 
-  <picture>  
-  <img src="https://github.com/jorenn92/Maintainerr/actions/workflows/release.yml/badge.svg?branch=main" width="19%" alt="Release" /> </picture>
-  &nbsp; 
-  <a href="https://hub.docker.com/r/jorenn92/maintainerr"><img src="https://img.shields.io/docker/pulls/jorenn92/maintainerr" alt="Docker pulls" width="16.5%"></a>
+  <a href="https://discord.gg/WP4ZW2QYwk"><img alt="Discord" src="https://img.shields.io/discord/1152219249549512724?style=flat&logo=discord&logoColor=white&label=Maintainerr"></a>
+  <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/jorenn92/maintainerr/.github%2Fworkflows%2Fbuild.yml?branch=main&style=flat&logo=github&label=Latest%20Build">
+  <a href="https://github.com/jorenn92/Maintainerr/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/jorenn92/maintainerr?style=flat&logo=github&logoColor=white&label=Latest%20Release"></a>
+  <img alt="GitHub commits since latest release" src="https://img.shields.io/github/commits-since/jorenn92/maintainerr/latest?style=flat&logo=github&logoColor=white">
+  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/jorenn92/maintainerr?style=flat&logo=github&logoColor=white&label=Stars">
+  <a href="https://hub.docker.com/r/jorenn92/maintainerr"><img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/jorenn92/maintainerr?style=flat&logo=docker&logoColor=white&label=Docker%20Pulls"></a>
+  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/jorenn92/maintainerr?style=flat&logo=github&logoColor=white&label=COMMITS">
+  <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues-closed/jorenn92/maintainerr?style=flat&logo=github&logoColor=white">
+  <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues/jorenn92/maintainerr?style=flat&logo=github&logoColor=white">
+  <a href="https://github.com/sponsors/jorenn92"><img alt="GitHub Sponsors" src="https://img.shields.io/github/sponsors/JORENN92?style=flat&logo=github%20sponsors&logoColor=white&label=sponsors"></a>
+  <a href="https://ko-fi.com/maintainerr_app"><img alt="Static Badge" src="https://img.shields.io/badge/DONATE-kofi-red?style=flat&logo=ko-fi&logoColor=white"></a>
+  <a href="https://docs.maintainerr.info"><img alt="Documentation" src="https://img.shields.io/badge/Documentation-9_pages-blue?style=flat&logo=read%20the%20docs&logoColor=white"></a>
+  <img alt="GitHub License" src="https://img.shields.io/github/license/jorenn92/maintainerr?style=flat">
 </p>
 
 <b>Maintainerr</b> makes managing your media easy.
@@ -53,12 +57,12 @@ Currently, <b>Maintainerr</b> supports rule parameters from these apps :
 
 # Installation
 
-Docker images for amd64 & arm64 are available under jorenn92/maintainerr and ghcr.io/jorenn92/maintainerr. <br />
+Docker images for amd64 & arm64 are available under [jorenn92/maintainerr](https://hub.docker.com/r/jorenn92/maintainerr) and ghcr.io/jorenn92/maintainerr. <br />
 
-Data is saved within the container under /opt/data, it is recommended to tie a persistent volume to this location in your docker command/compose file. 
+Data is saved within the container under /opt/data, it is recommended to tie a persistent volume to this location in your docker command/compose file.
 Make sure this directory is read/writeable by the user specified in the 'user' instruction. If no 'user' instruction is configured, the volume should be accessible by UID:GID 1000:1000.
 
-For more information, visit the [installation guide](docs/2-getting-started/1-installation/Installation.md) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your <b>Maintainerr</b> container.
+For more information, visit the [installation guide](https://docs.maintainerr.info/en/Installation) or navigate to \<maintainerr_url\>:\<port\>/docs after starting your <b>Maintainerr</b> container.
 
 Docker run:
 
@@ -99,4 +103,4 @@ services:
 
 Maintainerr is heavily inspired by Overseerr. Some parts of Maintainerr's code are plain copies. Big thanks to the Overseerr team for creating and maintaining such an amazing app!
 
-Please support them at https://github.com/sct/overseerr
+Please support them at <https://github.com/sct/overseerr>
