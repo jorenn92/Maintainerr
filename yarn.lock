@@ -10840,7 +10840,7 @@ __metadata:
     winston: "npm:^3.13.0"
     winston-daily-rotate-file: "npm:^5.0.0"
     xml2js: "npm:^0.6.2"
-    yaml: "npm:^2.4.1"
+    yaml: "npm:^2.4.2"
   languageName: unknown
   linkType: soft
 
@@ -16032,12 +16032,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:^2.4.1":
-  version: 2.4.1
-  resolution: "yaml@npm:2.4.1"
+"yaml@npm:^2.4.2":
+  version: 2.4.2
+  resolution: "yaml@npm:2.4.2"
   bin:
     yaml: bin.mjs
-  checksum: 10c0/816057dbaea16a7dfb0b868ace930f143dece96bbb4c4fbb6f38aa389166f897240d9fa535dbfd6b1b0d9442416f4abcc698e63f82394d0c67b329aa6c2be576
+  checksum: 10c0/280ddb2e43ffa7d91a95738e80c8f33e860749cdc25aa6d9e4d350a28e174fd7e494e4aa023108aaee41388e451e3dc1292261d8f022aabcf90df9c63d647549
   languageName: node
   linkType: hard
 
