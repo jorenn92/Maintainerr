@@ -246,7 +246,7 @@ export class CollectionWorkerService extends TaskBase {
               ? media.tmdbId
               : (
                   await this.tmdbIdService.getTmdbIdFromPlexRatingKey(
-                    plexData.ratingKey,
+                    media.plexId.toString(),
                   )
                 )?.id;
             break;
