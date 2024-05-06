@@ -81,6 +81,12 @@ export class RuleComparatorService {
 
       for (const rule of rulegroup.rules) {
         const parsedRule = JSON.parse((rule as RuleDbDto).ruleJson) as RuleDto;
+
+        // force operator of very first rule to null, otherwise this might cause corruption
+        if ((rule as RuleDbDto)?.id === (rulegroup.rules[0] as RuleDbDto)?.id) {
+          parsedRule.operator = null;
+        }
+
         if (currentSection === (rule as RuleDbDto).section) {
           // if section didn't change
           // execute and store in work array
