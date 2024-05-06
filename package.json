@@ -66,7 +66,7 @@
     "rxjs": "^7.8.1",
     "sqlite3": "^5.1.6",
     "typeorm": "^0.3.20",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.5",
     "web-push": "^3.6.6",
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0",
