@@ -11058,7 +11058,7 @@ __metadata:
     jsdoc: "npm:^4.0.3"
     lodash: "npm:^4.17.21"
     monaco-editor: "npm:0.48.0"
-    nest-winston: "npm:^1.9.4"
+    nest-winston: "npm:^1.9.6"
     next: "npm:14.2.3"
     node-cache: "npm:^5.1.2"
     path: "npm:^0.12.7"
@@ -11701,15 +11701,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nest-winston@npm:^1.9.4":
-  version: 1.9.4
-  resolution: "nest-winston@npm:1.9.4"
+"nest-winston@npm:^1.9.6":
+  version: 1.9.6
+  resolution: "nest-winston@npm:1.9.6"
   dependencies:
     fast-safe-stringify: "npm:^2.1.1"
   peerDependencies:
     "@nestjs/common": ^5.0.0 || ^6.6.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
     winston: ^3.0.0
-  checksum: 10c0/95930ce71481152b7d2980c57b0124fb8ea5a43cdb24f2f7f51ea84f7fa9a6f44fe0f2229f92371d353c66213590080180204542fe90130b1f0d01ae11a96583
+  checksum: 10c0/adeae6468ebc7946db5a730acf4893613c148fb6724d47ac6e60ceb48224bf377594f59dbd4926f91d8d3275444e9e9bb530d2a13c5bf0803a6740dcdb3a3a34
   languageName: node
   linkType: hard
 
