@@ -100,7 +100,8 @@ RUN corepack install && \
     # This is required for docker user directive to work
     chmod 777 /opt && \
     mkdir -m 777 /.cache  && \
-    mkdir -pm 777 /opt/app/ui/.next/cache
+    mkdir -pm 777 /opt/app/ui/.next/cache && \
+    chown -R node:node /opt/app/ui/.next/cache
 
 USER node
 
