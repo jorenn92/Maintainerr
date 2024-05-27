@@ -103,7 +103,6 @@ RUN corepack install && \
     mkdir -pm 777 /opt/app/ui/.next/cache && \
     chown -R node:node /opt/app/ui/.next/cache
 
-
 USER node
 
 # Picked up for Node's .cache directory.
