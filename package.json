@@ -52,7 +52,7 @@
     "crypto": "^1.0.1",
     "http-server": "^14.1.1",
     "lodash": "^4.17.21",
-    "nest-winston": "^1.9.6",
+    "nest-winston": "^1.10.0",
     "next": "14.2.3",
     "node-cache": "^5.1.2",
     "path": "^0.12.7",
