@@ -143,6 +143,14 @@ The key is used for identification in Yaml rule files.
 - Availability: shows, seasons
 - Type: date
 
+#### Last episode aired at
+
+> The date when the newest episode added to Plex was originally aired. This rule is only available for shows.
+
+- Key: Plex.sw_lastEpisodeAiredAt
+- Availability: shows, seasons
+- Type: date
+
 #### Total views
 
 > The total number of views for the Plex item. This rule is only available for shows.
