@@ -420,6 +420,24 @@ export class PlexGetterService {
 
           return new Date(+lastEpDate * 1000);
         }
+        case 'sw_lastEpisodeAiredAt': {
+          const seasons =
+            metadata.type !== 'season'
+              ? (
+                  await this.plexApi.getChildrenMetadata(metadata.ratingKey)
+                ).sort((a, b) => a.index - b.index)
+              : [metadata];
+
+          const lastEpDate = await this.plexApi
+            .getChildrenMetadata(seasons[seasons.length - 1].ratingKey)
+            .then((eps) => {
+              eps.sort((a, b) => a.index - b.index);
+              return eps[eps.length - 1]?.originallyAvailableAt || null;
+            });
+
+          // originallyAvailableAt is usually an ISO 8601 date string, no need to convert from epoch time
+          return lastEpDate ? new Date(lastEpDate) : null;
+        }
         default: {
           return null;
         }

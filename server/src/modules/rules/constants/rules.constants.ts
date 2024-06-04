@@ -322,6 +322,14 @@ export class RuleConstants {
           cacheReset: true,
           type: RuleType.TEXT,
         } as Property,
+        {
+          id: 27,
+          name: 'sw_lastEpisodeAiredAt',
+          humanName: 'Last episode aired at',
+          mediaType: MediaType.SHOW,
+          type: RuleType.DATE,
+          showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
+        } as Property,
       ],
     },
     {
