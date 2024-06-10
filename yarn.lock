@@ -11140,7 +11140,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jsdoc: "npm:^4.0.3"
     lodash: "npm:^4.17.21"
-    monaco-editor: "npm:0.48.0"
+    monaco-editor: "npm:0.49.0"
     nest-winston: "npm:^1.10.0"
     next: "npm:14.2.3"
     node-cache: "npm:^5.1.2"
@@ -11679,10 +11679,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monaco-editor@npm:0.48.0":
-  version: 0.48.0
-  resolution: "monaco-editor@npm:0.48.0"
-  checksum: 10c0/f4f8fbf372ab4a038d35f72b2195f0fef7403188e83cfe41f8ed01bf8e276eec25263b9aa5aed32a87a5e42796344c236b694e4fb1049c46d5f0ed9635ebf970
+"monaco-editor@npm:0.49.0":
+  version: 0.49.0
+  resolution: "monaco-editor@npm:0.49.0"
+  checksum: 10c0/c62d19e65f8ad441d0b29d8f43181c730bd373854ff0f9331c42ed1b97b729ab099e6f961c2e377acddda6923b8030e0453ae87edd3f7db3ace75c91f44431cd
   languageName: node
   linkType: hard
 
