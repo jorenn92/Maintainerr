@@ -8,7 +8,6 @@ ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
 
 COPY server/ ./server/
 COPY ui/ ./ui/
-COPY docs/ ./docs/
 COPY package.json ./package.json
 COPY yarn.lock ./yarn.lock
 COPY .yarnrc.yml ./.yarnrc.yml
