@@ -12,7 +12,7 @@ const DocsButton = (props: IDocsButton) => {
     <span className="h-full w-full inline-flex">
       <Link
         legacyBehavior
-        href={`https://docs.maintainerr.info/en/${props.page ? props.page : 'home'}`}
+        href={`https://docs.maintainerr.info/${props.page ? props.page : ''}`}
         passHref={true}
       >
         <a target="_blank" rel="noopener noreferrer">
