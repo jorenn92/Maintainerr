@@ -4,13 +4,13 @@
 
 <p align="center" >
   <a href="https://discord.gg/WP4ZW2QYwk"><img src="https://dcbadge.vercel.app/api/server/WP4ZW2QYwk?style=flat&theme=default-inverted" width="25%" alt="Discord link"/></a>
-  &nbsp; 
+  &nbsp;
   <picture>
   <img src="https://github.com/jorenn92/Maintainerr/actions/workflows/build.yml/badge.svg?branch=main" width="17%" alt="Build" /> </picture>
-    &nbsp; 
+    &nbsp;
   <picture>  
   <img src="https://github.com/jorenn92/Maintainerr/actions/workflows/release.yml/badge.svg?branch=main" width="19%" alt="Release" /> </picture>
-  &nbsp; 
+  &nbsp;
   <a href="https://hub.docker.com/r/jorenn92/maintainerr"><img src="https://img.shields.io/docker/pulls/jorenn92/maintainerr" alt="Docker pulls" width="16.5%"></a>
 </p>
 
@@ -58,7 +58,7 @@ Docker images for amd64 & arm64 are available under jorenn92/maintainerr and ghc
 Data is saved within the container under /opt/data, it is recommended to tie a persistent volume to this location in your docker command/compose file.
 Make sure this directory is read/writeable by the user specified in the 'user' instruction. If no 'user' instruction is configured, the volume should be accessible by UID:GID 1000:1000.
 
-For more information, visit the [installation guide](https://docs.maintainerr.info/en/Installation).
+For more information, visit the [installation guide](https://docs.maintainerr.info/Installation).
 
 Docker run:
 
@@ -103,4 +103,4 @@ services:
 
 Maintainerr is heavily inspired by Overseerr. Some parts of Maintainerr's code are plain copies. Big thanks to the Overseerr team for creating and maintaining such an amazing app!
 
-Please support them at https://github.com/sct/overseerr
+Please support them at <https://github.com/sct/overseerr>
