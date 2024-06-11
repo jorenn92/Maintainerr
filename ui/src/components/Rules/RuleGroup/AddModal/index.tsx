@@ -484,7 +484,7 @@ const AddModal = (props: AddModal) => {
                         },
                         {
                           id: 2,
-                          name: 'Unmonitor and Delete existing episodes',
+                          name: 'Unmonitor and delete existing episodes',
                         },
                         {
                           id: 3,

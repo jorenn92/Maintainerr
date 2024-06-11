@@ -18,17 +18,13 @@ const nextConfig = {
         source: '/api/:path*',
         destination: 'http://localhost:3001/api/:path*',
       },
-      {
-        source: '/docs/:path*',
-        destination: 'http://localhost:8080/:path*',
-      },
     ]
   },
   async redirects() {
     return [
       {
         source: '/docs',
-        destination: '/docs/index.html',
+        destination: 'https://docs.maintainerr.info/Introduction/',
         permanent: true,
       },
     ]
