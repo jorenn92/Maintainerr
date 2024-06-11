@@ -8,10 +8,8 @@ ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
 
 COPY server/ ./server/
 COPY ui/ ./ui/
-COPY docs/ ./docs/
 COPY package.json ./package.json
 COPY yarn.lock ./yarn.lock
-COPY jsdoc.json ./jsdoc.json
 COPY .yarnrc.yml ./.yarnrc.yml
 
 # Enable correct yarn version
@@ -31,9 +29,6 @@ RUN \
 RUN yarn build:server
 
 RUN yarn build:ui
-
-RUN yarn docs-generate && \
-    rm -rf ./docs
 
 # copy standalone UI 
 RUN mv ./ui/.next/standalone/ui/ ./standalone-ui/ && \

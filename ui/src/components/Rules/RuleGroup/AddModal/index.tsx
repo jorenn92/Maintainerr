@@ -308,7 +308,7 @@ const AddModal = (props: AddModal) => {
     <div className="h-full w-full">
       <div className="max-width-form-head flex">
         <div className="ml-0">
-          <h3 className="heading">General </h3>
+          <h3 className="heading">General</h3>
           <p className="description">
             General information about this group of rules
           </p>
@@ -316,7 +316,7 @@ const AddModal = (props: AddModal) => {
         <div className="ml-auto">
           <Link
             legacyBehavior
-            href={`/docs/tutorial-Rules.html`}
+            href={`https://docs.maintainerr.info/Rules`}
             passHref={true}
           >
             <a target="_blank" rel="noopener noreferrer">
@@ -433,12 +433,12 @@ const AddModal = (props: AddModal) => {
                             <option
                               key={
                                 EPlexDataType[
-                                  data as keyof typeof EPlexDataType
+                                data as keyof typeof EPlexDataType
                                 ]
                               }
                               value={
                                 EPlexDataType[
-                                  data as keyof typeof EPlexDataType
+                                data as keyof typeof EPlexDataType
                                 ]
                               }
                             >
@@ -459,49 +459,49 @@ const AddModal = (props: AddModal) => {
                 options={
                   +selectedType === EPlexDataType.SHOWS
                     ? [
+                      {
+                        id: 0,
+                        name: 'Delete entire show',
+                      },
+                      {
+                        id: 1,
+                        name: 'Unmonitor and delete all seasons / episodes',
+                      },
+                      {
+                        id: 2,
+                        name: 'Unmonitor and delete existing seasons / episodes',
+                      },
+                      {
+                        id: 3,
+                        name: 'Unmonitor show and keep files',
+                      },
+                    ]
+                    : +selectedType === EPlexDataType.SEASONS
+                      ? [
                         {
                           id: 0,
-                          name: 'Delete entire show',
-                        },
-                        {
-                          id: 1,
-                          name: 'Unmonitor and delete all seasons / episodes',
+                          name: 'Unmonitor and delete season',
                         },
                         {
                           id: 2,
-                          name: 'Unmonitor and delete existing seasons / episodes',
+                          name: 'Unmonitor and delete existing episodes',
                         },
                         {
                           id: 3,
-                          name: 'Unmonitor show and keep files',
+                          name: 'Unmonitor season and keep files',
                         },
                       ]
-                    : +selectedType === EPlexDataType.SEASONS
-                      ? [
-                          {
-                            id: 0,
-                            name: 'Unmonitor and delete season',
-                          },
-                          {
-                            id: 2,
-                            name: 'Unmonitor and Delete existing episodes',
-                          },
-                          {
-                            id: 3,
-                            name: 'Unmonitor season and keep files',
-                          },
-                        ]
                       : // episodes
-                        [
-                          {
-                            id: 0,
-                            name: 'Unmonitor and delete episode',
-                          },
-                          {
-                            id: 3,
-                            name: 'Unmonitor and keep file',
-                          },
-                        ]
+                      [
+                        {
+                          id: 0,
+                          name: 'Unmonitor and delete episode',
+                        },
+                        {
+                          id: 3,
+                          name: 'Unmonitor and keep file',
+                        },
+                      ]
                 }
               />
             </>

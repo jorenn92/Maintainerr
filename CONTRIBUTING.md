@@ -80,7 +80,7 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
 
      ```bash
      git fetch upstream
-     git rebase upstream/develop
+     git rebase upstream/main
      git push origin BRANCH_NAME -f
      ```
 

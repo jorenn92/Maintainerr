@@ -502,7 +502,7 @@ const PlexSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex flex-wrap sm:flex-nowrap w-full">
               <span className="m-auto sm:mr-auto sm:ml-3 rounded-md shadow-sm">
-                <DocsButton page="tutorial-Configuration" />
+                <DocsButton page="Configuration" />
               </span>
               <div className="flex sm:justify-end m-auto sm:m-0 mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/plex" />
