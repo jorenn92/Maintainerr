@@ -69,7 +69,7 @@
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0",
     "xml2js": "^0.6.2",
-    "yaml": "^2.4.2"
+    "yaml": "^2.4.5"
   },
   "devDependencies": {
     "@automock/jest": "^1.4.0",
