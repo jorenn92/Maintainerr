@@ -1,3 +1,15 @@
+## [2.0.4](https://github.com/jorenn92/Maintainerr/compare/v2.0.3...v2.0.4) (2024-06-19)
+
+
+### Bug Fixes
+
+* Added "Last Aired At" rule for shows & seasons (Thanks [@benfugate](https://github.com/benfugate)) ([63db845](https://github.com/jorenn92/Maintainerr/commit/63db845291445330f86b1c009c466341cf9735bc))
+* Adjusted UI to listen to all interfaces, resolving issues with multiple networks ([#1104](https://github.com/jorenn92/Maintainerr/issues/1104)) ([017a25d](https://github.com/jorenn92/Maintainerr/commit/017a25d73a792728fa227c7bd526ed50e9c12a1a))
+* Fixed an issue where .next/cache directory creation would fail when using a custom user ([#1102](https://github.com/jorenn92/Maintainerr/issues/1102)) ([fa9a30c](https://github.com/jorenn92/Maintainerr/commit/fa9a30c8181ccafe3614e2d5e113f61ff89a7a26))
+* Fixed an issue where fetching some Plex ratingkeys from shows would fail ([2268513](https://github.com/jorenn92/Maintainerr/commit/226851358ad856d761985b8d3f6d20864cfe4ac0))
+* Fixed an issue where having an operator on the first rule would make the rule return a 'null' value ([ce18dea](https://github.com/jorenn92/Maintainerr/commit/ce18dea65be7df37215671f7a9c810c8a34b7c76))
+* Redirected all links to the hosted documentation & removed the internal Jsdoc documentation server ([#1134](https://github.com/jorenn92/Maintainerr/issues/1134)) ([0ed8164](https://github.com/jorenn92/Maintainerr/commit/0ed8164bac6894dc2c5094876a36e016cfd0caae)), closes [#1119](https://github.com/jorenn92/Maintainerr/issues/1119) [#1119](https://github.com/jorenn92/Maintainerr/issues/1119) [#1119](https://github.com/jorenn92/Maintainerr/issues/1119) [#1119](https://github.com/jorenn92/Maintainerr/issues/1119)
+
 ## [2.0.3](https://github.com/jorenn92/Maintainerr/compare/v2.0.2...v2.0.3) (2024-03-25)
 
 
