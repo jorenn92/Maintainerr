@@ -30,14 +30,19 @@ import {
 import { EPlexDataType } from './enums/plex-data-type-enum';
 import axios from 'axios';
 import PlexApi from '../lib/plexApi';
-import PlexTvApi from '../lib/plextvApi';
+import PlexTvApi, { PlexUser } from '../lib/plextvApi';
 import cacheManager from '../../api/lib/cache';
 import { Settings } from '../../settings/entities/settings.entities';
+import PlexCommunityApi, {
+  GraphQLQuery,
+  PlexCommunityWatchList,
+} from '../../api/lib/plexCommunityApi';
 
 @Injectable()
 export class PlexApiService {
   private plexClient: PlexApi;
   private plexTvClient: PlexTvApi;
+  private plexCommunityClient: PlexCommunityApi;
   private machineId: string;
   private readonly logger = new Logger(PlexApiService.name);
   constructor(
@@ -102,6 +107,7 @@ export class PlexApiService {
         });
 
         this.plexTvClient = new PlexTvApi(plexToken);
+        this.plexCommunityClient = new PlexCommunityApi(plexToken);
 
         this.setMachineId();
       } else {
@@ -305,6 +311,16 @@ export class PlexApiService {
       return response.MediaContainer.User;
     } catch (err) {
       this.logger.warn("Outbound call to plex.tv failed. Couldn't fetch users");
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
+  public async getOwnerDataFromPlexTv(): Promise<PlexUser> {
+    try {
+      return await this.plexTvClient.getUser();
+    } catch (err) {
+      this.logger.warn("Outbound call to plex.tv failed. Couldn't fetch owner");
       this.logger.debug(err);
       return undefined;
     }
@@ -675,6 +691,60 @@ export class PlexApiService {
       );
       this.logger.debug(e);
       return [];
+    }
+  }
+
+  public async getWatchlistIdsForUser(
+    userId: string,
+  ): Promise<PlexCommunityWatchList[]> {
+    try {
+      let result: PlexCommunityWatchList[] = [];
+      let next = true;
+      let page = null;
+      const size = 50;
+
+      while (next) {
+        const resp = await this.plexCommunityClient.query({
+          query: `
+          query GetWatchlistHub($uuid: ID = "", $first: PaginationInt!, $after: String) {
+            user(id: $uuid) {
+              watchlist(first: $first, after: $after) {
+                nodes {
+                  id
+                  key
+                  title
+                  type
+                }
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                }
+              }
+            }
+          }
+        `,
+          variables: {
+            uuid: userId,
+            first: size,
+            skipUserState: true,
+            after: page,
+          },
+        });
+        const watchlist = resp.data.user.watchlist;
+        result = [...result, ...watchlist.nodes];
+
+        if (!watchlist.pageInfo?.hasNextPage) {
+          next = false;
+        } else {
+          page = watchlist.pageInfo?.endCursor;
+        }
+      }
+      return result;
+    } catch (e) {
+      this.logger.warn(
+        `Failure while fetching watchlist of user with ID: ${userId}`,
+      );
+      this.logger.debug(e);
     }
   }
 

@@ -149,6 +149,44 @@ export class ExternalApiService {
     }
   }
 
+  public async postRolling<T>(
+    endpoint: string,
+    data?: string,
+    config?: RawAxiosRequestConfig,
+    ttl?: number,
+  ): Promise<T> {
+    try {
+      const cacheKey = this.serializeCacheKey(endpoint + data ? data : '', config?.params);
+      const cachedItem = this.cache?.get<T>(cacheKey);
+
+      if (cachedItem) {
+        const keyTtl = this.cache?.getTtl(cacheKey) ?? 0;
+
+        // If the item has passed our rolling check, fetch again in background
+        if (
+          keyTtl - (ttl ?? DEFAULT_TTL) * 1000 <
+          Date.now() - DEFAULT_ROLLING_BUFFER
+        ) {
+          this.axios.post<T>(endpoint, data, config).then((response) => {
+            this.cache?.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
+          });
+        }
+        return cachedItem;
+      }
+
+      const response = await this.axios.post<T>(endpoint, data, config);
+
+      if (this.cache) {
+        this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
+      }
+
+      return response.data;
+    } catch (err) {
+      Logger.debug(`POST request failed: ${err}`);
+      return undefined;
+    }
+  }
+
   private serializeCacheKey(
     endpoint: string,
     params?: Record<string, unknown>,
