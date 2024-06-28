@@ -98,6 +98,7 @@ export interface PlexHub {
 export interface PlexUser {
   plexId: number;
   username: string;
+  uuid?: string;
 }
 export interface PlexUserResponse {
   Account: PlexUserAccount[];

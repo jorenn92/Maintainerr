@@ -438,6 +438,34 @@ export class PlexGetterService {
           // originallyAvailableAt is usually an ISO 8601 date string, no need to convert from epoch time
           return lastEpDate ? new Date(lastEpDate) : null;
         }
+        case 'watchlist_isListedByUsers': {
+          // returns a list of users that have this media item, or parent, in their watchlist
+          const guid = grandparent
+            ? grandparent.guid
+            : parent
+              ? parent.guid
+              : metadata.guid;
+          const media_uuid = guid.match(/plex:\/\/[a-z]+\/([a-z0-9]+)$/);
+
+          const plexUsers: PlexUser[] = await this.getCorrectedUsers();
+
+          const userFilterPromises = plexUsers.map(async (u) => {
+            if (u.uuid === undefined || media_uuid === undefined) return false; // break if uuids are unavailable
+            try {
+              const watchlist = await this.plexApi.getWatchlistIdsForUser(
+                u.uuid,
+              );
+              return (
+                watchlist.find((i) => i.id === media_uuid[1]) !== undefined
+              );
+            } catch (e) {
+              return false;
+            }
+          });
+          const filterResults = await Promise.all(userFilterPromises);
+          const result = plexUsers.filter((_, index) => filterResults[index]);
+          return result.map((u) => u.username);
+        }
         default: {
           return null;
         }
@@ -449,14 +477,32 @@ export class PlexGetterService {
   }
 
   private async getCorrectedUsers(): Promise<PlexUser[]> {
+    const thumbRegex = /https:\/\/plex\.tv\/users\/([a-z0-9]+)\/avatar\?c=\d+/;
+
     const plexTvUsers = await this.plexApi.getUserDataFromPlexTv();
+    const owner = await this.plexApi.getOwnerDataFromPlexTv();
 
     return (await this.plexApi.getUsers()).map((el) => {
       const plextv = plexTvUsers?.find((tvEl) => tvEl.$?.id == el.id);
+      const ownerUser = owner?.username === el.name ? owner : undefined;
 
       // use the username from plex.tv if available, since Overseerr also does this
-      if (plextv && plextv.$ && plextv.$.username) {
-        return { plexId: el.id, username: plextv.$.username } as PlexUser;
+      if (ownerUser) {
+        const match = ownerUser.thumb.match(thumbRegex);
+        const uuid = match ? match[1] : undefined;
+        return {
+          plexId: el.id,
+          username: ownerUser.username,
+          uuid: uuid,
+        } as PlexUser;
+      } else if (plextv && plextv.$ && plextv.$.username) {
+        const match = plextv.$.thumb?.match(thumbRegex);
+        const uuid = match ? match[1] : undefined;
+        return {
+          plexId: el.id,
+          username: plextv.$.username,
+          uuid: uuid,
+        } as PlexUser;
       }
       return { plexId: el.id, username: el.name } as PlexUser;
     });

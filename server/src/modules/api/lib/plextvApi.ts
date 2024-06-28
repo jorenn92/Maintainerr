@@ -9,7 +9,7 @@ interface PlexAccountResponse {
   user: PlexUser;
 }
 
-interface PlexUser {
+export interface PlexUser {
   id: number;
   uuid: string;
   email: string;

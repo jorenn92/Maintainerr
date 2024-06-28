@@ -330,6 +330,13 @@ export class RuleConstants {
           type: RuleType.DATE,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
         } as Property,
+        {
+          id: 28,
+          name: 'watchlist_isListedByUsers',
+          humanName: '[list] Watchlisted by (username) [experimental]',
+          mediaType: MediaType.BOTH,
+          type: RuleType.TEXT,
+        } as Property,
       ],
     },
     {

@@ -6,7 +6,8 @@ export type AvailableCacheIds =
   | 'sonarr'
   | 'plexguid'
   | 'plextv'
-  | 'overseerr';
+  | 'overseerr'
+  | 'plexcommunity';
 
 const DEFAULT_TTL = 300; // 5 min
 const DEFAULT_CHECK_PERIOD = 120; // 2 min
@@ -49,6 +50,7 @@ class CacheManager {
     plexguid: new Cache('plexguid', 'Plex GUID'),
     plextv: new Cache('plextv', 'Plex.tv'),
     overseerr: new Cache('overseerr', 'Overseerr API'),
+    plexcommunity: new Cache('plexcommunity', 'community.Plex.tv'),
   };
 
   public getCache(id: AvailableCacheIds): Cache {
