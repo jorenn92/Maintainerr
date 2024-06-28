@@ -488,7 +488,7 @@ export class PlexGetterService {
 
       // use the username from plex.tv if available, since Overseerr also does this
       if (ownerUser) {
-        const match = ownerUser.thumb.match(thumbRegex);
+        const match = ownerUser.thumb?.match(thumbRegex);
         const uuid = match ? match[1] : undefined;
         return {
           plexId: el.id,
