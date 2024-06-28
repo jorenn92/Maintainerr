@@ -36,7 +36,7 @@ import { Settings } from '../../settings/entities/settings.entities';
 import PlexCommunityApi, {
   GraphQLQuery,
   PlexCommunityWatchList,
-} from 'src/modules/api/lib/plexCommunityApi';
+} from '../../api/lib/plexCommunityApi';
 
 @Injectable()
 export class PlexApiService {
