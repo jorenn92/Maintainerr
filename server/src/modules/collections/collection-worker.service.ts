@@ -506,7 +506,7 @@ export class CollectionWorkerService extends TaskBase {
     } else {
       tvdbid = tmdbShow.external_ids.tvdb_id;
     }
-      return tvdbid;
+    return tvdbid;
   }
 
   private infoLogger(message: string) {
