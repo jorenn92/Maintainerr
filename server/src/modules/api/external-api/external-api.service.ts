@@ -54,7 +54,7 @@ export class ExternalApiService {
 
       return response.data;
     } catch (err) {
-      Logger.debug(`GET request failed: ${err}`);
+      Logger.debug(`GET request to ${endpoint} failed: ${err}`, 'ExternalAPI');
       return undefined;
     }
   }

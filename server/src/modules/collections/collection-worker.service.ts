@@ -484,7 +484,9 @@ export class CollectionWorkerService extends TaskBase {
       )?.id;
     }
 
-    const tmdbShow = await this.tmdbApi.getTvShow({ tvId: media.tmdbId });
+    const tmdbShow = media.tmdbId
+      ? await this.tmdbApi.getTvShow({ tvId: media.tmdbId })
+      : undefined;
 
     if (!tmdbShow?.external_ids?.tvdb_id) {
       let plexData = await this.plexApi.getMetadata(media.plexId.toString());
@@ -504,7 +506,7 @@ export class CollectionWorkerService extends TaskBase {
     } else {
       tvdbid = tmdbShow.external_ids.tvdb_id;
     }
-    return tvdbid;
+      return tvdbid;
   }
 
   private infoLogger(message: string) {
