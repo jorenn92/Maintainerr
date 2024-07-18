@@ -432,7 +432,7 @@ export class PlexApiService {
         uri: `/library/metadata/${plexId}`,
       });
     } catch (e) {
-      this.logger.log('Something went wrong while removing media from Plex.', {
+      this.logger.error('Something went wrong while removing media from Plex.', {
         label: 'Plex API',
         errorMessage: e.message,
         plexId,

@@ -412,7 +412,7 @@ export class CollectionWorkerService extends TaskBase {
             if (collection.arrAction !== ServarrAction.UNMONITOR) {
               this.plexApi.deleteMediaFromDisk(plexData.ratingKey);
               this.infoLogger(
-                `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. But media item was removed from Plex`,
+                `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. But media item was removed through Plex`,
               );
             } else {
               this.infoLogger(
@@ -467,10 +467,18 @@ export class CollectionWorkerService extends TaskBase {
       if (
         !(plexLibrary.type === 'movie'
           ? this.settings.radarrConfigured()
-          : this.settings.sonarrConfigured()) &&
-        collection.arrAction !== ServarrAction.UNMONITOR
+          : this.settings.sonarrConfigured())
       )
-        await this.plexApi.deleteMediaFromDisk(media.plexId);
+        if (collection.arrAction !== ServarrAction.UNMONITOR) {
+          await this.plexApi.deleteMediaFromDisk(media.plexId.toString());
+          this.infoLogger(
+            `Couldn't utilize *arr to find and remove the media with id ${media.plexId}, so media was removed from the filesystem through Plex. No unmonitor action was taken.`,
+          );
+        } else {
+          this.infoLogger(
+            `*arr unmonitor action isn't possible, since *arr is not available. Didn't unmonitor media with id ${media.plexId}.}`,
+          );
+        }
     }
   }
 
