@@ -76,7 +76,7 @@ export class OverseerrGetterService {
                 : origLibItem.parentIndex,
             );
             if (!seasonMediaResponse) {
-              this.logger.warn(
+              this.logger.debug(
                 `Couldn't fetch season data for '${libItem.title}' season ${
                   dataType === EPlexDataType.SEASONS
                     ? origLibItem.index
@@ -87,7 +87,7 @@ export class OverseerrGetterService {
           }
         }
       } else {
-        this.logger.warn(
+        this.logger.debug(
           `Couldn't find tmdb id for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Overseerr query could be made.`,
         );
       }
@@ -266,7 +266,7 @@ export class OverseerrGetterService {
           }
         }
       } else {
-        this.logger.warn(
+        this.logger.debug(
           `Couldn't fetch Overseerr metadate for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Overseerr query could be made.`,
         );
         return null;
