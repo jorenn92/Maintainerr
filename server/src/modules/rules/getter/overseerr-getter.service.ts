@@ -75,9 +75,23 @@ export class OverseerrGetterService {
                 ? origLibItem.index
                 : origLibItem.parentIndex,
             );
+            if (!seasonMediaResponse) {
+              this.logger.warn(
+                `Couldn't fetch season data for '${libItem.title}' season ${
+                  dataType === EPlexDataType.SEASONS
+                    ? origLibItem.index
+                    : origLibItem.parentIndex
+                } from Overseerr. As a result, unreliable results are expected.`,
+              );
+            }
           }
         }
+      } else {
+        this.logger.warn(
+          `Couldn't find tmdb id for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Overseerr query could be made.`,
+        );
       }
+
       if (mediaResponse && mediaResponse.mediaInfo) {
         switch (prop.name) {
           case 'addUser': {
@@ -99,7 +113,9 @@ export class OverseerrGetterService {
                   ) {
                     const includesSeason = this.includesSeason(
                       request,
-                      seasonMediaResponse.seasonNumber,
+                      dataType === EPlexDataType.SEASONS
+                        ? origLibItem.index
+                        : origLibItem.parentIndex,
                     );
                     if (includesSeason) {
                       userNames.push(
@@ -250,6 +266,9 @@ export class OverseerrGetterService {
           }
         }
       } else {
+        this.logger.warn(
+          `Couldn't fetch Overseerr metadate for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Overseerr query could be made.`,
+        );
         return null;
       }
     } catch (e) {
