@@ -120,7 +120,12 @@ export class RadarrGetterService {
               : null;
           }
         }
-      } else return null;
+      } else {
+        this.logger.debug(
+          `Couldn't fetch Radarr metadate for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Radarr query could be made.`,
+        );
+        return null;
+      }
     } catch (e) {
       this.logger.warn(`Radarr-Getter - Action failed : ${e.message}`);
       return undefined;

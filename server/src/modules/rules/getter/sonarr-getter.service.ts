@@ -245,7 +245,10 @@ export class SonarrGetterService {
           }
         } else return null;
       } else {
-        return undefined;
+        this.logger.debug(
+          `Couldn't fetch Sonarr metadate for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Sonarr query could be made.`,
+        );
+        return null;
       }
     } catch (e) {
       this.logger.warn(`Sonarr-Getter - Action failed : ${e.message}`);
