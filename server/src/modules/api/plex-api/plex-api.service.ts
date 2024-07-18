@@ -110,7 +110,7 @@ export class PlexApiService {
         );
       }
     } catch (err) {
-      this.logger.error(
+      this.logger.warn(
         `Couldn't connect to Plex.. Please check your settings`,
       );
       this.logger.debug(err);
@@ -432,7 +432,7 @@ export class PlexApiService {
         uri: `/library/metadata/${plexId}`,
       });
     } catch (e) {
-      this.logger.error('Something went wrong while removing media from Plex.', {
+      this.logger.warn('Something went wrong while removing media from Plex.', {
         label: 'Plex API',
         errorMessage: e.message,
         plexId,
@@ -835,7 +835,7 @@ export class PlexApiService {
         this.machineId = response.machineIdentifier;
         return response.machineIdentifier;
       } else {
-        this.logger.error("Couldn't reach Plex");
+        this.logger.warn("Couldn't reach Plex");
         return null;
       }
     } catch (err) {
