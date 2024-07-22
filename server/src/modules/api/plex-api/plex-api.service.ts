@@ -35,6 +35,7 @@ import cacheManager from '../../api/lib/cache';
 import { Settings } from '../../settings/entities/settings.entities';
 import PlexCommunityApi, {
   GraphQLQuery,
+  PlexCommunityWatchHistory,
   PlexCommunityWatchList,
 } from '../../api/lib/plexCommunityApi';
 
@@ -116,9 +117,7 @@ export class PlexApiService {
         );
       }
     } catch (err) {
-      this.logger.warn(
-        `Couldn't connect to Plex.. Please check your settings`,
-      );
+      this.logger.warn(`Couldn't connect to Plex.. Please check your settings`);
       this.logger.debug(err);
     }
   }
@@ -743,6 +742,118 @@ export class PlexApiService {
     } catch (e) {
       this.logger.warn(
         `Failure while fetching watchlist of user with ID: ${userId}`,
+      );
+      this.logger.debug(e);
+    }
+  }
+
+  public async getWatchHistoryIdsForUser(
+    userId: string,
+  ): Promise<PlexCommunityWatchHistory[]> {
+    try {
+      let result: PlexCommunityWatchHistory[] = [];
+      let next = true;
+      let page = null;
+      const size = 50;
+
+      while (next) {
+        const resp = await this.plexCommunityClient.query({
+          query: `
+          query GetWatchHistoryHub($uuid: ID = "", $first: PaginationInt!, $after: String, $skipUserState: Boolean = false) {
+            user(id: $uuid) {
+              watchHistory(first: $first, after: $after) {
+                nodes {
+                  metadataItem {
+                    ...itemFields
+                  }
+                  date
+                  id
+                }
+                pageInfo {
+                  hasNextPage
+                  hasPreviousPage
+                  endCursor
+                }
+              }
+            }
+          }
+              
+          fragment itemFields on MetadataItem {
+            id
+            images {
+              coverArt
+              coverPoster
+              thumbnail
+              art
+            }
+            userState @skip(if: $skipUserState) {
+              viewCount
+              viewedLeafCount
+              watchlistedAt
+            }
+            title
+            key
+            type
+            index
+            publicPagesURL
+            parent {
+              ...parentFields
+            }
+            grandparent {
+              ...parentFields
+            }
+            publishedAt
+            leafCount
+            year
+            originallyAvailableAt
+            childCount
+          }
+              
+          fragment parentFields on MetadataItem {
+            index
+            title
+            publishedAt
+            key
+            type
+            images {
+              coverArt
+              coverPoster
+              thumbnail
+              art
+            }
+            userState @skip(if: $skipUserState) {
+              viewCount
+              viewedLeafCount
+              watchlistedAt
+            }
+          }       
+        `,
+          variables: {
+            uuid: userId,
+            first: size,
+            skipUserState: true,
+            after: page,
+          },
+        });
+        const watchHistory = resp?.data?.user?.watchHistory;
+        if (watchHistory) {
+          result = [
+            ...result,
+            ...watchHistory?.nodes?.map((n) => n.metadataItem.key),
+          ];
+        }
+
+        if (!watchHistory.pageInfo?.hasNextPage) {
+          next = false;
+        } else {
+          // await new Promise((resolve) => setTimeout(resolve, 1000));
+          page = watchHistory.pageInfo?.endCursor;
+        }
+      }
+      return result;
+    } catch (e) {
+      this.logger.warn(
+        `Failure while fetching watchHistory of user with ID: ${userId}`,
       );
       this.logger.debug(e);
     }
