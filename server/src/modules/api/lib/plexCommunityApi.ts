@@ -19,6 +19,13 @@ export interface PlexCommunityWatchList {
   type: string;
 }
 
+export interface PlexCommunityWatchHistory {
+  id: string;
+  key: string;
+  title: string;
+  type: string;
+}
+
 export class PlexCommunityApi extends ExternalApiService {
   private authToken: string;
   private readonly logger = new Logger(PlexCommunityApi.name);
