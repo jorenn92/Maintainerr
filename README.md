@@ -103,6 +103,10 @@ services:
 
 [For more information, please consult the documentation](https://docs.maintainerr.info/)
 
+# Features
+
+[To get an indication of which features are most desired, you can vote for them](https://features.maintainerr.info/?view=most-wanted)
+
 # Credits
 
 Maintainerr is heavily inspired by Overseerr. Some parts of Maintainerr's code are plain copies. Big thanks to the Overseerr team for creating and maintaining such an amazing app!
