@@ -141,7 +141,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     }
   }
 
-  protected async runPut(command: string, body: string): Promise<void> {
+  protected async runPut(command: string, body: string): Promise<void>{
     try {
       await this.put(`/${command}`, body);
     } catch (e) {
