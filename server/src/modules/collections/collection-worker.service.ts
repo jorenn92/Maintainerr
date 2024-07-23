@@ -253,14 +253,14 @@ export class CollectionWorkerService extends TaskBase {
         }
 
         if (tvdbId) {
-          const sonarrMedia =
+          let sonarrMedia =
             await this.servarrApi.SonarrApi.getSeriesByTvdbId(tvdbId);
           if (sonarrMedia) {
             switch (collection.arrAction) {
               case ServarrAction.DELETE:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       true,
@@ -295,7 +295,7 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       false,
@@ -316,7 +316,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       'all',
                       false,
@@ -333,7 +333,7 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR_DELETE_ALL:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       true,
@@ -354,7 +354,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       'all',
                       true,
@@ -371,7 +371,7 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR_DELETE_EXISTING:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       true,
@@ -393,7 +393,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       'existing',
                       true,
