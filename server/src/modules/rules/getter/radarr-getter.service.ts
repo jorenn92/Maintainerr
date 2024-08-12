@@ -99,7 +99,9 @@ export class RadarrGetterService {
           case 'fileSize': {
             return movieResponse?.sizeOnDisk
               ? Math.round(movieResponse.sizeOnDisk / 1048576)
-              : null;
+              : movieResponse.movieFile?.size
+                ? Math.round(movieResponse.movieFile.size / 1048576)
+                : null;
           }
           case 'releaseDate': {
             return movieResponse?.physicalRelease &&
