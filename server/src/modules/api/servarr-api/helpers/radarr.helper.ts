@@ -37,11 +37,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
 
   public async getMovieByTmdbId(id: number): Promise<RadarrMovie> {
     try {
-      const response = await this.get<RadarrMovie[]>('/movie/lookup', {
-        params: {
-          term: `tmdb:${id}`,
-        },
-      });
+      const response = await this.get<RadarrMovie[]>(`/movie?tmdbId=${id}`);
 
       if (!response[0]) {
         this.logger.warn(`Could not find Movie with TMDb id ${id} in Radarr`);
