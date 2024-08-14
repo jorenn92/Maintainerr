@@ -40,8 +40,8 @@ export interface ReturnStatus {
 @Injectable()
 export class RulesService {
   private readonly logger = new Logger(RulesService.name);
-  private readonly communityUrl = 'https://jsonbin.org/maintainerr/rules';
-  private readonly key = 'e26bd648-2bb5-4092-b4f1-90d8bc9e3148';
+  private readonly communityUrl = 'https://jsonbin.maintainerr.info/maintainerr-app/rules';
+  private readonly key = '788bfded-1fd0-46e8-8616-28d76e8a2904';
 
   ruleConstants: RuleConstants;
   constructor(
@@ -293,9 +293,9 @@ export class RulesService {
         if (
           group.dataType !== params.dataType ||
           params.collection.manualCollection !==
-            dbCollection.manualCollection ||
+          dbCollection.manualCollection ||
           params.collection.manualCollectionName !==
-            dbCollection.manualCollectionName ||
+          dbCollection.manualCollectionName ||
           params.libraryId !== dbCollection.libraryId
         ) {
           this.logger.log(
@@ -477,12 +477,10 @@ export class RulesService {
         }
 
         this.logger.log(
-          `Added ${
-            data.ruleGroupId === undefined ? 'global ' : ''
-          }exclusion for media with id ${media.plexId} ${
-            data.ruleGroupId !== undefined
-              ? `and rulegroup id ${data.ruleGroupId}`
-              : ''
+          `Added ${data.ruleGroupId === undefined ? 'global ' : ''
+          }exclusion for media with id ${media.plexId} ${data.ruleGroupId !== undefined
+            ? `and rulegroup id ${data.ruleGroupId}`
+            : ''
           } `,
         );
       }
@@ -577,12 +575,10 @@ export class RulesService {
           );
         }
         this.logger.log(
-          `Removed ${
-            data.ruleGroupId === undefined ? 'global ' : ''
-          }exclusion for media with id ${media.plexId} ${
-            data.ruleGroupId !== undefined
-              ? `and rulegroup id ${data.ruleGroupId}`
-              : ''
+          `Removed ${data.ruleGroupId === undefined ? 'global ' : ''
+          }exclusion for media with id ${media.plexId} ${data.ruleGroupId !== undefined
+            ? `and rulegroup id ${data.ruleGroupId}`
+            : ''
           } `,
         );
       }
@@ -644,12 +640,12 @@ export class RulesService {
 
         return rulegroupId
           ? exclusions.concat(
-              await this.exclusionRepo.find({
-                where: {
-                  ruleGroupId: null,
-                },
-              }),
-            )
+            await this.exclusionRepo.find({
+              where: {
+                ruleGroupId: null,
+              },
+            }),
+          )
           : exclusions;
       }
       return [];
@@ -861,8 +857,8 @@ export class RulesService {
           if (rules.find((r) => r.id === id) === undefined) {
             this.logger.log(
               `Rules - Tried to edit the karma of rule with id ` +
-                id +
-                `, but it doesn't exist`,
+              id +
+              `, but it doesn't exist`,
             );
             return this.createReturnStatus(
               false,
@@ -979,7 +975,7 @@ export class RulesService {
         //test first value
         const first =
           constant.applications[parsedRule.firstVal[0]].props[
-            parsedRule.firstVal[1]
+          parsedRule.firstVal[1]
           ];
 
         result = first?.cacheReset ? true : result;
@@ -987,8 +983,8 @@ export class RulesService {
         // test second value
         const second = parsedRule.lastVal
           ? constant.applications[parsedRule.lastVal[0]].props[
-              parsedRule.lastVal[1]
-            ]
+          parsedRule.lastVal[1]
+          ]
           : undefined;
 
         result = second?.cacheReset ? true : result;
