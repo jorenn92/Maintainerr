@@ -462,7 +462,7 @@ export class PlexApiService {
     try {
       const response = await this.plexClient.query<PlexLibraryResponse>({
         uri: `/library/collections/${+collectionId}?`,
-      });
+      }, false);
       const collection: PlexCollection = response.MediaContainer
         .Metadata as PlexCollection;
 
