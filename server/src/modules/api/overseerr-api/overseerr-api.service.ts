@@ -52,6 +52,7 @@ interface OverseerrUser {
   email: string;
   username: string;
   plexToken: string;
+  plexId?: number;
   plexUsername: string;
   userType: number;
   permissions: number;
@@ -116,6 +117,31 @@ interface OverseerMedia {
   serviceUrl: string;
 }
 
+interface OverseerrUserResponse {
+  pageInfo: {
+    pages: number;
+    pageSize: number;
+    results: number;
+    page: number;
+  };
+  results: OverseerrUserResponseResult[];
+}
+
+interface OverseerrUserResponseResult {
+  permissions: number;
+  id: number;
+  email: string;
+  plexUsername: string;
+  username: string;
+  userType: number;
+  plexId: number;
+  avatar: string;
+  createdAt: string;
+  updatedAt: string;
+  requestCount: number;
+  displayName: string;
+}
+
 @Injectable()
 export class OverseerrApiService {
   api: OverseerrApi;
@@ -167,6 +193,37 @@ export class OverseerrApiService {
       );
       this.logger.debug(err);
       return undefined;
+    }
+  }
+
+  public async getUsers(): Promise<any> {
+    try {
+      const size = 50;
+      let hasNext = true;
+      let skip = 0;
+
+      let users: OverseerrUserResponseResult[] = [];
+
+      while (hasNext) {
+        let resp: OverseerrUserResponse = await this.api.get(
+          `/user?take=${size}&skip=${skip}`,
+        );
+
+        users.push(...resp.results);
+
+        if (resp?.pageInfo?.page < resp?.pageInfo?.pages) {
+          skip = skip + size;
+        } else {
+          hasNext = false;
+        }
+      }
+      return users;
+    } catch (err) {
+      this.logger.warn(
+        `Couldn't fetch Overseerr users. Is the application running?`,
+      );
+      this.logger.debug(err);
+      return [];
     }
   }
 

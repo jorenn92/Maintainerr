@@ -58,6 +58,7 @@ export class OverseerrGetterService {
 
       const prop = this.appProperties.find((el) => el.id === id);
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
+      // const overseerrUsers = await this.overseerrApi.getUsers();
 
       let mediaResponse: OverSeerrMediaResponse;
       if (tmdb && tmdb.id) {
@@ -123,8 +124,8 @@ export class OverseerrGetterService {
                           ? request.requestedBy?.username
                           : plexUsers.find(
                               (u) =>
-                                u.username ===
-                                request.requestedBy?.plexUsername,
+                                u.plexId ===
+                                request.requestedBy?.plexId,
                             )?.username,
                       );
                     }
@@ -135,7 +136,7 @@ export class OverseerrGetterService {
                         ? request.requestedBy?.username
                         : plexUsers.find(
                             (u) =>
-                              u.username === request.requestedBy?.plexUsername,
+                              u.plexId === request.requestedBy?.plexId,
                           )?.username,
                     );
                   }
