@@ -95,7 +95,7 @@
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^7.16.0",
-    "autoprefixer": "10.4.19",
+    "autoprefixer": "10.4.20",
     "eslint": "^9.9.0",
     "eslint-config-next": "14.2.4",
     "eslint-config-prettier": "^9.1.0",
