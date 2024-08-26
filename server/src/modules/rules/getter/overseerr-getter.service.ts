@@ -123,9 +123,7 @@ export class OverseerrGetterService {
                         request.requestedBy?.userType === 2
                           ? request.requestedBy?.username
                           : plexUsers.find(
-                              (u) =>
-                                u.plexId ===
-                                request.requestedBy?.plexId,
+                              (u) => u.plexId === request.requestedBy?.plexId,
                             )?.username,
                       );
                     }
@@ -135,8 +133,7 @@ export class OverseerrGetterService {
                       request.requestedBy?.userType === 2
                         ? request.requestedBy?.username
                         : plexUsers.find(
-                            (u) =>
-                              u.plexId === request.requestedBy?.plexId,
+                            (u) => u.plexId === request.requestedBy?.plexId,
                           )?.username,
                     );
                   }
@@ -251,15 +248,21 @@ export class OverseerrGetterService {
             }
           }
           case 'isRequested': {
-            if (
-              [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
-            ) {
-              return this.getSeasonRequests(origLibItem, mediaResponse).length >
-                0
-                ? 1
-                : 0;
-            } else {
-              return mediaResponse?.mediaInfo.requests.length > 0 ? 1 : 0;
+            try {
+              if (
+                [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
+                  dataType,
+                )
+              ) {
+                return this.getSeasonRequests(origLibItem, mediaResponse)
+                  .length > 0
+                  ? 1
+                  : 0;
+              } else {
+                return mediaResponse?.mediaInfo.requests.length > 0 ? 1 : 0;
+              }
+            } catch (e) {
+              return 0;
             }
           }
           default: {
