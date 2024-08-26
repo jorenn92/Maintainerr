@@ -119,26 +119,56 @@ export class OverseerrGetterService {
                         : origLibItem.parentIndex,
                     );
                     if (includesSeason) {
-                      userNames.push(
-                        request.requestedBy?.userType === 2
-                          ? request.requestedBy?.username
-                          : plexUsers.find(
-                              (u) => u.plexId === request.requestedBy?.plexId,
-                            )?.username,
-                      );
+                      if (request.requestedBy?.userType === 2) {
+                        userNames.push(request.requestedBy?.username);
+                      } else {
+                        let user = (
+                          await this.plexApi.getUser(
+                            request.requestedBy?.plexId,
+                          )
+                        )?.name;
+
+                        // if user not found by id, try to match by name (server owners sometimes have id 1 instead of their real id)
+                        user =
+                          user !== undefined
+                            ? user
+                            : plexUsers.find(
+                                (u) =>
+                                  u.username ===
+                                  request.requestedBy?.plexUsername,
+                              )?.username;
+
+                        if (user) {
+                          userNames.push(user);
+                        }
+                      }
                     }
                   } else {
                     // for shows and movies, add every request user
-                    userNames.push(
-                      request.requestedBy?.userType === 2
-                        ? request.requestedBy?.username
-                        : plexUsers.find(
-                            (u) => u.plexId === request.requestedBy?.plexId,
-                          )?.username,
-                    );
+                    if (request.requestedBy?.userType === 2) {
+                      userNames.push(request.requestedBy?.username);
+                    } else {
+                      let user = (
+                        await this.plexApi.getUser(request.requestedBy?.plexId)
+                      )?.name;
+
+                      // if user not found by id, try to match by name (server owners sometimes have id 1 instead of their real id)
+                      user =
+                        user !== undefined
+                          ? user
+                          : plexUsers.find(
+                              (u) =>
+                                u.username ===
+                                request.requestedBy?.plexUsername,
+                            )?.username;
+
+                      if (user) {
+                        userNames.push(user);
+                      }
+                    }
                   }
                 }
-                return userNames;
+                return [...new Set(userNames)]; // return only unique usernames
               }
               return [];
             } catch (e) {
