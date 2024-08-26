@@ -185,12 +185,12 @@ export class PlexApiService {
     }
   }
 
-  public async getUser(id: number): Promise<PlexUserAccount[]> {
+  public async getUser(id: number): Promise<PlexUserAccount> {
     try {
       const response: PlexAccountsResponse = await this.plexClient.queryAll({
         uri: `/accounts/${id}`,
       });
-      return response.MediaContainer.Account;
+      return response?.MediaContainer?.Account[0];
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
