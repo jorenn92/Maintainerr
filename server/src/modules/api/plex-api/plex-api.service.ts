@@ -17,6 +17,7 @@ import {
   PlexLibraryResponse,
   PlexSeenBy,
   PlexUserAccount,
+  SimplePlexUser,
 } from './interfaces/library.interfaces';
 import {
   PlexMetadata,
@@ -460,9 +461,12 @@ export class PlexApiService {
     collectionId: string | number,
   ): Promise<PlexCollection> {
     try {
-      const response = await this.plexClient.query<PlexLibraryResponse>({
-        uri: `/library/collections/${+collectionId}?`,
-      }, false);
+      const response = await this.plexClient.query<PlexLibraryResponse>(
+        {
+          uri: `/library/collections/${+collectionId}?`,
+        },
+        false,
+      );
       const collection: PlexCollection = response.MediaContainer
         .Metadata as PlexCollection;
 
@@ -1007,6 +1011,38 @@ export class PlexApiService {
       }
     }
     return handleMedia;
+  }
+
+  public async getCorrectedUsers(): Promise<SimplePlexUser[]> {
+    const thumbRegex = /https:\/\/plex\.tv\/users\/([a-z0-9]+)\/avatar\?c=\d+/;
+
+    const plexTvUsers = await this.getUserDataFromPlexTv();
+    const owner = await this.getOwnerDataFromPlexTv();
+
+    return (await this.getUsers()).map((el) => {
+      const plextv = plexTvUsers?.find((tvEl) => tvEl.$?.id == el.id);
+      const ownerUser = owner?.username === el.name ? owner : undefined;
+
+      // use the username from plex.tv if available, since Overseerr also does this
+      if (ownerUser) {
+        const match = ownerUser.thumb?.match(thumbRegex);
+        const uuid = match ? match[1] : undefined;
+        return {
+          plexId: +ownerUser.id,
+          username: ownerUser.username,
+          uuid: uuid,
+        } as SimplePlexUser;
+      } else if (plextv && plextv.$ && plextv.$.username) {
+        const match = plextv.$.thumb?.match(thumbRegex);
+        const uuid = match ? match[1] : undefined;
+        return {
+          plexId: +plextv.$.id,
+          username: plextv.$.username,
+          uuid: uuid,
+        } as SimplePlexUser;
+      }
+      return { plexId: +el.id, username: el.name } as SimplePlexUser;
+    });
   }
 
   private async setMachineId() {

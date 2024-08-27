@@ -8,7 +8,7 @@ import {
 } from '../../../modules/api/overseerr-api/overseerr-api.service';
 import {
   PlexLibraryItem,
-  PlexUser,
+  SimplePlexUser,
 } from '../../../modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
@@ -97,9 +97,7 @@ export class OverseerrGetterService {
         switch (prop.name) {
           case 'addUser': {
             try {
-              const plexUsers = (await this.plexApi.getUsers()).map((el) => {
-                return { plexId: el.id, username: el.name } as PlexUser;
-              });
+              const plexUsers = await this.plexApi.getCorrectedUsers();
               const userNames: string[] = [];
               if (
                 mediaResponse &&
@@ -122,22 +120,10 @@ export class OverseerrGetterService {
                       if (request.requestedBy?.userType === 2) {
                         userNames.push(request.requestedBy?.username);
                       } else {
-                        let user = (
-                          await this.plexApi.getUser(
-                            request.requestedBy?.plexId,
-                          )
-                        )?.name;
-
-                        // if user not found by id, try to match by name (server owners sometimes have id 1 instead of their real id)
-                        user =
-                          user !== undefined
-                            ? user
-                            : plexUsers.find(
-                                (u) =>
-                                  u.username ===
-                                  request.requestedBy?.plexUsername,
-                              )?.username;
-
+                        let user = plexUsers.find(
+                          (u) => u.plexId === request.requestedBy?.plexId,
+                        )?.username;
+                        
                         if (user) {
                           userNames.push(user);
                         }
@@ -148,19 +134,9 @@ export class OverseerrGetterService {
                     if (request.requestedBy?.userType === 2) {
                       userNames.push(request.requestedBy?.username);
                     } else {
-                      let user = (
-                        await this.plexApi.getUser(request.requestedBy?.plexId)
-                      )?.name;
-
-                      // if user not found by id, try to match by name (server owners sometimes have id 1 instead of their real id)
-                      user =
-                        user !== undefined
-                          ? user
-                          : plexUsers.find(
-                              (u) =>
-                                u.username ===
-                                request.requestedBy?.plexUsername,
-                            )?.username;
+                      let user = plexUsers.find(
+                        (u) => u.plexId === request.requestedBy?.plexId,
+                      )?.username;
 
                       if (user) {
                         userNames.push(user);

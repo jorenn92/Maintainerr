@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   PlexLibraryItem,
   PlexSeenBy,
-  PlexUser,
+  SimplePlexUser,
 } from '../../..//modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import {
@@ -52,7 +52,7 @@ export class PlexGetterService {
           return metadata.addedAt ? new Date(+metadata.addedAt * 1000) : null;
         }
         case 'seenBy': {
-          const plexUsers = await this.getCorrectedUsers();
+          const plexUsers = await this.plexApi.getCorrectedUsers();
 
           const viewers: PlexSeenBy[] = await this.plexApi
             .getWatchHistory(metadata.ratingKey)
@@ -267,7 +267,7 @@ export class PlexGetterService {
           return item.Genre ? item.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {
-          const plexUsers = await this.getCorrectedUsers();
+          const plexUsers = await this.plexApi.getCorrectedUsers();
 
           const seasons =
             metadata.type !== 'season'
@@ -310,7 +310,7 @@ export class PlexGetterService {
           return [];
         }
         case 'sw_watchers': {
-          const plexUsers = await this.getCorrectedUsers();
+          const plexUsers = await this.plexApi.getCorrectedUsers();
 
           const watchHistory = await this.plexApi.getWatchHistory(
             metadata.ratingKey,
@@ -447,7 +447,7 @@ export class PlexGetterService {
               : metadata.guid;
           const media_uuid = guid.match(/plex:\/\/[a-z]+\/([a-z0-9]+)$/);
 
-          const plexUsers: PlexUser[] = await this.getCorrectedUsers();
+          const plexUsers: SimplePlexUser[] = await this.plexApi.getCorrectedUsers();
 
           const userFilterPromises = plexUsers.map(async (u) => {
             if (u.uuid === undefined || media_uuid === undefined) return false; // break if uuids are unavailable
@@ -474,37 +474,5 @@ export class PlexGetterService {
       this.logger.warn(`Plex-Getter - Action failed : ${e.message}`);
       return undefined;
     }
-  }
-
-  private async getCorrectedUsers(): Promise<PlexUser[]> {
-    const thumbRegex = /https:\/\/plex\.tv\/users\/([a-z0-9]+)\/avatar\?c=\d+/;
-
-    const plexTvUsers = await this.plexApi.getUserDataFromPlexTv();
-    const owner = await this.plexApi.getOwnerDataFromPlexTv();
-
-    return (await this.plexApi.getUsers()).map((el) => {
-      const plextv = plexTvUsers?.find((tvEl) => tvEl.$?.id == el.id);
-      const ownerUser = owner?.username === el.name ? owner : undefined;
-
-      // use the username from plex.tv if available, since Overseerr also does this
-      if (ownerUser) {
-        const match = ownerUser.thumb?.match(thumbRegex);
-        const uuid = match ? match[1] : undefined;
-        return {
-          plexId: el.id,
-          username: ownerUser.username,
-          uuid: uuid,
-        } as PlexUser;
-      } else if (plextv && plextv.$ && plextv.$.username) {
-        const match = plextv.$.thumb?.match(thumbRegex);
-        const uuid = match ? match[1] : undefined;
-        return {
-          plexId: el.id,
-          username: plextv.$.username,
-          uuid: uuid,
-        } as PlexUser;
-      }
-      return { plexId: el.id, username: el.name } as PlexUser;
-    });
   }
 }
