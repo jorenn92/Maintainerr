@@ -2,8 +2,8 @@ import { Logger } from '@nestjs/common';
 import axios, { AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import NodeCache from 'node-cache';
 
-// 5 minute default TTL (in seconds)
-const DEFAULT_TTL = 300;
+// 15 minute default TTL (in seconds)
+const DEFAULT_TTL = 600;
 
 // 10 seconds default rolling buffer (in ms)
 const DEFAULT_ROLLING_BUFFER = 10000;
@@ -156,7 +156,10 @@ export class ExternalApiService {
     ttl?: number,
   ): Promise<T> {
     try {
-      const cacheKey = this.serializeCacheKey(endpoint + data ? data : '', config?.params);
+      const cacheKey = this.serializeCacheKey(
+        endpoint + data ? data : '',
+        config?.params,
+      );
       const cachedItem = this.cache?.get<T>(cacheKey);
 
       if (cachedItem) {

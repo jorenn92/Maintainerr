@@ -95,7 +95,7 @@ export interface PlexHub {
   deletable: boolean;
 }
 
-export interface PlexUser {
+export interface SimplePlexUser {
   plexId: number;
   username: string;
   uuid?: string;
