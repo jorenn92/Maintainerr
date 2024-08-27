@@ -253,14 +253,14 @@ export class CollectionWorkerService extends TaskBase {
         }
 
         if (tvdbId) {
-          const sonarrMedia =
+          let sonarrMedia =
             await this.servarrApi.SonarrApi.getSeriesByTvdbId(tvdbId);
           if (sonarrMedia) {
             switch (collection.arrAction) {
               case ServarrAction.DELETE:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       true,
@@ -295,7 +295,7 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       false,
@@ -316,7 +316,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       'all',
                       false,
@@ -333,7 +333,7 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR_DELETE_ALL:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       true,
@@ -354,7 +354,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       'all',
                       true,
@@ -371,7 +371,7 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR_DELETE_EXISTING:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       true,
@@ -393,7 +393,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
                       sonarrMedia.id,
                       'existing',
                       true,
@@ -412,7 +412,7 @@ export class CollectionWorkerService extends TaskBase {
             if (collection.arrAction !== ServarrAction.UNMONITOR) {
               this.plexApi.deleteMediaFromDisk(plexData.ratingKey);
               this.infoLogger(
-                `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. But media item was removed from Plex`,
+                `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. But media item was removed through Plex`,
               );
             } else {
               this.infoLogger(
@@ -467,10 +467,18 @@ export class CollectionWorkerService extends TaskBase {
       if (
         !(plexLibrary.type === 'movie'
           ? this.settings.radarrConfigured()
-          : this.settings.sonarrConfigured()) &&
-        collection.arrAction !== ServarrAction.UNMONITOR
+          : this.settings.sonarrConfigured())
       )
-        await this.plexApi.deleteMediaFromDisk(media.plexId);
+        if (collection.arrAction !== ServarrAction.UNMONITOR) {
+          await this.plexApi.deleteMediaFromDisk(media.plexId.toString());
+          this.infoLogger(
+            `Couldn't utilize *arr to find and remove the media with id ${media.plexId}, so media was removed from the filesystem through Plex. No unmonitor action was taken.`,
+          );
+        } else {
+          this.infoLogger(
+            `*arr unmonitor action isn't possible, since *arr is not available. Didn't unmonitor media with id ${media.plexId}.}`,
+          );
+        }
     }
   }
 
@@ -484,7 +492,9 @@ export class CollectionWorkerService extends TaskBase {
       )?.id;
     }
 
-    const tmdbShow = await this.tmdbApi.getTvShow({ tvId: media.tmdbId });
+    const tmdbShow = media.tmdbId
+      ? await this.tmdbApi.getTvShow({ tvId: media.tmdbId })
+      : undefined;
 
     if (!tmdbShow?.external_ids?.tvdb_id) {
       let plexData = await this.plexApi.getMetadata(media.plexId.toString());

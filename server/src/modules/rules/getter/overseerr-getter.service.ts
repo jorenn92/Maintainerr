@@ -8,7 +8,7 @@ import {
 } from '../../../modules/api/overseerr-api/overseerr-api.service';
 import {
   PlexLibraryItem,
-  PlexUser,
+  SimplePlexUser,
 } from '../../../modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
@@ -58,6 +58,7 @@ export class OverseerrGetterService {
 
       const prop = this.appProperties.find((el) => el.id === id);
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
+      // const overseerrUsers = await this.overseerrApi.getUsers();
 
       let mediaResponse: OverSeerrMediaResponse;
       if (tmdb && tmdb.id) {
@@ -75,16 +76,28 @@ export class OverseerrGetterService {
                 ? origLibItem.index
                 : origLibItem.parentIndex,
             );
+            if (!seasonMediaResponse) {
+              this.logger.debug(
+                `Couldn't fetch season data for '${libItem.title}' season ${
+                  dataType === EPlexDataType.SEASONS
+                    ? origLibItem.index
+                    : origLibItem.parentIndex
+                } from Overseerr. As a result, unreliable results are expected.`,
+              );
+            }
           }
         }
+      } else {
+        this.logger.debug(
+          `Couldn't find tmdb id for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Overseerr query could be made.`,
+        );
       }
+
       if (mediaResponse && mediaResponse.mediaInfo) {
         switch (prop.name) {
           case 'addUser': {
             try {
-              const plexUsers = (await this.plexApi.getUsers()).map((el) => {
-                return { plexId: el.id, username: el.name } as PlexUser;
-              });
+              const plexUsers = await this.plexApi.getCorrectedUsers();
               const userNames: string[] = [];
               if (
                 mediaResponse &&
@@ -99,32 +112,39 @@ export class OverseerrGetterService {
                   ) {
                     const includesSeason = this.includesSeason(
                       request,
-                      seasonMediaResponse.seasonNumber,
+                      dataType === EPlexDataType.SEASONS
+                        ? origLibItem.index
+                        : origLibItem.parentIndex,
                     );
                     if (includesSeason) {
-                      userNames.push(
-                        request.requestedBy?.userType === 2
-                          ? request.requestedBy?.username
-                          : plexUsers.find(
-                              (u) =>
-                                u.username ===
-                                request.requestedBy?.plexUsername,
-                            )?.username,
-                      );
+                      if (request.requestedBy?.userType === 2) {
+                        userNames.push(request.requestedBy?.username);
+                      } else {
+                        let user = plexUsers.find(
+                          (u) => u.plexId === request.requestedBy?.plexId,
+                        )?.username;
+                        
+                        if (user) {
+                          userNames.push(user);
+                        }
+                      }
                     }
                   } else {
                     // for shows and movies, add every request user
-                    userNames.push(
-                      request.requestedBy?.userType === 2
-                        ? request.requestedBy?.username
-                        : plexUsers.find(
-                            (u) =>
-                              u.username === request.requestedBy?.plexUsername,
-                          )?.username,
-                    );
+                    if (request.requestedBy?.userType === 2) {
+                      userNames.push(request.requestedBy?.username);
+                    } else {
+                      let user = plexUsers.find(
+                        (u) => u.plexId === request.requestedBy?.plexId,
+                      )?.username;
+
+                      if (user) {
+                        userNames.push(user);
+                      }
+                    }
                   }
                 }
-                return userNames;
+                return [...new Set(userNames)]; // return only unique usernames
               }
               return [];
             } catch (e) {
@@ -234,15 +254,21 @@ export class OverseerrGetterService {
             }
           }
           case 'isRequested': {
-            if (
-              [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
-            ) {
-              return this.getSeasonRequests(origLibItem, mediaResponse).length >
-                0
-                ? 1
-                : 0;
-            } else {
-              return mediaResponse?.mediaInfo.requests.length > 0 ? 1 : 0;
+            try {
+              if (
+                [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
+                  dataType,
+                )
+              ) {
+                return this.getSeasonRequests(origLibItem, mediaResponse)
+                  .length > 0
+                  ? 1
+                  : 0;
+              } else {
+                return mediaResponse?.mediaInfo.requests.length > 0 ? 1 : 0;
+              }
+            } catch (e) {
+              return 0;
             }
           }
           default: {
@@ -250,6 +276,9 @@ export class OverseerrGetterService {
           }
         }
       } else {
+        this.logger.debug(
+          `Couldn't fetch Overseerr metadate for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Overseerr query could be made.`,
+        );
         return null;
       }
     } catch (e) {

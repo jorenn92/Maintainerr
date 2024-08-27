@@ -99,7 +99,9 @@ export class RadarrGetterService {
           case 'fileSize': {
             return movieResponse?.sizeOnDisk
               ? Math.round(movieResponse.sizeOnDisk / 1048576)
-              : null;
+              : movieResponse.movieFile?.size
+                ? Math.round(movieResponse.movieFile.size / 1048576)
+                : null;
           }
           case 'releaseDate': {
             return movieResponse?.physicalRelease &&
@@ -120,7 +122,12 @@ export class RadarrGetterService {
               : null;
           }
         }
-      } else return null;
+      } else {
+        this.logger.debug(
+          `Couldn't fetch Radarr metadate for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Radarr query could be made.`,
+        );
+        return null;
+      }
     } catch (e) {
       this.logger.warn(`Radarr-Getter - Action failed : ${e.message}`);
       return undefined;

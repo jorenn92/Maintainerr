@@ -796,6 +796,7 @@ export class CollectionsService {
           collectionIds.plexId.toString(),
           childId.toString(),
         );
+
       if ('ratingKey' in responseColl) {
         await this.connection
           .createQueryBuilder()
@@ -817,8 +818,8 @@ export class CollectionsService {
         this.CollectionLogRecordForChild(childId, collectionIds.dbId, 'add');
       } else {
         this.logger.warn(
-          `Couldn't add media to collection: `,
-          responseColl.message,
+          `Couldn't add media to collection: 
+          ${responseColl.message}`,
         );
       }
     } catch (err) {

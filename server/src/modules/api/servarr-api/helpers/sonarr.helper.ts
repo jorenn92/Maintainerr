@@ -299,7 +299,7 @@ export class SonarrApi extends ServarrApi<{
         }
       }
     } catch (e) {
-      this.logger.log(`Couldn\'t remove/unmonitor episodes: ${episodeIds}`, {
+      this.logger.warn(`Couldn\'t remove/unmonitor episodes: ${episodeIds}`, {
         label: 'Sonarr API',
         errorMessage: e.message,
         seriesId,
@@ -313,7 +313,7 @@ export class SonarrApi extends ServarrApi<{
     type: 'all' | number | 'existing' = 'all',
     deleteFiles = true,
     forceExisting = false,
-  ): Promise<void> {
+  ): Promise<SonarrSeries> {
     try {
       const data: SonarrSeries = (await this.axios.get(`series/${seriesId}`))
         .data;
@@ -363,6 +363,7 @@ export class SonarrApi extends ServarrApi<{
           }
         }
       }
+      return data;
     } catch (e) {
       this.logger.log("Couldn't unmonitor/delete. Does it exist in sonarr?", {
         errorMessage: e.message,
@@ -372,8 +373,8 @@ export class SonarrApi extends ServarrApi<{
       this.logger.debug(e);
     }
     this.logger.log(
-      `Unmonitored season(s) ${
-        typeof type === 'number' ? type : ''
+      `Unmonitored ${
+        typeof type === 'number' ? `season ${type}` : 'seasons'
       } from Sonarr show with ID ${seriesId}`,
     );
   }

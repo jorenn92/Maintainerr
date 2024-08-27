@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   PlexLibraryItem,
   PlexSeenBy,
-  PlexUser,
+  SimplePlexUser,
 } from '../../..//modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import {
@@ -52,7 +52,7 @@ export class PlexGetterService {
           return metadata.addedAt ? new Date(+metadata.addedAt * 1000) : null;
         }
         case 'seenBy': {
-          const plexUsers = await this.getCorrectedUsers();
+          const plexUsers = await this.plexApi.getCorrectedUsers();
 
           const viewers: PlexSeenBy[] = await this.plexApi
             .getWatchHistory(metadata.ratingKey)
@@ -267,7 +267,7 @@ export class PlexGetterService {
           return item.Genre ? item.Genre.map((el) => el.tag) : null;
         }
         case 'sw_allEpisodesSeenBy': {
-          const plexUsers = await this.getCorrectedUsers();
+          const plexUsers = await this.plexApi.getCorrectedUsers();
 
           const seasons =
             metadata.type !== 'season'
@@ -310,7 +310,7 @@ export class PlexGetterService {
           return [];
         }
         case 'sw_watchers': {
-          const plexUsers = await this.getCorrectedUsers();
+          const plexUsers = await this.plexApi.getCorrectedUsers();
 
           const watchHistory = await this.plexApi.getWatchHistory(
             metadata.ratingKey,
@@ -438,6 +438,34 @@ export class PlexGetterService {
           // originallyAvailableAt is usually an ISO 8601 date string, no need to convert from epoch time
           return lastEpDate ? new Date(lastEpDate) : null;
         }
+        case 'watchlist_isListedByUsers': {
+          // returns a list of users that have this media item, or parent, in their watchlist
+          const guid = grandparent
+            ? grandparent.guid
+            : parent
+              ? parent.guid
+              : metadata.guid;
+          const media_uuid = guid.match(/plex:\/\/[a-z]+\/([a-z0-9]+)$/);
+
+          const plexUsers: SimplePlexUser[] = await this.plexApi.getCorrectedUsers();
+
+          const userFilterPromises = plexUsers.map(async (u) => {
+            if (u.uuid === undefined || media_uuid === undefined) return false; // break if uuids are unavailable
+            try {
+              const watchlist = await this.plexApi.getWatchlistIdsForUser(
+                u.uuid,
+              );
+              return (
+                watchlist.find((i) => i.id === media_uuid[1]) !== undefined
+              );
+            } catch (e) {
+              return false;
+            }
+          });
+          const filterResults = await Promise.all(userFilterPromises);
+          const result = plexUsers.filter((_, index) => filterResults[index]);
+          return result.map((u) => u.username);
+        }
         default: {
           return null;
         }
@@ -446,19 +474,5 @@ export class PlexGetterService {
       this.logger.warn(`Plex-Getter - Action failed : ${e.message}`);
       return undefined;
     }
-  }
-
-  private async getCorrectedUsers(): Promise<PlexUser[]> {
-    const plexTvUsers = await this.plexApi.getUserDataFromPlexTv();
-
-    return (await this.plexApi.getUsers()).map((el) => {
-      const plextv = plexTvUsers?.find((tvEl) => tvEl.$?.id == el.id);
-
-      // use the username from plex.tv if available, since Overseerr also does this
-      if (plextv && plextv.$ && plextv.$.username) {
-        return { plexId: el.id, username: plextv.$.username } as PlexUser;
-      }
-      return { plexId: el.id, username: el.name } as PlexUser;
-    });
   }
 }

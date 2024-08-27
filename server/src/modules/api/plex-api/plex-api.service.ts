@@ -17,6 +17,7 @@ import {
   PlexLibraryResponse,
   PlexSeenBy,
   PlexUserAccount,
+  SimplePlexUser,
 } from './interfaces/library.interfaces';
 import {
   PlexMetadata,
@@ -30,14 +31,20 @@ import {
 import { EPlexDataType } from './enums/plex-data-type-enum';
 import axios from 'axios';
 import PlexApi from '../lib/plexApi';
-import PlexTvApi from '../lib/plextvApi';
+import PlexTvApi, { PlexUser } from '../lib/plextvApi';
 import cacheManager from '../../api/lib/cache';
 import { Settings } from '../../settings/entities/settings.entities';
+import PlexCommunityApi, {
+  GraphQLQuery,
+  PlexCommunityWatchHistory,
+  PlexCommunityWatchList,
+} from '../../api/lib/plexCommunityApi';
 
 @Injectable()
 export class PlexApiService {
   private plexClient: PlexApi;
   private plexTvClient: PlexTvApi;
+  private plexCommunityClient: PlexCommunityApi;
   private machineId: string;
   private readonly logger = new Logger(PlexApiService.name);
   constructor(
@@ -102,6 +109,7 @@ export class PlexApiService {
         });
 
         this.plexTvClient = new PlexTvApi(plexToken);
+        this.plexCommunityClient = new PlexCommunityApi(plexToken);
 
         this.setMachineId();
       } else {
@@ -110,9 +118,7 @@ export class PlexApiService {
         );
       }
     } catch (err) {
-      this.logger.error(
-        `Couldn't connect to Plex.. Please check your settings`,
-      );
+      this.logger.warn(`Couldn't connect to Plex.. Please check your settings`);
       this.logger.debug(err);
     }
   }
@@ -180,12 +186,12 @@ export class PlexApiService {
     }
   }
 
-  public async getUser(id: number): Promise<PlexUserAccount[]> {
+  public async getUser(id: number): Promise<PlexUserAccount> {
     try {
       const response: PlexAccountsResponse = await this.plexClient.queryAll({
         uri: `/accounts/${id}`,
       });
-      return response.MediaContainer.Account;
+      return response?.MediaContainer?.Account[0];
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
@@ -305,6 +311,16 @@ export class PlexApiService {
       return response.MediaContainer.User;
     } catch (err) {
       this.logger.warn("Outbound call to plex.tv failed. Couldn't fetch users");
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
+  public async getOwnerDataFromPlexTv(): Promise<PlexUser> {
+    try {
+      return await this.plexTvClient.getUser();
+    } catch (err) {
+      this.logger.warn("Outbound call to plex.tv failed. Couldn't fetch owner");
       this.logger.debug(err);
       return undefined;
     }
@@ -432,7 +448,7 @@ export class PlexApiService {
         uri: `/library/metadata/${plexId}`,
       });
     } catch (e) {
-      this.logger.log('Something went wrong while removing media from Plex.', {
+      this.logger.warn('Something went wrong while removing media from Plex.', {
         label: 'Plex API',
         errorMessage: e.message,
         plexId,
@@ -445,9 +461,12 @@ export class PlexApiService {
     collectionId: string | number,
   ): Promise<PlexCollection> {
     try {
-      const response = await this.plexClient.query<PlexLibraryResponse>({
-        uri: `/library/collections/${+collectionId}?`,
-      });
+      const response = await this.plexClient.query<PlexLibraryResponse>(
+        {
+          uri: `/library/collections/${+collectionId}?`,
+        },
+        false,
+      );
       const collection: PlexCollection = response.MediaContainer
         .Metadata as PlexCollection;
 
@@ -678,6 +697,172 @@ export class PlexApiService {
     }
   }
 
+  public async getWatchlistIdsForUser(
+    userId: string,
+  ): Promise<PlexCommunityWatchList[]> {
+    try {
+      let result: PlexCommunityWatchList[] = [];
+      let next = true;
+      let page = null;
+      const size = 50;
+
+      while (next) {
+        const resp = await this.plexCommunityClient.query({
+          query: `
+          query GetWatchlistHub($uuid: ID = "", $first: PaginationInt!, $after: String) {
+            user(id: $uuid) {
+              watchlist(first: $first, after: $after) {
+                nodes {
+                  id
+                  key
+                  title
+                  type
+                }
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                }
+              }
+            }
+          }
+        `,
+          variables: {
+            uuid: userId,
+            first: size,
+            skipUserState: true,
+            after: page,
+          },
+        });
+        const watchlist = resp.data.user.watchlist;
+        result = [...result, ...watchlist.nodes];
+
+        if (!watchlist.pageInfo?.hasNextPage) {
+          next = false;
+        } else {
+          page = watchlist.pageInfo?.endCursor;
+        }
+      }
+      return result;
+    } catch (e) {
+      this.logger.warn(
+        `Failure while fetching watchlist of user with ID: ${userId}`,
+      );
+      this.logger.debug(e);
+    }
+  }
+
+  public async getWatchHistoryIdsForUser(
+    userId: string,
+  ): Promise<PlexCommunityWatchHistory[]> {
+    try {
+      let result: PlexCommunityWatchHistory[] = [];
+      let next = true;
+      let page = null;
+      const size = 50;
+
+      while (next) {
+        const resp = await this.plexCommunityClient.query({
+          query: `
+          query GetWatchHistoryHub($uuid: ID = "", $first: PaginationInt!, $after: String, $skipUserState: Boolean = false) {
+            user(id: $uuid) {
+              watchHistory(first: $first, after: $after) {
+                nodes {
+                  metadataItem {
+                    ...itemFields
+                  }
+                  date
+                  id
+                }
+                pageInfo {
+                  hasNextPage
+                  hasPreviousPage
+                  endCursor
+                }
+              }
+            }
+          }
+              
+          fragment itemFields on MetadataItem {
+            id
+            images {
+              coverArt
+              coverPoster
+              thumbnail
+              art
+            }
+            userState @skip(if: $skipUserState) {
+              viewCount
+              viewedLeafCount
+              watchlistedAt
+            }
+            title
+            key
+            type
+            index
+            publicPagesURL
+            parent {
+              ...parentFields
+            }
+            grandparent {
+              ...parentFields
+            }
+            publishedAt
+            leafCount
+            year
+            originallyAvailableAt
+            childCount
+          }
+              
+          fragment parentFields on MetadataItem {
+            index
+            title
+            publishedAt
+            key
+            type
+            images {
+              coverArt
+              coverPoster
+              thumbnail
+              art
+            }
+            userState @skip(if: $skipUserState) {
+              viewCount
+              viewedLeafCount
+              watchlistedAt
+            }
+          }       
+        `,
+          variables: {
+            uuid: userId,
+            first: size,
+            skipUserState: true,
+            after: page,
+          },
+        });
+        const watchHistory = resp?.data?.user?.watchHistory;
+        if (watchHistory) {
+          result = [
+            ...result,
+            ...watchHistory?.nodes?.map((n) => n.metadataItem.key),
+          ];
+        }
+
+        if (!watchHistory.pageInfo?.hasNextPage) {
+          next = false;
+        } else {
+          // await new Promise((resolve) => setTimeout(resolve, 1000));
+          page = watchHistory.pageInfo?.endCursor;
+        }
+      }
+      return result;
+    } catch (e) {
+      this.logger.warn(
+        `Failure while fetching watchHistory of user with ID: ${userId}`,
+      );
+      this.logger.debug(e);
+    }
+  }
+
   public async getAllIdsForContextAction(
     collectionType: EPlexDataType,
     context: { type: EPlexDataType; id: number },
@@ -828,6 +1013,38 @@ export class PlexApiService {
     return handleMedia;
   }
 
+  public async getCorrectedUsers(): Promise<SimplePlexUser[]> {
+    const thumbRegex = /https:\/\/plex\.tv\/users\/([a-z0-9]+)\/avatar\?c=\d+/;
+
+    const plexTvUsers = await this.getUserDataFromPlexTv();
+    const owner = await this.getOwnerDataFromPlexTv();
+
+    return (await this.getUsers()).map((el) => {
+      const plextv = plexTvUsers?.find((tvEl) => tvEl.$?.id == el.id);
+      const ownerUser = owner?.username === el.name ? owner : undefined;
+
+      // use the username from plex.tv if available, since Overseerr also does this
+      if (ownerUser) {
+        const match = ownerUser.thumb?.match(thumbRegex);
+        const uuid = match ? match[1] : undefined;
+        return {
+          plexId: +ownerUser.id,
+          username: ownerUser.username,
+          uuid: uuid,
+        } as SimplePlexUser;
+      } else if (plextv && plextv.$ && plextv.$.username) {
+        const match = plextv.$.thumb?.match(thumbRegex);
+        const uuid = match ? match[1] : undefined;
+        return {
+          plexId: +plextv.$.id,
+          username: plextv.$.username,
+          uuid: uuid,
+        } as SimplePlexUser;
+      }
+      return { plexId: +el.id, username: el.name } as SimplePlexUser;
+    });
+  }
+
   private async setMachineId() {
     try {
       const response = await this.getStatus();
@@ -835,7 +1052,7 @@ export class PlexApiService {
         this.machineId = response.machineIdentifier;
         return response.machineIdentifier;
       } else {
-        this.logger.error("Couldn't reach Plex");
+        this.logger.warn("Couldn't reach Plex");
         return null;
       }
     } catch (err) {
