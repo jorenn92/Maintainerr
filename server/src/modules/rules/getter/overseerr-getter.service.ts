@@ -123,7 +123,7 @@ export class OverseerrGetterService {
                         let user = plexUsers.find(
                           (u) => u.plexId === request.requestedBy?.plexId,
                         )?.username;
-
+                        
                         if (user) {
                           userNames.push(user);
                         }
