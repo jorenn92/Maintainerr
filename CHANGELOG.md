@@ -1,3 +1,21 @@
+# [2.1.0](https://github.com/jorenn92/Maintainerr/compare/v2.0.4...v2.1.0) (2024-09-02)
+
+
+### Bug Fixes
+
+* Added extra error handling to Overseerr's isRequested rule ([#1232](https://github.com/jorenn92/Maintainerr/issues/1232)) ([dc42a98](https://github.com/jorenn92/Maintainerr/commit/dc42a987f7a76deec454595384f13d371ac8c090))
+* Fetching movies by tmdbId no longer utilizes Radarr's lookup endpoint ([#1214](https://github.com/jorenn92/Maintainerr/issues/1214)) ([1a84b8c](https://github.com/jorenn92/Maintainerr/commit/1a84b8cf505bb6216af8a85ab907b3c912bdd267))
+* Fixed an issue where Overseerr's 'requested by' rule failed to fetch the Plex user when the user uses a display name ([a4422f5](https://github.com/jorenn92/Maintainerr/commit/a4422f578effca020be8b27ffb828c92c7a7bb56))
+* Fixed an issue where Overseerr's 'requested by' rule failed to fetch the Plex user when the user uses a display name ([#1231](https://github.com/jorenn92/Maintainerr/issues/1231)) ([9f1cc65](https://github.com/jorenn92/Maintainerr/commit/9f1cc6562148d2d631d6a3d05d4d12f74613f756))
+* Fixed Radarr file size rule, when 'sizeOnDisk' is not available, it'll now fall back to movieFile.size ([#1205](https://github.com/jorenn92/Maintainerr/issues/1205)) ([1aac50b](https://github.com/jorenn92/Maintainerr/commit/1aac50bc3e7d3be9d64e14950004619581944c6c))
+* Improved logging when media is not removable through *arr ([#1177](https://github.com/jorenn92/Maintainerr/issues/1177)) ([074c7c3](https://github.com/jorenn92/Maintainerr/commit/074c7c39acd5560e40c7a20ebe8b35c048ac7a6b))
+* Improved Overseerr rule logs in case of failures ([#1178](https://github.com/jorenn92/Maintainerr/issues/1178)) ([f6466e3](https://github.com/jorenn92/Maintainerr/commit/f6466e332be246505b1d00db6946ca1bfc7e873e))
+
+
+### Features
+
+* Added an integration with the Plex community API and introduced a 'Plex - Watchlisted by' rule utilizing this endpoint ([#1152](https://github.com/jorenn92/Maintainerr/issues/1152)) ([1ebba97](https://github.com/jorenn92/Maintainerr/commit/1ebba9766421439689a0a63dde4a85aef23845f1))
+
 ## [2.0.4](https://github.com/jorenn92/Maintainerr/compare/v2.0.3...v2.0.4) (2024-06-19)
 
 
