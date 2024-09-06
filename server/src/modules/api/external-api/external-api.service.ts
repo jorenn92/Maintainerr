@@ -180,7 +180,16 @@ export class ExternalApiService {
       const response = await this.axios
         .post<T>(endpoint, data, config)
         .catch((err: AxiosError) => {
-          throw err;
+          if (err.response?.status === 429) {
+            const retryAfter = err.response.headers['retry-after'] || 'unknown';
+            Logger.warn(
+              `${endpoint} Rate limit hit. Retry after: ${retryAfter} seconds.`,
+            );
+          } else {
+            Logger.warn(`POST request to ${endpoint} failed: ${err.message}`);
+            Logger.debug(err);
+          }
+          return undefined;
         });
 
       if (this.cache) {
@@ -189,15 +198,8 @@ export class ExternalApiService {
 
       return response.data;
     } catch (err: any) {
-      if (err.response?.status === 429) {
-        const retryAfter = err.response.headers['retry-after'] || 'unknown';
-        Logger.warn(
-          `${endpoint} Rate limit hit. Retry after: ${retryAfter} seconds.`,
-        );
-      } else {
-        Logger.warn(`POST request failed: ${err.message}`);
-        Logger.debug(err);
-      }
+      Logger.warn(`POST request to ${endpoint} failed: ${err.message}`);
+      Logger.debug(err);
       return undefined;
     }
   }
