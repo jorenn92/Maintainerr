@@ -2,8 +2,8 @@ import { Logger } from '@nestjs/common';
 import axios, { AxiosError, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import NodeCache from 'node-cache';
 
-// 15 minute default TTL (in seconds)
-const DEFAULT_TTL = 600;
+// 20 minute default TTL (in seconds)
+const DEFAULT_TTL = 1200;
 
 // 10 seconds default rolling buffer (in ms)
 const DEFAULT_ROLLING_BUFFER = 10000;
@@ -157,7 +157,7 @@ export class ExternalApiService {
   ): Promise<T> {
     try {
       const cacheKey = this.serializeCacheKey(
-        endpoint + data ? data : '',
+        endpoint + data ? data.replace(/\s/g, '').trim() : '',
         config?.params,
       );
       const cachedItem = this.cache?.get<T>(cacheKey);
@@ -167,12 +167,28 @@ export class ExternalApiService {
 
         // If the item has passed our rolling check, fetch again in background
         if (
-          keyTtl - (ttl ?? DEFAULT_TTL) * 1000 <
+          keyTtl <
           Date.now() - DEFAULT_ROLLING_BUFFER
         ) {
-          this.axios.post<T>(endpoint, data, config).then((response) => {
-            this.cache?.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
-          });
+          this.axios
+            .post<T>(endpoint, data, config)
+            .then((response) => {
+              this.cache?.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
+            })
+            .catch((err: AxiosError) => {
+              if (err.response?.status === 429) {
+                const retryAfter =
+                  err.response.headers['retry-after'] || 'unknown';
+                Logger.warn(
+                  `${endpoint} Rate limit hit. Retry after: ${retryAfter} seconds.`,
+                );
+              } else {
+                Logger.warn(
+                  `POST request to ${endpoint} failed: ${err.message}`,
+                );
+                Logger.debug(err);
+              }
+            });
         }
         return cachedItem;
       }
