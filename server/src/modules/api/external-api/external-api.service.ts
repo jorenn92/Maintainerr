@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import axios, { AxiosInstance, RawAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import NodeCache from 'node-cache';
 
 // 15 minute default TTL (in seconds)
@@ -177,15 +177,27 @@ export class ExternalApiService {
         return cachedItem;
       }
 
-      const response = await this.axios.post<T>(endpoint, data, config);
+      const response = await this.axios
+        .post<T>(endpoint, data, config)
+        .catch((err: AxiosError) => {
+          throw err;
+        });
 
       if (this.cache) {
         this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
       }
 
       return response.data;
-    } catch (err) {
-      Logger.debug(`POST request failed: ${err}`);
+    } catch (err: any) {
+      if (err.response?.status === 429) {
+        const retryAfter = err.response.headers['retry-after'] || 'unknown';
+        Logger.warn(
+          `${endpoint} Rate limit hit. Retry after: ${retryAfter} seconds.`,
+        );
+      } else {
+        Logger.warn(`POST request failed: ${err.message}`);
+        Logger.debug(err);
+      }
       return undefined;
     }
   }
