@@ -704,7 +704,7 @@ export class PlexApiService {
       let result: PlexCommunityWatchList[] = [];
       let next = true;
       let page = null;
-      const size = 50;
+      const size = 100;
 
       while (next) {
         const resp = await this.plexCommunityClient.query({
