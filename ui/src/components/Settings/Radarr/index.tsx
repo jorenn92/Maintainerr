@@ -78,9 +78,9 @@ const RadarrSettings = () => {
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https://')
           ? hostnameRef.current.value
-          : portRef.current.value == '443' ? 
-          'https://' + hostnameRef.current.value
-          : 'http://' + hostnameRef.current.value
+          : portRef.current.value == '443' ?
+            'https://' + hostnameRef.current.value
+            : 'http://' + hostnameRef.current.value
 
       let radarr_url = `${addPortToUrl(hostnameVal, +portRef.current.value)}`
       radarr_url = radarr_url.endsWith('/')
@@ -88,9 +88,8 @@ const RadarrSettings = () => {
         : radarr_url
 
       const payload = {
-        radarr_url: `${radarr_url}${
-          baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
-        }`,
+        radarr_url: `${radarr_url}${baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
+          }`,
         radarr_api_key: apiKeyRef.current.value,
       }
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
@@ -231,6 +230,7 @@ const RadarrSettings = () => {
               <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
                 <DocsButton page="Configuration" />
               </span>
+              <p className="description">🚨 You must Save Changes prior to clicking on Test Saved. 🚨</p>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/radarr" />
 
@@ -238,7 +238,7 @@ const RadarrSettings = () => {
                   <Button
                     buttonType="primary"
                     type="submit"
-                    // disabled={isSubmitting || !isValid}
+                  // disabled={isSubmitting || !isValid}
                   >
                     <SaveIcon />
                     <span>Save Changes</span>

@@ -109,8 +109,8 @@ const PlexSettings = () => {
         plex_hostname: sslRef.current?.checked
           ? `https://${hostnameRef.current.value.replace('http://', '').replace('https://', '')}`
           : hostnameRef.current.value
-              .replace('http://', '')
-              .replace('https://', ''),
+            .replace('http://', '')
+            .replace('https://', ''),
         plex_port: +portRef.current.value,
         plex_name: nameRef.current.value,
         plex_ssl: +sslRef.current.checked, // not used, server derives this from https://
@@ -363,9 +363,8 @@ const PlexSettings = () => {
                     <option key={`preset-server-${index}`} value={index}>
                       {`
                             ${server.name} (${server.address})
-                            [${server.local ? 'local' : 'remote'}]${
-                              server.ssl ? ` [secure]` : ''
-                            }
+                            [${server.local ? 'local' : 'remote'}]${server.ssl ? ` [secure]` : ''
+                        }
                           `}
                     </option>
                   ))}
@@ -504,6 +503,7 @@ const PlexSettings = () => {
               <span className="m-auto sm:mr-auto sm:ml-3 rounded-md shadow-sm">
                 <DocsButton page="Configuration" />
               </span>
+              <p className="description">🚨 You must Save Changes prior to clicking on Test Saved. 🚨</p>
               <div className="flex sm:justify-end m-auto sm:m-0 mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/plex" />
 
@@ -511,7 +511,7 @@ const PlexSettings = () => {
                   <Button
                     buttonType="primary"
                     type="submit"
-                    // disabled={isSubmitting || !isValid}
+                  // disabled={isSubmitting || !isValid}
                   >
                     <SaveIcon />
                     <span>Save Changes</span>
