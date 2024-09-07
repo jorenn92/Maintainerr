@@ -71,12 +71,12 @@ const RuleCreator = (props: iRuleCreator) => {
       // set sectionAmount
       editData
         ? editData.rules.forEach((el) =>
-            el.section !== undefined
-              ? sectionAmounts[el.section]
-                ? sectionAmounts[el.section]++
-                : (sectionAmounts[el.section] = 1)
-              : (sectionAmounts[0] = 1)
-          )
+          el.section !== undefined
+            ? sectionAmounts[el.section]
+              ? sectionAmounts[el.section]++
+              : (sectionAmounts[el.section] = 1)
+            : (sectionAmounts[0] = 1)
+        )
         : undefined
       setRuleAmount([
         editSections,
@@ -232,34 +232,34 @@ const RuleCreator = (props: iRuleCreator) => {
                   id={
                     ruleAmount[1].length > 1
                       ? ruleAmount[1].reduce((pv, cv, idx) =>
-                          sid === 1
-                            ? cv - (cv - id)
-                            : idx <= sid - 1
+                        sid === 1
+                          ? cv - (cv - id)
+                          : idx <= sid - 1
                             ? idx === sid - 1
                               ? cv - (cv - id) + pv
                               : cv + pv
                             : pv
-                        )
+                      )
                       : ruleAmount[1][0] - (ruleAmount[1][0] - id)
                   }
                   tagId={id}
                   editData={
                     editData
                       ? {
-                          rule: editData.rules[
-                            (ruleAmount[1].length > 1
-                              ? ruleAmount[1].reduce((pv, cv, idx) =>
-                                  sid === 1
-                                    ? cv - (cv - id)
-                                    : idx <= sid - 1
-                                    ? idx === sid - 1
-                                      ? cv - (cv - id) + pv
-                                      : cv + pv
-                                    : pv
-                                )
-                              : ruleAmount[1][0] - (ruleAmount[1][0] - id)) - 1
-                          ],
-                        }
+                        rule: editData.rules[
+                          (ruleAmount[1].length > 1
+                            ? ruleAmount[1].reduce((pv, cv, idx) =>
+                              sid === 1
+                                ? cv - (cv - id)
+                                : idx <= sid - 1
+                                  ? idx === sid - 1
+                                    ? cv - (cv - id) + pv
+                                    : cv + pv
+                                  : pv
+                            )
+                            : ruleAmount[1][0] - (ruleAmount[1][0] - id)) - 1
+                        ],
+                      }
                       : undefined
                   }
                   section={sid}
@@ -285,7 +285,7 @@ const RuleCreator = (props: iRuleCreator) => {
             >
               {<ClipboardListIcon className="m-auto ml-5 h-5" />}
               <p className="button-text m-auto ml-1 mr-5  text-zinc-200">
-                New Section
+                Add a New Section
               </p>
             </button>
           </div>
@@ -293,7 +293,7 @@ const RuleCreator = (props: iRuleCreator) => {
       ) : undefined}
 
       {rulesCreated.current.length !==
-      ruleAmount[1].reduce((pv, cv) => pv + cv) ? (
+        ruleAmount[1].reduce((pv, cv) => pv + cv) ? (
         <div className="max-width-form-head mt-5">
           <Alert>{`Some incomplete rules won't be saved`} </Alert>
         </div>

@@ -346,6 +346,7 @@ const AddModal = (props: AddModal) => {
           <div className="form-row">
             <label htmlFor="name" className="text-label">
               Name *
+              <p className="text-xs font-normal"> This will be the name of the collection in Plex</p>
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -525,6 +526,7 @@ const AddModal = (props: AddModal) => {
                   ref={deleteAfterRef}
                 />
               </div>
+              <p className="description text-xs font-normal"> 1 is the lowest number that will function </p>
             </div>
           </div>
 
@@ -704,6 +706,14 @@ const AddModal = (props: AddModal) => {
               </div>
             </div>
           </div>
+          <div className="form-row">
+            <label className="text-label">
+              Confused?
+            </label>
+            <div className="form-input button-text m-auto ml-1 text-zinc-100 rounded bg-amber-600 sm:h-8 ml-3 flex hover:bg-amber-500">
+              <a href="https://docs.maintainerr.info/blog/tutorials/getting-started-with-rules-s01e01/" target="_blank">🕮 Visit the Guides</a>
+            </div>
+          </div>
 
           <hr className="mt-5" />
           <div className={`section ${useRules ? `` : `hidden`}`}>
@@ -724,7 +734,7 @@ const AddModal = (props: AddModal) => {
                       <CloudDownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
                     }
                     <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
-                      Community
+                      See Community Uploads
                     </p>
                   </button>
                 </div>

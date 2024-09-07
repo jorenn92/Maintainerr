@@ -28,7 +28,7 @@ const SectionHeading = (props: ISectionHeading) => {
               title={`Add rule to section ${props.id}`}
             >
               {<DocumentAddIcon className="m-auto h-5 ml-5 text-zinc-200" />}
-              <p className="m-auto ml-1 mr-5 text-zinc-100 button-text">Add</p>
+              <p className="m-auto ml-1 mr-5 text-zinc-100 button-text">Add Rule to Section</p>
             </button>
           ) : undefined}
         </div>

@@ -180,15 +180,15 @@ const RuleInput = (props: IRuleInput) => {
               ? customValType === RuleType.DATE
                 ? customValType
                 : customValType === RuleType.NUMBER
-                ? customValType
-                : customValType === RuleType.TEXT &&
-                  secondVal === CustomParams.CUSTOM_DAYS
-                ? RuleType.NUMBER
-                : customValType === RuleType.TEXT
-                ? customValType
-                : customValType === RuleType.BOOL
-                ? customValType
-                : +ruleType
+                  ? customValType
+                  : customValType === RuleType.TEXT &&
+                    secondVal === CustomParams.CUSTOM_DAYS
+                    ? RuleType.NUMBER
+                    : customValType === RuleType.TEXT
+                      ? customValType
+                      : customValType === RuleType.BOOL
+                        ? customValType
+                        : +ruleType
               : +ruleType,
             value: customVal,
           },
@@ -299,8 +299,8 @@ const RuleInput = (props: IRuleInput) => {
             {props.tagId
               ? `Rule #${props.tagId}`
               : props.id
-              ? `Rule #${props.id}`
-              : `Rule #1`}
+                ? `Rule #${props.id}`
+                : `Rule #1`}
           </div>
 
           {props.id && props.id > 1 ? (
@@ -311,7 +311,7 @@ const RuleInput = (props: IRuleInput) => {
             >
               {<TrashIcon className="m-auto ml-5 h-5" />}
               <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
-                Delete
+                Remove Rule {props.tagId} from Section {props.section}
               </p>
             </button>
           ) : undefined}
@@ -323,7 +323,7 @@ const RuleInput = (props: IRuleInput) => {
             <label htmlFor="operator" className="text-label">
               Operator
               {!props.id ||
-              (props.tagId ? props.tagId === 1 : props.id === 1) ? (
+                (props.tagId ? props.tagId === 1 : props.id === 1) ? (
                 <span className="label-tip">
                   {`Section ${props.section}'s action on all previous section results.`}
                 </span>
@@ -448,9 +448,9 @@ const RuleInput = (props: IRuleInput) => {
                       Amount of days
                     </option>
                     {action &&
-                    +action !== +RulePossibility.IN_LAST &&
-                    action &&
-                    +action !== +RulePossibility.IN_NEXT ? (
+                      +action !== +RulePossibility.IN_LAST &&
+                      action &&
+                      +action !== +RulePossibility.IN_NEXT ? (
                       <option value={CustomParams.CUSTOM_DATE}>
                         Specific date
                       </option>
@@ -504,7 +504,7 @@ const RuleInput = (props: IRuleInput) => {
           <div className="form-input">
             <div className="form-input-field">
               {customValType === RuleType.TEXT &&
-              secondVal === 'custom_days' ? (
+                secondVal === 'custom_days' ? (
                 <input
                   type="number"
                   name="custom_val"
