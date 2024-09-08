@@ -202,7 +202,7 @@ const OverseerrSettings = () => {
                 <DocsButton page="Configuration" />
               </span>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
-                <p className="description">🚨 You must Save Changes prior to clicking on Test Saved. 🚨</p>
+                <p className="description">🚨 Save Changes before Testing</p>
                 <TestButton
                   onClick={appTest}
                   testUrl="/settings/test/overseerr"

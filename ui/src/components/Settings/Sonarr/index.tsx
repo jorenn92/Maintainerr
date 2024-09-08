@@ -228,7 +228,7 @@ const SonarrSettings = () => {
               <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
                 <DocsButton page="Configuration" />
               </span>
-              <p className="description">🚨 You must Save Changes prior to clicking on Test Saved. 🚨</p>
+              <p className="description">🚨 Save Changes before Testing</p>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/sonarr" />
 

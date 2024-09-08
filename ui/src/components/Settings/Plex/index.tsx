@@ -503,7 +503,7 @@ const PlexSettings = () => {
               <span className="m-auto sm:mr-auto sm:ml-3 rounded-md shadow-sm">
                 <DocsButton page="Configuration" />
               </span>
-              <p className="description">🚨 You must Save Changes prior to clicking on Test Saved. 🚨</p>
+              <p className="description">🚨 Save Changes before Testing</p>
               <div className="flex sm:justify-end m-auto sm:m-0 mt-3 xs:mt-0">
                 <TestButton onClick={appTest} testUrl="/settings/test/plex" />
 

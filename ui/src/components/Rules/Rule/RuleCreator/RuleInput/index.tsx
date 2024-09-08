@@ -305,7 +305,7 @@ const RuleInput = (props: IRuleInput) => {
 
           {props.id && props.id > 1 ? (
             <button
-              className="ml-auto flex h-8 rounded bg-amber-900 text-zinc-200 shadow-md hover:bg-amber-800"
+              className="ml-auto flex rounded bg-amber-900 text-zinc-200 shadow-md hover:bg-amber-800"
               onClick={onDelete}
               title={`Remove rule ${props.tagId}, section ${props.section}`}
             >

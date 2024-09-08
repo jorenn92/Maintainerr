@@ -710,9 +710,17 @@ const AddModal = (props: AddModal) => {
             <label className="text-label">
               Confused?
             </label>
-            <div className="form-input button-text m-auto ml-1 text-zinc-100 rounded bg-amber-600 sm:h-8 ml-3 flex hover:bg-amber-500">
-              <a href="https://docs.maintainerr.info/blog/tutorials/getting-started-with-rules-s01e01/" target="_blank">🕮 Visit the Guides</a>
-            </div>
+            <Link
+              legacyBehavior
+              href={`https://docs.maintainerr.info/blog/tutorials/getting-started-with-rules-s01e01/`}
+              passHref={true}
+            >
+              <a target="_blank" rel="noopener noreferrer">
+                <Button className="ml-3" buttonType="default" type="button">
+                  <span>🕮 View The Walkthrough</span>
+                </Button>
+              </a>
+            </Link>
           </div>
 
           <hr className="mt-5" />
@@ -734,7 +742,7 @@ const AddModal = (props: AddModal) => {
                       <CloudDownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
                     }
                     <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
-                      See Community Uploads
+                      Community Rules
                     </p>
                   </button>
                 </div>
