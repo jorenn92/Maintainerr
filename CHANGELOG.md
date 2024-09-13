@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/jorenn92/Maintainerr/compare/v2.1.1...v2.1.2) (2024-09-13)
+
+
+### Bug Fixes
+
+* Fixed the 'Viewed by' rule for the server owner for movies. This was already fixed for TV shows in 2.1.1 ([#1266](https://github.com/jorenn92/Maintainerr/issues/1266)) ([a41e8ab](https://github.com/jorenn92/Maintainerr/commit/a41e8ab476ee4fcf62e6edd3d2ce9079444c8e0c))
+
 ## [2.1.1](https://github.com/jorenn92/Maintainerr/compare/v2.1.0...v2.1.1) (2024-09-09)
 
 
