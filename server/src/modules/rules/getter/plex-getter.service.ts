@@ -52,7 +52,7 @@ export class PlexGetterService {
           return metadata.addedAt ? new Date(+metadata.addedAt * 1000) : null;
         }
         case 'seenBy': {
-          const plexUsers = await this.plexApi.getCorrectedUsers();
+          const plexUsers = await this.plexApi.getCorrectedUsers(false);
 
           const viewers: PlexSeenBy[] = await this.plexApi
             .getWatchHistory(metadata.ratingKey)

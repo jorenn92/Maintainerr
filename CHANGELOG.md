@@ -1,3 +1,19 @@
+## [2.1.2](https://github.com/jorenn92/Maintainerr/compare/v2.1.1...v2.1.2) (2024-09-13)
+
+
+### Bug Fixes
+
+* Fixed the 'Viewed by' rule for the server owner for movies. This was already fixed for TV shows in 2.1.1 ([#1266](https://github.com/jorenn92/Maintainerr/issues/1266)) ([a41e8ab](https://github.com/jorenn92/Maintainerr/commit/a41e8ab476ee4fcf62e6edd3d2ce9079444c8e0c))
+
+## [2.1.1](https://github.com/jorenn92/Maintainerr/compare/v2.1.0...v2.1.1) (2024-09-09)
+
+
+### Bug Fixes
+
+* Fixed an issue where 'Users that saw all available episodes' & 'Users that watch the show/season/episode' wouldn't work for the owner user after 2.1.0 ([#1252](https://github.com/jorenn92/Maintainerr/issues/1252)) ([bf8c2d3](https://github.com/jorenn92/Maintainerr/commit/bf8c2d31cb5961e44643356ae84a9744427df187))
+* The server no longer crashes when community.plex.tv rate limits have been hit. Also improved logging and increased API paging chunks to minimize the occurrence of this error. ([#1253](https://github.com/jorenn92/Maintainerr/issues/1253)) ([8227f8c](https://github.com/jorenn92/Maintainerr/commit/8227f8c2b2739460929b1b8cf381016efcb94732))
+* When a Tvdb ID isn't found, a warning with the media item's title is now displayed ([fb27332](https://github.com/jorenn92/Maintainerr/commit/fb273323fe6ddd689d976d7717a9c86728ae62cd))
+
 # [2.1.0](https://github.com/jorenn92/Maintainerr/compare/v2.0.4...v2.1.0) (2024-09-02)
 
 

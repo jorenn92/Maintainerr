@@ -55,6 +55,13 @@ export class SonarrGetterService {
 
       const tvdbId = await this.findTvdbidFromPlexLibItem(libItem);
 
+      if (!tvdbId) {
+        this.logger.warn(
+          `[TVDB] Failed to fetch tvdb id for '${libItem.title}'`,
+        );
+        return null;
+      }
+
       if (tvdbId) {
         const showResponse =
           await this.servarrService.SonarrApi.getSeriesByTvdbId(tvdbId);
