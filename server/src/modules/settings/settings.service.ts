@@ -10,6 +10,7 @@ import { ServarrService } from '../api/servarr-api/servarr.service';
 import { SettingDto } from "./dto's/setting.dto";
 import { Settings } from './entities/settings.entities';
 import { InternalApiService } from '../api/internal-api/internal-api.service';
+import { TautulliApiService } from '../api/tautulli-api/tautulli-api.service';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -50,6 +51,10 @@ export class SettingsService implements SettingDto {
 
   sonarr_api_key: string;
 
+  tautulli_url: string;
+
+  tautulli_api_key: string;
+
   collection_handler_job_cron: string;
 
   rules_handler_job_cron: string;
@@ -61,6 +66,8 @@ export class SettingsService implements SettingDto {
     private readonly servarr: ServarrService,
     @Inject(forwardRef(() => OverseerrApiService))
     private readonly overseerr: OverseerrApiService,
+    @Inject(forwardRef(() => TautulliApiService))
+    private readonly tautulli: TautulliApiService,
     @Inject(forwardRef(() => InternalApiService))
     private readonly internalApi: InternalApiService,
     @InjectRepository(Settings)
@@ -90,6 +97,8 @@ export class SettingsService implements SettingDto {
       this.radarr_api_key = settingsDb?.radarr_api_key;
       this.sonarr_url = settingsDb?.sonarr_url;
       this.sonarr_api_key = settingsDb?.sonarr_api_key;
+      this.tautulli_url = settingsDb?.tautulli_url;
+      this.tautulli_api_key = settingsDb?.tautulli_api_key;
       this.collection_handler_job_cron =
         settingsDb?.collection_handler_job_cron;
       this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;
@@ -147,6 +156,7 @@ export class SettingsService implements SettingDto {
       settings.radarr_url = settings.radarr_url?.toLowerCase();
       settings.sonarr_url = settings.sonarr_url?.toLowerCase();
       settings.overseerr_url = settings.overseerr_url?.toLowerCase();
+      settings.tautulli_url = settings.tautulli_url?.toLowerCase();
 
       const settingsDb = await this.settingsRepo.findOne({ where: {} });
       // Plex SSL specifics
@@ -173,6 +183,7 @@ export class SettingsService implements SettingDto {
         this.plexApi.initialize({});
         this.servarr.init();
         this.overseerr.init();
+        this.tautulli.init();
         this.internalApi.init();
 
         // reload Rule handler job if changed
@@ -240,6 +251,17 @@ export class SettingsService implements SettingDto {
     }
   }
 
+  public async testTautulli(): Promise<BasicResponseDto> {
+    try {
+      const resp = await this.tautulli.info();
+      return resp?.response.result == 'success'
+        ? { status: 'OK', code: 1, message: resp.response.data.version }
+        : { status: 'NOK', code: 0, message: 'Failure' };
+    } catch {
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
   public async testRadarr(): Promise<BasicResponseDto> {
     try {
       const resp = await this.servarr.RadarrApi.info();
@@ -283,6 +305,7 @@ export class SettingsService implements SettingDto {
       let radarrState = true;
       let sonarrState = true;
       let overseerrState = true;
+      let tautulliState = true;
       if (this.radarrConfigured()) {
         radarrState = (await this.testRadarr()).status === 'OK';
       }
@@ -295,7 +318,17 @@ export class SettingsService implements SettingDto {
         overseerrState = (await this.testOverseerr()).status === 'OK';
       }
 
-      if (plexState && radarrState && sonarrState && overseerrState) {
+      if (this.tautulliConfigured()) {
+        tautulliState = (await this.testTautulli()).status === 'OK';
+      }
+
+      if (
+        plexState &&
+        radarrState &&
+        sonarrState &&
+        overseerrState &&
+        tautulliState
+      ) {
         return true;
       } else {
         return false;
@@ -316,6 +349,10 @@ export class SettingsService implements SettingDto {
 
   public overseerrConfigured(): boolean {
     return this.overseerr_url !== null && this.overseerr_api_key !== null;
+  }
+
+  public tautulliConfigured(): boolean {
+    return this.tautulli_url !== null && this.tautulli_api_key !== null;
   }
 
   // Test if all required settings are set.
