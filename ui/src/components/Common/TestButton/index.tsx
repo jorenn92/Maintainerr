@@ -61,7 +61,7 @@ const TestButton = (props: ITestButton) => {
         ) : (
           <BeakerIcon />
         )}
-        <span className="ml-1">Test Saved</span>
+        <span className="ml-1">Test Saved Settings</span>
       </Button>
     </span>
   )

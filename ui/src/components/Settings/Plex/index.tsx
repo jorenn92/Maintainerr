@@ -356,7 +356,7 @@ const PlexSettings = () => {
                         ? 'Retrieving servers...'
                         : 'Manual configuration'
                       : tokenValid === true
-                        ? 'Press the button to load available servers'
+                        ? 'Press the refresh button to load available servers'
                         : 'Authenticate to load servers'}
                   </option>
                   {availablePresets.map((server, index) => (
@@ -503,19 +503,17 @@ const PlexSettings = () => {
               <span className="m-auto sm:mr-auto sm:ml-3 rounded-md shadow-sm">
                 <DocsButton page="Configuration" />
               </span>
-              <p className="description">🚨 Save Changes before Testing</p>
               <div className="flex sm:justify-end m-auto sm:m-0 mt-3 xs:mt-0">
-                <TestButton onClick={appTest} testUrl="/settings/test/plex" />
-
-                <span className="ml-3 inline-flex rounded-md shadow-sm">
-                  <Button
+              <Button
                     buttonType="primary"
                     type="submit"
                   // disabled={isSubmitting || !isValid}
                   >
                     <SaveIcon />
-                    <span>Save Changes</span>
+                    <span>Save Settings</span>
                   </Button>
+                <span className="ml-1 inline-flex rounded-md shadow-sm">
+                <TestButton onClick={appTest} testUrl="/settings/test/plex" />
                 </span>
               </div>
             </div>

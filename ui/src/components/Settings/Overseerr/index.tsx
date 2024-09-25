@@ -202,20 +202,19 @@ const OverseerrSettings = () => {
                 <DocsButton page="Configuration" />
               </span>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
-                <p className="description">🚨 Save Changes before Testing</p>
-                <TestButton
-                  onClick={appTest}
-                  testUrl="/settings/test/overseerr"
-                />
-                <span className="ml-3 inline-flex rounded-md shadow-sm">
-                  <Button
+              <Button
                     buttonType="primary"
                     type="submit"
                   // disabled={isSubmitting || !isValid}
                   >
                     <SaveIcon />
-                    <span>Save Changes</span>
+                    <span>Save Settings</span>
                   </Button>
+                <span className="ml-1 inline-flex rounded-md shadow-sm">
+                <TestButton
+                  onClick={appTest}
+                  testUrl="/settings/test/overseerr"
+                />
                 </span>
               </div>
             </div>

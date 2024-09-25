@@ -729,9 +729,6 @@ const AddModal = (props: AddModal) => {
               <div className="max-width-form-head flex">
                 <div className="ml-0">
                   <h3 className="heading">Rules</h3>
-                  <p className="description">
-                    Specify the rules this group needs to enforce
-                  </p>
                 </div>
                 <div className="ml-auto ">
                   <button
@@ -742,7 +739,7 @@ const AddModal = (props: AddModal) => {
                       <CloudDownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
                     }
                     <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
-                      Community Rules
+                      Community Hub
                     </p>
                   </button>
                 </div>

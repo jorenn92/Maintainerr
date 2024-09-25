@@ -311,7 +311,7 @@ const RuleInput = (props: IRuleInput) => {
             >
               {<TrashIcon className="m-auto ml-5 h-5" />}
               <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
-                Remove Rule {props.tagId} from Section {props.section}
+                Remove from Section
               </p>
             </button>
           ) : undefined}

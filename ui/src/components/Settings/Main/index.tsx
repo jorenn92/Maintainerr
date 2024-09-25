@@ -150,7 +150,7 @@ const MainSettings = () => {
                 <span className="ml-auto flex rounded-md shadow-sm">
                   <Button buttonType="primary" type="submit">
                     <SaveIcon />
-                    <span>Save Changes</span>
+                    <span>Save Settings</span>
                   </Button>
                 </span>
               </div>
