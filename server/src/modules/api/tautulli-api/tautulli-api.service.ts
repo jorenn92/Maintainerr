@@ -25,6 +25,7 @@ export interface TautulliMetadata {
   rating_key: string;
   parent_rating_key: string;
   grandparent_rating_key: string;
+  added_at: string;
 }
 
 interface TautulliChildrenMetadata {
@@ -45,9 +46,13 @@ interface TautulliHistoryItem {
   user_id: number;
   user: string;
   watched_status: number;
+  stopped: number;
+  rating_key: number;
+  media_index: number;
+  parent_media_index: number;
 }
 
-interface TautulliHistoryRequestOptions {
+export interface TautulliHistoryRequestOptions {
   grouping?: 0 | 1;
   include_activity?: 0 | 1;
   user?: string;
@@ -67,6 +72,17 @@ interface TautulliHistoryRequestOptions {
   start?: number;
   length?: number;
   search?: string;
+}
+
+interface TautulliItemWatchTimeStatsRequestOptions {
+  grouping?: 0 | 1;
+  rating_key: number | string;
+}
+
+interface TautulliItemWatchTimeStats {
+  query_days: 1 | 7 | 30 | 0;
+  total_time: number;
+  total_plays: number;
 }
 
 interface Response<T> {
@@ -139,12 +155,14 @@ export class TautulliApiService {
       });
 
       if (response.response.result !== 'success') {
-        throw new Error('Non-success response when fetching Tautulli users');
+        throw new Error(
+          'Non-success response when fetching Tautulli paginated history',
+        );
       }
 
       return response.response.data;
     } catch (e) {
-      this.logger.log("Couldn't fetch Tautulli history!", {
+      this.logger.log("Couldn't fetch Tautulli paginated history!", {
         label: 'Tautulli API',
         errorMessage: e.message,
       });
@@ -220,7 +238,7 @@ export class TautulliApiService {
       });
 
       if (response.response.result !== 'success') {
-        throw new Error('Non-success response when fetching Tautulli users');
+        throw new Error('Non-success response when fetching Tautulli metadata');
       }
 
       return response.response.data;
@@ -249,12 +267,43 @@ export class TautulliApiService {
       );
 
       if (response.response.result !== 'success') {
-        throw new Error('Non-success response when fetching Tautulli users');
+        throw new Error(
+          'Non-success response when fetching Tautulli children metadata',
+        );
       }
 
       return response.response.data.children_list;
     } catch (e) {
       this.logger.log("Couldn't fetch Tautulli children metadata!", {
+        label: 'Tautulli API',
+        errorMessage: e.message,
+      });
+      this.logger.debug(e);
+      return null;
+    }
+  }
+
+  public async getItemWatchTimeStats(
+    options: TautulliItemWatchTimeStatsRequestOptions,
+  ): Promise<TautulliItemWatchTimeStats[] | null> {
+    try {
+      const response: Response<TautulliItemWatchTimeStats[]> =
+        await this.api.get('', {
+          params: {
+            cmd: 'get_item_watch_time_stats',
+            ...options,
+          },
+        });
+
+      if (response.response.result !== 'success') {
+        throw new Error(
+          'Non-success response when fetching Tautulli item watch time stats',
+        );
+      }
+
+      return response.response.data;
+    } catch (e) {
+      this.logger.log("Couldn't fetch Tautulli item watch time stats!", {
         label: 'Tautulli API',
         errorMessage: e.message,
       });
