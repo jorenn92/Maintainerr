@@ -53,6 +53,10 @@ export class SettingsController {
   testPlex() {
     return this.settingsService.testPlex();
   }
+  @Get('/test/tautulli')
+  testTautulli() {
+    return this.settingsService.testTautulli();
+  }
 
   @Get('/plex/devices/servers')
   async getPlexServers() {

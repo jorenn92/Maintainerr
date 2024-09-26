@@ -134,7 +134,7 @@ const RadarrSettings = () => {
         testBanner.status ? (
           <Alert
             type="warning"
-            title={`successfully connected to Radarr (${testBanner.version})`}
+            title={`Successfully connected to Radarr (${testBanner.version})`}
           />
         ) : (
           <Alert

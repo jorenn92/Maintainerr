@@ -132,7 +132,7 @@ const SonarrSettings = () => {
         testBanner.status ? (
           <Alert
             type="warning"
-            title={`successfully connected to Sonarr (${testBanner.version})`}
+            title={`Successfully connected to Sonarr (${testBanner.version})`}
           />
         ) : (
           <Alert

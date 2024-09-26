@@ -25,6 +25,7 @@ export const enum Application {
   RADARR,
   SONARR,
   OVERSEERR,
+  TAUTULLI,
 }
 
 export const enum ArrAction {
@@ -128,7 +129,7 @@ export class RuleConstants {
           name: 'seenBy',
           humanName: '[list] Viewed by (username)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.TEXT, // returns id[]
+          type: RuleType.TEXT, // returns usernames []
         } as Property,
         {
           id: 2,
@@ -609,6 +610,28 @@ export class RuleConstants {
           humanName: 'Requested in Overseerr',
           mediaType: MediaType.BOTH,
           type: RuleType.BOOL,
+        } as Property,
+      ],
+    },
+    {
+      id: Application.TAUTULLI,
+      name: 'Tautulli',
+      mediaType: MediaType.BOTH,
+      props: [
+        {
+          id: 0,
+          name: 'seenBy',
+          humanName: '[list] Viewed by (username)',
+          mediaType: MediaType.MOVIE,
+          type: RuleType.TEXT, // returns usernames []
+        } as Property,
+        {
+          id: 1,
+          name: 'sw_allEpisodesSeenBy',
+          humanName: '[list] Users that saw all available episodes',
+          mediaType: MediaType.SHOW,
+          type: RuleType.TEXT, // return usernames []
+          showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
         } as Property,
       ],
     },

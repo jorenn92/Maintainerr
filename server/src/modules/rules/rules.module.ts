@@ -26,6 +26,8 @@ import { RuleYamlService } from './helpers/yaml.service';
 import { RuleComparatorService } from './helpers/rule.comparator.service';
 import { RuleConstanstService } from './constants/constants.service';
 import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.service';
+import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
+import { TautulliGetterService } from './getter/tautulli-getter.service';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.servi
       Settings,
     ]),
     OverseerrApiModule,
+    TautulliApiModule,
     TmdbApiModule,
     CollectionsModule,
     TasksModule,
@@ -54,6 +57,7 @@ import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.servi
     RadarrGetterService,
     SonarrGetterService,
     OverseerrGetterService,
+    TautulliGetterService,
     ValueGetterService,
     RuleYamlService,
     RuleComparatorService,

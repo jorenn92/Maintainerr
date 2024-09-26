@@ -25,6 +25,8 @@ export interface ISettings {
   radarr_api_key: string
   sonarr_url: string
   sonarr_api_key: string
+  tautulli_url: string
+  tautulli_api_key: string
   collection_handler_job_cron: string
   rules_handler_job_cron: string
 }

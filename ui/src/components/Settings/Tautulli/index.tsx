@@ -18,7 +18,7 @@ import {
   removePortFromUrl,
 } from '../../../utils/SettingsUtils'
 
-const OverseerrSettings = () => {
+const TautulliSettings = () => {
   const settingsCtx = useContext(SettingsContext)
   const hostnameRef = useRef<HTMLInputElement>(null)
   const portRef = useRef<HTMLInputElement>(null)
@@ -33,22 +33,22 @@ const OverseerrSettings = () => {
   }>({ status: false, version: '0' })
 
   useEffect(() => {
-    document.title = 'Maintainerr - Settings - Overseerr'
+    document.title = 'Maintainerr - Settings - Tautulli'
   }, [])
 
   useEffect(() => {
     // hostname
-    setHostname(removePortFromUrl(settingsCtx.settings.overseerr_url))
+    setHostname(removePortFromUrl(settingsCtx.settings.tautulli_url))
     // @ts-ignore
     hostnameRef.current = {
-      value: removePortFromUrl(settingsCtx.settings.overseerr_url),
+      value: removePortFromUrl(settingsCtx.settings.tautulli_url),
     }
 
     // port
-    setPort(getPortFromUrl(settingsCtx.settings.overseerr_url))
+    setPort(getPortFromUrl(settingsCtx.settings.tautulli_url))
     // @ts-ignore
     portRef.current = {
-      value: getPortFromUrl(settingsCtx.settings.overseerr_url),
+      value: getPortFromUrl(settingsCtx.settings.tautulli_url),
     }
   }, [settingsCtx])
 
@@ -84,9 +84,10 @@ const OverseerrSettings = () => {
         : 'http://' + hostnameRef.current.value
 
       const payload = {
-        overseerr_url: addPortToUrl(hostnameVal, +portRef.current.value),
-        overseerr_api_key: apiKeyRef.current.value,
+        tautulli_url: addPortToUrl(hostnameVal, +portRef.current.value),
+        tautulli_api_key: apiKeyRef.current.value,
       }
+
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
         '/settings',
         {
@@ -114,8 +115,8 @@ const OverseerrSettings = () => {
   return (
     <div className="h-full w-full">
       <div className="section h-full w-full">
-        <h3 className="heading">Overseerr Settings</h3>
-        <p className="description">Overseerr configuration</p>
+        <h3 className="heading">Tautulli Settings</h3>
+        <p className="description">Tautulli configuration</p>
       </div>
       {error ? (
         <Alert type="warning" title="Not all fields contain values" />
@@ -127,7 +128,7 @@ const OverseerrSettings = () => {
         testBanner.status ? (
           <Alert
             type="warning"
-            title={`Successfully connected to Overseerr (${testBanner.version})`}
+            title={`Successfully connected to Tautulli (${testBanner.version})`}
           />
         ) : (
           <Alert
@@ -190,7 +191,7 @@ const OverseerrSettings = () => {
                   id="apikey"
                   type="password"
                   ref={apiKeyRef}
-                  defaultValue={settingsCtx.settings.overseerr_api_key}
+                  defaultValue={settingsCtx.settings.tautulli_api_key}
                 ></input>
               </div>
             </div>
@@ -204,7 +205,7 @@ const OverseerrSettings = () => {
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
                 <TestButton
                   onClick={appTest}
-                  testUrl="/settings/test/overseerr"
+                  testUrl="/settings/test/tautulli"
                 />
                 <span className="ml-3 inline-flex rounded-md shadow-sm">
                   <Button
@@ -225,4 +226,4 @@ const OverseerrSettings = () => {
   )
 }
 
-export default OverseerrSettings
+export default TautulliSettings
