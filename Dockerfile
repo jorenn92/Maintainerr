@@ -90,7 +90,7 @@ COPY supervisord.conf /etc/supervisord.conf
 # Enable correct yarn version, add supervisor & chown root /opt dir
 RUN corepack install && \
     corepack enable && \
-    apk add supervisor && \
+    apk add supervisor curl && \
     chown node:node /opt && \
     # This is required for docker user directive to work
     chmod 777 /opt && \
