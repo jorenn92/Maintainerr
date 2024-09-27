@@ -254,8 +254,8 @@ export class SettingsService implements SettingDto {
   public async testTautulli(): Promise<BasicResponseDto> {
     try {
       const resp = await this.tautulli.info();
-      return resp?.response.result == 'success'
-        ? { status: 'OK', code: 1, message: resp.response.data.version }
+      return resp?.response && resp?.response.result == 'success'
+        ? { status: 'OK', code: 1, message: resp.response.data?.tautulli_version }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
       return { status: 'NOK', code: 0, message: 'Failure' };

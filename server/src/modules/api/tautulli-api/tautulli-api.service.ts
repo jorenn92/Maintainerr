@@ -4,8 +4,7 @@ import { TautulliApi } from './helpers/tautulli-api.helper';
 import _ from 'lodash';
 
 interface TautulliInfo {
-  machine_identifier: string;
-  version: string;
+  tautulli_version: string;
 }
 
 export interface TautulliUser {
@@ -125,7 +124,7 @@ export class TautulliApiService {
         {
           signal: AbortSignal.timeout(10000),
           params: {
-            cmd: 'get_server_identity',
+            cmd: 'get_tautulli_info',
           },
         },
       );
