@@ -985,20 +985,21 @@ export class RulesService {
       for (const rule of rulegroup.rules) {
         const parsedRule = JSON.parse((rule as RuleDbDto).ruleJson) as RuleDto;
 
-        //test first value
-        const first =
-          constant.applications[parsedRule.firstVal[0]].props[
-            parsedRule.firstVal[1]
-          ];
+        const firstValApplication = constant.applications.find(
+          (x) => x.id === parsedRule.firstVal[0],
+        );
 
-        result = first?.cacheReset ? true : result;
+        //test first value
+        const first = firstValApplication.props[parsedRule.firstVal[1]];
+
+        result = first.cacheReset ? true : result;
+
+        const secondValApplication = parsedRule.lastVal
+          ? constant.applications.find((x) => x.id === parsedRule.lastVal[0])
+          : undefined;
 
         // test second value
-        const second = parsedRule.lastVal
-          ? constant.applications[parsedRule.lastVal[0]].props[
-              parsedRule.lastVal[1]
-            ]
-          : undefined;
+        const second = secondValApplication?.props[parsedRule.lastVal[1]];
 
         result = second?.cacheReset ? true : result;
       }
