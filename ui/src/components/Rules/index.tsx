@@ -8,6 +8,7 @@ import LoadingSpinner from '../Common/LoadingSpinner'
 import RuleGroup, { IRuleGroup } from './RuleGroup'
 import AddModal from './RuleGroup/AddModal'
 import { useToasts } from 'react-toast-notifications'
+import { ConstantsContextProvider } from '../../contexts/constants-context'
 
 const Rules: React.FC = () => {
   const [addModalActive, setAddModal] = useState(false)
@@ -75,24 +76,28 @@ const Rules: React.FC = () => {
 
   if (addModalActive) {
     return (
-      <AddModal
-        onSuccess={refreshData}
-        onCancel={() => {
-          setAddModal(false)
-        }}
-      />
+      <ConstantsContextProvider>
+        <AddModal
+          onSuccess={refreshData}
+          onCancel={() => {
+            setAddModal(false)
+          }}
+        />
+      </ConstantsContextProvider>
     )
   }
 
   if (editModalActive) {
     return (
-      <AddModal
-        onSuccess={refreshData}
-        editData={editData}
-        onCancel={() => {
-          setEditModal(false)
-        }}
-      />
+      <ConstantsContextProvider>
+        <AddModal
+          onSuccess={refreshData}
+          editData={editData}
+          onCancel={() => {
+            setEditModal(false)
+          }}
+        />
+      </ConstantsContextProvider>
     )
   }
 
