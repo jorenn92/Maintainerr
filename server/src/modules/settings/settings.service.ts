@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
-import { IsNull, Not, Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { isValidCron } from 'cron-validator';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
@@ -24,7 +24,6 @@ import {
   SonarrSettingResponseDto,
 } from "./dto's/sonarr-setting.dto";
 import { NotificationSettings } from './interfaces/notifications-settings.interface';
-import { NotificationService } from '../notifications/notifications.service';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -107,6 +106,7 @@ export class SettingsService implements SettingDto {
       this.overseerr_api_key = settingsDb?.overseerr_api_key;
       this.tautulli_url = settingsDb?.tautulli_url;
       this.tautulli_api_key = settingsDb?.tautulli_api_key;
+      this.notification_settings = settingsDb?.notification_settings;
       this.collection_handler_job_cron =
         settingsDb?.collection_handler_job_cron;
       this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;

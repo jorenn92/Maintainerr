@@ -1,7 +1,5 @@
 import axios from 'axios';
-import {
-  hasNotificationType,
-} from '../notifications.service';
+import { hasNotificationType } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
@@ -10,6 +8,7 @@ import {
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
+import { Notification } from '../entities/notification.entities';
 
 interface GotifyPayload {
   title: string;
@@ -22,8 +21,14 @@ class GotifyAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentConfig,
-  ) {}
+    readonly notification: Notification,
+  ) {
+    this.notification = notification;
+  }
+
   private readonly logger = new Logger(GotifyAgent.name);
+
+  getNotification = () => this.notification;
 
   getSettings = () => this.settings;
 
@@ -43,8 +48,7 @@ class GotifyAgent implements NotificationAgent {
     type: NotificationType,
     payload: NotificationPayload,
   ): GotifyPayload {
-    const { applicationUrl, applicationTitle } = this.appSettings;
-    let priority = 0;
+    const priority = 0;
 
     const title = payload.event
       ? `${payload.event} - ${payload.subject}`
@@ -80,11 +84,7 @@ class GotifyAgent implements NotificationAgent {
       return true;
     }
 
-    this.logger.debug('Sending Gotify notification', {
-      label: 'Notifications',
-      type: NotificationType[type],
-      subject: payload.subject,
-    });
+    this.logger.log('Sending Gotify notification');
     try {
       const endpoint = `${settings.options.url}/message?token=${settings.options.token}`;
       const notificationPayload = this.getNotificationPayload(type, payload);
@@ -93,13 +93,8 @@ class GotifyAgent implements NotificationAgent {
 
       return true;
     } catch (e) {
-      this.logger.error('Error sending Gotify notification', {
-        label: 'Notifications',
-        type: NotificationType[type],
-        subject: payload.subject,
-        errorMessage: e.message,
-        response: e.response?.data,
-      });
+      this.logger.error('Error sending Gotify notification');
+      this.logger.debug(e);
 
       return false;
     }

@@ -7,11 +7,10 @@ export class NotificationsController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @Post('/test')
-  public async sendNotification() {
-    // this.notificationService.handleNotification(NotificationType.TEST_NOTIFICATION, null);
+  public async sendTestNotification() {
     this.notificationService.handleNotification(
-      NotificationType.MEDIA_ADDED_TO_COLLECTION,
-      [{ plexId: 22423 }, { plexId: 22424 }],
+      NotificationType.TEST_NOTIFICATION,
+      null,
     );
   }
 
@@ -20,15 +19,22 @@ export class NotificationsController {
     return this.notificationService.getAgentSpec();
   }
 
+  @Get('/types')
+  getNotificationTypes() {
+    return this.notificationService.getTypes();
+  }
+
   @Post('/configuration/add')
   async addNotificationConfiguration(
     @Body()
     payload: {
+      id?: number;
       agent: string;
       name: string;
       enabled: boolean;
       types: number[];
-      options: {};
+      aboutScale: number;
+      options: object;
     },
   ) {
     return this.notificationService.addNotificationConfiguration(payload);

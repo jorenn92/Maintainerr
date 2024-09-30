@@ -54,6 +54,9 @@ export class Settings implements SettingDto {
   @Column({ nullable: true })
   tautulli_api_key: string;
 
+  @Column({ type: 'simple-json', nullable: true })
+  notification_settings: NotificationSettings;
+
   @Column({ nullable: false, default: CronExpression.EVERY_12_HOURS })
   collection_handler_job_cron: string;
 

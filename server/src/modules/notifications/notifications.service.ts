@@ -13,6 +13,13 @@ import PushoverAgent from './agents/pushover';
 import { SettingsService } from '../settings/settings.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
+import EmailAgent from './agents/email';
+import GotifyAgent from './agents/gotify';
+import LunaSeaAgent from './agents/lunasea';
+import PushbulletAgent from './agents/pushbullet';
+import SlackAgent from './agents/slack';
+import TelegramAgent from './agents/telegram';
+import WebhookAgent from './agents/webhook';
 
 export const hasNotificationType = (
   type: NotificationType,
@@ -41,11 +48,21 @@ export class NotificationService {
     private readonly plexApi: PlexApiService,
   ) {}
 
-  public registerAgents = (agents: NotificationAgent[]): void => {
+  public registerAgents = (
+    agents: NotificationAgent[],
+    skiplog = false,
+  ): void => {
     this.activeAgents = [...this.activeAgents, ...agents];
-    this.logger.log(
-      `Registered ${agents.length} notification agent${agents.length === 1 ? '' : 's'}`,
-    );
+
+    if (!skiplog) {
+      this.logger.log(
+        `Registered ${agents.length} notification agent${agents.length === 1 ? '' : 's'}`,
+      );
+    }
+  };
+
+  public getActiveAgents = () => {
+    return this.activeAgents;
   };
 
   public sendNotification(
@@ -53,33 +70,63 @@ export class NotificationService {
     payload: NotificationPayload,
   ): void {
     this.activeAgents.forEach((agent) => {
-      if (agent.shouldSend()) {
-        if (agent.getSettings().types?.includes(type))
-          agent.send(type, payload);
-      }
+      this.sendNotificationToAgent(type, payload, agent);
     });
   }
 
+  public sendNotificationToAgent(
+    type: NotificationType,
+    payload: NotificationPayload,
+    agent: NotificationAgent,
+  ): void {
+    if (agent.shouldSend()) {
+      if (agent.getSettings().types?.includes(type)) agent.send(type, payload);
+    }
+  }
+
   async addNotificationConfiguration(payload: {
+    id?: number;
     agent: string;
     name: string;
     enabled: boolean;
     types: number[];
-    options: {};
+    aboutScale: number;
+    options: object;
   }) {
     try {
-      await this.connection
-        .createQueryBuilder()
-        .insert()
-        .into(Notification)
-        .values({
-          name: payload.name,
-          agent: payload.agent,
-          enabled: payload.enabled,
-          types: JSON.stringify(payload.types),
-          options: JSON.stringify(payload.options),
-        })
-        .execute();
+      if (payload.id !== undefined) {
+        // update
+        await this.connection
+          .createQueryBuilder()
+          .update(Notification)
+          .set({
+            name: payload.name,
+            agent: payload.agent,
+            enabled: payload.enabled,
+            aboutScale: payload.aboutScale,
+            types: JSON.stringify(payload.types),
+            options: JSON.stringify(payload.options),
+          })
+          .where('id = :id', { id: payload.id })
+          .execute();
+      } else {
+        await this.connection
+          .createQueryBuilder()
+          .insert()
+          .into(Notification)
+          .values({
+            name: payload.name,
+            agent: payload.agent,
+            enabled: payload.enabled,
+            aboutScale: payload.aboutScale,
+
+            types: JSON.stringify(payload.types),
+            options: JSON.stringify(payload.options),
+          })
+          .execute();
+      }
+      // reset & reload notification agents
+      this.registerConfiguredAgents(true);
       return { code: 1, result: 'success' };
     } catch (err) {
       this.logger.warn('Adding a new notification configuration failed');
@@ -108,10 +155,10 @@ export class NotificationService {
           return { code: 1, result: 'success' };
         }
       }
-      this.logger.warn('Adding a new notification configuration failed');
+      this.logger.warn('Connecting the notification configuration failed');
       return { code: 0, result: 'failed' };
     } catch (err) {
-      this.logger.error('Adding a new notification configuration failed');
+      this.logger.error('Connecting the notification configuration failed');
       this.logger.debug(err);
       return { code: 0, result: err };
     }
@@ -140,14 +187,27 @@ export class NotificationService {
 
       return { code: 0, result: 'failed' };
     } catch (err) {
-      this.logger.warn('Removing a notification configuration failed');
+      this.logger.error('Disconnecting the notification configuration failed');
       this.logger.debug(err);
       return { code: 0, result: err };
     }
   }
 
-  async getNotificationConfigurations() {
+  async getNotificationConfigurations(withRelation = false) {
     try {
+      if (withRelation) {
+        const notifConfigs = await this.notificationRepo.find();
+        // hack to get the relationship working. I was tired of the typeORM headache
+        return await Promise.all(
+          notifConfigs.map(async (n) => {
+            n.rulegroups = await this.ruleGroupRepo.find({
+              where: { notifications: { id: n.id } },
+            });
+            return n;
+          }),
+        );
+      }
+
       return await this.notificationRepo.find();
     } catch (err) {
       this.logger.warn('Fetching Notification configurations failed');
@@ -155,38 +215,139 @@ export class NotificationService {
     }
   }
 
-  public async registerConfiguredAgents() {
+  public async registerConfiguredAgents(skiplog = false) {
+    this.activeAgents = [];
     const configuredAgents = await this.getNotificationConfigurations();
 
-    const agents: NotificationAgent[] = configuredAgents.map((agent) => {
-      switch (agent.name) {
-        case NotificationAgentKey.DISCORD:
-          return new DiscordAgent({
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-        case NotificationAgentKey.PUSHOVER:
-          return new PushoverAgent(this.settings, {
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-      }
-    });
+    const agents: NotificationAgent[] = configuredAgents?.map(
+      (notification) => {
+        switch (notification.agent) {
+          case NotificationAgentKey.DISCORD:
+            return new DiscordAgent(
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.PUSHOVER:
+            return new PushoverAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.EMAIL:
+            return new EmailAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.GOTIFY:
+            return new GotifyAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.LUNASEA:
+            return new LunaSeaAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.PUSHBULLET:
+            return new PushbulletAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.SLACK:
+            return new SlackAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.TELEGRAM:
+            return new TelegramAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.WEBHOOK:
+            return new WebhookAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+        }
+      },
+    );
 
-    this.registerAgents(agents);
+    this.registerAgents(agents, skiplog);
   }
 
   async deleteNotificationConfiguration(notificationId: number) {
     try {
       await this.notificationRepo.delete(notificationId);
+
+      // reset & reload notification agents
+      this.registerConfiguredAgents(true);
+
       return { code: 1, result: 'success' };
     } catch (err) {
-      this.logger.warn('Notification configuration removal failed');
+      this.logger.error('Notification configuration removal failed');
       this.logger.debug(err);
       return { code: 0, result: err };
     }
+  }
+
+  public getTypes() {
+    return Object.keys(NotificationType)
+      .filter((key) => isNaN(Number(key)))
+      .map((key) => ({
+        title: this.humanizeTitle(key),
+        id: NotificationType[key],
+      }));
+  }
+
+  // Helper function to convert enum keys to human-readable titles
+  private humanizeTitle(key: string): string {
+    return key
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
   public getAgentSpec() {
@@ -342,6 +503,7 @@ export class NotificationService {
     mediaItems: { plexId: number }[],
     collectionName?: string,
     dayAmount?: number,
+    agent?: NotificationAgent,
   ) {
     const payload: NotificationPayload = {
       subject: '',
@@ -356,7 +518,11 @@ export class NotificationService {
       dayAmount,
     );
 
-    this.sendNotification(type, payload);
+    if (agent) {
+      this.sendNotificationToAgent(type, payload, agent);
+    } else {
+      this.sendNotification(type, payload);
+    }
   }
 
   private getMessageContent(type: NotificationType, multiple: boolean): string {
@@ -376,13 +542,17 @@ export class NotificationService {
           message =
             '⚠️ Rule Handling Failed: Oops! Something went wrong while processing your rules.';
           break;
-        case NotificationType.MEDIA_ABOUT_TO_BE_REMOVED:
+        case NotificationType.MEDIA_ABOUT_TO_BE_HANDLED:
           message =
-            "⏰ Reminder: {media_title} will be handled in {days} days! If you want to keep it, make sure to take action before it's gone. Don’t miss out!";
+            "⏰ Reminder: {media_title} will be handled in {days} days. If you want to keep it, make sure to take action before it's gone. Don’t miss out!";
           break;
         case NotificationType.MEDIA_ADDED_TO_COLLECTION:
           message =
-            "\uD83D\uDCC2 '{media_title}' has been added to '{collection_name}'! The item will be handled in {days} days";
+            "\uD83D\uDCC2 '{media_title}' has been added to '{collection_name}'. The item will be handled in {days} days";
+          break;
+        case NotificationType.MEDIA_REMOVED_FROM_COLLECTION:
+          message =
+            "\uD83D\uDCC2 '{media_title}' has been removed from '{collection_name}'. It won't be handled anymore.";
           break;
         case NotificationType.MEDIA_HANDLED:
           message =
@@ -391,13 +561,17 @@ export class NotificationService {
       }
     } else {
       switch (type) {
-        case NotificationType.MEDIA_ABOUT_TO_BE_REMOVED:
+        case NotificationType.MEDIA_ABOUT_TO_BE_HANDLED:
           message =
-            "⏰ Reminder: These media items will be handled in {days} days! If you want to keep them, make sure to take action before they're gone. Don’t miss out! \n \n {media_items}";
+            "⏰ Reminder: These media items will be handled in {days} days. If you want to keep them, make sure to take action before they're gone. Don’t miss out! \n \n {media_items}";
           break;
         case NotificationType.MEDIA_ADDED_TO_COLLECTION:
           message =
-            "\uD83D\uDCC2 These media items have been added to '{collection_name}'! The items will be handled in {days} days. \n \n {media_items}";
+            "\uD83D\uDCC2 These media items have been added to '{collection_name}'. The items will be handled in {days} days. \n \n {media_items}";
+          break;
+        case NotificationType.MEDIA_REMOVED_FROM_COLLECTION:
+          message =
+            "\uD83D\uDCC2 These media items have been removed from '{collection_name}'. The items will not be handled anymore. \n \n {media_items}";
           break;
         case NotificationType.MEDIA_HANDLED:
           message =
@@ -453,6 +627,7 @@ export class NotificationService {
       return message;
     } catch (e) {
       this.logger.error("Couldn't transform notification message", e);
+      this.logger.debug(e);
     }
   }
 

@@ -95,26 +95,10 @@ export enum NotificationAgentKey {
 export enum NotificationType {
   NONE = 0,
   MEDIA_ADDED_TO_COLLECTION = 2,
-  MEDIA_ABOUT_TO_BE_REMOVED = 4,
-  MEDIA_HANDLED = 8,
-  RULE_HANDLING_FAILED = 16,
-  COLLECTION_HANDLING_FAILED = 32,
-  TEST_NOTIFICATION = 64,
-}
-
-interface NotificationAgents {
-  discord: NotificationAgentDiscord;
-  email: NotificationAgentEmail;
-  gotify: NotificationAgentGotify;
-  lunasea: NotificationAgentLunaSea;
-  pushbullet: NotificationAgentPushbullet;
-  pushover: NotificationAgentPushover;
-  slack: NotificationAgentSlack;
-  telegram: NotificationAgentTelegram;
-  webhook: NotificationAgentWebhook;
-  webpush: NotificationAgentConfig;
-}
-
-interface NotificationSettings {
-  agents: NotificationAgents;
+  MEDIA_REMOVED_FROM_COLLECTION = 4,
+  MEDIA_ABOUT_TO_BE_HANDLED = 8, // TODO
+  MEDIA_HANDLED = 16,
+  RULE_HANDLING_FAILED = 32,
+  COLLECTION_HANDLING_FAILED = 64,
+  TEST_NOTIFICATION = 128,
 }

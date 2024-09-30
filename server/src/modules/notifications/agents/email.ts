@@ -10,13 +10,20 @@ import {
   NotificationType,
 } from '../notifications-interfaces';
 import { SettingsService } from '../../settings/settings.service';
+import { Notification } from '../entities/notification.entities';
 
 class EmailAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentConfig,
-  ) {}
+    readonly notification: Notification,
+  ) {
+    this.notification = notification;
+  }
+
   private readonly logger = new Logger(EmailAgent.name);
+
+  getNotification = () => this.notification;
 
   getSettings = () => this.settings;
   getIdentifier = () => NotificationAgentKey.EMAIL;
@@ -79,12 +86,7 @@ class EmailAgent implements NotificationAgent {
     type: NotificationType,
     payload: NotificationPayload,
   ): Promise<boolean> {
-    this.logger.log('Sending email notification', {
-      label: 'Notifications',
-      recipient: this.settings.options.emailTo,
-      type: NotificationType[type],
-      subject: payload.subject,
-    });
+    this.logger.log('Sending email notification');
 
     try {
       const email = new PreparedEmail(
@@ -100,13 +102,8 @@ class EmailAgent implements NotificationAgent {
         ),
       );
     } catch (e) {
-      this.logger.error('Error sending email notification', {
-        label: 'Notifications',
-        recipient: this.getSettings().options.emailTo,
-        type: NotificationType[type],
-        subject: payload.subject,
-        errorMessage: e.message,
-      });
+      this.logger.error('Error sending email notification');
+      this.logger.debug(e);
 
       return false;
     }

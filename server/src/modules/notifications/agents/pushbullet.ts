@@ -1,7 +1,5 @@
 import axios from 'axios';
-import {
-  hasNotificationType,
-} from '../notifications.service';
+import { hasNotificationType } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
@@ -10,6 +8,7 @@ import {
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
+import { Notification } from '../entities/notification.entities';
 
 interface PushbulletPayload {
   type: string;
@@ -22,8 +21,14 @@ class PushbulletAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentConfig,
-  ) {}
+    readonly notification: Notification,
+  ) {
+    this.notification = notification;
+  }
+
   private readonly logger = new Logger(PushbulletAgent.name);
+
+  getNotification = () => this.notification;
 
   getSettings = () => this.settings;
 
@@ -85,25 +90,15 @@ class PushbulletAgent implements NotificationAgent {
           },
         );
       } catch (e) {
-        this.logger.error('Error sending Pushbullet notification', {
-          label: 'Notifications',
-          type: NotificationType[type],
-          subject: payload.subject,
-          errorMessage: e.message,
-          response: e.response?.data,
-        });
+        this.logger.error('Error sending Pushbullet notification');
+        this.logger.debug(e);
 
         return false;
       }
     }
 
     if (settings.options.accessToken) {
-      this.logger.debug('Sending Pushbullet notification', {
-        label: 'Notifications',
-        recipient: settings.options.displayName,
-        type: NotificationType[type],
-        subject: payload.subject,
-      });
+      this.logger.log('Sending Pushbullet notification');
 
       try {
         await axios.post(endpoint, notificationPayload, {
@@ -112,14 +107,8 @@ class PushbulletAgent implements NotificationAgent {
           },
         });
       } catch (e) {
-        this.logger.error('Error sending Pushbullet notification', {
-          label: 'Notifications',
-          recipient: settings.options.displayName,
-          type: NotificationType[type],
-          subject: payload.subject,
-          errorMessage: e.message,
-          response: e.response?.data,
-        });
+        this.logger.error('Error sending Pushbullet notification');
+        this.logger.debug(e);
 
         return false;
       }

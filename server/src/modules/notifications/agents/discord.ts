@@ -1,15 +1,13 @@
 import axios from 'axios';
-import {
-  hasNotificationType,
-} from '../notifications.service';
+import { hasNotificationType } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
-import { Injectable, Logger } from '@nestjs/common';
-import { SettingsService } from '../../settings/settings.service';
+import { Logger } from '@nestjs/common';
 import {
   NotificationAgentConfig,
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
+import { Notification } from '../entities/notification.entities';
 
 enum EmbedColors {
   DEFAULT = 0,
@@ -85,9 +83,16 @@ interface DiscordWebhookPayload {
 }
 
 class DiscordAgent implements NotificationAgent {
-  constructor(private readonly settings: NotificationAgentConfig) {}
+  constructor(
+    private readonly settings: NotificationAgentConfig,
+    readonly notification: Notification,
+  ) {
+    this.notification = notification;
+  }
 
   private readonly logger = new Logger(DiscordAgent.name);
+
+  getNotification = () => this.notification;
 
   getSettings = () => this.settings;
 
@@ -97,7 +102,7 @@ class DiscordAgent implements NotificationAgent {
     type: NotificationType,
     payload: NotificationPayload,
   ): DiscordRichEmbed {
-    let color = EmbedColors.DARK_PURPLE;
+    const color = EmbedColors.DARK_PURPLE;
     const fields: Field[] = [];
 
     for (const extra of payload.extra ?? []) {
@@ -140,11 +145,7 @@ class DiscordAgent implements NotificationAgent {
       return true;
     }
 
-    this.logger.log('Sending Discord notification', {
-      label: 'Notifications',
-      type: NotificationType[type],
-      subject: payload.subject,
-    });
+    this.logger.log('Sending Discord notification');
 
     try {
       await axios.post(
@@ -160,13 +161,8 @@ class DiscordAgent implements NotificationAgent {
 
       return true;
     } catch (e) {
-      this.logger.warn('Error sending Discord notification', {
-        label: 'Notifications',
-        type: NotificationType[type],
-        subject: payload.subject,
-        errorMessage: e.message,
-        response: e.response?.data,
-      });
+      this.logger.warn('Error sending Discord notification');
+      this.logger.debug(e);
 
       return false;
     }
