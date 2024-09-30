@@ -66,6 +66,14 @@ export const enum MediaType {
   SHOW,
 }
 
+export const enum Application {
+  PLEX,
+  RADARR,
+  SONARR,
+  OVERSEERR,
+  TAUTULLI,
+}
+
 const ConstantsContext = createContext({
   constants: {} as Iconstants,
   addConstants: (constant: Iconstants) => {},

@@ -1,11 +1,7 @@
-import { useContext, useEffect, useRef, useState } from 'react'
-import GetApiHandler from '../../../../utils/ApiHandler'
-import ConstantsContext, {
-  MediaType,
-} from '../../../../contexts/constants-context'
+import { useEffect, useRef, useState } from 'react'
+import { MediaType } from '../../../../contexts/constants-context'
 import Alert from '../../../Common/Alert'
 import RuleInput from './RuleInput'
-import LoadingSpinner from '../../../Common/LoadingSpinner'
 import SectionHeading from '../../../Common/SectionHeading'
 import _ from 'lodash'
 import { ClipboardListIcon } from '@heroicons/react/solid'
@@ -39,14 +35,10 @@ interface iRuleCreator {
 }
 
 const RuleCreator = (props: iRuleCreator) => {
-  const [isLoading, setIsLoading] = useState(true)
   const [editSections, setEditSections] = useState<number>()
   const [ruleAmount, setRuleAmount] = useState<[number, number[]]>([1, [1]])
-  const [totalRules, setTotalRules] = useState<number>(0)
   const [editData, setEditData] = useState<{ rules: IRule[] }>()
-  const [createdRules, setCreatedRules] = useState<IRulesToCreate[]>([])
   const rulesCreated = useRef<IRulesToCreate[]>([])
-  const ConstantsCtx = useContext(ConstantsContext)
   const [ruleAmountArr, setRuleAmountArr] = useState<[number[], [number[]]]>([
     [1],
     [[1]],
@@ -55,14 +47,9 @@ const RuleCreator = (props: iRuleCreator) => {
   const added = useRef<number[]>([])
 
   useEffect(() => {
-    setIsLoading(true)
     if (props.editData) {
       loadRules(props.editData)
     }
-    GetApiHandler('/rules/constants').then((resp) => {
-      ConstantsCtx.addConstants(resp)
-      setIsLoading(false)
-    })
   }, [])
 
   useEffect(() => {
@@ -75,7 +62,7 @@ const RuleCreator = (props: iRuleCreator) => {
               ? sectionAmounts[el.section]
                 ? sectionAmounts[el.section]++
                 : (sectionAmounts[el.section] = 1)
-              : (sectionAmounts[0] = 1)
+              : (sectionAmounts[0] = 1),
           )
         : undefined
       setRuleAmount([
@@ -98,10 +85,9 @@ const RuleCreator = (props: iRuleCreator) => {
     if (rulesCreated) {
       const rules = rulesCreated.current.filter((el) => el.id !== id)
       const toCommit = [...rules, { id: id, rule: rule }].sort(
-        (a, b) => a.id - b.id
+        (a, b) => a.id - b.id,
       )
       rulesCreated.current = toCommit
-      setCreatedRules(toCommit)
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
       added.current = added.current.filter((e) => e !== id)
     }
@@ -111,7 +97,6 @@ const RuleCreator = (props: iRuleCreator) => {
     if (rulesCreated) {
       const rules = rulesCreated.current?.filter((el) => el.id !== id)
       rulesCreated.current = [...rules]
-      setCreatedRules([...rules])
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
     }
   }
@@ -124,7 +109,6 @@ const RuleCreator = (props: iRuleCreator) => {
         return e
       })
       rulesCreated.current = [...rules]
-      setCreatedRules([...rules])
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
     }
 
@@ -150,7 +134,7 @@ const RuleCreator = (props: iRuleCreator) => {
   const RuleAdded = (section: number) => {
     const ruleId =
       ruleAmount[1].reduce((prev, cur, idx) =>
-        idx + 1 <= section ? prev + cur : prev
+        idx + 1 <= section ? prev + cur : prev,
       ) + 1
 
     added.current = [...added.current, ruleId]
@@ -173,7 +157,7 @@ const RuleCreator = (props: iRuleCreator) => {
 
     const ruleId =
       ruleAmount[1].reduce((prev, cur, idx) =>
-        idx + 1 <= ruleAmount[0] + 1 ? prev + cur : prev
+        idx + 1 <= ruleAmount[0] + 1 ? prev + cur : prev,
       ) + 1
     added.current = [...added.current, ruleId]
 
@@ -197,23 +181,6 @@ const RuleCreator = (props: iRuleCreator) => {
     setRuleAmountArr(worker)
   }, [ruleAmount])
 
-  useEffect(() => {
-    let counter = 0
-    ruleAmountArr[0].forEach((sid) => {
-      let c = _.clone(sid)
-      counter = counter + ruleAmount[1][sid - 1]
-    })
-    setTotalRules(counter)
-  }, [ruleAmountArr])
-
-  if (isLoading) {
-    return (
-      <span className='className="h-full w-full'>
-        <LoadingSpinner />
-      </span>
-    )
-  }
-
   return (
     <div className="h-full w-full">
       {ruleAmountArr[0].map((sid) => {
@@ -235,10 +202,10 @@ const RuleCreator = (props: iRuleCreator) => {
                           sid === 1
                             ? cv - (cv - id)
                             : idx <= sid - 1
-                            ? idx === sid - 1
-                              ? cv - (cv - id) + pv
-                              : cv + pv
-                            : pv
+                              ? idx === sid - 1
+                                ? cv - (cv - id) + pv
+                                : cv + pv
+                              : pv,
                         )
                       : ruleAmount[1][0] - (ruleAmount[1][0] - id)
                   }
@@ -252,10 +219,10 @@ const RuleCreator = (props: iRuleCreator) => {
                                   sid === 1
                                     ? cv - (cv - id)
                                     : idx <= sid - 1
-                                    ? idx === sid - 1
-                                      ? cv - (cv - id) + pv
-                                      : cv + pv
-                                    : pv
+                                      ? idx === sid - 1
+                                        ? cv - (cv - id) + pv
+                                        : cv + pv
+                                      : pv,
                                 )
                               : ruleAmount[1][0] - (ruleAmount[1][0] - id)) - 1
                           ],
