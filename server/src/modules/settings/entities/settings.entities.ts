@@ -2,6 +2,7 @@ import { CronExpression } from '@nestjs/schedule';
 import { randomUUID } from 'crypto';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { SettingDto } from "../dto's/setting.dto";
+import { NotificationSettings } from '../interfaces/notifications-settings.interface';
 
 @Entity()
 export class Settings implements SettingDto {
@@ -52,6 +53,9 @@ export class Settings implements SettingDto {
 
   @Column({ nullable: true })
   tautulli_api_key: string;
+
+  @Column({ type: 'simple-json', nullable: true })
+  notification_settings: NotificationSettings;
 
   @Column({ nullable: false, default: CronExpression.EVERY_12_HOURS })
   collection_handler_job_cron: string;

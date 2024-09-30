@@ -1,0 +1,168 @@
+import axios from 'axios';
+import { hasNotificationType, Notification } from '../notifications.service';
+import type { NotificationAgent, NotificationPayload } from './agent';
+import { SettingsService } from '../../settings/settings.service';
+import { Logger } from '@nestjs/common';
+
+interface EmbedField {
+  type: 'plain_text' | 'mrkdwn';
+  text: string;
+}
+
+interface TextItem {
+  type: 'plain_text' | 'mrkdwn';
+  text: string;
+  emoji?: boolean;
+}
+
+interface Element {
+  type: 'button';
+  text?: TextItem;
+  action_id: string;
+  url?: string;
+  value?: string;
+  style?: 'primary' | 'danger';
+}
+
+interface EmbedBlock {
+  type: 'header' | 'actions' | 'section' | 'context';
+  block_id?: 'section789';
+  text?: TextItem;
+  fields?: EmbedField[];
+  accessory?: {
+    type: 'image';
+    image_url: string;
+    alt_text: string;
+  };
+  elements?: (Element | TextItem)[];
+}
+
+interface SlackBlockEmbed {
+  text: string;
+  blocks: EmbedBlock[];
+}
+
+class SlackAgent implements NotificationAgent {
+  public constructor(private readonly settings: SettingsService) {}
+  private readonly logger = new Logger(SlackAgent.name);
+
+  getSettings = () =>
+    this.settings?.notification_settings?.notifications?.agents?.slack;
+
+  public buildEmbed(
+    type: Notification,
+    payload: NotificationPayload,
+  ): SlackBlockEmbed {
+    const { applicationUrl, applicationTitle } = this.settings;
+
+    const fields: EmbedField[] = [];
+
+    for (const extra of payload.extra ?? []) {
+      fields.push({
+        type: 'mrkdwn',
+        text: `*${extra.name}*\n${extra.value}`,
+      });
+    }
+
+    const blocks: EmbedBlock[] = [];
+
+    if (payload.event) {
+      blocks.push({
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `*${payload.event}*`,
+          },
+        ],
+      });
+    }
+
+    blocks.push({
+      type: 'header',
+      text: {
+        type: 'plain_text',
+        text: payload.subject,
+      },
+    });
+
+    if (payload.message) {
+      blocks.push({
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: payload.message,
+        },
+        accessory: payload.image
+          ? {
+              type: 'image',
+              image_url: payload.image,
+              alt_text: payload.subject,
+            }
+          : undefined,
+      });
+    }
+
+    if (fields.length > 0) {
+      blocks.push({
+        type: 'section',
+        fields,
+      });
+    }
+
+    return {
+      text: payload.event ?? payload.subject,
+      blocks,
+    };
+  }
+
+  public shouldSend(): boolean {
+    const settings = this.getSettings();
+
+    if (settings.enabled && settings.options.webhookUrl) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public async send(
+    type: Notification,
+    payload: NotificationPayload,
+  ): Promise<boolean> {
+    const settings = this.getSettings();
+
+    if (
+      !payload.notifySystem ||
+      !hasNotificationType(type, settings.types ?? [0])
+    ) {
+      return true;
+    }
+
+    this.logger.debug('Sending Slack notification', {
+      label: 'Notifications',
+      type: Notification[type],
+      subject: payload.subject,
+    });
+    try {
+      await axios.post(
+        settings.options.webhookUrl,
+        this.buildEmbed(type, payload),
+      );
+
+      return true;
+    } catch (e) {
+      this.logger.error('Error sending Slack notification', {
+        label: 'Notifications',
+        type: Notification[type],
+        subject: payload.subject,
+        errorMessage: e.message,
+        response: e.response?.data,
+      });
+
+      return false;
+    }
+  }
+}
+
+export default SlackAgent;

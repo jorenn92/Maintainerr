@@ -16,6 +16,7 @@ import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { NotificationsModule } from '../modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.ser
     TautulliApiModule,
     RulesModule,
     CollectionsModule,
+    NotificationsModule
   ],
   controllers: [AppController],
   providers: [AppService],
