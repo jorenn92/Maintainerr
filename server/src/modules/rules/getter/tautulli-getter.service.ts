@@ -33,20 +33,7 @@ export class TautulliGetterService {
       switch (prop.name) {
         case 'seenBy':
         case 'sw_watchers': {
-          const options: TautulliHistoryRequestOptions = {};
-
-          if (
-            metadata.media_type == 'episode' ||
-            metadata.media_type == 'movie'
-          ) {
-            options.rating_key = metadata.rating_key;
-          } else if (metadata.media_type == 'season') {
-            options.parent_rating_key = metadata.rating_key;
-          } else {
-            options.grandparent_rating_key = metadata.rating_key;
-          }
-
-          const history = await this.tautulliApi.getHistory(options);
+          const history = await this.getHistoryForMetadata(metadata);
 
           if (history.length > 0) {
             const viewers = history
@@ -81,7 +68,6 @@ export class TautulliGetterService {
             for (const episode of episodes) {
               const viewers = await this.tautulliApi.getHistory({
                 rating_key: episode.rating_key,
-                media_type: 'episode',
               });
 
               const arrLength = allViewers.length - 1;
@@ -116,30 +102,13 @@ export class TautulliGetterService {
         }
         case 'viewCount':
         case 'sw_amountOfViews': {
-          const itemWatchTimeStats =
-            await this.tautulliApi.getItemWatchTimeStats({
-              rating_key: metadata.rating_key,
-              grouping: 1,
-            });
-
-          return itemWatchTimeStats.find((x) => x.query_days == 0).total_plays;
+          const history = await this.getHistoryForMetadata(metadata);
+          const watchedContent = history.filter((x) => x.watched_status == 1);
+          return watchedContent.length;
         }
         case 'lastViewedAt': {
           // get_metadata has a last_viewed_at field which would be easier but it's not correct
-          const options: TautulliHistoryRequestOptions = {};
-
-          if (
-            metadata.media_type == 'movie' ||
-            metadata.media_type == 'episode'
-          ) {
-            options.rating_key = metadata.rating_key;
-          } else if (metadata.media_type == 'season') {
-            options.parent_rating_key = metadata.rating_key;
-          } else {
-            options.grandparent_rating_key = metadata.rating_key;
-          }
-
-          const history = await this.tautulliApi.getHistory(options);
+          const history = await this.getHistoryForMetadata(metadata);
           const sortedHistory = history
             .filter((x) => x.watched_status == 1)
             .map((el) => el.stopped)
@@ -151,14 +120,7 @@ export class TautulliGetterService {
             : null;
         }
         case 'sw_viewedEpisodes': {
-          const history =
-            metadata.media_type !== 'season'
-              ? await this.tautulliApi.getHistory({
-                  grandparent_rating_key: metadata.rating_key,
-                })
-              : await this.tautulliApi.getHistory({
-                  parent_rating_key: metadata.rating_key,
-                });
+          const history = await this.getHistoryForMetadata(metadata);
 
           const watchedEpisodes = history
             .filter((x) => x.watched_status == 1)
@@ -169,14 +131,7 @@ export class TautulliGetterService {
           return uniqueEpisodes.length;
         }
         case 'sw_lastWatched': {
-          let history =
-            metadata.media_type !== 'season'
-              ? await this.tautulliApi.getHistory({
-                  grandparent_rating_key: metadata.rating_key,
-                })
-              : await this.tautulliApi.getHistory({
-                  parent_rating_key: metadata.rating_key,
-                });
+          let history = await this.getHistoryForMetadata(metadata);
 
           history
             .filter((x) => x.watched_status == 1)
@@ -201,5 +156,22 @@ export class TautulliGetterService {
       this.logger.warn(`Tautulli-Getter - Action failed : ${e.message}`);
       return undefined;
     }
+  }
+
+  private async getHistoryForMetadata(metadata: TautulliMetadata) {
+    const options: TautulliHistoryRequestOptions = {};
+
+    if (metadata.media_type == 'movie' || metadata.media_type == 'episode') {
+      options.rating_key = metadata.rating_key;
+    } else if (metadata.media_type == 'season') {
+      options.parent_rating_key = metadata.rating_key;
+    } else if (metadata.media_type == 'show') {
+      options.grandparent_rating_key = metadata.rating_key;
+    } else {
+      return [];
+    }
+
+    const history = await this.tautulliApi.getHistory(options);
+    return history;
   }
 }
