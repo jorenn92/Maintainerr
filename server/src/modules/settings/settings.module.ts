@@ -7,6 +7,7 @@ import { PlexApiModule } from '../api/plex-api/plex-api.module';
 import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
 import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { InternalApiModule } from '../api/internal-api/internal-api.module';
+import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 
 @Global()
 @Module({
@@ -14,6 +15,7 @@ import { InternalApiModule } from '../api/internal-api/internal-api.module';
     forwardRef(() => PlexApiModule),
     forwardRef(() => ServarrApiModule),
     forwardRef(() => OverseerrApiModule),
+    forwardRef(() => TautulliApiModule),
     forwardRef(() => InternalApiModule),
     TypeOrmModule.forFeature([Settings]),
   ],

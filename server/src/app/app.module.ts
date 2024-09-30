@@ -15,6 +15,8 @@ import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
 import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.service';
 import { ServarrService } from '../modules/api/servarr-api/servarr.service';
 import ormConfig from './config/typeOrmConfig';
+import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
+import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import ormConfig from './config/typeOrmConfig';
     TmdbApiModule,
     ServarrApiModule,
     OverseerrApiModule,
+    TautulliApiModule,
     RulesModule,
     CollectionsModule,
   ],
@@ -37,6 +40,7 @@ export class AppModule implements OnModuleInit {
     private readonly plexApi: PlexApiService,
     private readonly overseerApi: OverseerrApiService,
     private readonly servarr: ServarrService,
+    private readonly tautulliApi: TautulliApiService,
   ) {}
   async onModuleInit() {
     // Initialize stuff needing settings here.. Otherwise problems
@@ -44,5 +48,6 @@ export class AppModule implements OnModuleInit {
     await this.plexApi.initialize({});
     await this.servarr.init();
     await this.overseerApi.init();
+    await this.tautulliApi.init();
   }
 }

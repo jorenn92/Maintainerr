@@ -59,6 +59,12 @@ export class Settings implements SettingDto {
   @Column({ nullable: true })
   sonarr_api_key: string;
 
+  @Column({ nullable: true })
+  tautulli_url: string;
+
+  @Column({ nullable: true })
+  tautulli_api_key: string;
+
   @Column({ nullable: false, default: CronExpression.EVERY_12_HOURS })
   collection_handler_job_cron: string;
 

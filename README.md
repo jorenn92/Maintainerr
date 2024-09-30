@@ -29,13 +29,12 @@ It's a one-stop-shop for handling those outlying shows and movies that take up p
 
 # Features
 
-- Configure rules specific to your needs, based off of several available options from Plex, Overseerr, Radarr, and Sonarr.
+- Configure rules specific to your needs, based off of several available options from Plex, Overseerr, Radarr, Sonarr and Tautulli.
 - Manually add media to a collection, in case it's not included after rule execution. (one-off items that don't match a rule set)
 - Selectively exclude media from being added to a collection, even if it matches a rule.
 - Show a collection, containing rule matched media, on the Plex home screen for a specific duration before deletion. Think "Leaving soon".
 - Optionally, use a manual Plex collection, in case you don't want <b>Maintainerr</b> to add & remove Plex collections at will.
 - Manage media straight from the collection within Plex. <b>Maintainerr</b> will sync and add or exclude media to/from the internal collection.
-
 - Remove or unmonitor media from \*arr
 - Clear requests from Overseerr
 - Delete files from disk
@@ -47,6 +46,7 @@ Currently, <b>Maintainerr</b> supports rule parameters from these apps :
 - Overseerr
 - Radarr
 - Sonarr
+- Tautulli
 
 # Preview
 

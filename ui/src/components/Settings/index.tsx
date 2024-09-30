@@ -37,6 +37,11 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
       regex: /^\/settings(\/sonarr)?$/,
     },
     {
+      text: 'Tautulli',
+      route: '/settings/tautulli',
+      regex: /^\/settings(\/tautulli)?$/,
+    },
+    {
       text: 'Jobs',
       route: '/settings/jobs',
       regex: /^\/settings(\/jobs)?$/,

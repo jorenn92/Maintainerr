@@ -25,6 +25,7 @@ export const enum Application {
   RADARR,
   SONARR,
   OVERSEERR,
+  TAUTULLI,
 }
 
 export const enum ArrAction {
@@ -128,7 +129,7 @@ export class RuleConstants {
           name: 'seenBy',
           humanName: '[list] Viewed by (username)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.TEXT, // returns id[]
+          type: RuleType.TEXT, // returns usernames []
         } as Property,
         {
           id: 2,
@@ -609,6 +610,84 @@ export class RuleConstants {
           humanName: 'Requested in Overseerr',
           mediaType: MediaType.BOTH,
           type: RuleType.BOOL,
+        } as Property,
+      ],
+    },
+    {
+      id: Application.TAUTULLI,
+      name: 'Tautulli',
+      mediaType: MediaType.BOTH,
+      props: [
+        {
+          id: 0,
+          name: 'seenBy',
+          humanName: '[list] Viewed by (username)',
+          mediaType: MediaType.MOVIE,
+          type: RuleType.TEXT, // returns usernames []
+        } as Property,
+        {
+          id: 1,
+          name: 'sw_allEpisodesSeenBy',
+          humanName: '[list] Users that saw all available episodes',
+          mediaType: MediaType.SHOW,
+          type: RuleType.TEXT, // return usernames []
+          showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
+        } as Property,
+        {
+          id: 2,
+          name: 'addDate',
+          humanName: 'Date added',
+          mediaType: MediaType.BOTH,
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 3,
+          name: 'viewCount',
+          humanName: 'Times viewed',
+          mediaType: MediaType.MOVIE,
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 4,
+          name: 'lastViewedAt',
+          humanName: 'Last view date',
+          mediaType: MediaType.BOTH,
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 5,
+          name: 'sw_amountOfViews',
+          humanName: 'Total views',
+          mediaType: MediaType.SHOW,
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 6,
+          name: 'sw_viewedEpisodes',
+          humanName: 'Amount of watched episodes',
+          mediaType: MediaType.SHOW,
+          type: RuleType.NUMBER,
+          showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
+        } as Property,
+        {
+          id: 7,
+          name: 'sw_lastWatched',
+          humanName: 'Newest episode view date',
+          mediaType: MediaType.SHOW,
+          type: RuleType.DATE,
+          showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
+        } as Property,
+        {
+          id: 8,
+          name: 'sw_watchers',
+          humanName: '[list] Users that watch the show/season/episode',
+          mediaType: MediaType.SHOW,
+          type: RuleType.TEXT, // return usernames []
+          showType: [
+            EPlexDataType.SHOWS,
+            EPlexDataType.SEASONS,
+            EPlexDataType.EPISODES,
+          ],
         } as Property,
       ],
     },

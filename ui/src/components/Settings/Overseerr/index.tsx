@@ -127,7 +127,7 @@ const OverseerrSettings = () => {
         testBanner.status ? (
           <Alert
             type="warning"
-            title={`successfully connected to Overseerr (${testBanner.version})`}
+            title={`Successfully connected to Overseerr (${testBanner.version})`}
           />
         ) : (
           <Alert

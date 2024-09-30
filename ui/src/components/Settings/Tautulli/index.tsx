@@ -1,5 +1,10 @@
 import { SaveIcon } from '@heroicons/react/solid'
-import { useContext, useEffect, useRef, useState } from 'react'
+import {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
@@ -8,20 +13,17 @@ import DocsButton from '../../Common/DocsButton'
 import TestButton from '../../Common/TestButton'
 import {
   addPortToUrl,
-  getArrBaseUrl,
-  getHostname,
   getPortFromUrl,
   handleSettingsInputChange,
+  removePortFromUrl,
 } from '../../../utils/SettingsUtils'
 
-const RadarrSettings = () => {
+const TautulliSettings = () => {
   const settingsCtx = useContext(SettingsContext)
   const hostnameRef = useRef<HTMLInputElement>(null)
-  const baseUrlRef = useRef<HTMLInputElement>(null)
   const portRef = useRef<HTMLInputElement>(null)
   const apiKeyRef = useRef<HTMLInputElement>(null)
   const [hostname, setHostname] = useState<string>()
-  const [baseURl, setBaseUrl] = useState<string>()
   const [port, setPort] = useState<string>()
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
@@ -31,24 +33,23 @@ const RadarrSettings = () => {
   }>({ status: false, version: '0' })
 
   useEffect(() => {
-    document.title = 'Maintainerr - Settings - Radarr'
+    document.title = 'Maintainerr - Settings - Tautulli'
   }, [])
 
   useEffect(() => {
-    setHostname(getHostname(settingsCtx.settings.radarr_url))
-    setBaseUrl(getArrBaseUrl(settingsCtx.settings.radarr_url))
-    setPort(getPortFromUrl(settingsCtx.settings.radarr_url))
-
+    // hostname
+    setHostname(removePortFromUrl(settingsCtx.settings.tautulli_url))
     // @ts-ignore
     hostnameRef.current = {
-      value: getHostname(settingsCtx.settings.radarr_url),
+      value: removePortFromUrl(settingsCtx.settings.tautulli_url),
     }
+
+    // port
+    setPort(getPortFromUrl(settingsCtx.settings.tautulli_url))
     // @ts-ignore
-    baseUrlRef.current = {
-      value: getArrBaseUrl(settingsCtx.settings.radarr_url),
+    portRef.current = {
+      value: getPortFromUrl(settingsCtx.settings.tautulli_url),
     }
-    // @ts-ignore
-    portRef.current = { value: getPortFromUrl(settingsCtx.settings.radarr_url) }
   }, [settingsCtx])
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,27 +72,22 @@ const RadarrSettings = () => {
 
     if (
       hostnameRef.current?.value &&
-      portRef.current?.value &&
-      apiKeyRef.current?.value
+      apiKeyRef.current?.value &&
+      portRef.current?.value
     ) {
       const hostnameVal = hostnameRef.current.value.includes('http://')
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https://')
           ? hostnameRef.current.value
-          : portRef.current.value == '443' ?
-            'https://' + hostnameRef.current.value
-            : 'http://' + hostnameRef.current.value
-
-      let radarr_url = `${addPortToUrl(hostnameVal, +portRef.current.value)}`
-      radarr_url = radarr_url.endsWith('/')
-        ? radarr_url.slice(0, -1)
-        : radarr_url
+        : portRef.current.value == '443'
+        ? 'https://' + hostnameRef.current.value
+        : 'http://' + hostnameRef.current.value
 
       const payload = {
-        radarr_url: `${radarr_url}${baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
-          }`,
-        radarr_api_key: apiKeyRef.current.value,
+        tautulli_url: addPortToUrl(hostnameVal, +portRef.current.value),
+        tautulli_api_key: apiKeyRef.current.value,
       }
+
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
         '/settings',
         {
@@ -119,10 +115,9 @@ const RadarrSettings = () => {
   return (
     <div className="h-full w-full">
       <div className="section h-full w-full">
-        <h3 className="heading">Radarr Settings</h3>
-        <p className="description">Radarr configuration</p>
+        <h3 className="heading">Tautulli Settings</h3>
+        <p className="description">Tautulli configuration</p>
       </div>
-
       {error ? (
         <Alert type="warning" title="Not all fields contain values" />
       ) : changed ? (
@@ -133,7 +128,7 @@ const RadarrSettings = () => {
         testBanner.status ? (
           <Alert
             type="warning"
-            title={`Successfully connected to Radarr (${testBanner.version})`}
+            title={`Successfully connected to Tautulli (${testBanner.version})`}
           />
         ) : (
           <Alert
@@ -155,8 +150,8 @@ const RadarrSettings = () => {
                   name="hostname"
                   id="hostname"
                   type="text"
-                  ref={hostnameRef}
                   defaultValue={hostname}
+                  ref={hostnameRef}
                   value={hostnameRef.current?.value}
                   onChange={(e) =>
                     handleSettingsInputChange(e, hostnameRef, setHostname)
@@ -177,32 +172,9 @@ const RadarrSettings = () => {
                   id="port"
                   type="number"
                   ref={portRef}
-                  defaultValue={port}
                   value={portRef.current?.value}
-                  onChange={(e) =>
-                    handleSettingsInputChange(e, portRef, setPort)
-                  }
-                ></input>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="baseUrl" className="text-label">
-              Base URL
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="baseUrl"
-                  id="baseUrl"
-                  type="text"
-                  ref={baseUrlRef}
-                  defaultValue={baseURl}
-                  value={baseUrlRef.current?.value}
-                  onChange={(e) =>
-                    handleSettingsInputChange(e, baseUrlRef, setBaseUrl)
-                  }
+                  defaultValue={port}
+                  onChange={(e) => handleSettingsInputChange(e, portRef, setPort)}
                 ></input>
               </div>
             </div>
@@ -219,7 +191,7 @@ const RadarrSettings = () => {
                   id="apikey"
                   type="password"
                   ref={apiKeyRef}
-                  defaultValue={settingsCtx.settings.radarr_api_key}
+                  defaultValue={settingsCtx.settings.tautulli_api_key}
                 ></input>
               </div>
             </div>
@@ -231,16 +203,19 @@ const RadarrSettings = () => {
                 <DocsButton page="Configuration" />
               </span>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
-              <Button
+                <TestButton
+                  onClick={appTest}
+                  testUrl="/settings/test/tautulli"
+                />
+                <span className="ml-3 inline-flex rounded-md shadow-sm">
+                  <Button
                     buttonType="primary"
                     type="submit"
-                  // disabled={isSubmitting || !isValid}
+                    // disabled={isSubmitting || !isValid}
                   >
                     <SaveIcon />
-                    <span>Save Settings</span>
+                    <span>Save Changes</span>
                   </Button>
-                <span className="ml-1 inline-flex rounded-md shadow-sm">
-                <TestButton onClick={appTest} testUrl="/settings/test/radarr" />
                 </span>
               </div>
             </div>
@@ -251,4 +226,4 @@ const RadarrSettings = () => {
   )
 }
 
-export default RadarrSettings
+export default TautulliSettings
