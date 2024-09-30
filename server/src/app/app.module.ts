@@ -17,6 +17,7 @@ import { ServarrService } from '../modules/api/servarr-api/servarr.service';
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { NotificationsModule } from '../modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.ser
     TautulliApiModule,
     RulesModule,
     CollectionsModule,
+    NotificationsModule
   ],
   controllers: [AppController],
   providers: [AppService],
