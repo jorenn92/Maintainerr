@@ -912,24 +912,26 @@ export class CollectionsService {
             .values([
               {
                 title: collection.title,
-                description: collection?.description,
+                description: collection.description,
                 plexId: plexId,
                 type: collection.type,
                 libraryId: collection.libraryId,
                 arrAction: collection.arrAction ? collection.arrAction : 0,
                 isActive: collection.isActive,
-                visibleOnHome: collection?.visibleOnHome,
-                deleteAfterDays: collection?.deleteAfterDays,
-                listExclusions: collection?.listExclusions,
-                forceOverseerr: collection?.forceOverseerr,
-                keepLogsForMonths: collection?.keepLogsForMonths,
+                visibleOnHome: collection.visibleOnHome,
+                deleteAfterDays: collection.deleteAfterDays,
+                listExclusions: collection.listExclusions,
+                forceOverseerr: collection.forceOverseerr,
+                keepLogsForMonths: collection.keepLogsForMonths,
+                tautulliWatchedPercentOverride:
+                  collection.tautulliWatchedPercentOverride ?? null,
                 manualCollection:
-                  collection?.manualCollection !== undefined
-                    ? collection?.manualCollection
+                  collection.manualCollection !== undefined
+                    ? collection.manualCollection
                     : false,
                 manualCollectionName:
-                  collection?.manualCollectionName !== undefined
-                    ? collection?.manualCollectionName
+                  collection.manualCollectionName !== undefined
+                    ? collection.manualCollectionName
                     : '',
               },
             ])

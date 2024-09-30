@@ -44,6 +44,7 @@ interface ICreateApiObject {
   useRules: boolean
   listExclusions: boolean
   forceOverseerr: boolean
+  tautulliWatchedPercentOverride?: number
   collection: {
     visibleOnHome: boolean
     deleteAfterDays: number
@@ -77,15 +78,12 @@ const AddModal = (props: AddModal) => {
   const collectionTypeRef = useRef<any>(EPlexDataType.MOVIES)
   const deleteAfterRef = useRef<any>()
   const keepLogsForMonthsRef = useRef<any>()
+  const tautulliWatchedPercentOverrideRef = useRef<any>()
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showHome, setShowHome] = useState<boolean>(true)
   const [listExclusion, setListExclusion] = useState<boolean>(true)
   const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
-
   const [manualCollection, setManualCollection] = useState<boolean>(false)
-  const [manualCollectionName, setManualCollectionName] = useState<string>(
-    'My custom collection',
-  )
 
   const { addToast } = useToasts()
 
@@ -262,6 +260,10 @@ const AddModal = (props: AddModal) => {
         useRules: useRules,
         listExclusions: listExclusion,
         forceOverseerr: forceOverseerr,
+        tautulliWatchedPercentOverride:
+          tautulliWatchedPercentOverrideRef.current.value != ''
+            ? +tautulliWatchedPercentOverrideRef.current.value
+            : undefined,
         collection: {
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
@@ -433,12 +435,12 @@ const AddModal = (props: AddModal) => {
                             <option
                               key={
                                 EPlexDataType[
-                                data as keyof typeof EPlexDataType
+                                  data as keyof typeof EPlexDataType
                                 ]
                               }
                               value={
                                 EPlexDataType[
-                                data as keyof typeof EPlexDataType
+                                  data as keyof typeof EPlexDataType
                                 ]
                               }
                             >
@@ -459,49 +461,49 @@ const AddModal = (props: AddModal) => {
                 options={
                   +selectedType === EPlexDataType.SHOWS
                     ? [
-                      {
-                        id: 0,
-                        name: 'Delete entire show',
-                      },
-                      {
-                        id: 1,
-                        name: 'Unmonitor and delete all seasons / episodes',
-                      },
-                      {
-                        id: 2,
-                        name: 'Unmonitor and delete existing seasons / episodes',
-                      },
-                      {
-                        id: 3,
-                        name: 'Unmonitor show and keep files',
-                      },
-                    ]
-                    : +selectedType === EPlexDataType.SEASONS
-                      ? [
                         {
                           id: 0,
-                          name: 'Unmonitor and delete season',
+                          name: 'Delete entire show',
+                        },
+                        {
+                          id: 1,
+                          name: 'Unmonitor and delete all seasons / episodes',
                         },
                         {
                           id: 2,
-                          name: 'Unmonitor and delete existing episodes',
+                          name: 'Unmonitor and delete existing seasons / episodes',
                         },
                         {
                           id: 3,
-                          name: 'Unmonitor season and keep files',
+                          name: 'Unmonitor show and keep files',
                         },
                       ]
+                    : +selectedType === EPlexDataType.SEASONS
+                      ? [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete season',
+                          },
+                          {
+                            id: 2,
+                            name: 'Unmonitor and delete existing episodes',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor season and keep files',
+                          },
+                        ]
                       : // episodes
-                      [
-                        {
-                          id: 0,
-                          name: 'Unmonitor and delete episode',
-                        },
-                        {
-                          id: 3,
-                          name: 'Unmonitor and keep file',
-                        },
-                      ]
+                        [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete episode',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor and keep file',
+                          },
+                        ]
                 }
               />
             </>
@@ -544,6 +546,34 @@ const AddModal = (props: AddModal) => {
                   id="collection_logs_months"
                   defaultValue={collection ? collection.keepLogsForMonths : 6}
                   ref={keepLogsForMonthsRef}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label
+              htmlFor="tautulli_watched_percent_override"
+              className="text-label"
+            >
+              Tautulli watched percent override
+              <p className="text-xs font-normal">
+                Overrides the configured Watched Percent in Tautulli which is
+                used to determine when media is counted as watched
+              </p>
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  name="tautulli_watched_percent_override"
+                  id="tautulli_watched_percent_override"
+                  defaultValue={
+                    collection ? collection.tautulliWatchedPercentOverride : ''
+                  }
+                  ref={tautulliWatchedPercentOverrideRef}
                 />
               </div>
             </div>

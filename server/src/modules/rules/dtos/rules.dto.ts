@@ -18,4 +18,5 @@ export class RulesDto {
   manualCollection?: boolean;
   manualCollectionName?: string;
   dataType: EPlexDataType;
+  tautulliWatchedPercentOverride?: number;
 }

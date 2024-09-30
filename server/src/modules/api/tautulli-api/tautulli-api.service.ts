@@ -45,6 +45,7 @@ interface TautulliHistoryItem {
   user_id: number;
   user: string;
   watched_status: number;
+  percent_complete: number;
   stopped: number;
   rating_key: number;
   media_index: number;

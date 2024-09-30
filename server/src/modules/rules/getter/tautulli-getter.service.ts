@@ -12,23 +12,41 @@ import {
   TautulliHistoryRequestOptions,
   TautulliMetadata,
 } from '../../api/tautulli-api/tautulli-api.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Collection } from '../../collections/entities/collection.entities';
+import { RulesDto } from '../dtos/rules.dto';
 
 @Injectable()
 export class TautulliGetterService {
   appProperties: Property[];
   private readonly logger = new Logger(TautulliGetterService.name);
 
-  constructor(private readonly tautulliApi: TautulliApiService) {
+  constructor(
+    private readonly tautulliApi: TautulliApiService,
+    @InjectRepository(Collection)
+    private readonly collectionRepository: Repository<Collection>,
+  ) {
     const ruleConstanst = new RuleConstants();
     this.appProperties = ruleConstanst.applications.find(
       (el) => el.id === Application.TAUTULLI,
     ).props;
   }
 
-  async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
+  async get(
+    id: number,
+    libItem: PlexLibraryItem,
+    dataType?: EPlexDataType,
+    ruleGroup?: RulesDto,
+  ) {
     try {
       const prop = this.appProperties.find((el) => el.id === id);
       const metadata = await this.tautulliApi.getMetadata(libItem.ratingKey);
+      const collection = await this.collectionRepository.findOne({
+        where: { id: ruleGroup.collection.id },
+      });
+      const tautulliWatchedPercentOverride =
+        collection.tautulliWatchedPercentOverride;
 
       switch (prop.name) {
         case 'seenBy':
@@ -37,7 +55,11 @@ export class TautulliGetterService {
 
           if (history.length > 0) {
             const viewers = history
-              .filter((x) => x.watched_status == 1)
+              .filter((x) =>
+                tautulliWatchedPercentOverride != null
+                  ? x.percent_complete >= tautulliWatchedPercentOverride
+                  : x.watched_status == 1,
+              )
               .map((el) => el.user);
 
             const uniqueViewers = [...new Set(viewers)];
@@ -78,7 +100,10 @@ export class TautulliGetterService {
                   if (
                     !viewers?.find(
                       (viewEl) =>
-                        viewEl.watched_status == 1 &&
+                        (tautulliWatchedPercentOverride != null
+                          ? viewEl.percent_complete >=
+                            tautulliWatchedPercentOverride
+                          : viewEl.watched_status == 1) &&
                         el.user_id === viewEl.user_id,
                     )
                   ) {
@@ -103,14 +128,22 @@ export class TautulliGetterService {
         case 'viewCount':
         case 'sw_amountOfViews': {
           const history = await this.getHistoryForMetadata(metadata);
-          const watchedContent = history.filter((x) => x.watched_status == 1);
+          const watchedContent = history.filter((x) =>
+            tautulliWatchedPercentOverride != null
+              ? x.percent_complete >= tautulliWatchedPercentOverride
+              : x.watched_status == 1,
+          );
           return watchedContent.length;
         }
         case 'lastViewedAt': {
           // get_metadata has a last_viewed_at field which would be easier but it's not correct
           const history = await this.getHistoryForMetadata(metadata);
           const sortedHistory = history
-            .filter((x) => x.watched_status == 1)
+            .filter((x) =>
+              tautulliWatchedPercentOverride != null
+                ? x.percent_complete >= tautulliWatchedPercentOverride
+                : x.watched_status == 1,
+            )
             .map((el) => el.stopped)
             .sort()
             .reverse();
@@ -123,7 +156,11 @@ export class TautulliGetterService {
           const history = await this.getHistoryForMetadata(metadata);
 
           const watchedEpisodes = history
-            .filter((x) => x.watched_status == 1)
+            .filter((x) =>
+              tautulliWatchedPercentOverride != null
+                ? x.percent_complete >= tautulliWatchedPercentOverride
+                : x.watched_status == 1,
+            )
             .map((x) => x.rating_key);
 
           const uniqueEpisodes = [...new Set(watchedEpisodes)];
@@ -134,7 +171,11 @@ export class TautulliGetterService {
           let history = await this.getHistoryForMetadata(metadata);
 
           history
-            .filter((x) => x.watched_status == 1)
+            .filter((x) =>
+              tautulliWatchedPercentOverride != null
+                ? x.percent_complete >= tautulliWatchedPercentOverride
+                : x.watched_status == 1,
+            )
             .sort((a, b) => a.parent_media_index - b.parent_media_index)
             .reverse();
 
