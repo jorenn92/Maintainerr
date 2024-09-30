@@ -73,17 +73,6 @@ export interface TautulliHistoryRequestOptions {
   search?: string;
 }
 
-interface TautulliItemWatchTimeStatsRequestOptions {
-  grouping?: 0 | 1;
-  rating_key: number | string;
-}
-
-interface TautulliItemWatchTimeStats {
-  query_days: 1 | 7 | 30 | 0;
-  total_time: number;
-  total_plays: number;
-}
-
 interface Response<T> {
   response:
     | {
@@ -274,35 +263,6 @@ export class TautulliApiService {
       return response.response.data.children_list;
     } catch (e) {
       this.logger.log("Couldn't fetch Tautulli children metadata!", {
-        label: 'Tautulli API',
-        errorMessage: e.message,
-      });
-      this.logger.debug(e);
-      return null;
-    }
-  }
-
-  public async getItemWatchTimeStats(
-    options: TautulliItemWatchTimeStatsRequestOptions,
-  ): Promise<TautulliItemWatchTimeStats[] | null> {
-    try {
-      const response: Response<TautulliItemWatchTimeStats[]> =
-        await this.api.get('', {
-          params: {
-            cmd: 'get_item_watch_time_stats',
-            ...options,
-          },
-        });
-
-      if (response.response.result !== 'success') {
-        throw new Error(
-          'Non-success response when fetching Tautulli item watch time stats',
-        );
-      }
-
-      return response.response.data;
-    } catch (e) {
-      this.logger.log("Couldn't fetch Tautulli item watch time stats!", {
         label: 'Tautulli API',
         errorMessage: e.message,
       });
