@@ -10,45 +10,24 @@ import {
 } from '../notifications-interfaces';
 import { Notification } from '../entities/notification.entities';
 
-interface EmbedField {
-  type: 'plain_text' | 'mrkdwn';
+interface TelegramMessagePayload {
   text: string;
+  parse_mode: string;
+  chat_id: string;
+  disable_notification: boolean;
 }
 
-interface TextItem {
-  type: 'plain_text' | 'mrkdwn';
-  text: string;
-  emoji?: boolean;
+interface TelegramPhotoPayload {
+  photo: string;
+  caption: string;
+  parse_mode: string;
+  chat_id: string;
+  disable_notification: boolean;
 }
 
-interface Element {
-  type: 'button';
-  text?: TextItem;
-  action_id: string;
-  url?: string;
-  value?: string;
-  style?: 'primary' | 'danger';
-}
+class TelegramAgent implements NotificationAgent {
+  private baseUrl = 'https://api.telegram.org/';
 
-interface EmbedBlock {
-  type: 'header' | 'actions' | 'section' | 'context';
-  block_id?: 'section789';
-  text?: TextItem;
-  fields?: EmbedField[];
-  accessory?: {
-    type: 'image';
-    image_url: string;
-    alt_text: string;
-  };
-  elements?: (Element | TextItem)[];
-}
-
-interface SlackBlockEmbed {
-  text: string;
-  blocks: EmbedBlock[];
-}
-
-class SlackAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentConfig,
@@ -57,87 +36,53 @@ class SlackAgent implements NotificationAgent {
     this.notification = notification;
   }
 
-  private readonly logger = new Logger(SlackAgent.name);
+  private readonly logger = new Logger(TelegramAgent.name);
 
   getNotification = () => this.notification;
 
   getSettings = () => this.settings;
 
-  getIdentifier = () => NotificationAgentKey.SLACK;
-
-  public buildEmbed(
-    type: NotificationType,
-    payload: NotificationPayload,
-  ): SlackBlockEmbed {
-    const fields: EmbedField[] = [];
-
-    for (const extra of payload.extra ?? []) {
-      fields.push({
-        type: 'mrkdwn',
-        text: `*${extra.name}*\n${extra.value}`,
-      });
-    }
-
-    const blocks: EmbedBlock[] = [];
-
-    if (payload.event) {
-      blocks.push({
-        type: 'context',
-        elements: [
-          {
-            type: 'mrkdwn',
-            text: `*${payload.event}*`,
-          },
-        ],
-      });
-    }
-
-    blocks.push({
-      type: 'header',
-      text: {
-        type: 'plain_text',
-        text: payload.subject,
-      },
-    });
-
-    if (payload.message) {
-      blocks.push({
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: payload.message,
-        },
-        accessory: payload.image
-          ? {
-              type: 'image',
-              image_url: payload.image,
-              alt_text: payload.subject,
-            }
-          : undefined,
-      });
-    }
-
-    if (fields.length > 0) {
-      blocks.push({
-        type: 'section',
-        fields,
-      });
-    }
-
-    return {
-      text: payload.event ?? payload.subject,
-      blocks,
-    };
-  }
+  getIdentifier = () => NotificationAgentKey.TELEGRAM;
 
   public shouldSend(): boolean {
     const settings = this.getSettings();
 
-    if (settings.enabled && settings.options.webhookUrl) {
+    if (settings.enabled && settings.options.botAPI) {
       return true;
     }
 
     return false;
+  }
+
+  private escapeText(text: string | undefined): string {
+    return text ? text.replace(/[_*[\]()~>#+=|{}.!-]/gi, (x) => '\\' + x) : '';
+  }
+
+  private getNotificationPayload(
+    type: NotificationType,
+    payload: NotificationPayload,
+  ): Partial<TelegramMessagePayload | TelegramPhotoPayload> {
+    let message = `\*${this.escapeText(
+      payload.event ? `${payload.event} - ${payload.subject}` : payload.subject,
+    )}\*`;
+    if (payload.message) {
+      message += `\n${this.escapeText(payload.message)}`;
+    }
+
+    for (const extra of payload.extra ?? []) {
+      message += `\n\*${extra.name}:\* ${extra.value}`;
+    }
+
+    return payload.image
+      ? {
+          photo: payload.image,
+          caption: message,
+          parse_mode: 'MarkdownV2',
+        }
+      : {
+          text: message,
+          parse_mode: 'MarkdownV2',
+        };
   }
 
   public async send(
@@ -145,38 +90,33 @@ class SlackAgent implements NotificationAgent {
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
+    const endpoint = `${this.baseUrl}bot${settings.options.botAPI}/${
+      payload.image ? 'sendPhoto' : 'sendMessage'
+    }`;
+    const notificationPayload = this.getNotificationPayload(type, payload);
 
     if (
-      !payload.notifySystem ||
-      !hasNotificationType(type, settings.types ?? [0])
+      hasNotificationType(type, settings.types ?? [0]) &&
+      settings.options.chatId
     ) {
-      return true;
+      this.logger.debug('Sending Telegram notification');
+
+      try {
+        await axios.post(endpoint, {
+          ...notificationPayload,
+          chat_id: settings.options.chatId,
+          disable_notification: !!settings.options.sendSilently,
+        } as TelegramMessagePayload | TelegramPhotoPayload);
+      } catch (e) {
+        this.logger.error('Error sending Telegram notification');
+        this.logger.debug(e);
+
+        return false;
+      }
     }
 
-    this.logger.debug('Sending Slack notification', {
-      label: 'Notifications',
-      type: NotificationType[type],
-      subject: payload.subject,
-    });
-    try {
-      await axios.post(
-        settings.options.webhookUrl as string,
-        this.buildEmbed(type, payload),
-      );
-
-      return true;
-    } catch (e) {
-      this.logger.error('Error sending Slack notification', {
-        label: 'Notifications',
-        type: NotificationType[type],
-        subject: payload.subject,
-        errorMessage: e.message,
-        response: e.response?.data,
-      });
-
-      return false;
-    }
+    return true;
   }
 }
 
-export default SlackAgent;
+export default TelegramAgent;

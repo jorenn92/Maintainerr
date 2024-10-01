@@ -10,14 +10,7 @@ import {
 } from '../notifications-interfaces';
 import { Notification } from '../entities/notification.entities';
 
-interface GotifyPayload {
-  title: string;
-  message: string;
-  priority: number;
-  extras: Record<string, unknown>;
-}
-
-class GotifyAgent implements NotificationAgent {
+class LunaSeaAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentConfig,
@@ -26,49 +19,38 @@ class GotifyAgent implements NotificationAgent {
     this.notification = notification;
   }
 
-  private readonly logger = new Logger(GotifyAgent.name);
+  private readonly logger = new Logger(LunaSeaAgent.name);
 
   getNotification = () => this.notification;
 
   getSettings = () => this.settings;
 
-  getIdentifier = () => NotificationAgentKey.GOTIFY;
+  getIdentifier = () => NotificationAgentKey.LUNASEA;
+
+  private buildPayload(type: NotificationType, payload: NotificationPayload) {
+    return {
+      notification_type: NotificationType[type],
+      event: payload.event,
+      subject: payload.subject,
+      message: payload.message,
+      image: payload.image ?? null,
+      email: this.getSettings().options.email,
+      username: this.getSettings().options.displayName
+        ? this.getSettings().options.profileName
+        : this.getSettings().options.displayName,
+      avatar: this.getSettings().options.avatar,
+      extra: payload.extra ?? [],
+    };
+  }
 
   public shouldSend(): boolean {
     const settings = this.getSettings();
 
-    if (settings.enabled && settings.options.url && settings.options.token) {
+    if (settings.enabled && settings.options.webhookUrl) {
       return true;
     }
 
     return false;
-  }
-
-  private getNotificationPayload(
-    type: NotificationType,
-    payload: NotificationPayload,
-  ): GotifyPayload {
-    const priority = 0;
-
-    const title = payload.event
-      ? `${payload.event} - ${payload.subject}`
-      : payload.subject;
-    let message = payload.message ?? '';
-
-    for (const extra of payload.extra ?? []) {
-      message += `\n\n**${extra.name}**\n${extra.value}`;
-    }
-
-    return {
-      extras: {
-        'client::display': {
-          contentType: 'text/markdown',
-        },
-      },
-      title,
-      message,
-      priority,
-    };
   }
 
   public async send(
@@ -84,16 +66,26 @@ class GotifyAgent implements NotificationAgent {
       return true;
     }
 
-    this.logger.log('Sending Gotify notification');
-    try {
-      const endpoint = `${settings.options.url}/message?token=${settings.options.token}`;
-      const notificationPayload = this.getNotificationPayload(type, payload);
+    this.logger.log('Sending LunaSea notification');
 
-      await axios.post(endpoint, notificationPayload);
+    try {
+      await axios.post(
+        this.getSettings().options.webhookUrl as string,
+        this.buildPayload(type, payload),
+        settings.options.profileName
+          ? {
+              headers: {
+                Authorization: `Basic ${Buffer.from(
+                  `${settings.options.profileName}:`,
+                ).toString('base64')}`,
+              },
+            }
+          : undefined,
+      );
 
       return true;
     } catch (e) {
-      this.logger.error('Error sending Gotify notification');
+      this.logger.error('Error sending LunaSea notification');
       this.logger.debug(e);
 
       return false;
@@ -101,4 +93,4 @@ class GotifyAgent implements NotificationAgent {
   }
 }
 
-export default GotifyAgent;
+export default LunaSeaAgent;
