@@ -1,97 +1,43 @@
 export interface NotificationSettings {
   notifications: {
-    agents: {
-      email: {
-        enabled: boolean;
-        options: {
-          emailFrom: string;
-          emailTo: string;
-          smtpHost: string;
-          smtpPort: number;
-          secure: boolean;
-          ignoreTls: boolean;
-          requireTls: boolean;
-          allowSelfSigned: boolean;
-          senderName: string;
-          pgpKey: string;
-          pgpPassword: string;
-        };
-      };
-      discord: {
+    agents: [
+      {
+        name: string;
+        agent: string;
         enabled: boolean;
         types: number[];
         options: {
-          webhookUrl: string;
+          emailFrom?: string;
+          emailTo?: string;
+          smtpHost?: string;
+          smtpPort?: number;
+          secure?: boolean;
+          ignoreTls?: boolean;
+          requireTls?: boolean;
+          allowSelfSigned?: boolean;
+          senderName?: string;
+          pgpKey?: string;
+          pgpPassword?: string;
+          webhookUrl?: string;
           botUsername?: string;
           botAvatarUrl?: string;
+          displayName?: string;
+          profileName?: string;
+          email?: string;
+          avatar?: string;
+          botAPI?: string;
+          chatId?: string;
+          sendSilently?: boolean;
+          accessToken?: string;
+          channelTag?: string;
+          userToken?: string;
+          sound?: string;
+          jsonPayload?: string;
+          authHeader?: string;
+          url?: string;
+          token?: string;
         };
-      };
-      lunasea: {
-        enabled: boolean;
-        types: number[];
-        options: {
-          webhookUrl: string;
-          displayName: string;
-          profileName: string;
-          email: string;
-          avatar: string;
-        };
-      };
-      slack: {
-        enabled: boolean;
-        types: number[];
-        options: {
-          webhookUrl: string;
-        };
-      };
-      telegram: {
-        enabled: boolean;
-        types: number[];
-        options: {
-          botAPI: string;
-          chatId: string;
-          sendSilently: boolean;
-        };
-      };
-      pushbullet: {
-        enabled: boolean;
-        types: number[];
-        options: {
-          accessToken: string;
-          channelTag: string;
-          displayName: string;
-        };
-      };
-      pushover: {
-        enabled: boolean;
-        types: number[];
-        options: {
-          accessToken: string;
-          userToken: string;
-          sound: string;
-        };
-      };
-      webhook: {
-        enabled: boolean;
-        types: number[];
-        options: {
-          webhookUrl: string;
-          jsonPayload: string;
-          authHeader: string;
-        };
-      };
-      webpush: {
-        enabled: boolean;
-        options: Record<string, unknown>;
-      };
-      gotify: {
-        enabled: boolean;
-        types: number[];
-        options: {
-          url: string;
-          token: string;
-        };
-      };
-    };
+      },
+    ];
   };
 }

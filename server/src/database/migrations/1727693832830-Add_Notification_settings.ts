@@ -6,21 +6,33 @@ export class AddNotificationSettings1727693832830
   name = 'AddNotificationSettings1727693832830';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      'ALTER TABLE settings ADD COLUMN "notification_settings" text ',
-    );
+    // Create notification table
+    await queryRunner.query(`
+      CREATE TABLE "notification" (
+        "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        "name" VARCHAR NOT NULL,
+        "agent" VARCHAR NOT NULL,
+        "enabled" BOOLEAN DEFAULT false,
+        "types" TEXT,
+        "options" TEXT NOT NULL
+      );
+    `);
 
-    const initialNotificationSettings =
-      '{"notifications":{"agents":{"email":{"enabled":false,"options":{"emailFrom":"","emailTo":"","pgpKey":"","pgpPassword":"","smtpHost":"","smtpPort":587,"secure":false,"ignoreTls":false,"requireTls":false,"allowSelfSigned":false,"senderName":"Maintainerr"}},"discord":{"enabled":false,"types":0,"options":{"webhookUrl":"","botUsername":"","botAvatarUrl":""}},"lunasea":{"enabled":false,"types":0,"options":{"webhookUrl":""}},"slack":{"enabled":false,"types":0,"options":{"webhookUrl":""}},"telegram":{"enabled":false,"types":0,"options":{"botAPI":"","chatId":"","sendSilently":false}},"pushbullet":{"enabled":false,"types":0,"options":{"accessToken":""}},"pushover":{"enabled":false,"types":0,"options":{"accessToken":"","userToken":"","sound":""}},"webhook":{"enabled":false,"types":0,"options":{"webhookUrl":"","jsonPayload":""}},"webpush":{"enabled":false,"options":{}},"gotify":{"enabled":false,"types":0,"options":{"url":"","token":""}}}}}';
-
-    await queryRunner.query(
-      `UPDATE settings SET "notification_settings" = '${initialNotificationSettings}'`,
-    );
+    // Create notification_rulegroup table with foreign key constraints directly
+    await queryRunner.query(`
+      CREATE TABLE "notification_rulegroup" (
+        "notificationId" INTEGER NOT NULL,
+        "rulegroupId" INTEGER NOT NULL,
+        PRIMARY KEY ("notificationId", "rulegroupId"),
+        FOREIGN KEY ("notificationId") REFERENCES "notification"("id") ON DELETE CASCADE,
+        FOREIGN KEY ("rulegroupId") REFERENCES "rulegroup"("id") ON DELETE CASCADE
+      );
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE settings DROP "notification_settings"`,
-    );
+    // Drop the tables in reverse order
+    await queryRunner.query(`DROP TABLE "notification_rulegroup"`);
+    await queryRunner.query(`DROP TABLE "notification"`);
   }
 }

@@ -1,6 +1,6 @@
 export interface NotificationAgentConfig {
     enabled: boolean;
-    types?: number;
+    types?: number[];
     options: Record<string, unknown>;
   }
   export interface NotificationAgentDiscord extends NotificationAgentConfig {

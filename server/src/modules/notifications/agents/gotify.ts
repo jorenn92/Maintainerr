@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { hasNotificationType, Notification } from '../notifications.service';
+import {
+  hasNotificationType,
+  NotificationTypes,
+} from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
+import { NotificationAgentConfig } from '../notifications-interfaces';
 
 interface GotifyPayload {
   title: string;
@@ -12,11 +16,13 @@ interface GotifyPayload {
 }
 
 class GotifyAgent implements NotificationAgent {
-  public constructor(private readonly settings: SettingsService) {}
+  public constructor(
+    private readonly appSettings: SettingsService,
+    private readonly settings: NotificationAgentConfig,
+  ) {}
   private readonly logger = new Logger(GotifyAgent.name);
 
-  getSettings = () =>
-    this.settings?.notification_settings?.notifications?.agents?.gotify;
+  getSettings = () => this.settings;
 
   public shouldSend(): boolean {
     const settings = this.getSettings();
@@ -29,10 +35,10 @@ class GotifyAgent implements NotificationAgent {
   }
 
   private getNotificationPayload(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): GotifyPayload {
-    const { applicationUrl, applicationTitle } = this.settings;
+    const { applicationUrl, applicationTitle } = this.appSettings;
     let priority = 0;
 
     const title = payload.event
@@ -57,7 +63,7 @@ class GotifyAgent implements NotificationAgent {
   }
 
   public async send(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -71,7 +77,7 @@ class GotifyAgent implements NotificationAgent {
 
     this.logger.debug('Sending Gotify notification', {
       label: 'Notifications',
-      type: Notification[type],
+      type: NotificationTypes[type],
       subject: payload.subject,
     });
     try {
@@ -84,7 +90,7 @@ class GotifyAgent implements NotificationAgent {
     } catch (e) {
       this.logger.error('Error sending Gotify notification', {
         label: 'Notifications',
-        type: Notification[type],
+        type: NotificationTypes[type],
         subject: payload.subject,
         errorMessage: e.message,
         response: e.response?.data,

@@ -12,6 +12,7 @@ import { Settings } from './entities/settings.entities';
 import { InternalApiService } from '../api/internal-api/internal-api.service';
 import { TautulliApiService } from '../api/tautulli-api/tautulli-api.service';
 import { NotificationSettings } from './interfaces/notifications-settings.interface';
+import { NotificationService } from '../notifications/notifications.service';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -102,7 +103,6 @@ export class SettingsService implements SettingDto {
       this.sonarr_api_key = settingsDb?.sonarr_api_key;
       this.tautulli_url = settingsDb?.tautulli_url;
       this.tautulli_api_key = settingsDb?.tautulli_api_key;
-      this.notification_settings = settingsDb?.notification_settings;
       this.collection_handler_job_cron =
         settingsDb?.collection_handler_job_cron;
       this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;
@@ -259,7 +259,11 @@ export class SettingsService implements SettingDto {
     try {
       const resp = await this.tautulli.info();
       return resp?.response && resp?.response.result == 'success'
-        ? { status: 'OK', code: 1, message: resp.response.data?.tautulli_version }
+        ? {
+            status: 'OK',
+            code: 1,
+            message: resp.response.data?.tautulli_version,
+          }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
       return { status: 'NOK', code: 0, message: 'Failure' };

@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { hasNotificationType, Notification } from '../notifications.service';
+import {
+  hasNotificationType,
+  NotificationTypes,
+} from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
+import { NotificationAgentConfig } from '../notifications-interfaces';
 
 interface PushbulletPayload {
   type: string;
@@ -12,18 +16,20 @@ interface PushbulletPayload {
 }
 
 class PushbulletAgent implements NotificationAgent {
-  public constructor(private readonly settings: SettingsService) {}
+  public constructor(
+    private readonly appSettings: SettingsService,
+    private readonly settings: NotificationAgentConfig,
+  ) {}
   private readonly logger = new Logger(PushbulletAgent.name);
 
-  getSettings = () =>
-    this.settings?.notification_settings?.notifications?.agents?.pushbullet;
+  getSettings = () => this.settings;
 
   public shouldSend(): boolean {
     return true;
   }
 
   private getNotificationPayload(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): PushbulletPayload {
     const title = payload.event
@@ -43,7 +49,7 @@ class PushbulletAgent implements NotificationAgent {
   }
 
   public async send(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -59,7 +65,7 @@ class PushbulletAgent implements NotificationAgent {
     ) {
       this.logger.debug('Sending Pushbullet notification', {
         label: 'Notifications',
-        type: Notification[type],
+        type: NotificationTypes[type],
         subject: payload.subject,
       });
 
@@ -69,14 +75,14 @@ class PushbulletAgent implements NotificationAgent {
           { ...notificationPayload, channel_tag: settings.options.channelTag },
           {
             headers: {
-              'Access-Token': settings.options.accessToken,
+              'Access-Token': settings.options.accessToken as string,
             },
           },
         );
       } catch (e) {
         this.logger.error('Error sending Pushbullet notification', {
           label: 'Notifications',
-          type: Notification[type],
+          type: NotificationTypes[type],
           subject: payload.subject,
           errorMessage: e.message,
           response: e.response?.data,
@@ -86,35 +92,33 @@ class PushbulletAgent implements NotificationAgent {
       }
     }
 
-      if (
-          settings.options.accessToken
-      ) {
-        this.logger.debug('Sending Pushbullet notification', {
+    if (settings.options.accessToken) {
+      this.logger.debug('Sending Pushbullet notification', {
+        label: 'Notifications',
+        recipient: settings.options.displayName,
+        type: NotificationTypes[type],
+        subject: payload.subject,
+      });
+
+      try {
+        await axios.post(endpoint, notificationPayload, {
+          headers: {
+            'Access-Token': settings.options.accessToken as string,
+          },
+        });
+      } catch (e) {
+        this.logger.error('Error sending Pushbullet notification', {
           label: 'Notifications',
           recipient: settings.options.displayName,
-          type: Notification[type],
+          type: NotificationTypes[type],
           subject: payload.subject,
+          errorMessage: e.message,
+          response: e.response?.data,
         });
 
-        try {
-          await axios.post(endpoint, notificationPayload, {
-            headers: {
-              'Access-Token': settings.options.accessToken,
-            },
-          });
-        } catch (e) {
-          this.logger.error('Error sending Pushbullet notification', {
-            label: 'Notifications',
-            recipient: settings.options.displayName,
-            type: Notification[type],
-            subject: payload.subject,
-            errorMessage: e.message,
-            response: e.response?.data,
-          });
-
-          return false;
-        }
+        return false;
       }
+    }
 
     return true;
   }
