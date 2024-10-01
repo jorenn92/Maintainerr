@@ -1,4 +1,4 @@
-import type { Notification } from '../notifications.service';
+import type { NotificationTypes } from '../notifications.service';
 
 export interface NotificationPayload {
   event?: string;
@@ -11,5 +11,5 @@ export interface NotificationPayload {
 
 export interface NotificationAgent {
   shouldSend(): boolean;
-  send(type: Notification, payload: NotificationPayload): Promise<boolean>;
+  send(type: NotificationTypes, payload: NotificationPayload): Promise<boolean>;
 }

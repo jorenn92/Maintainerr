@@ -1,19 +1,25 @@
 import axios from 'axios';
-import { hasNotificationType, Notification } from '../notifications.service';
+import {
+  hasNotificationType,
+  NotificationTypes,
+} from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
+import { NotificationAgentConfig } from '../notifications-interfaces';
 
 class LunaSeaAgent implements NotificationAgent {
-  public constructor(private readonly settings: SettingsService) {}
+  public constructor(
+    private readonly appSettings: SettingsService,
+    private readonly settings: NotificationAgentConfig,
+  ) {}
   private readonly logger = new Logger(LunaSeaAgent.name);
 
-  getSettings = () =>
-    this.settings?.notification_settings?.notifications?.agents?.lunasea;
+  getSettings = () => this.settings;
 
-  private buildPayload(type: Notification, payload: NotificationPayload) {
+  private buildPayload(type: NotificationTypes, payload: NotificationPayload) {
     return {
-      notification_type: Notification[type],
+      notification_type: NotificationTypes[type],
       event: payload.event,
       subject: payload.subject,
       message: payload.message,
@@ -38,7 +44,7 @@ class LunaSeaAgent implements NotificationAgent {
   }
 
   public async send(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -52,13 +58,13 @@ class LunaSeaAgent implements NotificationAgent {
 
     this.logger.debug('Sending LunaSea notification', {
       label: 'Notifications',
-      type: Notification[type],
+      type: NotificationTypes[type],
       subject: payload.subject,
     });
 
     try {
       await axios.post(
-        settings.options.webhookUrl,
+        this.getSettings().options.webhookUrl as string,
         this.buildPayload(type, payload),
         settings.options.profileName
           ? {
@@ -75,7 +81,7 @@ class LunaSeaAgent implements NotificationAgent {
     } catch (e) {
       this.logger.error('Error sending LunaSea notification', {
         label: 'Notifications',
-        type: Notification[type],
+        type: NotificationTypes[type],
         subject: payload.subject,
         errorMessage: e.message,
         response: e.response?.data,

@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { hasNotificationType, Notification } from '../notifications.service';
+import {
+  hasNotificationType,
+  NotificationTypes,
+} from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
+import { NotificationAgentConfig } from '../notifications-interfaces';
 
 interface TelegramMessagePayload {
   text: string;
@@ -22,11 +26,13 @@ interface TelegramPhotoPayload {
 class TelegramAgent implements NotificationAgent {
   private baseUrl = 'https://api.telegram.org/';
 
-  public constructor(private readonly settings: SettingsService) {}
+  public constructor(
+    private readonly appSettings: SettingsService,
+    private readonly settings: NotificationAgentConfig,
+  ) {}
   private readonly logger = new Logger(TelegramAgent.name);
 
-  getSettings = () =>
-    this.settings?.notification_settings?.notifications?.agents?.telegram;
+  getSettings = () => this.settings;
 
   public shouldSend(): boolean {
     const settings = this.getSettings();
@@ -43,10 +49,10 @@ class TelegramAgent implements NotificationAgent {
   }
 
   private getNotificationPayload(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Partial<TelegramMessagePayload | TelegramPhotoPayload> {
-    const { applicationUrl, applicationTitle } = this.settings;
+    const { applicationUrl, applicationTitle } = this.appSettings;
 
     let message = `\*${this.escapeText(
       payload.event ? `${payload.event} - ${payload.subject}` : payload.subject,
@@ -72,7 +78,7 @@ class TelegramAgent implements NotificationAgent {
   }
 
   public async send(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -87,7 +93,7 @@ class TelegramAgent implements NotificationAgent {
     ) {
       this.logger.debug('Sending Telegram notification', {
         label: 'Notifications',
-        type: Notification[type],
+        type: NotificationTypes[type],
         subject: payload.subject,
       });
 
@@ -100,7 +106,7 @@ class TelegramAgent implements NotificationAgent {
       } catch (e) {
         this.logger.error('Error sending Telegram notification', {
           label: 'Notifications',
-          type: Notification[type],
+          type: NotificationTypes[type],
           subject: payload.subject,
           errorMessage: e.message,
           response: e.response?.data,

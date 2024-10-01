@@ -1,5 +1,3 @@
-import { NotificationSettings } from "../interfaces/notifications-settings.interface";
-
 export class SettingDto {
   id: number;
 
@@ -32,8 +30,6 @@ export class SettingDto {
   tautulli_url: string;
 
   tautulli_api_key: string;
-
-  notification_settings: NotificationSettings
 
   collection_handler_job_cron: string;
 
