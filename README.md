@@ -18,7 +18,7 @@
 - Do you have a lot of media that never gets watched?
 - Do your users constantly request media, and let it sit there afterward never to be touched again?
 
-If you answered yes to any of those questions.. You NEED <b>Maintainerr</b>.
+If you answered yes to any of those questions... You NEED <b>Maintainerr</b>.
 It's a one-stop-shop for handling those outlying shows and movies that take up precious space on your server.
 
 # Features
