@@ -1,17 +1,23 @@
 import type { EmailOptions } from 'email-templates';
 import path from 'path';
-import { Notification } from '../notifications.service';
+import { NotificationTypes } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
-import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
 import PreparedEmail from '../email/preparedEmail';
+import {
+  NotificationAgentConfig,
+  NotificationAgentEmail,
+} from '../notifications-interfaces';
+import { SettingsService } from '../../settings/settings.service';
 
 class EmailAgent implements NotificationAgent {
-  public constructor(private readonly settings: SettingsService) {}
+  public constructor(
+    private readonly appSettings: SettingsService,
+    private readonly settings: NotificationAgentConfig,
+  ) {}
   private readonly logger = new Logger(EmailAgent.name);
 
-  getSettings = () =>
-    this.settings?.notification_settings?.notifications?.agents?.email;
+  getSettings = () => this.settings;
 
   public shouldSend(): boolean {
     const settings = this.getSettings();
@@ -29,14 +35,12 @@ class EmailAgent implements NotificationAgent {
   }
 
   private buildMessage(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
     recipientEmail: string,
     recipientName?: string,
   ): EmailOptions | undefined {
-    const { applicationUrl, applicationTitle } = this.settings;
-
-    if (type === Notification.TEST_NOTIFICATION) {
+    if (type === NotificationTypes.TEST_NOTIFICATION) {
       return {
         template: path.join(__dirname, '../../../templates/email/test-email'),
         message: {
@@ -44,69 +48,67 @@ class EmailAgent implements NotificationAgent {
         },
         locals: {
           body: payload.message,
-          applicationUrl,
-          applicationTitle,
+          applicationTitle: 'Maintainerr',
           recipientName,
           recipientEmail,
         },
       };
     }
 
-      return {
-        template: path.join(__dirname, '../templates/email-template'),
-        message: {
-          to: recipientEmail,
-        },
-        locals: {
-          event: payload.event,
-          body: payload.message,
-          extra: payload.extra ?? [],
-          imageUrl: payload.image,
-          timestamp: new Date().toTimeString(),
-          applicationUrl,
-          applicationTitle,
-          recipientName,
-          recipientEmail,
-        },
-      };
+    return {
+      template: path.join(__dirname, '../templates/email-template'),
+      message: {
+        to: recipientEmail,
+      },
+      locals: {
+        event: payload.event,
+        body: payload.message,
+        extra: payload.extra ?? [],
+        imageUrl: payload.image,
+        timestamp: new Date().toTimeString(),
+        applicationTitle: 'Maintainerr',
+        recipientName,
+        recipientEmail,
+      },
+    };
   }
 
   public async send(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Promise<boolean> {
-        this.logger.log('Sending email notification', {
-          label: 'Notifications',
-          recipient: this.settings.notification_settings.notifications.agents.email.options.emailTo,
-          type: Notification[type],
-          subject: payload.subject,
-        });
+    this.logger.log('Sending email notification', {
+      label: 'Notifications',
+      recipient: this.settings.options.emailTo,
+      type: NotificationTypes[type],
+      subject: payload.subject,
+    });
 
-        try {
-          const email = new PreparedEmail(
-            this.settings,
-            this.getSettings(),
-            this.settings.notification_settings.notifications.agents.email.options.pgpKey,
-          );
-          await email.send(
-            this.buildMessage(
-              type,
-              payload,
-              this.getSettings().options.emailTo,
-            ),
-          );
-        } catch (e) {
-          this.logger.error('Error sending email notification', {
-            label: 'Notifications',
-            recipient: this.getSettings().options.emailTo,
-            type: Notification[type],
-            subject: payload.subject,
-            errorMessage: e.message,
-          });
+    try {
+      const email = new PreparedEmail(
+        this.appSettings,
+        this.getSettings() as NotificationAgentEmail,
+        this.getSettings().options.pgpKey as string,
+      );
+      await email.send(
+        this.buildMessage(
+          type,
+          payload,
+          this.getSettings().options.emailTo as string,
+        ),
+      );
+    } catch (e) {
+      this.logger.error('Error sending email notification', {
+        label: 'Notifications',
+        recipient: this.getSettings().options.emailTo,
+        type: NotificationTypes[type],
+        subject: payload.subject,
+        errorMessage: e.message,
+      });
 
-          return false;
-        }
-      
+      return false;
+    }
+
     return true;
   }
 }

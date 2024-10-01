@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { hasNotificationType, Notification } from '../notifications.service';
+import {
+  hasNotificationType,
+  NotificationTypes,
+} from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
+import { NotificationAgentConfig } from '../notifications-interfaces';
 
 interface PushoverImagePayload {
   attachment_base64: string;
@@ -21,11 +25,13 @@ interface PushoverPayload extends PushoverImagePayload {
 }
 
 class PushoverAgent implements NotificationAgent {
-  public constructor(private readonly settings: SettingsService) {}
+  public constructor(
+    private readonly appSettings: SettingsService,
+    private readonly settings: NotificationAgentConfig,
+  ) {}
   private readonly logger = new Logger(PushoverAgent.name);
 
-  getSettings = () =>
-    this.settings?.notification_settings?.notifications?.agents?.pushover;
+  getSettings = () => this.settings;
 
   public shouldSend(): boolean {
     return true;
@@ -58,10 +64,10 @@ class PushoverAgent implements NotificationAgent {
   }
 
   private async getNotificationPayload(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Promise<Partial<PushoverPayload>> {
-    const { applicationUrl, applicationTitle } = this.settings;
+    const { applicationUrl, applicationTitle } = this.appSettings;
 
     const title = payload.event ?? payload.subject;
     let message = payload.event ? `<b>${payload.subject}</b>` : '';
@@ -96,7 +102,7 @@ class PushoverAgent implements NotificationAgent {
   }
 
   public async send(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -116,7 +122,7 @@ class PushoverAgent implements NotificationAgent {
     ) {
       this.logger.log('Sending Pushover notification', {
         label: 'Notifications',
-        type: Notification[type],
+        type: NotificationTypes[type],
         subject: payload.subject,
       });
 
@@ -130,7 +136,7 @@ class PushoverAgent implements NotificationAgent {
       } catch (e) {
         this.logger.error('Error sending Pushover notification', {
           label: 'Notifications',
-          type: Notification[type],
+          type: NotificationTypes[type],
           subject: payload.subject,
           errorMessage: e.message,
           response: e.response?.data,

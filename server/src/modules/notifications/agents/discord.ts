@@ -1,11 +1,12 @@
 import axios from 'axios';
 import {
   hasNotificationType,
-  Notification,
+  NotificationTypes,
 } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { Injectable, Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
+import { NotificationAgentConfig } from '../notifications-interfaces';
 
 enum EmbedColors {
   DEFAULT = 0,
@@ -81,15 +82,17 @@ interface DiscordWebhookPayload {
 }
 
 class DiscordAgent implements NotificationAgent {
-  public constructor(private readonly settings: SettingsService) {}
+  constructor(
+    private readonly appSettings: SettingsService,
+    private readonly settings: NotificationAgentConfig,
+  ) {}
 
   private readonly logger = new Logger(DiscordAgent.name);
 
-  getSettings = () => this.settings?.notification_settings?.notifications?.agents?.discord;
-
+  getSettings = () => this.settings;
 
   public buildEmbed(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): DiscordRichEmbed {
     let color = EmbedColors.DARK_PURPLE;
@@ -120,7 +123,6 @@ class DiscordAgent implements NotificationAgent {
   }
 
   public shouldSend(): boolean {
-
     if (this.getSettings().enabled && this.getSettings().options.webhookUrl) {
       return true;
     }
@@ -129,35 +131,36 @@ class DiscordAgent implements NotificationAgent {
   }
 
   public async send(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Promise<boolean> {
-    if (
-      !hasNotificationType(type, this.getSettings().types ?? [0])
-    ) {
+    if (!hasNotificationType(type, this.getSettings().types ?? [0])) {
       return true;
     }
 
     this.logger.log('Sending Discord notification', {
       label: 'Notifications',
-      type: Notification[type],
+      type: NotificationTypes[type],
       subject: payload.subject,
     });
 
     try {
-      await axios.post(this.getSettings().options.webhookUrl, {
-        username: this.getSettings().options.botUsername
-          ? this.getSettings().options.botUsername
-          : this.settings.applicationTitle,
-        avatar_url: this.getSettings().options.botAvatarUrl,
-        embeds: [this.buildEmbed(type, payload)],
-      } as DiscordWebhookPayload);
+      await axios.post(
+        this.getSettings().options.webhookUrl as string,
+        {
+          username: this.getSettings().options.botUsername
+            ? this.getSettings().options.botUsername
+            : 'Maintainerr',
+          avatar_url: this.getSettings().options.botAvatarUrl,
+          embeds: [this.buildEmbed(type, payload)],
+        } as DiscordWebhookPayload,
+      );
 
       return true;
     } catch (e) {
       this.logger.warn('Error sending Discord notification', {
         label: 'Notifications',
-        type: Notification[type],
+        type: NotificationTypes[type],
         subject: payload.subject,
         errorMessage: e.message,
         response: e.response?.data,

@@ -5,11 +5,13 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToMany,
-  ManyToOne,
   OneToOne,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Rules } from './rules.entities';
+import { Notification } from '../../notifications/entities/notification.entities';
 
 @Entity()
 export class RuleGroup {
@@ -41,6 +43,10 @@ export class RuleGroup {
     onDelete: 'CASCADE',
   })
   rules: Rules[];
+
+  @ManyToMany(() => Notification)
+  @JoinTable()
+  notifications: Notification[]
 
   @OneToOne(() => Collection, (c) => c.ruleGroup, {
     eager: true,

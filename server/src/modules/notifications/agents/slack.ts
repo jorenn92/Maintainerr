@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { hasNotificationType, Notification } from '../notifications.service';
+import {
+  hasNotificationType,
+  NotificationTypes,
+} from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
+import { NotificationAgentConfig } from '../notifications-interfaces';
 
 interface EmbedField {
   type: 'plain_text' | 'mrkdwn';
@@ -43,17 +47,19 @@ interface SlackBlockEmbed {
 }
 
 class SlackAgent implements NotificationAgent {
-  public constructor(private readonly settings: SettingsService) {}
+  public constructor(
+    private readonly appSettings: SettingsService,
+    private readonly settings: NotificationAgentConfig,
+  ) {}
   private readonly logger = new Logger(SlackAgent.name);
 
-  getSettings = () =>
-    this.settings?.notification_settings?.notifications?.agents?.slack;
+  getSettings = () => this.settings;
 
   public buildEmbed(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): SlackBlockEmbed {
-    const { applicationUrl, applicationTitle } = this.settings;
+    const { applicationUrl, applicationTitle } = this.appSettings;
 
     const fields: EmbedField[] = [];
 
@@ -127,7 +133,7 @@ class SlackAgent implements NotificationAgent {
   }
 
   public async send(
-    type: Notification,
+    type: NotificationTypes,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -141,12 +147,12 @@ class SlackAgent implements NotificationAgent {
 
     this.logger.debug('Sending Slack notification', {
       label: 'Notifications',
-      type: Notification[type],
+      type: NotificationTypes[type],
       subject: payload.subject,
     });
     try {
       await axios.post(
-        settings.options.webhookUrl,
+        settings.options.webhookUrl as string,
         this.buildEmbed(type, payload),
       );
 
@@ -154,7 +160,7 @@ class SlackAgent implements NotificationAgent {
     } catch (e) {
       this.logger.error('Error sending Slack notification', {
         label: 'Notifications',
-        type: Notification[type],
+        type: NotificationTypes[type],
         subject: payload.subject,
         errorMessage: e.message,
         response: e.response?.data,

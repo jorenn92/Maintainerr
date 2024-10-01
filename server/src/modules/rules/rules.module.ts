@@ -28,6 +28,7 @@ import { RuleConstanstService } from './constants/constants.service';
 import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.service';
 import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { TautulliGetterService } from './getter/tautulli-getter.service';
+import { Notification } from '../notifications/entities/notification.entities';
 
 @Module({
   imports: [

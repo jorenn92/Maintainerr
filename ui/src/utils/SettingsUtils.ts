@@ -64,6 +64,13 @@ export function getArrBaseUrl(url: string): string | undefined {
   }
 }
 
+export function camelCaseToPrettyText(camelCaseStr: string): string {
+  return camelCaseStr
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/^./, (char) => char.toUpperCase())
+    .trim();
+}
+
 export const handleSettingsInputChange = (
   event: React.ChangeEvent<HTMLInputElement>,
   ref: RefObject<HTMLInputElement>,
