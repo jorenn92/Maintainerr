@@ -73,7 +73,7 @@
   },
   "devDependencies": {
     "@automock/jest": "^1.4.0",
-    "@babel/core": "^7.25.2",
+    "@babel/core": "^7.25.7",
     "@nestjs/cli": "^10.4.5",
     "@nestjs/schematics": "^10.1.4",
     "@nestjs/testing": "^10.4.4",
