@@ -2859,9 +2859,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/platform-express@npm:^10.4.2":
-  version: 10.4.2
-  resolution: "@nestjs/platform-express@npm:10.4.2"
+"@nestjs/platform-express@npm:^10.4.4":
+  version: 10.4.4
+  resolution: "@nestjs/platform-express@npm:10.4.4"
   dependencies:
     body-parser: "npm:1.20.3"
     cors: "npm:2.8.5"
@@ -2871,7 +2871,7 @@ __metadata:
   peerDependencies:
     "@nestjs/common": ^10.0.0
     "@nestjs/core": ^10.0.0
-  checksum: 10c0/cec2bff307b552f27be6df90be930ae10f327e867dd44156822b33909d4f481b65802b39f1a1031f28d7721c9963d259d34422bca2891b337ca73e0ce6bcf487
+  checksum: 10c0/fd9bfeb9193e539ef3b966c096c1c69d44375f93ff018811515179a6b3f1f5f08a9d047ee673a52da64728f3be18322b4ad2b20f2d32670346495bf2d096b16d
   languageName: node
   linkType: hard
 
@@ -11219,7 +11219,7 @@ __metadata:
     "@nestjs/cli": "npm:^10.4.5"
     "@nestjs/common": "npm:^10.4.4"
     "@nestjs/core": "npm:^10.4.4"
-    "@nestjs/platform-express": "npm:^10.4.2"
+    "@nestjs/platform-express": "npm:^10.4.4"
     "@nestjs/schedule": "npm:^4.0.0"
     "@nestjs/schematics": "npm:^10.1.4"
     "@nestjs/testing": "npm:^10.4.4"
