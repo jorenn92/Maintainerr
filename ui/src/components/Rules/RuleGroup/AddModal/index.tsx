@@ -30,7 +30,8 @@ import CachedImage from '../../../Common/CachedImage'
 import YamlImporterModal from '../../../Common/YamlImporterModal'
 import { CloudDownloadIcon } from '@heroicons/react/outline'
 import { useToasts } from 'react-toast-notifications'
-import Modal from '../../../Common/Modal'
+import ConfigureNotificationModal from './ConfigureNotificationModal'
+import { AgentConfiguration } from '../../../Settings/Notifications/CreateNotificationModal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -51,10 +52,11 @@ interface ICreateApiObject {
   radarrSettingsId?: number
   sonarrSettingsId?: number
   collection: {
+    visibleOnRecommended: boolean
     visibleOnHome: boolean
     deleteAfterDays: number
     manualCollection?: boolean
-    manualCollectionName?: String
+    manualCollectionName?: string
     keepLogsForMonths?: number
   }
   rules: IRule[]
@@ -63,33 +65,40 @@ interface ICreateApiObject {
 
 const AddModal = (props: AddModal) => {
   const [selectedLibraryId, setSelectedLibraryId] = useState<string>(
-    props.editData ? props.editData.libraryId.toString() : '1',
+    props.editData ? props.editData.libraryId.toString() : '',
   )
   const [selectedType, setSelectedType] = useState<string>(
-    props.editData && props.editData.type
-      ? props.editData.type.toString()
-      : '1',
+    props.editData?.type ? props.editData.type.toString() : '',
   )
   const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
   const [collection, setCollection] = useState<ICollection>()
   const [isLoading, setIsLoading] = useState(true)
   const [CommunityModal, setCommunityModal] = useState(false)
   const [yamlImporterModal, setYamlImporterModal] = useState(false)
+  const [configureNotificionModal, setConfigureNotificationModal] =
+    useState(false)
   const yaml = useRef<string>()
 
   const nameRef = useRef<any>()
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
-  const collectionTypeRef = useRef<any>(EPlexDataType.MOVIES)
+  const collectionTypeRef = useRef<any>()
   const deleteAfterRef = useRef<any>()
   const keepLogsForMonthsRef = useRef<any>()
   const tautulliWatchedPercentOverrideRef = useRef<any>()
   const manualCollectionNameRef = useRef<any>('My custom collection')
+  const [showRecommended, setShowRecommended] = useState<boolean>(true)
   const [showHome, setShowHome] = useState<boolean>(true)
   const [listExclusion, setListExclusion] = useState<boolean>(true)
   const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
   const [manualCollection, setManualCollection] = useState<boolean>(false)
   const ConstantsCtx = useContext(ConstantsContext)
+  const [
+    configuredNotificationConfigurations,
+    setConfiguredNotificationConfigurations,
+  ] = useState<AgentConfiguration[]>(
+    props.editData?.notifications ? props.editData?.notifications : [],
+  )
 
   const { addToast } = useToasts()
 
@@ -97,14 +106,12 @@ const AddModal = (props: AddModal) => {
     props.editData ? props.editData.useRules : true,
   )
   const [arrOption, setArrOption] = useState<number>()
-  const [radarrSettingsId, setRadarrSettingsId] = useState<number>()
-  const [sonarrSettingsId, setSonarrSettingsId] = useState<number>()
-  const [originalRadarrSettingsId, setOriginalRadarrSettingsId] =
-    useState<number>()
-  const [originalSonarrSettingsId, setOriginalSonarrSettingsId] =
-    useState<number>()
-  const [showArrServerChangeWarning, setShowArrServerChangeWarning] =
-    useState<boolean>(false)
+  const [radarrSettingsId, setRadarrSettingsId] = useState<
+    number | null | undefined
+  >(props.editData ? null : undefined)
+  const [sonarrSettingsId, setSonarrSettingsId] = useState<
+    number | null | undefined
+  >(props.editData ? null : undefined)
   const [active, setActive] = useState<boolean>(
     props.editData ? props.editData.isActive : true,
   )
@@ -126,9 +133,35 @@ const AddModal = (props: AddModal) => {
       (x) => x.id == Application.OVERSEERR,
     ) ?? false
 
-  function setLibraryId(event: { target: { value: string } }) {
-    setSelectedLibraryId(event.target.value)
+  function updateLibraryId(value: string) {
+    const lib = LibrariesCtx.libraries.find(
+      (el: ILibrary) => +el.key === +value,
+    )
+
+    if (lib) {
+      setSelectedLibraryId(lib.key)
+      setSelectedLibrary(lib)
+      setSelectedType(
+        lib.type === 'movie'
+          ? EPlexDataType.MOVIES.toString()
+          : EPlexDataType.SHOWS.toString(),
+      )
+    }
+
+    setRadarrSettingsId(undefined)
+    setSonarrSettingsId(undefined)
     setArrOption(0)
+  }
+
+  function setLibraryId(value: string) {
+    const lib = LibrariesCtx.libraries.find(
+      (el: ILibrary) => +el.key === +value,
+    )
+
+    if (lib) {
+      setSelectedLibraryId(lib.key)
+      setSelectedLibrary(lib)
+    }
   }
 
   function setCollectionType(event: { target: { value: string } }) {
@@ -138,37 +171,17 @@ const AddModal = (props: AddModal) => {
 
   const handleUpdateArrAction = (
     type: 'Radarr' | 'Sonarr',
-    e: number,
-    settingId?: number,
+    arrAction: number,
+    settingId?: number | null,
   ) => {
-    setArrOption(e)
+    setArrOption(arrAction)
 
     if (type === 'Radarr') {
       setSonarrSettingsId(undefined)
-      setOriginalSonarrSettingsId(undefined)
       setRadarrSettingsId(settingId)
-
-      if (
-        props.editData &&
-        originalRadarrSettingsId != null &&
-        originalRadarrSettingsId != settingId &&
-        settingId != radarrSettingsId
-      ) {
-        setShowArrServerChangeWarning(true)
-      }
     } else if (type === 'Sonarr') {
       setRadarrSettingsId(undefined)
-      setOriginalRadarrSettingsId(undefined)
       setSonarrSettingsId(settingId)
-
-      if (
-        props.editData &&
-        originalSonarrSettingsId != null &&
-        originalSonarrSettingsId != settingId &&
-        settingId != sonarrSettingsId
-      ) {
-        setShowArrServerChangeWarning(true)
-      }
     }
   }
 
@@ -248,14 +261,6 @@ const AddModal = (props: AddModal) => {
   }
 
   useEffect(() => {
-    const lib = LibrariesCtx.libraries.find(
-      (el: ILibrary) => +el.key === +selectedLibraryId,
-    )
-    setSelectedLibrary(lib)
-    setSelectedType(lib?.type === 'movie' ? '1' : '2')
-  }, [selectedLibraryId])
-
-  useEffect(() => {
     setIsLoading(true)
 
     const load = async () => {
@@ -288,16 +293,16 @@ const AddModal = (props: AddModal) => {
 
       if (collection) {
         setCollection(collection)
+        setShowRecommended(collection.visibleOnRecommended!)
         setShowHome(collection.visibleOnHome!)
         setListExclusion(collection.listExclusions!)
         setForceOverseerr(collection.forceOverseerr!)
         setArrOption(collection.arrAction)
-        setSelectedType(collection.type ? collection.type.toString() : '1')
+        setSelectedType(collection.type.toString())
         setManualCollection(collection.manualCollection)
-        setRadarrSettingsId(collection.radarrSettingsId)
-        setSonarrSettingsId(collection.sonarrSettingsId)
-        setOriginalRadarrSettingsId(collection.radarrSettingsId)
-        setOriginalSonarrSettingsId(collection.sonarrSettingsId)
+        setRadarrSettingsId(collection.radarrSettingsId ?? null)
+        setSonarrSettingsId(collection.sonarrSettingsId ?? null)
+        setLibraryId(collection.libraryId.toString())
       }
 
       setIsLoading(false)
@@ -326,6 +331,7 @@ const AddModal = (props: AddModal) => {
       nameRef.current.value &&
       libraryRef.current.value &&
       deleteAfterRef.current.value &&
+      (radarrSettingsId !== undefined || sonarrSettingsId !== undefined) &&
       ((useRules && rules.length > 0) || !useRules)
     ) {
       setFormIncomplete(false)
@@ -344,9 +350,10 @@ const AddModal = (props: AddModal) => {
           tautulliWatchedPercentOverrideRef.current.value != ''
             ? +tautulliWatchedPercentOverrideRef.current.value
             : undefined,
-        radarrSettingsId: radarrSettingsId,
-        sonarrSettingsId: sonarrSettingsId,
+        radarrSettingsId: radarrSettingsId ?? undefined,
+        sonarrSettingsId: sonarrSettingsId ?? undefined,
         collection: {
+          visibleOnRecommended: showRecommended,
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
           manualCollection: manualCollection,
@@ -381,9 +388,11 @@ const AddModal = (props: AddModal) => {
   }
 
   if (isLoading) {
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
     return (
       <span>
-        <CachedImage fill src="/spinner.svg" alt="Loading..." />
+        <CachedImage fill src={`${basePath}/spinner.svg`} alt="Loading..." />
       </span>
     )
   }
@@ -472,9 +481,12 @@ const AddModal = (props: AddModal) => {
                     name="library"
                     id="library"
                     value={selectedLibraryId}
-                    onChange={setLibraryId}
+                    onChange={(e) => updateLibraryId(e.target.value)}
                     ref={libraryRef}
                   >
+                    {selectedLibraryId === '' && (
+                      <option value="" disabled></option>
+                    )}
                     {LibrariesCtx.libraries.map((data: ILibrary) => {
                       return (
                         <option key={data.key} value={data.key}>
@@ -486,16 +498,32 @@ const AddModal = (props: AddModal) => {
                 </div>
               </div>
             </div>
-            {selectedLibrary && selectedLibrary!.type === 'movie' ? (
+            {selectedLibrary && selectedLibrary!.type === 'movie' && (
               <ArrAction
                 type="Radarr"
                 arrAction={arrOption}
                 settingId={radarrSettingsId}
-                onUpdate={(e: number, settingId) => {
-                  handleUpdateArrAction('Radarr', e, settingId)
+                onUpdate={(arrAction: number, settingId) => {
+                  handleUpdateArrAction('Radarr', arrAction, settingId)
                 }}
+                options={[
+                  {
+                    id: 0,
+                    name: 'Delete',
+                  },
+                  {
+                    id: 1,
+                    name: 'Unmonitor and delete files',
+                  },
+                  {
+                    id: 3,
+                    name: 'Unmonitor and keep files',
+                  },
+                ]}
               />
-            ) : (
+            )}
+
+            {selectedLibrary && selectedLibrary!.type !== 'movie' && (
               <>
                 <div className="form-row">
                   <label htmlFor="type" className="text-label">
@@ -694,6 +722,29 @@ const AddModal = (props: AddModal) => {
 
             <div className="form-row">
               <label htmlFor="collection_visible" className="text-label">
+                Show on library recommended
+                <p className="text-xs font-normal">
+                  Show the collection on the Plex library recommended screen
+                </p>
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <input
+                    type="checkbox"
+                    name="collection_visible_library"
+                    id="collection_visible_library"
+                    className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                    defaultChecked={showRecommended}
+                    onChange={() => {
+                      setShowRecommended(!showRecommended)
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="collection_visible" className="text-label">
                 Show on home
                 <p className="text-xs font-normal">
                   Show the collection on the Plex home screen
@@ -830,6 +881,29 @@ const AddModal = (props: AddModal) => {
               </div>
             </div>
 
+            <div className="form-row">
+              <label htmlFor="notifications" className="text-label">
+                Notifications
+                {/* <p className="text-xs font-normal">
+                Configure notifications
+              </p> */}
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <Button
+                    buttonType="default"
+                    type="button"
+                    name="notifications"
+                    onClick={() => {
+                      setConfigureNotificationModal(!configureNotificionModal)
+                    }}
+                  >
+                    <span>Configure</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             <hr className="mt-5" />
             <div className={`section ${useRules ? `` : `hidden`}`}>
               <div className="section">
@@ -840,9 +914,9 @@ const AddModal = (props: AddModal) => {
                       Specify the rules this group needs to enforce
                     </p>
                   </div>
-                  <div className="ml-auto ">
+                  <div className="ml-auto">
                     <button
-                      className="ml-3 flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
+                      className="ml-3 flex h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
                       onClick={toggleCommunityRuleModal}
                     >
                       {
@@ -854,9 +928,9 @@ const AddModal = (props: AddModal) => {
                     </button>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center justify-center sm:justify-end max-width-form-head">
+                <div className="max-width-form-head mt-4 flex items-center justify-center sm:justify-end">
                   <button
-                    className="ml-3 flex  h-fit rounded bg-amber-600 p-1 text-zinc-900 shadow-md hover:bg-amber-500 md:h-10"
+                    className="ml-3 flex h-fit rounded bg-amber-600 p-1 text-zinc-900 shadow-md hover:bg-amber-500 md:h-10"
                     onClick={toggleYamlImporter}
                   >
                     {
@@ -868,7 +942,7 @@ const AddModal = (props: AddModal) => {
                   </button>
 
                   <button
-                    className="ml-3 flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
+                    className="ml-3 flex h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
                     onClick={toggleYamlExporter}
                   >
                     {
@@ -898,6 +972,18 @@ const AddModal = (props: AddModal) => {
                   onCancel={() => {
                     setYamlImporterModal(false)
                   }}
+                />
+              ) : undefined}
+              {configureNotificionModal ? (
+                <ConfigureNotificationModal
+                  onSuccess={(selection) => {
+                    setConfiguredNotificationConfigurations(selection)
+                    setConfigureNotificationModal(false)
+                  }}
+                  onCancel={() => {
+                    setConfigureNotificationModal(false)
+                  }}
+                  selectedAgents={configuredNotificationConfigurations}
                 />
               ) : undefined}
               <RuleCreator
@@ -942,18 +1028,6 @@ const AddModal = (props: AddModal) => {
           </form>
         </div>
       </div>
-      {showArrServerChangeWarning ? (
-        <Modal
-          title="Warning"
-          size="sm"
-          onOk={() => setShowArrServerChangeWarning(false)}
-        >
-          <p>
-            Changing server will result in all collection media and specific
-            exclusions being removed.
-          </p>
-        </Modal>
-      ) : undefined}
     </>
   )
 }

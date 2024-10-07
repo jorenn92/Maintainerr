@@ -25,7 +25,7 @@ export class AddNotificationSettings1727693832830
         "rulegroupId" INTEGER NOT NULL,
         PRIMARY KEY ("notificationId", "rulegroupId"),
         FOREIGN KEY ("notificationId") REFERENCES "notification"("id") ON DELETE CASCADE,
-        FOREIGN KEY ("rulegroupId") REFERENCES "rulegroup"("id") ON DELETE CASCADE
+        FOREIGN KEY ("rulegroupId") REFERENCES "rule_group"("id") ON DELETE CASCADE
       );
     `);
   }
