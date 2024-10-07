@@ -2334,9 +2334,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@headlessui/react@npm:2.1.6":
-  version: 2.1.6
-  resolution: "@headlessui/react@npm:2.1.6"
+"@headlessui/react@npm:2.1.9":
+  version: 2.1.9
+  resolution: "@headlessui/react@npm:2.1.9"
   dependencies:
     "@floating-ui/react": "npm:^0.26.16"
     "@react-aria/focus": "npm:^3.17.1"
@@ -2345,7 +2345,7 @@ __metadata:
   peerDependencies:
     react: ^18
     react-dom: ^18
-  checksum: 10c0/74b393957ece1f51c4f6efa7a7a8b2da52a63e92ad234a14f3e2f6eb1441227d3f07510149024b5a2d8eb3211cd75e6ff34428184790a2a54551adc6831bf2a6
+  checksum: 10c0/bcee8b0a6d331ad6a55761f51f0c6cc68416e7dff161b18cda1477f71a6d0d7c83d17fb743adddedb88c5733fc0a222cb45d6c6744ee8e19ccfeed617bcc1feb
   languageName: node
   linkType: hard
 
@@ -11192,7 +11192,7 @@ __metadata:
   dependencies:
     "@automock/jest": "npm:^1.4.0"
     "@babel/core": "npm:^7.25.2"
-    "@headlessui/react": "npm:2.1.6"
+    "@headlessui/react": "npm:2.1.9"
     "@heroicons/react": "npm:^1.0.6"
     "@monaco-editor/react": "npm:^4.6.0"
     "@nestjs/cli": "npm:^10.4.5"
