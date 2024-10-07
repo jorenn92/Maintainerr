@@ -36,6 +36,32 @@ export class NotificationsController {
     return this.notificationService.addNotificationConfiguration(payload);
   }
 
+  @Post('/configuration/connect')
+  async connectNotificationConfiguration(
+    @Body()
+    payload: {
+      rulegroupId: number;
+      notificationId: number;
+    },
+  ) {
+    return this.notificationService.connectNotificationConfigurationToRule(
+      payload,
+    );
+  }
+
+  @Post('/configuration/disconnect')
+  async disconnectionNotificationConfiguration(
+    @Body()
+    payload: {
+      rulegroupId: number;
+      notificationId: number;
+    },
+  ) {
+    return this.notificationService.disconnectNotificationConfigurationFromRule(
+      payload,
+    );
+  }
+
   @Get('/configurations')
   async getNotificationConfigurations() {
     return this.notificationService.getNotificationConfigurations();
