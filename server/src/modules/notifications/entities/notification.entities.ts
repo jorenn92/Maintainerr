@@ -1,5 +1,5 @@
-
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { RuleGroup } from '../../rules/entities/rule-group.entities';
 
 @Entity()
 export class Notification {
@@ -20,4 +20,9 @@ export class Notification {
 
   @Column({ type: 'simple-json', nullable: false })
   options: string;
+
+  @ManyToMany(() => RuleGroup, (rulegroup) => rulegroup.notifications, {
+    onDelete: 'CASCADE',
+  })
+  rulegroups: RuleGroup[];
 }

@@ -3,15 +3,16 @@ import type { NotificationAgent, NotificationPayload } from './agents/agent';
 import { Injectable, Logger } from '@nestjs/common';
 import { Notification } from './entities/notification.entities';
 import { DataSource, Repository } from 'typeorm';
-import { getEnabledCategories } from 'trace_events';
+import { RuleGroup } from '../rules/entities/rule-group.entities';
 
 export enum NotificationTypes {
   NONE = 0,
   MEDIA_ADDED_TO_COLLECTION = 2,
-  MEDIA_HANDLED = 4,
-  RULE_HANDLING_FAILED = 8,
-  COLLECTION_HANDLING_FAILED = 16,
-  TEST_NOTIFICATION = 32,
+  MEDIA_ABOUT_TO_BE_REMOVED = 4,
+  MEDIA_HANDLED = 8,
+  RULE_HANDLING_FAILED = 16,
+  COLLECTION_HANDLING_FAILED = 32,
+  TEST_NOTIFICATION = 64,
 }
 
 export const hasNotificationType = (
@@ -34,6 +35,8 @@ export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepo: Repository<Notification>,
+    @InjectRepository(RuleGroup)
+    private readonly ruleGroupRepo: Repository<RuleGroup>,
     private readonly connection: DataSource,
   ) {}
 
@@ -83,6 +86,64 @@ export class NotificationService {
       return { code: 1, result: 'success' };
     } catch (err) {
       this.logger.warn('Adding a new notification configuration failed');
+      this.logger.debug(err);
+      return { code: 0, result: err };
+    }
+  }
+
+  async connectNotificationConfigurationToRule(payload: {
+    rulegroupId: number;
+    notificationId: number;
+  }) {
+    try {
+      if (payload.rulegroupId && payload.notificationId) {
+        const ruleGroup = await this.ruleGroupRepo.findOne({
+          where: { id: payload.rulegroupId },
+        });
+
+        const notificationConfig = await this.notificationRepo.findOne({
+          where: { id: payload.notificationId },
+        });
+
+        if (ruleGroup && notificationConfig) {
+          ruleGroup.notifications.push(notificationConfig);
+          await this.ruleGroupRepo.save(ruleGroup);
+          return { code: 1, result: 'success' };
+        }
+      }
+      this.logger.warn('Adding a new notification configuration failed');
+      return { code: 0, result: 'failed' };
+    } catch (err) {
+      this.logger.error('Adding a new notification configuration failed');
+      this.logger.debug(err);
+      return { code: 0, result: err };
+    }
+  }
+
+  async disconnectNotificationConfigurationFromRule(payload: {
+    rulegroupId: number;
+    notificationId: number;
+  }) {
+    try {
+      const ruleGroup = await this.ruleGroupRepo.findOne({
+        where: { id: payload.rulegroupId },
+      });
+
+      const notificationConfig = await this.notificationRepo.findOne({
+        where: { id: payload.notificationId },
+      });
+
+      if (ruleGroup && notificationConfig) {
+        ruleGroup.notifications = ruleGroup.notifications.filter(
+          (c) => c.id !== payload.notificationId,
+        );
+        await this.ruleGroupRepo.save(ruleGroup);
+        return { code: 1, result: 'success' };
+      }
+
+      return { code: 0, result: 'failed' };
+    } catch (err) {
+      this.logger.warn('Removing a notification configuration failed');
       this.logger.debug(err);
       return { code: 0, result: err };
     }

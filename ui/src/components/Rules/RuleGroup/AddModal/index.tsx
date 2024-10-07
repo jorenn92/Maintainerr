@@ -28,6 +28,8 @@ import CachedImage from '../../../Common/CachedImage'
 import YamlImporterModal from '../../../Common/YamlImporterModal'
 import { CloudDownloadIcon } from '@heroicons/react/outline'
 import { useToasts } from 'react-toast-notifications'
+import ConfigureNotificationModal from './ConfigureNotificationModal'
+import { AgentConfiguration } from '../../../Settings/Notifications/CreateNotificationModal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -53,6 +55,7 @@ interface ICreateApiObject {
   }
   rules: IRule[]
   dataType: EPlexDataType
+  notifications: AgentConfiguration[]
 }
 
 const AddModal = (props: AddModal) => {
@@ -69,6 +72,8 @@ const AddModal = (props: AddModal) => {
   const [isLoading, setIsLoading] = useState(true)
   const [CommunityModal, setCommunityModal] = useState(false)
   const [yamlImporterModal, setYamlImporterModal] = useState(false)
+  const [configureNotificionModal, setConfigureNotificationModal] =
+    useState(false)
   const yaml = useRef<string>()
 
   const nameRef = useRef<any>()
@@ -83,6 +88,10 @@ const AddModal = (props: AddModal) => {
   const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
 
   const [manualCollection, setManualCollection] = useState<boolean>(false)
+  const [
+    configuredNotificationConfigurations,
+    setConfiguredNotificationConfigurations,
+  ] = useState<AgentConfiguration[]>([])
   const [manualCollectionName, setManualCollectionName] = useState<string>(
     'My custom collection',
   )
@@ -270,6 +279,7 @@ const AddModal = (props: AddModal) => {
           keepLogsForMonths: +keepLogsForMonthsRef.current.value,
         },
         rules: useRules ? rules : [],
+        notifications: configuredNotificationConfigurations,
       }
 
       if (!props.editData) {
@@ -433,12 +443,12 @@ const AddModal = (props: AddModal) => {
                             <option
                               key={
                                 EPlexDataType[
-                                data as keyof typeof EPlexDataType
+                                  data as keyof typeof EPlexDataType
                                 ]
                               }
                               value={
                                 EPlexDataType[
-                                data as keyof typeof EPlexDataType
+                                  data as keyof typeof EPlexDataType
                                 ]
                               }
                             >
@@ -459,49 +469,49 @@ const AddModal = (props: AddModal) => {
                 options={
                   +selectedType === EPlexDataType.SHOWS
                     ? [
-                      {
-                        id: 0,
-                        name: 'Delete entire show',
-                      },
-                      {
-                        id: 1,
-                        name: 'Unmonitor and delete all seasons / episodes',
-                      },
-                      {
-                        id: 2,
-                        name: 'Unmonitor and delete existing seasons / episodes',
-                      },
-                      {
-                        id: 3,
-                        name: 'Unmonitor show and keep files',
-                      },
-                    ]
-                    : +selectedType === EPlexDataType.SEASONS
-                      ? [
                         {
                           id: 0,
-                          name: 'Unmonitor and delete season',
+                          name: 'Delete entire show',
+                        },
+                        {
+                          id: 1,
+                          name: 'Unmonitor and delete all seasons / episodes',
                         },
                         {
                           id: 2,
-                          name: 'Unmonitor and delete existing episodes',
+                          name: 'Unmonitor and delete existing seasons / episodes',
                         },
                         {
                           id: 3,
-                          name: 'Unmonitor season and keep files',
+                          name: 'Unmonitor show and keep files',
                         },
                       ]
+                    : +selectedType === EPlexDataType.SEASONS
+                      ? [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete season',
+                          },
+                          {
+                            id: 2,
+                            name: 'Unmonitor and delete existing episodes',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor season and keep files',
+                          },
+                        ]
                       : // episodes
-                      [
-                        {
-                          id: 0,
-                          name: 'Unmonitor and delete episode',
-                        },
-                        {
-                          id: 3,
-                          name: 'Unmonitor and keep file',
-                        },
-                      ]
+                        [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete episode',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor and keep file',
+                          },
+                        ]
                 }
               />
             </>
@@ -705,6 +715,29 @@ const AddModal = (props: AddModal) => {
             </div>
           </div>
 
+          <div className="form-row">
+            <label htmlFor="notifications" className="text-label">
+              Notifications
+              {/* <p className="text-xs font-normal">
+                Configure notifications
+              </p> */}
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <Button
+                  buttonType="default"
+                  type="button"
+                  name="notifications"
+                  onClick={() => {
+                    setConfigureNotificationModal(!configureNotificionModal)
+                  }}
+                >
+                  <span>Configure</span>
+                </Button>
+              </div>
+            </div>
+          </div>
+
           <hr className="mt-5" />
           <div className={`section ${useRules ? `` : `hidden`}`}>
             <div className="section">
@@ -770,6 +803,18 @@ const AddModal = (props: AddModal) => {
                 }}
                 onCancel={() => {
                   setYamlImporterModal(false)
+                }}
+              />
+            ) : undefined}
+
+            {configureNotificionModal ? (
+              <ConfigureNotificationModal
+                onSuccess={(selection) => {
+                  setConfiguredNotificationConfigurations(selection)
+                  setConfigureNotificationModal(false)
+                }}
+                onCancel={() => {
+                  setConfigureNotificationModal(false)
                 }}
               />
             ) : undefined}

@@ -12,6 +12,7 @@ interface agentSpec {
 }
 
 export interface AgentConfiguration {
+  id?: number
   name: string
   agent: string
   enabled: boolean
@@ -61,9 +62,11 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
   }, [])
 
   const postNotificationConfig = (payload: AgentConfiguration) => {
-    PostApiHandler('/notifications/configuration/add', payload).then((status) => {
-      props.onSave(status)
-    })
+    PostApiHandler('/notifications/configuration/add', payload).then(
+      (status) => {
+        props.onSave(status)
+      },
+    )
   }
 
   const handleInputChange = (fieldName: string, value: any) => {
