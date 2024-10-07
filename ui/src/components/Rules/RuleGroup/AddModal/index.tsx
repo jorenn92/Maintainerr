@@ -61,6 +61,7 @@ interface ICreateApiObject {
   }
   rules: IRule[]
   dataType: EPlexDataType
+  notifications: AgentConfiguration[]
 }
 
 const AddModal = (props: AddModal) => {
@@ -361,6 +362,7 @@ const AddModal = (props: AddModal) => {
           keepLogsForMonths: +keepLogsForMonthsRef.current.value,
         },
         rules: useRules ? rules : [],
+        notifications: configuredNotificationConfigurations,
       }
 
       if (!props.editData) {
