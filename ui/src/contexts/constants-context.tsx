@@ -76,7 +76,7 @@ export const enum Application {
 
 const ConstantsContext = createContext({
   constants: {} as Iconstants,
-  addConstants: (constant: Iconstants) => {},
+  setConstants: (constants: Iconstants) => {},
   removeConstants: () => {},
 })
 
@@ -91,24 +91,20 @@ export function ConstantsContextProvider(props: {
 }) {
   const [constants, setConstants] = useState<Iconstants>({ applications: null })
 
-  function addConstantsHandler(constants: Iconstants) {
-    setConstants(() => {
-      return constants
-    })
+  function setConstantsHandler(constants: Iconstants) {
+    setConstants(constants)
   }
   function removeConstantsHandler() {
-    setConstants(() => {
-      return {} as Iconstants
-    })
+    setConstants({} as Iconstants)
   }
 
   const context: {
     constants: Iconstants
-    addConstants: (constants: Iconstants) => void
+    setConstants: (constants: Iconstants) => void
     removeConstants: () => void
   } = {
     constants: constants,
-    addConstants: addConstantsHandler,
+    setConstants: setConstantsHandler,
     removeConstants: removeConstantsHandler,
   }
 
