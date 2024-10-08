@@ -228,6 +228,8 @@ export class RulesService {
             forceOverseerr: params.forceOverseerr
               ? params.forceOverseerr
               : false,
+            tautulliWatchedPercentOverride:
+              params.tautulliWatchedPercentOverride ?? null,
             visibleOnHome: params.collection?.visibleOnHome,
             deleteAfterDays: +params.collection?.deleteAfterDays,
             manualCollection: params.collection?.manualCollection,
@@ -347,6 +349,8 @@ export class RulesService {
             forceOverseerr: params.forceOverseerr
               ? params.forceOverseerr
               : false,
+            tautulliWatchedPercentOverride:
+              params.tautulliWatchedPercentOverride ?? null,
             visibleOnHome: params.collection?.visibleOnHome,
             deleteAfterDays: +params.collection?.deleteAfterDays,
             manualCollection: params.collection?.manualCollection,
