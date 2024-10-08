@@ -229,7 +229,7 @@ const AddModal = (props: AddModal) => {
         collectionPromise,
       ])
 
-      ConstantsCtx.addConstants(constants)
+      ConstantsCtx.setConstants(constants)
 
       if (libraries != null) {
         if (libraries) {

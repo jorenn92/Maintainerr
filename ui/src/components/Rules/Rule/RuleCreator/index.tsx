@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { MediaType } from '../../../../contexts/constants-context'
 import Alert from '../../../Common/Alert'
 import RuleInput from './RuleInput'
@@ -34,52 +34,64 @@ interface iRuleCreator {
   onCancel: () => void
 }
 
+const calculateRuleAmount = (
+  data: { rules: IRule[] } | undefined,
+  sections: number,
+): [number, number[]] => {
+  const sectionAmounts = [] as number[]
+  data
+    ? data.rules.forEach((el) =>
+        el.section !== undefined
+          ? sectionAmounts[el.section]
+            ? sectionAmounts[el.section]++
+            : (sectionAmounts[el.section] = 1)
+          : (sectionAmounts[0] = 1),
+      )
+    : undefined
+
+  return [
+    sections,
+    sectionAmounts.filter((el) => el !== undefined && el !== null),
+  ]
+}
+
+const calculateRuleAmountArr = (ruleAmount: [number, number[]]) => {
+  let s = 0,
+    r = 0,
+    lenS = ruleAmount[0]
+
+  const worker: [number[], [number[]]] = [[], [[]]]
+
+  while (++s <= lenS) worker[0].push(s), s > 1 ? worker[1].push([]) : undefined
+
+  for (const sec of worker[0]) {
+    r = 0
+    while (++r <= ruleAmount[1][sec - 1]) worker[1][sec - 1].push(r)
+  }
+
+  return worker
+}
+
 const RuleCreator = (props: iRuleCreator) => {
-  const [editSections, setEditSections] = useState<number>()
-  const [ruleAmount, setRuleAmount] = useState<[number, number[]]>([1, [1]])
-  const [editData, setEditData] = useState<{ rules: IRule[] }>()
+  const initialSections = props.editData
+    ? (props.editData.rules[props.editData.rules.length - 1]?.section! + 1 ??
+      undefined)
+    : undefined
+  const initialRuleAmount: [number, number[]] = initialSections
+    ? calculateRuleAmount(props.editData, initialSections)
+    : [1, [1]]
+
+  const [ruleAmount, setRuleAmount] =
+    useState<[number, number[]]>(initialRuleAmount)
+  const [editData, setEditData] = useState<{ rules: IRule[] } | undefined>(
+    props.editData,
+  )
+  const [ruleAmountArr, setRuleAmountArr] = useState<[number[], [number[]]]>(
+    calculateRuleAmountArr(initialRuleAmount),
+  )
   const rulesCreated = useRef<IRulesToCreate[]>([])
-  const [ruleAmountArr, setRuleAmountArr] = useState<[number[], [number[]]]>([
-    [1],
-    [[1]],
-  ])
   const deleted = useRef<number>(0)
   const added = useRef<number[]>([])
-
-  useEffect(() => {
-    if (props.editData) {
-      loadRules(props.editData)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (editSections) {
-      const sectionAmounts = [] as number[]
-      // set sectionAmount
-      editData
-        ? editData.rules.forEach((el) =>
-            el.section !== undefined
-              ? sectionAmounts[el.section]
-                ? sectionAmounts[el.section]++
-                : (sectionAmounts[el.section] = 1)
-              : (sectionAmounts[0] = 1),
-          )
-        : undefined
-      setRuleAmount([
-        editSections,
-        sectionAmounts.filter((el) => el !== undefined && el !== null),
-      ])
-    }
-  }, [editSections])
-
-  const loadRules = (rules: { rules: IRule[] }) => {
-    setEditData(rules)
-    const editSec = rules
-      ? rules.rules[rules.rules.length - 1]?.section! + 1
-      : undefined
-
-    editSec !== undefined ? setEditSections(editSec) : undefined
-  }
 
   const ruleCommited = (id: number, rule: IRule) => {
     if (rulesCreated) {
@@ -118,12 +130,11 @@ const RuleCreator = (props: iRuleCreator) => {
 
     if (rulesCreated.current.length > 0) {
       setEditData({ rules: rulesCreated.current.map((el) => el.rule) })
-      setEditSections(ruleAmount[0] - rules.filter((e) => e <= 0).length)
     }
 
     const nonEmptySections = rules.filter((e) => e > 0)
 
-    setRuleAmount([
+    updateRuleAmount([
       ruleAmount[0] - rules.filter((e) => e <= 0).length,
       nonEmptySections.length > 0 ? nonEmptySections : [1],
     ])
@@ -147,11 +158,10 @@ const RuleCreator = (props: iRuleCreator) => {
     let rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] + 1
 
-    setRuleAmount([ruleAmount[0], rules])
+    updateRuleAmount([ruleAmount[0], rules])
   }
 
   const addSection = (e: any) => {
-    e.preventDefault()
     const rules = [...ruleAmount[1]]
     rules.push(1)
 
@@ -161,25 +171,13 @@ const RuleCreator = (props: iRuleCreator) => {
       ) + 1
     added.current = [...added.current, ruleId]
 
-    setRuleAmount([ruleAmount[0] + 1, rules])
+    updateRuleAmount([ruleAmount[0] + 1, rules])
   }
 
-  useEffect(() => {
-    let s = 0,
-      r = 0,
-      lenS = ruleAmount[0]
-
-    const worker: [number[], [number[]]] = [[], [[]]]
-
-    while (++s <= lenS)
-      worker[0].push(s), s > 1 ? worker[1].push([]) : undefined
-
-    for (const sec of worker[0]) {
-      r = 0
-      while (++r <= ruleAmount[1][sec - 1]) worker[1][sec - 1].push(r)
-    }
-    setRuleAmountArr(worker)
-  }, [ruleAmount])
+  const updateRuleAmount = (ruleAmount: [number, number[]]) => {
+    setRuleAmountArr(calculateRuleAmountArr(ruleAmount))
+    setRuleAmount(ruleAmount)
+  }
 
   return (
     <div className="h-full w-full">
@@ -246,6 +244,7 @@ const RuleCreator = (props: iRuleCreator) => {
         <div className="mt-5 flex w-full">
           <div className="m-auto xl:m-0">
             <button
+              type="button"
               className="ml-auto flex h-8 rounded bg-amber-600 text-zinc-200 shadow-md hover:bg-amber-500"
               onClick={addSection}
               title={`Add a new section`}
