@@ -8,7 +8,7 @@ import DocsButton from '../../Common/DocsButton'
 import TestButton from '../../Common/TestButton'
 import {
   getHostname,
-  getArrBaseUrl,
+  getBaseUrl,
   getPortFromUrl,
   addPortToUrl,
   handleSettingsInputChange,
@@ -36,7 +36,7 @@ const SonarrSettings = () => {
 
   useEffect(() => {
     setHostname(getHostname(settingsCtx.settings.sonarr_url))
-    setBaseUrl(getArrBaseUrl(settingsCtx.settings.sonarr_url))
+    setBaseUrl(getBaseUrl(settingsCtx.settings.sonarr_url))
     setPort(getPortFromUrl(settingsCtx.settings.sonarr_url))
 
     // @ts-ignore
@@ -45,7 +45,7 @@ const SonarrSettings = () => {
     }
     // @ts-ignore
     baseUrlRef.current = {
-      value: getArrBaseUrl(settingsCtx.settings.sonarr_url),
+      value: getBaseUrl(settingsCtx.settings.sonarr_url),
     }
     // @ts-ignore
     portRef.current = { value: getPortFromUrl(settingsCtx.settings.sonarr_url) }
