@@ -1,10 +1,5 @@
 import { SaveIcon } from '@heroicons/react/solid'
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { useContext, useEffect, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
@@ -13,17 +8,16 @@ import DocsButton from '../../Common/DocsButton'
 import TestButton from '../../Common/TestButton'
 import {
   addPortToUrl,
+  getBaseUrl,
+  getHostname,
   getPortFromUrl,
-  handleSettingsInputChange,
-  removePortFromUrl,
 } from '../../../utils/SettingsUtils'
 
 const TautulliSettings = () => {
   const settingsCtx = useContext(SettingsContext)
-  const hostnameRef = useRef<HTMLInputElement>(null)
-  const portRef = useRef<HTMLInputElement>(null)
-  const apiKeyRef = useRef<HTMLInputElement>(null)
   const [hostname, setHostname] = useState<string>()
+  const [baseUrl, setBaseUrl] = useState<string>()
+  const [apiKey, setApiKey] = useState<string>()
   const [port, setPort] = useState<string>()
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
@@ -37,55 +31,48 @@ const TautulliSettings = () => {
   }, [])
 
   useEffect(() => {
-    // hostname
-    setHostname(removePortFromUrl(settingsCtx.settings.tautulli_url))
-    // @ts-ignore
-    hostnameRef.current = {
-      value: removePortFromUrl(settingsCtx.settings.tautulli_url),
-    }
-
-    // port
+    setHostname(getHostname(settingsCtx.settings.tautulli_url))
+    setBaseUrl(getBaseUrl(settingsCtx.settings.tautulli_url))
     setPort(getPortFromUrl(settingsCtx.settings.tautulli_url))
-    // @ts-ignore
-    portRef.current = {
-      value: getPortFromUrl(settingsCtx.settings.tautulli_url),
-    }
+    setApiKey(settingsCtx.settings.tautulli_api_key)
   }, [settingsCtx])
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    let portToUse = port
+
     // if port not specified, but hostname is. Derive the port
-    if (!portRef.current?.value && hostnameRef.current?.value) {
-      const derivedPort = hostnameRef.current.value.includes('http://')
+    if (!port && hostname) {
+      const derivedPort = hostname.includes('http://')
         ? 80
-        : hostnameRef.current.value.includes('https://')
+        : hostname.includes('https://')
           ? 443
           : 80
 
       if (derivedPort) {
-        setPort(derivedPort.toString())
-        // @ts-ignore
-        portRef.current = { value: derivedPort.toString() }
+        portToUse = derivedPort.toString()
+        setPort(portToUse)
       }
     }
 
-    if (
-      hostnameRef.current?.value &&
-      apiKeyRef.current?.value &&
-      portRef.current?.value
-    ) {
-      const hostnameVal = hostnameRef.current.value.includes('http://')
-        ? hostnameRef.current.value
-        : hostnameRef.current.value.includes('https://')
-          ? hostnameRef.current.value
-        : portRef.current.value == '443'
-        ? 'https://' + hostnameRef.current.value
-        : 'http://' + hostnameRef.current.value
+    if (hostname && apiKey && portToUse) {
+      const hostnameVal = hostname.includes('http://')
+        ? hostname
+        : hostname.includes('https://')
+          ? hostname
+          : portToUse == '443'
+            ? 'https://' + hostname
+            : 'http://' + hostname
+
+      let tautulli_url = `${addPortToUrl(hostnameVal, +portToUse)}`
+      tautulli_url = tautulli_url.endsWith('/')
+        ? tautulli_url.slice(0, -1)
+        : tautulli_url
 
       const payload = {
-        tautulli_url: addPortToUrl(hostnameVal, +portRef.current.value),
-        tautulli_api_key: apiKeyRef.current.value,
+        tautulli_url: `${tautulli_url}${baseUrl ? `/${baseUrl}` : ''}`,
+        tautulli_api_key: apiKey,
       }
 
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
@@ -150,13 +137,9 @@ const TautulliSettings = () => {
                   name="hostname"
                   id="hostname"
                   type="text"
-                  defaultValue={hostname}
-                  ref={hostnameRef}
-                  value={hostnameRef.current?.value}
-                  onChange={(e) =>
-                    handleSettingsInputChange(e, hostnameRef, setHostname)
-                  }
-                ></input>
+                  value={hostname}
+                  onChange={(e) => setHostname(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -171,11 +154,26 @@ const TautulliSettings = () => {
                   name="port"
                   id="port"
                   type="number"
-                  ref={portRef}
-                  value={portRef.current?.value}
-                  defaultValue={port}
-                  onChange={(e) => handleSettingsInputChange(e, portRef, setPort)}
-                ></input>
+                  value={port}
+                  onChange={(e) => setPort(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="baseUrl" className="text-label">
+              Base URL
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <input
+                  name="baseUrl"
+                  id="baseUrl"
+                  type="text"
+                  value={baseUrl}
+                  onChange={(e) => setBaseUrl(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -190,9 +188,9 @@ const TautulliSettings = () => {
                   name="apikey"
                   id="apikey"
                   type="password"
-                  ref={apiKeyRef}
-                  defaultValue={settingsCtx.settings.tautulli_api_key}
-                ></input>
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -208,11 +206,7 @@ const TautulliSettings = () => {
                   testUrl="/settings/test/tautulli"
                 />
                 <span className="ml-3 inline-flex rounded-md shadow-sm">
-                  <Button
-                    buttonType="primary"
-                    type="submit"
-                    // disabled={isSubmitting || !isValid}
-                  >
+                  <Button buttonType="primary" type="submit">
                     <SaveIcon />
                     <span>Save Changes</span>
                   </Button>
