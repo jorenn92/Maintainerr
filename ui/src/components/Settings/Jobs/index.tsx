@@ -162,7 +162,7 @@ const JobSettings = () => {
                   // disabled={isSubmitting || !isValid}
                 >
                   <SaveIcon />
-                  <span>Save Changes</span>
+                  <span>Save Settings</span>
                 </Button>
               </span>
             </div>

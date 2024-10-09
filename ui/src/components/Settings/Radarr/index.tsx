@@ -78,9 +78,9 @@ const RadarrSettings = () => {
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https://')
           ? hostnameRef.current.value
-          : portRef.current.value == '443' ? 
-          'https://' + hostnameRef.current.value
-          : 'http://' + hostnameRef.current.value
+          : portRef.current.value == '443' ?
+            'https://' + hostnameRef.current.value
+            : 'http://' + hostnameRef.current.value
 
       let radarr_url = `${addPortToUrl(hostnameVal, +portRef.current.value)}`
       radarr_url = radarr_url.endsWith('/')
@@ -88,9 +88,8 @@ const RadarrSettings = () => {
         : radarr_url
 
       const payload = {
-        radarr_url: `${radarr_url}${
-          baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
-        }`,
+        radarr_url: `${radarr_url}${baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
+          }`,
         radarr_api_key: apiKeyRef.current.value,
       }
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
@@ -232,17 +231,16 @@ const RadarrSettings = () => {
                 <DocsButton page="Configuration" />
               </span>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
-                <TestButton onClick={appTest} testUrl="/settings/test/radarr" />
-
-                <span className="ml-3 inline-flex rounded-md shadow-sm">
-                  <Button
+              <Button
                     buttonType="primary"
                     type="submit"
-                    // disabled={isSubmitting || !isValid}
+                  // disabled={isSubmitting || !isValid}
                   >
                     <SaveIcon />
-                    <span>Save Changes</span>
+                    <span>Save Settings</span>
                   </Button>
+                <span className="ml-1 inline-flex rounded-md shadow-sm">
+                <TestButton onClick={appTest} testUrl="/settings/test/radarr" />
                 </span>
               </div>
             </div>

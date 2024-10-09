@@ -346,6 +346,7 @@ const AddModal = (props: AddModal) => {
           <div className="form-row">
             <label htmlFor="name" className="text-label">
               Name *
+              <p className="text-xs font-normal"> This will be the name of the collection in Plex</p>
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -525,6 +526,7 @@ const AddModal = (props: AddModal) => {
                   ref={deleteAfterRef}
                 />
               </div>
+              <p className="description text-xs font-normal"> 1 is the lowest number that will function </p>
             </div>
           </div>
 
@@ -704,6 +706,22 @@ const AddModal = (props: AddModal) => {
               </div>
             </div>
           </div>
+          <div className="form-row">
+            <label className="text-label">
+              Confused?
+            </label>
+            <Link
+              legacyBehavior
+              href={`https://docs.maintainerr.info/blog/tutorials/getting-started-with-rules-s01e01/`}
+              passHref={true}
+            >
+              <a target="_blank" rel="noopener noreferrer">
+                <Button className="ml-3" buttonType="default" type="button">
+                  <span>🕮 View The Walkthrough</span>
+                </Button>
+              </a>
+            </Link>
+          </div>
 
           <hr className="mt-5" />
           <div className={`section ${useRules ? `` : `hidden`}`}>
@@ -711,9 +729,6 @@ const AddModal = (props: AddModal) => {
               <div className="max-width-form-head flex">
                 <div className="ml-0">
                   <h3 className="heading">Rules</h3>
-                  <p className="description">
-                    Specify the rules this group needs to enforce
-                  </p>
                 </div>
                 <div className="ml-auto ">
                   <button
@@ -724,7 +739,7 @@ const AddModal = (props: AddModal) => {
                       <CloudDownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
                     }
                     <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
-                      Community
+                      Community Hub
                     </p>
                   </button>
                 </div>

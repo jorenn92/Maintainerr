@@ -109,8 +109,8 @@ const PlexSettings = () => {
         plex_hostname: sslRef.current?.checked
           ? `https://${hostnameRef.current.value.replace('http://', '').replace('https://', '')}`
           : hostnameRef.current.value
-              .replace('http://', '')
-              .replace('https://', ''),
+            .replace('http://', '')
+            .replace('https://', ''),
         plex_port: +portRef.current.value,
         plex_name: nameRef.current.value,
         plex_ssl: +sslRef.current.checked, // not used, server derives this from https://
@@ -356,16 +356,15 @@ const PlexSettings = () => {
                         ? 'Retrieving servers...'
                         : 'Manual configuration'
                       : tokenValid === true
-                        ? 'Press the button to load available servers'
+                        ? 'Press the refresh button to load available servers'
                         : 'Authenticate to load servers'}
                   </option>
                   {availablePresets.map((server, index) => (
                     <option key={`preset-server-${index}`} value={index}>
                       {`
                             ${server.name} (${server.address})
-                            [${server.local ? 'local' : 'remote'}]${
-                              server.ssl ? ` [secure]` : ''
-                            }
+                            [${server.local ? 'local' : 'remote'}]${server.ssl ? ` [secure]` : ''
+                        }
                           `}
                     </option>
                   ))}
@@ -505,17 +504,16 @@ const PlexSettings = () => {
                 <DocsButton page="Configuration" />
               </span>
               <div className="flex sm:justify-end m-auto sm:m-0 mt-3 xs:mt-0">
-                <TestButton onClick={appTest} testUrl="/settings/test/plex" />
-
-                <span className="ml-3 inline-flex rounded-md shadow-sm">
-                  <Button
+              <Button
                     buttonType="primary"
                     type="submit"
-                    // disabled={isSubmitting || !isValid}
+                  // disabled={isSubmitting || !isValid}
                   >
                     <SaveIcon />
-                    <span>Save Changes</span>
+                    <span>Save Settings</span>
                   </Button>
+                <span className="ml-1 inline-flex rounded-md shadow-sm">
+                <TestButton onClick={appTest} testUrl="/settings/test/plex" />
                 </span>
               </div>
             </div>

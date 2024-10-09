@@ -86,9 +86,8 @@ const SonarrSettings = () => {
       url = url.endsWith('/') ? url.slice(0, -1) : url
 
       const payload = {
-        sonarr_url: `${url}${
-          baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
-        }`,
+        sonarr_url: `${url}${baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
+          }`,
         sonarr_api_key: apiKeyRef.current.value,
       }
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
@@ -230,17 +229,16 @@ const SonarrSettings = () => {
                 <DocsButton page="Configuration" />
               </span>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
-                <TestButton onClick={appTest} testUrl="/settings/test/sonarr" />
-
-                <span className="ml-3 inline-flex rounded-md shadow-sm">
-                  <Button
+              <Button
                     buttonType="primary"
                     type="submit"
-                    // disabled={isSubmitting || !isValid}
+                  // disabled={isSubmitting || !isValid}
                   >
                     <SaveIcon />
-                    <span>Save Changes</span>
+                    <span>Save Settings</span>
                   </Button>
+                <span className="ml-1 inline-flex rounded-md shadow-sm">
+                <TestButton onClick={appTest} testUrl="/settings/test/sonarr" />
                 </span>
               </div>
             </div>

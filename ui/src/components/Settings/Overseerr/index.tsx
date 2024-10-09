@@ -79,9 +79,9 @@ const OverseerrSettings = () => {
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https://')
           ? hostnameRef.current.value
-        : portRef.current.value == '443'
-        ? 'https://' + hostnameRef.current.value
-        : 'http://' + hostnameRef.current.value
+          : portRef.current.value == '443'
+            ? 'https://' + hostnameRef.current.value
+            : 'http://' + hostnameRef.current.value
 
       const payload = {
         overseerr_url: addPortToUrl(hostnameVal, +portRef.current.value),
@@ -202,19 +202,19 @@ const OverseerrSettings = () => {
                 <DocsButton page="Configuration" />
               </span>
               <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
+              <Button
+                    buttonType="primary"
+                    type="submit"
+                  // disabled={isSubmitting || !isValid}
+                  >
+                    <SaveIcon />
+                    <span>Save Settings</span>
+                  </Button>
+                <span className="ml-1 inline-flex rounded-md shadow-sm">
                 <TestButton
                   onClick={appTest}
                   testUrl="/settings/test/overseerr"
                 />
-                <span className="ml-3 inline-flex rounded-md shadow-sm">
-                  <Button
-                    buttonType="primary"
-                    type="submit"
-                    // disabled={isSubmitting || !isValid}
-                  >
-                    <SaveIcon />
-                    <span>Save Changes</span>
-                  </Button>
                 </span>
               </div>
             </div>
