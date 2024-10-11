@@ -1,12 +1,15 @@
 import axios from 'axios';
 import {
   hasNotificationType,
-  NotificationTypes,
 } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { Injectable, Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
-import { NotificationAgentConfig } from '../notifications-interfaces';
+import {
+  NotificationAgentConfig,
+  NotificationAgentKey,
+  NotificationType,
+} from '../notifications-interfaces';
 
 enum EmbedColors {
   DEFAULT = 0,
@@ -82,17 +85,16 @@ interface DiscordWebhookPayload {
 }
 
 class DiscordAgent implements NotificationAgent {
-  constructor(
-    private readonly appSettings: SettingsService,
-    private readonly settings: NotificationAgentConfig,
-  ) {}
+  constructor(private readonly settings: NotificationAgentConfig) {}
 
   private readonly logger = new Logger(DiscordAgent.name);
 
   getSettings = () => this.settings;
 
+  getIdentifier = () => NotificationAgentKey.DISCORD;
+
   public buildEmbed(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): DiscordRichEmbed {
     let color = EmbedColors.DARK_PURPLE;
@@ -131,7 +133,7 @@ class DiscordAgent implements NotificationAgent {
   }
 
   public async send(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): Promise<boolean> {
     if (!hasNotificationType(type, this.getSettings().types ?? [0])) {
@@ -140,7 +142,7 @@ class DiscordAgent implements NotificationAgent {
 
     this.logger.log('Sending Discord notification', {
       label: 'Notifications',
-      type: NotificationTypes[type],
+      type: NotificationType[type],
       subject: payload.subject,
     });
 
@@ -160,7 +162,7 @@ class DiscordAgent implements NotificationAgent {
     } catch (e) {
       this.logger.warn('Error sending Discord notification', {
         label: 'Notifications',
-        type: NotificationTypes[type],
+        type: NotificationType[type],
         subject: payload.subject,
         errorMessage: e.message,
         response: e.response?.data,

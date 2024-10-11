@@ -1,12 +1,15 @@
 import axios from 'axios';
 import {
   hasNotificationType,
-  NotificationTypes,
 } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
-import { NotificationAgentConfig } from '../notifications-interfaces';
+import {
+  NotificationAgentConfig,
+  NotificationAgentKey,
+  NotificationType,
+} from '../notifications-interfaces';
 
 interface PushbulletPayload {
   type: string;
@@ -24,12 +27,14 @@ class PushbulletAgent implements NotificationAgent {
 
   getSettings = () => this.settings;
 
+  getIdentifier = () => NotificationAgentKey.PUSHBULLET;
+
   public shouldSend(): boolean {
     return true;
   }
 
   private getNotificationPayload(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): PushbulletPayload {
     const title = payload.event
@@ -49,7 +54,7 @@ class PushbulletAgent implements NotificationAgent {
   }
 
   public async send(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -65,7 +70,7 @@ class PushbulletAgent implements NotificationAgent {
     ) {
       this.logger.debug('Sending Pushbullet notification', {
         label: 'Notifications',
-        type: NotificationTypes[type],
+        type: NotificationType[type],
         subject: payload.subject,
       });
 
@@ -82,7 +87,7 @@ class PushbulletAgent implements NotificationAgent {
       } catch (e) {
         this.logger.error('Error sending Pushbullet notification', {
           label: 'Notifications',
-          type: NotificationTypes[type],
+          type: NotificationType[type],
           subject: payload.subject,
           errorMessage: e.message,
           response: e.response?.data,
@@ -96,7 +101,7 @@ class PushbulletAgent implements NotificationAgent {
       this.logger.debug('Sending Pushbullet notification', {
         label: 'Notifications',
         recipient: settings.options.displayName,
-        type: NotificationTypes[type],
+        type: NotificationType[type],
         subject: payload.subject,
       });
 
@@ -110,7 +115,7 @@ class PushbulletAgent implements NotificationAgent {
         this.logger.error('Error sending Pushbullet notification', {
           label: 'Notifications',
           recipient: settings.options.displayName,
-          type: NotificationTypes[type],
+          type: NotificationType[type],
           subject: payload.subject,
           errorMessage: e.message,
           response: e.response?.data,

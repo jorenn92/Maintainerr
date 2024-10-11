@@ -1,12 +1,15 @@
 import axios from 'axios';
 import {
   hasNotificationType,
-  NotificationTypes,
 } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
-import { NotificationAgentConfig } from '../notifications-interfaces';
+import {
+  NotificationAgentConfig,
+  NotificationAgentKey,
+  NotificationType,
+} from '../notifications-interfaces';
 
 interface EmbedField {
   type: 'plain_text' | 'mrkdwn';
@@ -55,8 +58,10 @@ class SlackAgent implements NotificationAgent {
 
   getSettings = () => this.settings;
 
+  getIdentifier = () => NotificationAgentKey.SLACK;
+
   public buildEmbed(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): SlackBlockEmbed {
     const { applicationUrl, applicationTitle } = this.appSettings;
@@ -133,7 +138,7 @@ class SlackAgent implements NotificationAgent {
   }
 
   public async send(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -147,7 +152,7 @@ class SlackAgent implements NotificationAgent {
 
     this.logger.debug('Sending Slack notification', {
       label: 'Notifications',
-      type: NotificationTypes[type],
+      type: NotificationType[type],
       subject: payload.subject,
     });
     try {
@@ -160,7 +165,7 @@ class SlackAgent implements NotificationAgent {
     } catch (e) {
       this.logger.error('Error sending Slack notification', {
         label: 'Notifications',
-        type: NotificationTypes[type],
+        type: NotificationType[type],
         subject: payload.subject,
         errorMessage: e.message,
         response: e.response?.data,

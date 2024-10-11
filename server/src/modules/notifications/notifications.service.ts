@@ -4,20 +4,19 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Notification } from './entities/notification.entities';
 import { DataSource, Repository } from 'typeorm';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
-
-export enum NotificationTypes {
-  NONE = 0,
-  MEDIA_ADDED_TO_COLLECTION = 2,
-  MEDIA_ABOUT_TO_BE_REMOVED = 4,
-  MEDIA_HANDLED = 8,
-  RULE_HANDLING_FAILED = 16,
-  COLLECTION_HANDLING_FAILED = 32,
-  TEST_NOTIFICATION = 64,
-}
+import {
+  NotificationAgentKey,
+  NotificationType,
+} from './notifications-interfaces';
+import DiscordAgent from './agents/discord';
+import PushoverAgent from './agents/pushover';
+import { SettingsService } from '../settings/settings.service';
+import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 
 export const hasNotificationType = (
-  type: NotificationTypes,
-  value: NotificationTypes[],
+  type: NotificationType,
+  value: NotificationType[],
 ): boolean => {
   // If we are not checking any notifications, bail out and return true
   if (type === 0) {
@@ -38,27 +37,25 @@ export class NotificationService {
     @InjectRepository(RuleGroup)
     private readonly ruleGroupRepo: Repository<RuleGroup>,
     private readonly connection: DataSource,
+    private readonly settings: SettingsService,
+    private readonly plexApi: PlexApiService,
   ) {}
 
   public registerAgents = (agents: NotificationAgent[]): void => {
     this.activeAgents = [...this.activeAgents, ...agents];
-    this.logger.log('Registered notification agents', {
-      label: 'Notifications',
-    });
+    this.logger.log(
+      `Registered ${agents.length} notification agent${agents.length === 1 ? '' : 's'}`,
+    );
   };
 
   public sendNotification(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): void {
-    this.logger.log(`Sending notification(s) for ${NotificationTypes[type]}`, {
-      label: 'Notifications',
-      subject: payload.subject,
-    });
-
     this.activeAgents.forEach((agent) => {
       if (agent.shouldSend()) {
-        agent.send(type, payload);
+        if (agent.getSettings().types?.includes(type))
+          agent.send(type, payload);
       }
     });
   }
@@ -156,6 +153,29 @@ export class NotificationService {
       this.logger.warn('Fetching Notification configurations failed');
       this.logger.debug(err);
     }
+  }
+
+  public async registerConfiguredAgents() {
+    const configuredAgents = await this.getNotificationConfigurations();
+
+    const agents: NotificationAgent[] = configuredAgents.map((agent) => {
+      switch (agent.name) {
+        case NotificationAgentKey.DISCORD:
+          return new DiscordAgent({
+            enabled: agent.enabled,
+            types: JSON.parse(agent.types),
+            options: JSON.parse(agent.options),
+          });
+        case NotificationAgentKey.PUSHOVER:
+          return new PushoverAgent(this.settings, {
+            enabled: agent.enabled,
+            types: JSON.parse(agent.types),
+            options: JSON.parse(agent.options),
+          });
+      }
+    });
+
+    this.registerAgents(agents);
   }
 
   async deleteNotificationConfiguration(notificationId: number) {
@@ -315,5 +335,132 @@ export class NotificationService {
         ],
       },
     ];
+  }
+
+  public async handleNotification(
+    type: NotificationType,
+    mediaItems: { plexId: number }[],
+    collectionName?: string,
+    dayAmount?: number,
+  ) {
+    const payload: NotificationPayload = {
+      subject: '',
+      notifySystem: false,
+      message: '',
+    };
+
+    payload.message = await this.transformMessageContent(
+      this.getMessageContent(type, mediaItems && mediaItems.length > 1),
+      mediaItems,
+      collectionName,
+      dayAmount,
+    );
+
+    this.sendNotification(type, payload);
+  }
+
+  private getMessageContent(type: NotificationType, multiple: boolean): string {
+    let message: string;
+
+    if (!multiple) {
+      switch (type) {
+        case NotificationType.TEST_NOTIFICATION:
+          message =
+            "\uD83D\uDD0D Test Notification: Just checking if this thing works... if you're seeing this, success! If not, well... we have a problem!";
+          break;
+        case NotificationType.COLLECTION_HANDLING_FAILED:
+          message =
+            '⚠️ Collection Handling Failed: Oops! Something went wrong while processing your collections.';
+          break;
+        case NotificationType.RULE_HANDLING_FAILED:
+          message =
+            '⚠️ Rule Handling Failed: Oops! Something went wrong while processing your rules.';
+          break;
+        case NotificationType.MEDIA_ABOUT_TO_BE_REMOVED:
+          message =
+            "⏰ Reminder: {media_title} will be handled in {days} days! If you want to keep it, make sure to take action before it's gone. Don’t miss out!";
+          break;
+        case NotificationType.MEDIA_ADDED_TO_COLLECTION:
+          message =
+            "\uD83D\uDCC2 '{media_title}' has been added to '{collection_name}'! The item will be handled in {days} days";
+          break;
+        case NotificationType.MEDIA_HANDLED:
+          message =
+            "✅ Media Handled. '{media_title}' has been handled by '{collection_name}'";
+          break;
+      }
+    } else {
+      switch (type) {
+        case NotificationType.MEDIA_ABOUT_TO_BE_REMOVED:
+          message =
+            "⏰ Reminder: These media items will be handled in {days} days! If you want to keep them, make sure to take action before they're gone. Don’t miss out! \n \n {media_items}";
+          break;
+        case NotificationType.MEDIA_ADDED_TO_COLLECTION:
+          message =
+            "\uD83D\uDCC2 These media items have been added to '{collection_name}'! The items will be handled in {days} days. \n \n {media_items}";
+          break;
+        case NotificationType.MEDIA_HANDLED:
+          message =
+            "✅ Media Handled: These media items have been handled by '{collection_name}'. \n \n {media_items}";
+          break;
+      }
+    }
+    return message;
+  }
+
+  private async transformMessageContent(
+    message: string,
+    items?: { plexId: number }[],
+    collectionName?: string,
+    dayAmount?: number,
+  ): Promise<string> {
+    try {
+      if (items) {
+        if (items.length > 1) {
+          // if multiple items
+          const titles = [];
+
+          for (const i of items) {
+            const item = await this.plexApi.getMetadata(i.plexId.toString());
+
+            titles.push(this.getTitle(item));
+          }
+
+          const result = titles
+            .map((name) => `* ${name.charAt(0).toUpperCase() + name.slice(1)}`)
+            .join(' \n');
+
+          message = message.replace('{media_items}', result);
+        } else {
+          // if 1 item
+          const item = await this.plexApi.getMetadata(
+            items[0].plexId.toString(),
+          );
+
+          message = message.replace('{media_title}', this.getTitle(item));
+        }
+      }
+
+      message = collectionName
+        ? message.replace('{collection_name}', collectionName)
+        : message;
+
+      message =
+        dayAmount && dayAmount > 0
+          ? message.replace('{days}', dayAmount.toString())
+          : message;
+
+      return message;
+    } catch (e) {
+      this.logger.error("Couldn't transform notification message", e);
+    }
+  }
+
+  private getTitle(item: PlexMetadata): string {
+    return item.grandparentRatingKey
+      ? `${item.grandparentTitle} - season ${item.parentIndex} - episode ${item.index}`
+      : item.parentRatingKey
+        ? `${item.parentTitle} - season ${item.index}`
+        : item.title;
   }
 }

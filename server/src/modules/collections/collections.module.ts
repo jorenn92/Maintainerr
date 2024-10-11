@@ -15,6 +15,8 @@ import { Exclusion } from '../rules/entities/exclusion.entities';
 import { CollectionLog } from '../collections/entities/collection_log.entities';
 import { CollectionLogCleanerService } from '../collections/tasks/collection-log-cleaner.service';
 import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
+import { Notification } from '../notifications/entities/notification.entities';
+import { NotificationService } from '../notifications/notifications.service';
 
 @Module({
   imports: [
@@ -25,17 +27,19 @@ import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
       CollectionLog,
       RuleGroup,
       Exclusion,
+      Notification
     ]),
     OverseerrApiModule,
     TautulliApiModule,
     TmdbApiModule,
     ServarrApiModule,
-    TasksModule,
+    TasksModule
   ],
   providers: [
     CollectionsService,
     CollectionWorkerService,
     CollectionLogCleanerService,
+    NotificationService
   ],
   controllers: [CollectionsController],
   exports: [CollectionsService],

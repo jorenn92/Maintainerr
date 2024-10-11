@@ -4,9 +4,10 @@ import { NotificationService } from './notifications.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Notification } from './entities/notification.entities';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
+import { PlexApiModule } from '../api/plex-api/plex-api.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Notification, RuleGroup])],
+  imports: [PlexApiModule, TypeOrmModule.forFeature([Notification, RuleGroup])],
   providers: [NotificationService],
   controllers: [NotificationsController],
   exports: [NotificationService],

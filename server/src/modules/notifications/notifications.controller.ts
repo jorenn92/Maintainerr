@@ -1,20 +1,18 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import {
-  NotificationTypes,
-  NotificationService,
-} from './notifications.service';
+import { NotificationService } from './notifications.service';
+import { NotificationType } from './notifications-interfaces';
 
 @Controller('api/notifications')
 export class NotificationsController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Post('/send')
-  public sendNotification() {
-    this.notificationService.sendNotification(NotificationTypes.MEDIA_HANDLED, {
-      subject: 'test',
-      notifySystem: true,
-      message: 'This is a test message',
-    });
+  @Post('/test')
+  public async sendNotification() {
+    // this.notificationService.handleNotification(NotificationType.TEST_NOTIFICATION, null);
+    this.notificationService.handleNotification(
+      NotificationType.MEDIA_ADDED_TO_COLLECTION,
+      [{ plexId: 22423 }, { plexId: 22424 }],
+    );
   }
 
   @Get('/agents')

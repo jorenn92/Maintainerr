@@ -25,6 +25,8 @@ import { ICollection } from './interfaces/collection.interface';
 import { Exclusion } from '../rules/entities/exclusion.entities';
 import { CollectionLog } from '../../modules/collections/entities/collection_log.entities';
 import { ECollectionLogType } from '../../modules/collections/entities/collection_log.entities';
+import { NotificationService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/notifications-interfaces';
 
 interface addCollectionDbResponse {
   id: number;
@@ -53,6 +55,7 @@ export class CollectionsService {
     private readonly plexApi: PlexApiService,
     private readonly tmdbApi: TmdbApiService,
     private readonly tmdbIdHelper: TmdbIdService,
+    private readonly notificationService: NotificationService
   ) {}
 
   async getCollection(id?: number, title?: string) {
@@ -580,6 +583,7 @@ export class CollectionsService {
             );
           }
         }
+        this.notificationService.handleNotification(NotificationType.MEDIA_ADDED_TO_COLLECTION, media);
         return collection;
       } else {
         this.logger.warn("Collection doesn't exist.");

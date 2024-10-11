@@ -1,12 +1,15 @@
 import axios from 'axios';
 import {
   hasNotificationType,
-  NotificationTypes,
 } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
-import { NotificationAgentConfig } from '../notifications-interfaces';
+import {
+  NotificationAgentConfig,
+  NotificationAgentKey,
+  NotificationType,
+} from '../notifications-interfaces';
 
 interface TelegramMessagePayload {
   text: string;
@@ -34,6 +37,8 @@ class TelegramAgent implements NotificationAgent {
 
   getSettings = () => this.settings;
 
+  getIdentifier = () => NotificationAgentKey.TELEGRAM;
+
   public shouldSend(): boolean {
     const settings = this.getSettings();
 
@@ -49,7 +54,7 @@ class TelegramAgent implements NotificationAgent {
   }
 
   private getNotificationPayload(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): Partial<TelegramMessagePayload | TelegramPhotoPayload> {
     const { applicationUrl, applicationTitle } = this.appSettings;
@@ -78,7 +83,7 @@ class TelegramAgent implements NotificationAgent {
   }
 
   public async send(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -93,7 +98,7 @@ class TelegramAgent implements NotificationAgent {
     ) {
       this.logger.debug('Sending Telegram notification', {
         label: 'Notifications',
-        type: NotificationTypes[type],
+        type: NotificationType[type],
         subject: payload.subject,
       });
 
@@ -106,7 +111,7 @@ class TelegramAgent implements NotificationAgent {
       } catch (e) {
         this.logger.error('Error sending Telegram notification', {
           label: 'Notifications',
-          type: NotificationTypes[type],
+          type: NotificationType[type],
           subject: payload.subject,
           errorMessage: e.message,
           response: e.response?.data,
