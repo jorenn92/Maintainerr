@@ -70,6 +70,9 @@ export class Collection {
   @Column({ nullable: false, default: 0 })
   lastDurationInSeconds: number;
 
+  @Column({ nullable: true, default: null })
+  tautulliWatchedPercentOverride: number;
+
   @OneToMany(
     (type) => CollectionMedia,
     (collectionMedia) => collectionMedia.collectionId,
