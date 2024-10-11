@@ -8,7 +8,7 @@ import DocsButton from '../../Common/DocsButton'
 import TestButton from '../../Common/TestButton'
 import {
   addPortToUrl,
-  getArrBaseUrl,
+  getBaseUrl,
   getHostname,
   getPortFromUrl,
   handleSettingsInputChange,
@@ -36,7 +36,7 @@ const RadarrSettings = () => {
 
   useEffect(() => {
     setHostname(getHostname(settingsCtx.settings.radarr_url))
-    setBaseUrl(getArrBaseUrl(settingsCtx.settings.radarr_url))
+    setBaseUrl(getBaseUrl(settingsCtx.settings.radarr_url))
     setPort(getPortFromUrl(settingsCtx.settings.radarr_url))
 
     // @ts-ignore
@@ -45,7 +45,7 @@ const RadarrSettings = () => {
     }
     // @ts-ignore
     baseUrlRef.current = {
-      value: getArrBaseUrl(settingsCtx.settings.radarr_url),
+      value: getBaseUrl(settingsCtx.settings.radarr_url),
     }
     // @ts-ignore
     portRef.current = { value: getPortFromUrl(settingsCtx.settings.radarr_url) }
@@ -78,9 +78,9 @@ const RadarrSettings = () => {
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https://')
           ? hostnameRef.current.value
-          : portRef.current.value == '443' ? 
-          'https://' + hostnameRef.current.value
-          : 'http://' + hostnameRef.current.value
+          : portRef.current.value == '443'
+            ? 'https://' + hostnameRef.current.value
+            : 'http://' + hostnameRef.current.value
 
       let radarr_url = `${addPortToUrl(hostnameVal, +portRef.current.value)}`
       radarr_url = radarr_url.endsWith('/')

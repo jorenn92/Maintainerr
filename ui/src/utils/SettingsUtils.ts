@@ -52,7 +52,7 @@ export function getHostname(url: string): string | undefined {
   }
 }
 
-export function getArrBaseUrl(url: string): string | undefined {
+export function getBaseUrl(url: string): string | undefined {
   try {
     const urlObject = new URL(url)
     let baseUrl = urlObject.pathname

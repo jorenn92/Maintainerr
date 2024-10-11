@@ -102,7 +102,7 @@ export class TautulliApiService {
 
   public async init() {
     this.api = new TautulliApi({
-      url: `${this.settings.tautulli_url}api/v2`,
+      url: `${this.settings.tautulli_url}/api/v2`,
       apiKey: `${this.settings.tautulli_api_key}`,
     });
   }
