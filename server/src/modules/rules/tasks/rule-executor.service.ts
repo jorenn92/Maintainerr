@@ -16,6 +16,8 @@ import cacheManager from '../../api/lib/cache';
 import { RuleComparatorService } from '../helpers/rule.comparator.service';
 import { Collection } from '../../collections/entities/collection.entities';
 import { TaskBase } from '../../tasks/task.base';
+import { NotificationService } from '../../notifications/notifications.service';
+import { NotificationType } from '../../notifications/notifications-interfaces';
 
 interface PlexData {
   page: number;
@@ -44,6 +46,7 @@ export class RuleExecutorService extends TaskBase {
     private readonly collectionService: CollectionsService,
     protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
+    private readonly notificationService: NotificationService,
     private readonly comparator: RuleComparatorService,
   ) {
     super(taskService);
@@ -119,6 +122,7 @@ export class RuleExecutorService extends TaskBase {
       this.logger.log(
         'Not all applications are reachable.. Skipped rule execution.',
       );
+      this.notificationService.handleNotification(NotificationType.RULE_HANDLING_FAILED, undefined);
     }
     // clean up
     this.finish();
@@ -296,9 +300,11 @@ export class RuleExecutorService extends TaskBase {
         return collection;
       } else {
         this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
+        this.notificationService.handleNotification(NotificationType.RULE_HANDLING_FAILED, undefined);
       }
     } catch (err) {
       this.logger.warn(`Execption occurred whild handling rule: `, err);
+      this.notificationService.handleNotification(NotificationType.RULE_HANDLING_FAILED, undefined);
     }
   }
 

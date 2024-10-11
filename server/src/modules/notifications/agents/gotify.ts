@@ -1,12 +1,15 @@
 import axios from 'axios';
 import {
   hasNotificationType,
-  NotificationTypes,
 } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
-import { NotificationAgentConfig } from '../notifications-interfaces';
+import {
+  NotificationAgentConfig,
+  NotificationAgentKey,
+  NotificationType,
+} from '../notifications-interfaces';
 
 interface GotifyPayload {
   title: string;
@@ -24,6 +27,8 @@ class GotifyAgent implements NotificationAgent {
 
   getSettings = () => this.settings;
 
+  getIdentifier = () => NotificationAgentKey.GOTIFY;
+
   public shouldSend(): boolean {
     const settings = this.getSettings();
 
@@ -35,7 +40,7 @@ class GotifyAgent implements NotificationAgent {
   }
 
   private getNotificationPayload(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): GotifyPayload {
     const { applicationUrl, applicationTitle } = this.appSettings;
@@ -63,7 +68,7 @@ class GotifyAgent implements NotificationAgent {
   }
 
   public async send(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -77,7 +82,7 @@ class GotifyAgent implements NotificationAgent {
 
     this.logger.debug('Sending Gotify notification', {
       label: 'Notifications',
-      type: NotificationTypes[type],
+      type: NotificationType[type],
       subject: payload.subject,
     });
     try {
@@ -90,7 +95,7 @@ class GotifyAgent implements NotificationAgent {
     } catch (e) {
       this.logger.error('Error sending Gotify notification', {
         label: 'Notifications',
-        type: NotificationTypes[type],
+        type: NotificationType[type],
         subject: payload.subject,
         errorMessage: e.message,
         response: e.response?.data,

@@ -28,6 +28,9 @@ import { RuleConstanstService } from './constants/constants.service';
 import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.service';
 import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { TautulliGetterService } from './getter/tautulli-getter.service';
+import { NotificationService } from '../notifications/notifications.service';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { Notification } from '../notifications/entities/notification.entities';
 
 @Module({
   imports: [
@@ -41,12 +44,14 @@ import { TautulliGetterService } from './getter/tautulli-getter.service';
       Exclusion,
       CommunityRuleKarma,
       Settings,
+      Notification
     ]),
     OverseerrApiModule,
     TautulliApiModule,
     TmdbApiModule,
     CollectionsModule,
     TasksModule,
+    NotificationsModule
   ],
   providers: [
     RulesService,
@@ -62,6 +67,7 @@ import { TautulliGetterService } from './getter/tautulli-getter.service';
     RuleYamlService,
     RuleComparatorService,
     RuleConstanstService,
+    NotificationService
   ],
   controllers: [RulesController],
 })

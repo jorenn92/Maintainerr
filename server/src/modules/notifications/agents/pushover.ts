@@ -1,12 +1,13 @@
 import axios from 'axios';
-import {
-  hasNotificationType,
-  NotificationTypes,
-} from '../notifications.service';
+import { hasNotificationType } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
-import { NotificationAgentConfig } from '../notifications-interfaces';
+import {
+  NotificationAgentConfig,
+  NotificationAgentKey,
+  NotificationType,
+} from '../notifications-interfaces';
 
 interface PushoverImagePayload {
   attachment_base64: string;
@@ -33,8 +34,17 @@ class PushoverAgent implements NotificationAgent {
 
   getSettings = () => this.settings;
 
+  getIdentifier = () => NotificationAgentKey.PUSHOVER;
+
   public shouldSend(): boolean {
-    return true;
+    if (
+      this.settings.enabled &&
+      this.settings.options.accessToken &&
+      this.settings.options.userToken
+    ) {
+      return true;
+    }
+    return false;
   }
 
   private async getImagePayload(
@@ -64,7 +74,7 @@ class PushoverAgent implements NotificationAgent {
   }
 
   private async getNotificationPayload(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): Promise<Partial<PushoverPayload>> {
     const { applicationUrl, applicationTitle } = this.appSettings;
@@ -102,7 +112,7 @@ class PushoverAgent implements NotificationAgent {
   }
 
   public async send(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -112,17 +122,11 @@ class PushoverAgent implements NotificationAgent {
       payload,
     );
 
-    // Send system notification
-    if (
-      payload.notifySystem &&
-      hasNotificationType(type, settings.types ?? [0]) &&
-      settings.enabled &&
-      settings.options.accessToken &&
-      settings.options.userToken
-    ) {
+    // Send notification
+    if (hasNotificationType(type, settings.types ?? [0]) && this.shouldSend()) {
       this.logger.log('Sending Pushover notification', {
         label: 'Notifications',
-        type: NotificationTypes[type],
+        type: NotificationType[type],
         subject: payload.subject,
       });
 
@@ -136,7 +140,7 @@ class PushoverAgent implements NotificationAgent {
       } catch (e) {
         this.logger.error('Error sending Pushover notification', {
           label: 'Notifications',
-          type: NotificationTypes[type],
+          type: NotificationType[type],
           subject: payload.subject,
           errorMessage: e.message,
           response: e.response?.data,

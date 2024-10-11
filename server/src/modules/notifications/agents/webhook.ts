@@ -1,21 +1,22 @@
 import axios from 'axios';
 import { get } from 'lodash';
-import {
-  hasNotificationType,
-  NotificationTypes,
-} from '../notifications.service';
+import { hasNotificationType } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
-import { NotificationAgentConfig } from '../notifications-interfaces';
+import {
+  NotificationAgentConfig,
+  NotificationAgentKey,
+  NotificationType,
+} from '../notifications-interfaces';
 
 type KeyMapFunction = (
   payload: NotificationPayload,
-  type: NotificationTypes,
+  type: NotificationType,
 ) => string;
 
 const KeyMap: Record<string, string | KeyMapFunction> = {
-  notification_type: (_payload, type) => NotificationTypes[type],
+  notification_type: (_payload, type) => NotificationType[type],
   event: 'event',
   subject: 'subject',
   message: 'message',
@@ -31,10 +32,12 @@ class WebhookAgent implements NotificationAgent {
 
   getSettings = () => this.settings;
 
+  getIdentifier = () => NotificationAgentKey.WEBHOOK;
+
   private parseKeys(
     finalPayload: Record<string, unknown>,
     payload: NotificationPayload,
-    type: NotificationTypes,
+    type: NotificationType,
   ): Record<string, unknown> {
     Object.keys(finalPayload).forEach((key) => {
       if (key === '{{extra}}') {
@@ -65,7 +68,7 @@ class WebhookAgent implements NotificationAgent {
     return finalPayload;
   }
 
-  private buildPayload(type: NotificationTypes, payload: NotificationPayload) {
+  private buildPayload(type: NotificationType, payload: NotificationPayload) {
     const payloadString = Buffer.from(
       this.getSettings().options.jsonPayload as string,
       'base64',
@@ -87,7 +90,7 @@ class WebhookAgent implements NotificationAgent {
   }
 
   public async send(
-    type: NotificationTypes,
+    type: NotificationType,
     payload: NotificationPayload,
   ): Promise<boolean> {
     const settings = this.getSettings();
@@ -101,7 +104,7 @@ class WebhookAgent implements NotificationAgent {
 
     this.logger.debug('Sending webhook notification', {
       label: 'Notifications',
-      type: NotificationTypes[type],
+      type: NotificationType[type],
       subject: payload.subject,
     });
 
@@ -122,7 +125,7 @@ class WebhookAgent implements NotificationAgent {
     } catch (e) {
       this.logger.error('Error sending webhook notification', {
         label: 'Notifications',
-        type: NotificationTypes[type],
+        type: NotificationType[type],
         subject: payload.subject,
         errorMessage: e.message,
         response: e.response?.data,
