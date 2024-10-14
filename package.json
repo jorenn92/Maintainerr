@@ -93,7 +93,7 @@
     "@types/react-transition-group": "^4.4.11",
     "@types/web-push": "^3.6.3",
     "@types/xml2js": "^0.4.14",
-    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/eslint-plugin": "^8.9.0",
     "@typescript-eslint/parser": "^8.8.1",
     "autoprefixer": "10.4.20",
     "eslint": "^9.12.0",
