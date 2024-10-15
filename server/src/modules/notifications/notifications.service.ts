@@ -41,11 +41,17 @@ export class NotificationService {
     private readonly plexApi: PlexApiService,
   ) {}
 
-  public registerAgents = (agents: NotificationAgent[]): void => {
+  public registerAgents = (
+    agents: NotificationAgent[],
+    skiplog = false,
+  ): void => {
     this.activeAgents = [...this.activeAgents, ...agents];
-    this.logger.log(
-      `Registered ${agents.length} notification agent${agents.length === 1 ? '' : 's'}`,
-    );
+
+    if (!skiplog) {
+      this.logger.log(
+        `Registered ${agents.length} notification agent${agents.length === 1 ? '' : 's'}`,
+      );
+    }
   };
 
   public sendNotification(
@@ -155,7 +161,7 @@ export class NotificationService {
     }
   }
 
-  public async registerConfiguredAgents() {
+  public async registerConfiguredAgents(skiplog = false) {
     const configuredAgents = await this.getNotificationConfigurations();
 
     const agents: NotificationAgent[] = configuredAgents.map((agent) => {
@@ -175,7 +181,7 @@ export class NotificationService {
       }
     });
 
-    this.registerAgents(agents);
+    this.registerAgents(agents, skiplog);
   }
 
   async deleteNotificationConfiguration(notificationId: number) {
@@ -187,6 +193,23 @@ export class NotificationService {
       this.logger.debug(err);
       return { code: 0, result: err };
     }
+  }
+
+  public getTypes() {
+    return Object.keys(NotificationType)
+      .filter((key) => isNaN(Number(key)))
+      .map((key) => ({
+        title: this.humanizeTitle(key),
+        id: NotificationType[key],
+      }));
+  }
+
+  // Helper function to convert enum keys to human-readable titles
+  private humanizeTitle(key: string): string {
+    return key
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
   public getAgentSpec() {
@@ -376,13 +399,17 @@ export class NotificationService {
           message =
             '⚠️ Rule Handling Failed: Oops! Something went wrong while processing your rules.';
           break;
-        case NotificationType.MEDIA_ABOUT_TO_BE_REMOVED:
+        case NotificationType.MEDIA_ABOUT_TO_BE_HANDLED:
           message =
-            "⏰ Reminder: {media_title} will be handled in {days} days! If you want to keep it, make sure to take action before it's gone. Don’t miss out!";
+            "⏰ Reminder: {media_title} will be handled in {days} days. If you want to keep it, make sure to take action before it's gone. Don’t miss out!";
           break;
         case NotificationType.MEDIA_ADDED_TO_COLLECTION:
           message =
-            "\uD83D\uDCC2 '{media_title}' has been added to '{collection_name}'! The item will be handled in {days} days";
+            "\uD83D\uDCC2 '{media_title}' has been added to '{collection_name}'. The item will be handled in {days} days";
+          break;
+        case NotificationType.MEDIA_REMOVED_FROM_COLLECTION:
+          message =
+            "\uD83D\uDCC2 '{media_title}' has been removed from '{collection_name}'. It won't be handled anymore.";
           break;
         case NotificationType.MEDIA_HANDLED:
           message =
@@ -391,13 +418,17 @@ export class NotificationService {
       }
     } else {
       switch (type) {
-        case NotificationType.MEDIA_ABOUT_TO_BE_REMOVED:
+        case NotificationType.MEDIA_ABOUT_TO_BE_HANDLED:
           message =
-            "⏰ Reminder: These media items will be handled in {days} days! If you want to keep them, make sure to take action before they're gone. Don’t miss out! \n \n {media_items}";
+            "⏰ Reminder: These media items will be handled in {days} days. If you want to keep them, make sure to take action before they're gone. Don’t miss out! \n \n {media_items}";
           break;
         case NotificationType.MEDIA_ADDED_TO_COLLECTION:
           message =
-            "\uD83D\uDCC2 These media items have been added to '{collection_name}'! The items will be handled in {days} days. \n \n {media_items}";
+            "\uD83D\uDCC2 These media items have been added to '{collection_name}'. The items will be handled in {days} days. \n \n {media_items}";
+          break;
+        case NotificationType.MEDIA_REMOVED_FROM_COLLECTION:
+          message =
+            "\uD83D\uDCC2 These media items have been removed from '{collection_name}'. The items will not be handled anymore. \n \n {media_items}";
           break;
         case NotificationType.MEDIA_HANDLED:
           message =
@@ -453,6 +484,7 @@ export class NotificationService {
       return message;
     } catch (e) {
       this.logger.error("Couldn't transform notification message", e);
+      this.logger.debug(e);
     }
   }
 

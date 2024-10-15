@@ -1,5 +1,4 @@
-import { SaveIcon } from '@heroicons/react/solid'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import React from 'react'
 import PaginatedList from '../../Common/PaginatedList'
@@ -12,6 +11,7 @@ const NotificationSettings = () => {
   const settingsCtx = useContext(SettingsContext)
   const [addModalActive, setAddModalActive] = useState(false)
   const [configurations, setConfigurations] = useState<AgentConfiguration[]>()
+  const [editConfig, setEditConfig] = useState<AgentConfiguration>()
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Notifications'
@@ -19,6 +19,13 @@ const NotificationSettings = () => {
       setConfigurations(configs),
     )
   }, [])
+
+  const doEdit = (id: number) => {
+    const config = configurations?.find((c) => c.id === id)
+
+    setEditConfig(config)
+    setAddModalActive(!addModalActive)
+  }
 
   return (
     <div className="h-full w-full">
@@ -29,13 +36,13 @@ const NotificationSettings = () => {
       <div>
         {configurations ? (
           <PaginatedList
-            items={configurations!.map((i, index) => {
-              return { id: index, title: i.name }
+            items={configurations!.map((i) => {
+              return { id: i.id!, title: i.name }
             })}
             onAdd={() => {
               setAddModalActive(!addModalActive)
             }}
-            onEdit={() => {}}
+            onEdit={doEdit}
             addName="Create Notification"
           />
         ) : null}
@@ -45,11 +52,24 @@ const NotificationSettings = () => {
         <CreateNotificationModal
           onCancel={() => {
             setAddModalActive(!addModalActive)
+            setEditConfig(undefined)
           }}
           onSave={() => {
             setAddModalActive(!addModalActive)
+            setEditConfig(undefined)
           }}
           onTest={() => {}}
+          {...(editConfig
+            ? {
+                selected: {
+                  id: editConfig.id!,
+                  name: editConfig.name!,
+                  enabled: editConfig.enabled!,
+                  agent: editConfig.agent!,
+                  types: editConfig.types!,
+                },
+              }
+            : {})}
         />
       ) : null}
     </div>

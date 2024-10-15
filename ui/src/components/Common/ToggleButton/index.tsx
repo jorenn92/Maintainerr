@@ -1,13 +1,24 @@
 // components/ToggleItem.tsx
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface ToggleItemProps {
   label: string
+  toggled?: boolean
   onStateChange: (state: boolean) => void
 }
 
-const ToggleItem: React.FC<ToggleItemProps> = ({ label, onStateChange }) => {
+const ToggleItem: React.FC<ToggleItemProps> = ({
+  label,
+  toggled,
+  onStateChange,
+}) => {
   const [isToggled, setIsToggled] = useState(false)
+
+  useEffect(() => {
+    if (toggled !== undefined) {
+      setIsToggled(toggled)
+    }
+  }, [])
 
   const handleToggle = () => {
     onStateChange(!isToggled)

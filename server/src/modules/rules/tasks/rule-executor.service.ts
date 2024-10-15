@@ -56,6 +56,7 @@ export class RuleExecutorService extends TaskBase {
 
   protected onBootstrapHook(): void {
     this.cronSchedule = this.settings.rules_handler_job_cron;
+    this.notificationService.registerConfiguredAgents(true); // re register notification agents for scheduled job
   }
 
   public async execute() {
@@ -122,7 +123,10 @@ export class RuleExecutorService extends TaskBase {
       this.logger.log(
         'Not all applications are reachable.. Skipped rule execution.',
       );
-      this.notificationService.handleNotification(NotificationType.RULE_HANDLING_FAILED, undefined);
+      this.notificationService.handleNotification(
+        NotificationType.RULE_HANDLING_FAILED,
+        undefined,
+      );
     }
     // clean up
     this.finish();
@@ -269,6 +273,12 @@ export class RuleExecutorService extends TaskBase {
                 : collection.title
             }'.`,
           );
+
+          this.notificationService.handleNotification(
+            NotificationType.MEDIA_REMOVED_FROM_COLLECTION,
+            dataToRemove,
+            collection.title,
+          );
         }
 
         if (dataToAdd.length > 0) {
@@ -278,6 +288,13 @@ export class RuleExecutorService extends TaskBase {
                 ? collection.manualCollectionName
                 : collection.title
             }'.`,
+          );
+
+          this.notificationService.handleNotification(
+            NotificationType.MEDIA_ADDED_TO_COLLECTION,
+            dataToAdd,
+            collection.title,
+            collection.deleteAfterDays,
           );
         }
 
@@ -300,11 +317,17 @@ export class RuleExecutorService extends TaskBase {
         return collection;
       } else {
         this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
-        this.notificationService.handleNotification(NotificationType.RULE_HANDLING_FAILED, undefined);
+        this.notificationService.handleNotification(
+          NotificationType.RULE_HANDLING_FAILED,
+          undefined,
+        );
       }
     } catch (err) {
       this.logger.warn(`Execption occurred whild handling rule: `, err);
-      this.notificationService.handleNotification(NotificationType.RULE_HANDLING_FAILED, undefined);
+      this.notificationService.handleNotification(
+        NotificationType.RULE_HANDLING_FAILED,
+        undefined,
+      );
     }
   }
 

@@ -581,7 +581,6 @@ export class CollectionsService {
             );
           }
         }
-        this.notificationService.handleNotification(NotificationType.MEDIA_ADDED_TO_COLLECTION, media);
         return collection;
       } else {
         this.logger.warn("Collection doesn't exist.");

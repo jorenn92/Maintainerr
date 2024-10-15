@@ -46,7 +46,7 @@ const ConfigureNotificationModal = (props: ConfigureNotificationModal) => {
                     ? setActivatedNotifications([...activatedNotifications, n])
                     : setActivatedNotifications([
                         ...activatedNotifications.filter(
-                          (el) => el.id !== el.id,
+                          (el) => el.id !== n.id,
                         ),
                       ])
                 }}

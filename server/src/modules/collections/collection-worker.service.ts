@@ -15,6 +15,8 @@ import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TaskBase } from '../tasks/task.base';
+import { NotificationService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/notifications-interfaces';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -37,84 +39,114 @@ export class CollectionWorkerService extends TaskBase {
     private readonly settings: SettingsService,
     private readonly tmdbIdService: TmdbIdService,
     private readonly tmdbIdHelper: TmdbIdService,
+    private readonly notificationService: NotificationService,
   ) {
     super(taskService);
   }
 
   protected onBootstrapHook(): void {
     this.cronSchedule = this.settings.collection_handler_job_cron;
+    this.notificationService.registerConfiguredAgents(true); // re register notification agents for scheduled job
   }
 
   public async execute() {
-    // check if another instance of this task is already running
-    if (await this.isRunning()) {
-      this.logger.log(
-        `Another instance of the ${this.name} task is currently running. Skipping this execution`,
-      );
-      return;
-    }
-
-    await super.execute();
-
-    // wait 5 seconds to make sure we're not executing together with the rule handler
-    setTimeout(() => {}, 5000);
-    // if we are, then wait..
-    await this.taskService.waitUntilTaskIsFinished('Rule Handler', this.name);
-
-    // Start actual task
-    const appStatus = await this.settings.testConnections();
-
-    this.logger.log('Start handling all collections');
-    let handledCollections = 0;
-    if (appStatus) {
-      // loop over all active collections
-      const collections = await this.collectionRepo.find({
-        where: { isActive: true },
-      });
-      for (const collection of collections) {
-        this.infoLogger(`Handling collection '${collection.title}'`);
-
-        const collectionMedia = await this.collectionMediaRepo.find({
-          where: {
-            collectionId: collection.id,
-          },
-        });
-
-        const dangerDate = new Date(
-          new Date().getTime() - +collection.deleteAfterDays * 86400000,
+    try {
+      // check if another instance of this task is already running
+      if (await this.isRunning()) {
+        this.logger.log(
+          `Another instance of the ${this.name} task is currently running. Skipping this execution`,
         );
-
-        for (const media of collectionMedia) {
-          // handle media addate <= due date
-          if (new Date(media.addDate) <= dangerDate) {
-            await this.handleMedia(collection, media);
-            handledCollections++;
-          }
-        }
-
-        this.infoLogger(`Handling collection '${collection.title}' finished`);
+        return;
       }
-      if (handledCollections > 0) {
-        if (this.settings.overseerrConfigured()) {
-          setTimeout(() => {
-            this.overseerrApi.api
-              .post('/settings/jobs/availability-sync/run')
-              .then(() => {
-                this.infoLogger(
-                  `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
-                );
-              });
-          }, 7000);
+
+      await super.execute();
+
+      // wait 5 seconds to make sure we're not executing together with the rule handler
+      setTimeout(() => {}, 5000);
+      // if we are, then wait..
+      await this.taskService.waitUntilTaskIsFinished('Rule Handler', this.name);
+
+      // Start actual task
+      const appStatus = await this.settings.testConnections();
+
+      this.logger.log('Start handling all collections');
+      let handledCollections = 0;
+      if (appStatus) {
+        // loop over all active collections
+        const collections = await this.collectionRepo.find({
+          where: { isActive: true },
+        });
+        for (const collection of collections) {
+          this.infoLogger(`Handling collection '${collection.title}'`);
+
+          const collectionMedia = await this.collectionMediaRepo.find({
+            where: {
+              collectionId: collection.id,
+            },
+          });
+
+          const dangerDate = new Date(
+            new Date().getTime() - +collection.deleteAfterDays * 86400000,
+          );
+
+          const handledMediaForNotification = [];
+          for (const media of collectionMedia) {
+            // handle media addate <= due date
+            if (new Date(media.addDate) <= dangerDate) {
+              await this.handleMedia(collection, media);
+              handledCollections++;
+              handledMediaForNotification.push({ plexId: media.plexId });
+            }
+          }
+
+          // handle notification
+          if (handledMediaForNotification.length > 0) {
+            this.notificationService.handleNotification(
+              NotificationType.MEDIA_HANDLED,
+              handledMediaForNotification,
+              collection.title,
+            );
+          }
+
+          this.infoLogger(`Handling collection '${collection.title}' finished`);
+        }
+        if (handledCollections > 0) {
+          if (this.settings.overseerrConfigured()) {
+            setTimeout(() => {
+              this.overseerrApi.api
+                .post('/settings/jobs/availability-sync/run')
+                .then(() => {
+                  this.infoLogger(
+                    `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
+                  );
+                });
+            }, 7000);
+          }
+        } else {
+          this.infoLogger(`All collections handled. No data was altered`);
         }
       } else {
-        this.infoLogger(`All collections handled. No data was altered`);
+        this.infoLogger(
+          'Not all applications are reachable.. Skipping collection handling',
+        );
+
+        // notify
+        this.notificationService.handleNotification(
+          NotificationType.COLLECTION_HANDLING_FAILED,
+          undefined,
+        );
       }
-    } else {
-      this.infoLogger(
-        'Not all applications are reachable.. Skipping collection handling',
+      this.finish();
+    } catch (e) {
+      this.logger.error('An error occurred where handling collections');
+      this.logger.debug(e);
+
+      // notify
+      this.notificationService.handleNotification(
+        NotificationType.COLLECTION_HANDLING_FAILED,
+        undefined,
       );
     }
-    this.finish();
   }
 
   private async handleMedia(collection: Collection, media: CollectionMedia) {
@@ -260,11 +292,12 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.DELETE:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
-                      sonarrMedia.id,
-                      plexData.index,
-                      true,
-                    );
+                    sonarrMedia =
+                      await this.servarrApi.SonarrApi.unmonitorSeasons(
+                        sonarrMedia.id,
+                        plexData.index,
+                        true,
+                      );
                     this.infoLogger(
                       `[Sonarr] Removed season ${plexData.index} from show '${sonarrMedia.title}'`,
                     );
@@ -295,11 +328,12 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
-                      sonarrMedia.id,
-                      plexData.index,
-                      false,
-                    );
+                    sonarrMedia =
+                      await this.servarrApi.SonarrApi.unmonitorSeasons(
+                        sonarrMedia.id,
+                        plexData.index,
+                        false,
+                      );
                     this.infoLogger(
                       `[Sonarr] Unmonitored season ${plexData.index} from show '${sonarrMedia.title}'`,
                     );
@@ -316,11 +350,12 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
-                      sonarrMedia.id,
-                      'all',
-                      false,
-                    );
+                    sonarrMedia =
+                      await this.servarrApi.SonarrApi.unmonitorSeasons(
+                        sonarrMedia.id,
+                        'all',
+                        false,
+                      );
                     // unmonitor show
                     sonarrMedia.monitored = false;
                     this.servarrApi.SonarrApi.updateSeries(sonarrMedia);
@@ -333,11 +368,12 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR_DELETE_ALL:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
-                      sonarrMedia.id,
-                      plexData.index,
-                      true,
-                    );
+                    sonarrMedia =
+                      await this.servarrApi.SonarrApi.unmonitorSeasons(
+                        sonarrMedia.id,
+                        plexData.index,
+                        true,
+                      );
                     this.infoLogger(
                       `[Sonarr] Removed season ${plexData.index} from show '${sonarrMedia.title}'`,
                     );
@@ -354,11 +390,12 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
-                      sonarrMedia.id,
-                      'all',
-                      true,
-                    );
+                    sonarrMedia =
+                      await this.servarrApi.SonarrApi.unmonitorSeasons(
+                        sonarrMedia.id,
+                        'all',
+                        true,
+                      );
                     // unmonitor show
                     sonarrMedia.monitored = false;
                     this.servarrApi.SonarrApi.updateSeries(sonarrMedia);
@@ -371,12 +408,13 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR_DELETE_EXISTING:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
-                      sonarrMedia.id,
-                      plexData.index,
-                      true,
-                      true,
-                    );
+                    sonarrMedia =
+                      await this.servarrApi.SonarrApi.unmonitorSeasons(
+                        sonarrMedia.id,
+                        plexData.index,
+                        true,
+                        true,
+                      );
                     this.infoLogger(
                       `[Sonarr] Removed exisiting episodes from season ${plexData.index} from show '${sonarrMedia.title}'`,
                     );
@@ -393,11 +431,12 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
-                      sonarrMedia.id,
-                      'existing',
-                      true,
-                    );
+                    sonarrMedia =
+                      await this.servarrApi.SonarrApi.unmonitorSeasons(
+                        sonarrMedia.id,
+                        'existing',
+                        true,
+                      );
                     // unmonitor show
                     sonarrMedia.monitored = false;
                     this.servarrApi.SonarrApi.updateSeries(sonarrMedia);

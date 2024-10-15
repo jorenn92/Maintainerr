@@ -3,12 +3,18 @@ import Modal from '../../../Common/Modal'
 import GetApiHandler, { PostApiHandler } from '../../../../utils/ApiHandler'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
 import { camelCaseToPrettyText } from '../../../../utils/SettingsUtils'
+import ToggleItem from '../../../Common/ToggleButton'
 
 interface agentSpec {
   name: string
   options: [
     { field: string; type: string; required: boolean; extraInfo: string },
   ]
+}
+
+interface typeSpec {
+  title: string
+  id: number
 }
 
 export interface AgentConfiguration {
@@ -21,7 +27,13 @@ export interface AgentConfiguration {
 }
 
 interface CreateNotificationModal {
-  selected?: { agent: string; options: any }
+  selected?: {
+    id: number
+    name: string
+    enabled: boolean
+    agent: string
+    types: number[]
+  }
   onSave: (status: boolean) => void
   onTest: () => void
   onCancel: () => void
@@ -29,24 +41,23 @@ interface CreateNotificationModal {
 
 const CreateNotificationModal = (props: CreateNotificationModal) => {
   const [availableAgents, setAvailableAgents] = useState<agentSpec[]>()
-  const nameRef = useRef<HTMLInputElement>(null)
-  const enabledRef = useRef<HTMLInputElement>()
+  const [availableTypes, setAvailableTypes] = useState<typeSpec[]>()
+  const nameRef = useRef<string>('null')
+  const enabledRef = useRef<boolean>(false)
   const [formValues, setFormValues] = useState({})
 
   const [targetAgent, setTargetAgent] = useState<agentSpec>()
+  const [targetTypes, setTargetTypes] = useState<typeSpec[]>([])
 
   const handleSubmit = () => {
-    if (targetAgent && nameRef.current?.value !== null) {
+    const types = targetTypes ? targetTypes.map((t) => t.id) : []
+
+    if (targetAgent && nameRef.current !== null) {
       const payload: AgentConfiguration = {
-        name: nameRef.current!.value,
+        name: nameRef.current,
         agent: targetAgent.name,
-        enabled:
-          enabledRef.current?.value == null
-            ? false
-            : enabledRef.current?.value == 'on'
-              ? true
-              : false,
-        types: [0, 1],
+        enabled: enabledRef.current,
+        types: types,
         options: formValues,
       }
       postNotificationConfig(payload)
@@ -57,8 +68,36 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
 
   useEffect(() => {
     GetApiHandler('/notifications/agents').then((agents) => {
-      setAvailableAgents(agents)
+      setAvailableAgents([{ name: 'none', options: [] }, ...agents])
+
+      // load selected agents if editing
+      if (props.selected && props.selected.agent) {
+        setTargetAgent(
+          agents.find(
+            (agent: agentSpec) => props.selected!.agent === agent.name,
+          ),
+        )
+      }
     })
+
+    GetApiHandler('/notifications/types').then((types: typeSpec[]) => {
+      setAvailableTypes(types)
+
+      // load selected types if editing
+      if (props.selected && props.selected.types) {
+        setTargetTypes(
+          types.filter((type) => props.selected!.types.includes(type.id)),
+        )
+      }
+    })
+
+    // load rest of data if editing
+    if (props.selected) {
+      console.log(props.selected)
+
+      nameRef.current = props.selected.name
+      enabledRef.current = props.selected.enabled
+    }
   }, [])
 
   const postNotificationConfig = (payload: AgentConfiguration) => {
@@ -76,7 +115,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
     }))
   }
 
-  if (!availableAgents) {
+  if (!availableAgents || !availableTypes) {
     return (
       <span>
         <LoadingSpinner />
@@ -107,8 +146,9 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                   <input
                     type="text"
                     name="name"
-                    id="name"
-                    ref={nameRef}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      (nameRef.current = event.target.value)
+                    }
                   ></input>
                 </div>
               </div>
@@ -124,7 +164,11 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                     type="checkbox"
                     name="enabled"
                     id="enabled"
-                    ref={enabledRef}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      event.target.value === 'on'
+                        ? (enabledRef.current = true)
+                        : (enabledRef.current = false)
+                    }
                   ></input>
                 </div>
               </div>
@@ -132,7 +176,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
             {/* Select agent */}
             <div className="form-row">
               <label htmlFor="ssl" className="text-label">
-                Type *
+                Agent *
               </label>
               <div className="form-input">
                 <div className="form-input-field">
@@ -185,6 +229,28 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                   </div>
                 )
               })}
+
+              {/* Select types */}
+              <div className="form-row">
+                <label htmlFor="ssl" className="text-label">
+                  Types *
+                </label>
+                <div className="form-input">
+                  {availableTypes.map((n) => (
+                    <ToggleItem
+                      label={n.title}
+                      toggled={props.selected?.types.includes(n.id)}
+                      onStateChange={(state) => {
+                        state
+                          ? setTargetTypes([...targetTypes, n])
+                          : setTargetTypes([
+                              ...targetTypes.filter((el) => el.id !== n.id),
+                            ])
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </form>
         </div>

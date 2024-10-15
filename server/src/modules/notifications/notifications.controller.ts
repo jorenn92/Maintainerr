@@ -8,16 +8,21 @@ export class NotificationsController {
 
   @Post('/test')
   public async sendNotification() {
-    this.notificationService.handleNotification(NotificationType.TEST_NOTIFICATION, null);
-    // this.notificationService.handleNotification(
-    //   NotificationType.MEDIA_ADDED_TO_COLLECTION,
-    //   [{ plexId: 22423 }, { plexId: 22424 }],
-    // );
+    // this.notificationService.handleNotification(NotificationType.TEST_NOTIFICATION, null);
+    this.notificationService.handleNotification(
+      NotificationType.MEDIA_HANDLED,
+      [{ plexId: 22423 }, { plexId: 22424 }], 'My name is Josh', 7
+    );
   }
 
   @Get('/agents')
   getNotificationAgents() {
     return this.notificationService.getAgentSpec();
+  }
+
+  @Get('/types')
+  getNotificationTypes() {
+    return this.notificationService.getTypes();
   }
 
   @Post('/configuration/add')
