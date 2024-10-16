@@ -6,10 +6,14 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   OneToOne,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { CollectionMedia } from './collection_media.entities';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { CollectionLog } from '../../collections/entities/collection_log.entities';
+import { RadarrSettings } from '../../settings/entities/radarr_settings.entities';
+import { SonarrSettings } from '../../settings/entities/sonarr_settings.entities';
 
 @Entity()
 export class Collection {
@@ -72,6 +76,20 @@ export class Collection {
 
   @Column({ nullable: true, default: null })
   tautulliWatchedPercentOverride: number;
+
+  @Column({ nullable: true })
+  radarrSettingsId: number;
+
+  @ManyToOne(() => RadarrSettings, { nullable: true })
+  @JoinColumn({ name: 'radarrSettingsId', referencedColumnName: 'id' })
+  radarrSettings: RadarrSettings;
+
+  @Column({ nullable: true })
+  sonarrSettingsId: number;
+
+  @ManyToOne(() => SonarrSettings, { nullable: true })
+  @JoinColumn({ name: 'sonarrSettingsId', referencedColumnName: 'id' })
+  sonarrSettings: SonarrSettings;
 
   @OneToMany(
     (type) => CollectionMedia,

@@ -155,7 +155,6 @@ export class OverseerrApiService {
   public async init() {
     this.api = new OverseerrApi({
       url: `${this.settings.overseerr_url}/api/v1`,
-      cacheName: 'overseerr',
       apiKey: `${this.settings.overseerr_api_key}`,
     });
   }

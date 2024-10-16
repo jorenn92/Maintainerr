@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { isValidCron } from 'cron-validator';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
@@ -11,6 +11,18 @@ import { SettingDto } from "./dto's/setting.dto";
 import { Settings } from './entities/settings.entities';
 import { InternalApiService } from '../api/internal-api/internal-api.service';
 import { TautulliApiService } from '../api/tautulli-api/tautulli-api.service';
+import { RadarrSettings } from './entities/radarr_settings.entities';
+import {
+  DeleteRadarrSettingResponseDto,
+  RadarrSettingRawDto,
+  RadarrSettingResponseDto,
+} from "./dto's/radarr-setting.dto";
+import { SonarrSettings } from './entities/sonarr_settings.entities';
+import {
+  DeleteSonarrSettingResponseDto,
+  SonarrSettingRawDto,
+  SonarrSettingResponseDto,
+} from "./dto's/sonarr-setting.dto";
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -43,14 +55,6 @@ export class SettingsService implements SettingDto {
 
   overseerr_api_key: string;
 
-  radarr_url: string;
-
-  radarr_api_key: string;
-
-  sonarr_url: string;
-
-  sonarr_api_key: string;
-
   tautulli_url: string;
 
   tautulli_api_key: string;
@@ -72,6 +76,10 @@ export class SettingsService implements SettingDto {
     private readonly internalApi: InternalApiService,
     @InjectRepository(Settings)
     private readonly settingsRepo: Repository<Settings>,
+    @InjectRepository(RadarrSettings)
+    private readonly radarrSettingsRepo: Repository<RadarrSettings>,
+    @InjectRepository(SonarrSettings)
+    private readonly sonarrSettingsRepo: Repository<SonarrSettings>,
   ) {}
 
   public async init() {
@@ -93,10 +101,6 @@ export class SettingsService implements SettingDto {
       this.plex_auth_token = settingsDb?.plex_auth_token;
       this.overseerr_url = settingsDb?.overseerr_url;
       this.overseerr_api_key = settingsDb?.overseerr_api_key;
-      this.radarr_url = settingsDb?.radarr_url;
-      this.radarr_api_key = settingsDb?.radarr_api_key;
-      this.sonarr_url = settingsDb?.sonarr_url;
-      this.sonarr_api_key = settingsDb?.sonarr_api_key;
       this.tautulli_url = settingsDb?.tautulli_url;
       this.tautulli_api_key = settingsDb?.tautulli_api_key;
       this.collection_handler_job_cron =
@@ -119,6 +123,252 @@ export class SettingsService implements SettingDto {
         'Something went wrong while getting settings. Is the database file locked?',
       );
       return { status: 'NOK', code: 0, message: err } as BasicResponseDto;
+    }
+  }
+
+  public async getRadarrSettings() {
+    try {
+      return this.radarrSettingsRepo.find();
+    } catch (err) {
+      this.logger.error(
+        'Something went wrong while getting radarr settings. Is the database file locked?',
+      );
+      return { status: 'NOK', code: 0, message: err } as BasicResponseDto;
+    }
+  }
+
+  public async getRadarrSetting(id: number) {
+    try {
+      return this.radarrSettingsRepo.findOne({ where: { id: id } });
+    } catch (err) {
+      this.logger.error(
+        `Something went wrong while getting radarr setting ${id}. Is the database file locked?`,
+      );
+      return { status: 'NOK', code: 0, message: err } as BasicResponseDto;
+    }
+  }
+
+  public async addRadarrSetting(
+    settings: Omit<RadarrSettings, 'id' | 'collections'>,
+  ): Promise<RadarrSettingResponseDto> {
+    try {
+      settings.url = settings.url.toLowerCase();
+
+      return this.radarrSettingsRepo.manager.transaction(async (manager) => {
+        if (settings.isDefault) {
+          await manager
+            .withRepository(this.radarrSettingsRepo)
+            .update({ isDefault: true }, { isDefault: false });
+        }
+
+        const savedSetting = await manager
+          .withRepository(this.radarrSettingsRepo)
+          .save(settings);
+
+        this.logger.log('Radarr setting added');
+        return {
+          data: savedSetting,
+          status: 'OK',
+          code: 1,
+          message: 'Success',
+        };
+      });
+    } catch (e) {
+      this.logger.error('Error while adding Radarr setting: ', e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async updateRadarrSetting(
+    settings: Omit<RadarrSettings, 'collections'>,
+  ): Promise<RadarrSettingResponseDto> {
+    try {
+      settings.url = settings.url.toLowerCase();
+
+      return this.radarrSettingsRepo.manager.transaction(async (manager) => {
+        const settingsDb = await manager
+          .withRepository(this.radarrSettingsRepo)
+          .findOne({
+            where: { id: settings.id },
+          });
+
+        const data = {
+          ...settingsDb,
+          ...settings,
+        };
+
+        await manager.withRepository(this.radarrSettingsRepo).save(data);
+
+        if (settings.isDefault) {
+          await manager
+            .withRepository(this.radarrSettingsRepo)
+            .update(
+              { isDefault: true, id: Not(settings.id) },
+              { isDefault: false },
+            );
+        }
+
+        this.logger.log('Radarr settings updated');
+        return { data, status: 'OK', code: 1, message: 'Success' };
+      });
+    } catch (e) {
+      this.logger.error('Error while updating Radarr settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async deleteRadarrSetting(
+    id: number,
+  ): Promise<DeleteRadarrSettingResponseDto> {
+    try {
+      const settingsDb = await this.radarrSettingsRepo.findOne({
+        where: { id: id },
+        relations: ['collections'],
+      });
+
+      if (settingsDb.collections.length > 0) {
+        return {
+          status: 'NOK',
+          code: 0,
+          message: 'Cannot delete setting with associated collections',
+          data: {
+            collectionsInUse: settingsDb.collections,
+          },
+        };
+      }
+
+      await this.radarrSettingsRepo.delete({
+        id,
+      });
+
+      this.logger.log('Radarr setting deleted');
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error while deleting Radarr setting: ', e);
+      return { status: 'NOK', code: 0, message: 'Failure', data: null };
+    }
+  }
+
+  public async getSonarrSettings() {
+    try {
+      return this.sonarrSettingsRepo.find();
+    } catch (err) {
+      this.logger.error(
+        'Something went wrong while getting sonarr settings. Is the database file locked?',
+      );
+      return { status: 'NOK', code: 0, message: err } as BasicResponseDto;
+    }
+  }
+
+  public async getSonarrSetting(id: number) {
+    try {
+      return this.sonarrSettingsRepo.findOne({ where: { id: id } });
+    } catch (err) {
+      this.logger.error(
+        `Something went wrong while getting sonarr setting ${id}. Is the database file locked?`,
+      );
+      return { status: 'NOK', code: 0, message: err } as BasicResponseDto;
+    }
+  }
+
+  public async addSonarrSetting(
+    settings: Omit<SonarrSettings, 'id' | 'collections'>,
+  ): Promise<SonarrSettingResponseDto> {
+    try {
+      settings.url = settings.url.toLowerCase();
+
+      return this.sonarrSettingsRepo.manager.transaction(async (manager) => {
+        if (settings.isDefault) {
+          await manager
+            .withRepository(this.sonarrSettingsRepo)
+            .update({ isDefault: true }, { isDefault: false });
+        }
+
+        const savedSetting = await manager
+          .withRepository(this.sonarrSettingsRepo)
+          .save(settings);
+
+        this.logger.log('Sonarr setting added');
+        return {
+          data: savedSetting,
+          status: 'OK',
+          code: 1,
+          message: 'Success',
+        };
+      });
+    } catch (e) {
+      this.logger.error('Error while adding Sonarr setting: ', e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async updateSonarrSetting(
+    settings: Omit<SonarrSettings, 'collections'>,
+  ): Promise<SonarrSettingResponseDto> {
+    try {
+      settings.url = settings.url.toLowerCase();
+
+      return this.sonarrSettingsRepo.manager.transaction(async (manager) => {
+        const settingsDb = await manager
+          .withRepository(this.sonarrSettingsRepo)
+          .findOne({
+            where: { id: settings.id },
+          });
+
+        const data = {
+          ...settingsDb,
+          ...settings,
+        };
+
+        await manager.withRepository(this.sonarrSettingsRepo).save(data);
+
+        if (settings.isDefault) {
+          await manager
+            .withRepository(this.sonarrSettingsRepo)
+            .update(
+              { isDefault: true, id: Not(settings.id) },
+              { isDefault: false },
+            );
+        }
+
+        this.logger.log('Sonarr settings updated');
+        return { data, status: 'OK', code: 1, message: 'Success' };
+      });
+    } catch (e) {
+      this.logger.error('Error while updating Sonarr settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async deleteSonarrSetting(
+    id: number,
+  ): Promise<DeleteSonarrSettingResponseDto> {
+    try {
+      const settingsDb = await this.sonarrSettingsRepo.findOne({
+        where: { id: id },
+        relations: ['collections'],
+      });
+
+      if (settingsDb.collections.length > 0) {
+        return {
+          status: 'NOK',
+          code: 0,
+          message: 'Cannot delete setting with associated collections',
+          data: {
+            collectionsInUse: settingsDb.collections,
+          },
+        };
+      }
+
+      await this.sonarrSettingsRepo.delete({
+        id,
+      });
+
+      this.logger.log('Sonarr settings deleted');
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error while deleting Sonarr setting: ', e);
+      return { status: 'NOK', code: 0, message: 'Failure', data: null };
     }
   }
 
@@ -153,8 +403,6 @@ export class SettingsService implements SettingDto {
   public async updateSettings(settings: Settings): Promise<BasicResponseDto> {
     try {
       settings.plex_hostname = settings.plex_hostname?.toLowerCase();
-      settings.radarr_url = settings.radarr_url?.toLowerCase();
-      settings.sonarr_url = settings.sonarr_url?.toLowerCase();
       settings.overseerr_url = settings.overseerr_url?.toLowerCase();
       settings.tautulli_url = settings.tautulli_url?.toLowerCase();
 
@@ -181,7 +429,6 @@ export class SettingsService implements SettingDto {
         await this.init();
         this.logger.log('Settings updated');
         this.plexApi.initialize({});
-        this.servarr.init();
         this.overseerr.init();
         this.tautulli.init();
         this.internalApi.init();
@@ -243,7 +490,7 @@ export class SettingsService implements SettingDto {
   public async testOverseerr(): Promise<BasicResponseDto> {
     try {
       const resp = await this.overseerr.status();
-      return resp !== null && resp.version !== undefined
+      return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
@@ -255,17 +502,25 @@ export class SettingsService implements SettingDto {
     try {
       const resp = await this.tautulli.info();
       return resp?.response && resp?.response.result == 'success'
-        ? { status: 'OK', code: 1, message: resp.response.data?.tautulli_version }
+        ? {
+            status: 'OK',
+            code: 1,
+            message: resp.response.data?.tautulli_version,
+          }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
       return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
 
-  public async testRadarr(): Promise<BasicResponseDto> {
+  public async testRadarr(
+    id: number | RadarrSettingRawDto,
+  ): Promise<BasicResponseDto> {
     try {
-      const resp = await this.servarr.RadarrApi.info();
-      return resp !== null && resp.version !== undefined
+      const apiClient = await this.servarr.getRadarrApiClient(id);
+
+      const resp = await apiClient.info();
+      return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
@@ -273,10 +528,14 @@ export class SettingsService implements SettingDto {
     }
   }
 
-  public async testSonarr(): Promise<BasicResponseDto> {
+  public async testSonarr(
+    id: number | SonarrSettingRawDto,
+  ): Promise<BasicResponseDto> {
     try {
-      const resp = await this.servarr.SonarrApi.info();
-      return resp !== null && resp.version !== undefined
+      const apiClient = await this.servarr.getSonarrApiClient(id);
+
+      const resp = await apiClient.info();
+      return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch (e) {
@@ -289,7 +548,7 @@ export class SettingsService implements SettingDto {
   public async testPlex(): Promise<any> {
     try {
       const resp = await this.plexApi.getStatus();
-      return resp !== null && resp.version !== undefined
+      return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch (e) {
@@ -306,12 +565,19 @@ export class SettingsService implements SettingDto {
       let sonarrState = true;
       let overseerrState = true;
       let tautulliState = true;
-      if (this.radarrConfigured()) {
-        radarrState = (await this.testRadarr()).status === 'OK';
+
+      const radarrSettings = await this.radarrSettingsRepo.find();
+      for (const radarrSetting of radarrSettings) {
+        radarrState =
+          (await this.testRadarr(radarrSetting.id)).status === 'OK' &&
+          radarrState;
       }
 
-      if (this.sonarrConfigured()) {
-        sonarrState = (await this.testSonarr()).status === 'OK';
+      const sonarrSettings = await this.sonarrSettingsRepo.find();
+      for (const sonarrSetting of sonarrSettings) {
+        sonarrState =
+          (await this.testSonarr(sonarrSetting.id)).status === 'OK' &&
+          sonarrState;
       }
 
       if (this.overseerrConfigured()) {
@@ -337,14 +603,6 @@ export class SettingsService implements SettingDto {
       this.logger.debug(e);
       return false;
     }
-  }
-
-  public radarrConfigured(): boolean {
-    return this.radarr_url !== null && this.radarr_api_key !== null;
-  }
-
-  public sonarrConfigured(): boolean {
-    return this.sonarr_url !== null && this.sonarr_api_key !== null;
   }
 
   public overseerrConfigured(): boolean {

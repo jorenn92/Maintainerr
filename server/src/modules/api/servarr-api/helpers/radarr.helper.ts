@@ -8,8 +8,16 @@ import {
 
 export class RadarrApi extends ServarrApi<{ movieId: number }> {
   logger: Logger;
-  constructor({ url, apiKey }: { url: string; apiKey: string }) {
-    super({ url, apiKey, cacheName: 'radarr', apiName: 'Radarr' });
+  constructor({
+    url,
+    apiKey,
+    cacheName,
+  }: {
+    url: string;
+    apiKey: string;
+    cacheName?: string;
+  }) {
+    super({ url, apiKey, cacheName, apiName: 'Radarr' });
     this.logger = new Logger(RadarrApi.name);
   }
 
@@ -100,7 +108,7 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
   public async info(): Promise<RadarrInfo> {
     try {
       const info: RadarrInfo = (
-        await this.axios.get(`system/status`, {
+        await this.axios.get<RadarrInfo>(`system/status`, {
           signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
         })
       ).data;
