@@ -14,8 +14,16 @@ export class SonarrApi extends ServarrApi<{
   episodeId: number;
 }> {
   logger: Logger;
-  constructor({ url, apiKey }: { url: string; apiKey: string }) {
-    super({ url, apiKey, cacheName: 'sonarr', apiName: 'Sonarr' });
+  constructor({
+    url,
+    apiKey,
+    cacheName,
+  }: {
+    url: string;
+    apiKey: string;
+    cacheName?: string;
+  }) {
+    super({ url, apiKey, cacheName, apiName: 'Sonarr' });
     this.logger = new Logger(SonarrApi.name);
   }
 

@@ -197,7 +197,6 @@ export class TautulliGetterService {
         }
       }
     } catch (e) {
-      console.log(e);
       this.logger.warn(`Tautulli-Getter - Action failed : ${e.message}`);
       return undefined;
     }
