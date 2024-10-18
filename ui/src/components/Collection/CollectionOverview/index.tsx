@@ -19,7 +19,10 @@ const CollectionOverview = (props: ICollectionOverview) => {
       <div className="m-auto mb-3 flex ">
         <div className="m-auto sm:m-0 ">
           <ExecuteButton
-            onClick={debounce(props.doActions, 5000)}
+            onClick={debounce(props.doActions, 5000, {
+              leading: true,
+              trailing: false,
+            })}
             text="Handle Collections"
           />
         </div>
