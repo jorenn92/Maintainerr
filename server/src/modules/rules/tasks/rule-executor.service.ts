@@ -121,7 +121,7 @@ export class RuleExecutorService extends TaskBase {
       );
     }
     // clean up
-    this.finish();
+    await this.finish();
   }
 
   private async syncManualPlexMediaToCollectionDB(rulegroup: RuleGroup) {

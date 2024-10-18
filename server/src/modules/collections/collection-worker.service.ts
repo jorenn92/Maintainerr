@@ -57,7 +57,8 @@ export class CollectionWorkerService extends TaskBase {
     await super.execute();
 
     // wait 5 seconds to make sure we're not executing together with the rule handler
-    setTimeout(() => {}, 5000);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     // if we are, then wait..
     await this.taskService.waitUntilTaskIsFinished('Rule Handler', this.name);
 
@@ -114,7 +115,7 @@ export class CollectionWorkerService extends TaskBase {
         'Not all applications are reachable.. Skipping collection handling',
       );
     }
-    this.finish();
+    await this.finish();
   }
 
   private async handleMedia(collection: Collection, media: CollectionMedia) {
