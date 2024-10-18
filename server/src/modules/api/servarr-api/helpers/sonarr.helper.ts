@@ -13,7 +13,6 @@ export class SonarrApi extends ServarrApi<{
   seriesId: number;
   episodeId: number;
 }> {
-  logger: Logger;
   constructor({
     url,
     apiKey,

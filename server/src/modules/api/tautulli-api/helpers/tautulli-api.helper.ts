@@ -1,14 +1,9 @@
+import { Logger } from '@nestjs/common';
 import { ExternalApiService } from '../../external-api/external-api.service';
 import cacheManager from '../../lib/cache';
 
 export class TautulliApi extends ExternalApiService {
-  constructor({
-    url,
-    apiKey,
-  }: {
-    url: string;
-    apiKey: string;
-  }) {
+  constructor({ url, apiKey }: { url: string; apiKey: string }) {
     super(
       url,
       {
@@ -18,5 +13,6 @@ export class TautulliApi extends ExternalApiService {
         nodeCache: cacheManager.getCache('tautulli').data,
       },
     );
+    this.logger = new Logger(TautulliApi.name);
   }
 }

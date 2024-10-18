@@ -10,6 +10,7 @@ import {
   Tag,
 } from '../interfaces/servarr.interface';
 import cacheManager from '../../lib/cache';
+import { Logger } from '@nestjs/common';
 
 export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
   static buildUrl(settings: DVRSettings, path?: string): string {
@@ -40,6 +41,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     );
 
     this.apiName = apiName;
+    this.logger = new Logger(ServarrApi.name);
   }
 
   public getSystemStatus = async (): Promise<SystemStatus> => {
