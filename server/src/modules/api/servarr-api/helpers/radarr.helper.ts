@@ -7,7 +7,6 @@ import {
 } from '../interfaces/radarr.interface';
 
 export class RadarrApi extends ServarrApi<{ movieId: number }> {
-  logger: Logger;
   constructor({
     url,
     apiKey,

@@ -129,7 +129,6 @@ export interface PlexWatchlistItem {
 
 export class PlexTvApi extends ExternalApiService {
   private authToken: string;
-  private readonly logger = new Logger(PlexTvApi.name);
 
   constructor(authToken: string) {
     super(
@@ -145,6 +144,7 @@ export class PlexTvApi extends ExternalApiService {
       },
     );
     this.authToken = authToken;
+    this.logger = new Logger(PlexTvApi.name);
   }
 
   public async getUser(): Promise<PlexUser> {

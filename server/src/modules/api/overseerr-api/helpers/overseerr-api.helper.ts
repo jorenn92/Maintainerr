@@ -1,5 +1,6 @@
 import { ExternalApiService } from '../../external-api/external-api.service';
 import cacheManager from '../../lib/cache';
+import { Logger } from '@nestjs/common';
 
 export class OverseerrApi extends ExternalApiService {
   constructor({ url, apiKey }: { url: string; apiKey: string }) {
@@ -15,5 +16,7 @@ export class OverseerrApi extends ExternalApiService {
         nodeCache: cacheManager.getCache('overseerr').data,
       },
     );
+
+    this.logger = new Logger(OverseerrApi.name);
   }
 }
