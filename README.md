@@ -14,7 +14,7 @@
   <picture><img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues/jorenn92/maintainerr?style=flat&logo=github&logoColor=white"></picture>
   <a href="https://github.com/sponsors/jorenn92"><img alt="GitHub Sponsors" src="https://img.shields.io/github/sponsors/JORENN92?style=flat&logo=github%20sponsors&logoColor=white&label=sponsors"></a>
   <a href="https://ko-fi.com/maintainerr_app"><img alt="Static Badge" src="https://img.shields.io/badge/DONATE-kofi-red?style=flat&logo=ko-fi&logoColor=white"></a>
-  <a href="https://docs.maintainerr.info"><img alt="Documentation" src="https://img.shields.io/badge/Documentation-9_pages-blue?style=flat&logo=read%20the%20docs&logoColor=white"></a>
+  <a href="https://docs.maintainerr.info"><img alt="Documentation" src="https://img.shields.io/badge/Material_for_MkDocs-%3A)-blue?style=flat&logo=materialformkdocs&logoColor=white"></a>
   <picture><img alt="GitHub License" src="https://img.shields.io/github/license/jorenn92/maintainerr?style=flat"></picture>
 </p>
 
