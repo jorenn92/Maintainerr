@@ -58,47 +58,51 @@ const AboutSettings = () => {
         </div>
       </div>
 
-      <div className="section h-full w-full">
+      <div className="section h-full w-full mb-2">
         <h3 className="heading">About Maintainerr</h3>
       </div>
-      <div className="section">
-        <div className="form-row">
+      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+      <div className="section my-2">
+        <div className="form-row my-2">
           <label htmlFor="name" className="text-label">
             Version
           </label>
-          <div className="form-input p-2">
+          <div className="form-input">
             <div className="form-input-field">
-              <span className="p-2">
+              <span className="">
                 <code>{commitTag === 'local' ? 'local' : <>{version}</>}</code>
               </span>
             </div>
           </div>
         </div>
-        <div className="form-row">
+        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+        <div className="form-row my-2">
           <label htmlFor="name" className="text-label">
             Container Config Path
           </label>
-          <div className="form-input p-2">
+          <div className="form-input">
             <div className="form-input-field">
-              <span className="p-2">
+              <span className="">
                 <code>/opt/data</code>
               </span>
             </div>
           </div>
         </div>
-        <div className="form-row">
+        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+        <div className="form-row my-2">
           <label htmlFor="name" className="text-label">
             Time Zone
           </label>
-          <div className="form-input p-2">
+          <div className="form-input">
             <div className="form-input-field">
-              <span className="p-2">
+              <span className="">
                 <code>{getBrowserTimezone()}</code>
               </span>
             </div>
           </div>
         </div>
       </div>
+      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
       <div className="section h-full w-full">
         <h3 className="heading">Radarr Statistics</h3>
       </div>
