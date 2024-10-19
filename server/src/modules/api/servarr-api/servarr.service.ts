@@ -32,7 +32,9 @@ export class ServarrService {
         }
 
         const cacheKey = `sonarr-${id}`;
-        cacheManager.createCache(cacheKey, `Sonarr-${id}`, 'sonarr');
+        if (!cacheManager.getCache(cacheKey)) {
+          cacheManager.createCache(cacheKey, `Sonarr-${id}`, 'sonarr');
+        }
 
         this.sonarrApiCache[id] = new SonarrApi({
           url: `${setting.url}/api/v3/`,
@@ -60,7 +62,9 @@ export class ServarrService {
         }
 
         const cacheKey = `radarr-${id}`;
-        cacheManager.createCache(cacheKey, `Radarr-${id}`, 'radarr');
+        if (!cacheManager.getCache(cacheKey)) {
+          cacheManager.createCache(cacheKey, `Radarr-${id}`, 'radarr');
+        }
 
         this.radarrApiCache[id] = new RadarrApi({
           url: `${setting.url}/api/v3/`,
@@ -70,6 +74,18 @@ export class ServarrService {
       }
 
       return this.radarrApiCache[id];
+    }
+  }
+
+  public deleteCachedRadarrApiClient(id: number) {
+    if (this.radarrApiCache[id]) {
+      delete this.radarrApiCache[id];
+    }
+  }
+
+  public deleteCachedSonarrApiClient(id: number) {
+    if (this.sonarrApiCache[id]) {
+      delete this.sonarrApiCache[id];
     }
   }
 }

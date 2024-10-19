@@ -185,32 +185,37 @@ export class SettingsService implements SettingDto {
     try {
       settings.url = settings.url.toLowerCase();
 
-      return this.radarrSettingsRepo.manager.transaction(async (manager) => {
-        const settingsDb = await manager
-          .withRepository(this.radarrSettingsRepo)
-          .findOne({
-            where: { id: settings.id },
-          });
-
-        const data = {
-          ...settingsDb,
-          ...settings,
-        };
-
-        await manager.withRepository(this.radarrSettingsRepo).save(data);
-
-        if (settings.isDefault) {
-          await manager
+      const data = await this.radarrSettingsRepo.manager.transaction(
+        async (manager) => {
+          const settingsDb = await manager
             .withRepository(this.radarrSettingsRepo)
-            .update(
-              { isDefault: true, id: Not(settings.id) },
-              { isDefault: false },
-            );
-        }
+            .findOne({
+              where: { id: settings.id },
+            });
 
-        this.logger.log('Radarr settings updated');
-        return { data, status: 'OK', code: 1, message: 'Success' };
-      });
+          const data = {
+            ...settingsDb,
+            ...settings,
+          };
+
+          await manager.withRepository(this.radarrSettingsRepo).save(data);
+
+          if (settings.isDefault) {
+            await manager
+              .withRepository(this.radarrSettingsRepo)
+              .update(
+                { isDefault: true, id: Not(settings.id) },
+                { isDefault: false },
+              );
+          }
+
+          return data;
+        },
+      );
+
+      this.servarr.deleteCachedRadarrApiClient(settings.id);
+      this.logger.log('Radarr settings updated');
+      return { data, status: 'OK', code: 1, message: 'Success' };
     } catch (e) {
       this.logger.error('Error while updating Radarr settings: ', e);
       return { status: 'NOK', code: 0, message: 'Failure' };
@@ -240,6 +245,8 @@ export class SettingsService implements SettingDto {
       await this.radarrSettingsRepo.delete({
         id,
       });
+
+      this.servarr.deleteCachedRadarrApiClient(id);
 
       this.logger.log('Radarr setting deleted');
       return { status: 'OK', code: 1, message: 'Success' };
@@ -308,32 +315,38 @@ export class SettingsService implements SettingDto {
     try {
       settings.url = settings.url.toLowerCase();
 
-      return this.sonarrSettingsRepo.manager.transaction(async (manager) => {
-        const settingsDb = await manager
-          .withRepository(this.sonarrSettingsRepo)
-          .findOne({
-            where: { id: settings.id },
-          });
-
-        const data = {
-          ...settingsDb,
-          ...settings,
-        };
-
-        await manager.withRepository(this.sonarrSettingsRepo).save(data);
-
-        if (settings.isDefault) {
-          await manager
+      const data = await this.sonarrSettingsRepo.manager.transaction(
+        async (manager) => {
+          const settingsDb = await manager
             .withRepository(this.sonarrSettingsRepo)
-            .update(
-              { isDefault: true, id: Not(settings.id) },
-              { isDefault: false },
-            );
-        }
+            .findOne({
+              where: { id: settings.id },
+            });
 
-        this.logger.log('Sonarr settings updated');
-        return { data, status: 'OK', code: 1, message: 'Success' };
-      });
+          const data = {
+            ...settingsDb,
+            ...settings,
+          };
+
+          await manager.withRepository(this.sonarrSettingsRepo).save(data);
+
+          if (settings.isDefault) {
+            await manager
+              .withRepository(this.sonarrSettingsRepo)
+              .update(
+                { isDefault: true, id: Not(settings.id) },
+                { isDefault: false },
+              );
+          }
+
+          return data;
+        },
+      );
+
+      this.servarr.deleteCachedSonarrApiClient(settings.id);
+
+      this.logger.log('Sonarr settings updated');
+      return { data, status: 'OK', code: 1, message: 'Success' };
     } catch (e) {
       this.logger.error('Error while updating Sonarr settings: ', e);
       return { status: 'NOK', code: 0, message: 'Failure' };
@@ -363,6 +376,7 @@ export class SettingsService implements SettingDto {
       await this.sonarrSettingsRepo.delete({
         id,
       });
+      this.servarr.deleteCachedSonarrApiClient(id);
 
       this.logger.log('Sonarr settings deleted');
       return { status: 'OK', code: 1, message: 'Success' };
@@ -493,7 +507,8 @@ export class SettingsService implements SettingDto {
       return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
-    } catch {
+    } catch (e) {
+      this.logger.debug(e);
       return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
@@ -508,7 +523,8 @@ export class SettingsService implements SettingDto {
             message: resp.response.data?.tautulli_version,
           }
         : { status: 'NOK', code: 0, message: 'Failure' };
-    } catch {
+    } catch (e) {
+      this.logger.debug(e);
       return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
@@ -523,7 +539,8 @@ export class SettingsService implements SettingDto {
       return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
-    } catch {
+    } catch (e) {
+      this.logger.debug(e);
       return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
@@ -540,7 +557,6 @@ export class SettingsService implements SettingDto {
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch (e) {
       this.logger.debug(e);
-
       return { status: 'NOK', code: 0, message: 'Failure' };
     }
   }
