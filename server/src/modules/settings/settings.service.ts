@@ -55,6 +55,10 @@ export class SettingsService implements SettingDto {
 
   tautulli_api_key: string;
 
+  ombi_url: string;
+
+  ombi_api_key: string;
+
   collection_handler_job_cron: string;
 
   rules_handler_job_cron: string;
@@ -102,6 +106,8 @@ export class SettingsService implements SettingDto {
       this.collection_handler_job_cron =
         settingsDb?.collection_handler_job_cron;
       this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;
+      this.ombi_api_key = '34178362ec5e4e2380f2c16eabe7d6e6';
+      this.ombi_url = 'http://ombi.home.arpa';
     } else {
       this.logger.log('Settings not found.. Creating initial settings');
       await this.settingsRepo.insert({
@@ -255,7 +261,11 @@ export class SettingsService implements SettingDto {
     try {
       const resp = await this.tautulli.info();
       return resp?.response && resp?.response.result == 'success'
-        ? { status: 'OK', code: 1, message: resp.response.data?.tautulli_version }
+        ? {
+            status: 'OK',
+            code: 1,
+            message: resp.response.data?.tautulli_version,
+          }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch {
       return { status: 'NOK', code: 0, message: 'Failure' };

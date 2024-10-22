@@ -28,6 +28,8 @@ import { RuleConstanstService } from './constants/constants.service';
 import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.service';
 import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { TautulliGetterService } from './getter/tautulli-getter.service';
+import { OmbiGetterService } from './getter/ombi-getter.service';
+import { OmbiApiModule } from '../api/ombi-api/ombi-api.module';
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { TautulliGetterService } from './getter/tautulli-getter.service';
     ]),
     OverseerrApiModule,
     TautulliApiModule,
+    OmbiApiModule,
     TmdbApiModule,
     CollectionsModule,
     TasksModule,
@@ -58,6 +61,7 @@ import { TautulliGetterService } from './getter/tautulli-getter.service';
     SonarrGetterService,
     OverseerrGetterService,
     TautulliGetterService,
+    OmbiGetterService,
     ValueGetterService,
     RuleYamlService,
     RuleComparatorService,

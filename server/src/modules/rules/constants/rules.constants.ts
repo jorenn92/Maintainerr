@@ -26,6 +26,7 @@ export const enum Application {
   SONARR,
   OVERSEERR,
   TAUTULLI,
+  OMBI,
 }
 
 export const enum ArrAction {
@@ -689,6 +690,62 @@ export class RuleConstants {
             EPlexDataType.EPISODES,
           ],
         } as Property,
+      ],
+    },
+    {
+      id: Application.OMBI,
+      name: 'Ombi',
+      mediaType: MediaType.BOTH,
+      props: [
+        {
+          id: 0,
+          name: 'addUser',
+          humanName: 'Requested by user (Plex or local username)',
+          mediaType: MediaType.BOTH,
+          type: RuleType.TEXT,
+        } as Property, //  returns username[]
+        /*{
+          id: 1,
+          name: 'requestDate',
+          humanName: 'Request date',
+          mediaType: MediaType.BOTH,
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 2,
+          name: 'releaseDate',
+          humanName: 'Release/air date',
+          mediaType: MediaType.BOTH,
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 3,
+          name: 'approvalDate',
+          humanName: 'Approval date',
+          mediaType: MediaType.BOTH,
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 4,
+          name: 'mediaAddedAt',
+          humanName: 'Media downloaded date',
+          mediaType: MediaType.BOTH,
+          type: RuleType.DATE,
+        } as Property,
+        {
+          id: 5,
+          name: 'amountRequested',
+          humanName: 'Amount of requests',
+          mediaType: MediaType.BOTH,
+          type: RuleType.NUMBER,
+        } as Property,
+        {
+          id: 6,
+          name: 'isRequested',
+          humanName: 'Requested in Overseerr',
+          mediaType: MediaType.BOTH,
+          type: RuleType.BOOL,
+        } as Property,*/
       ],
     },
   ];

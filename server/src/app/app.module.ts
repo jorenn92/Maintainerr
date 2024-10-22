@@ -17,6 +17,8 @@ import { ServarrService } from '../modules/api/servarr-api/servarr.service';
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { OmbiApiModule } from '../modules/api/ombi-api/ombi-api.module';
+import { OmbiApiService } from '../modules/api/ombi-api/ombi-api.service';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.ser
     ServarrApiModule,
     OverseerrApiModule,
     TautulliApiModule,
+    OmbiApiModule,
     RulesModule,
     CollectionsModule,
   ],
@@ -41,6 +44,7 @@ export class AppModule implements OnModuleInit {
     private readonly overseerApi: OverseerrApiService,
     private readonly servarr: ServarrService,
     private readonly tautulliApi: TautulliApiService,
+    private readonly ombiApi: OmbiApiService,
   ) {}
   async onModuleInit() {
     // Initialize stuff needing settings here.. Otherwise problems
@@ -49,5 +53,6 @@ export class AppModule implements OnModuleInit {
     await this.servarr.init();
     await this.overseerApi.init();
     await this.tautulliApi.init();
+    await this.ombiApi.init();
   }
 }
