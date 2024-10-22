@@ -48,18 +48,6 @@ export class Settings implements SettingDto {
   overseerr_api_key: string;
 
   @Column({ nullable: true })
-  radarr_url: string;
-
-  @Column({ nullable: true })
-  radarr_api_key: string;
-
-  @Column({ nullable: true })
-  sonarr_url: string;
-
-  @Column({ nullable: true })
-  sonarr_api_key: string;
-
-  @Column({ nullable: true })
   tautulli_url: string;
 
   @Column({ nullable: true })

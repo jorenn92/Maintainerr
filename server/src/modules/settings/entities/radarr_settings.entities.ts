@@ -1,0 +1,24 @@
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { RadarrSettingDto } from "../dto's/radarr-setting.dto";
+import { Collection } from '../../collections/entities/collection.entities';
+
+@Entity()
+export class RadarrSettings {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  serverName: string;
+
+  @Column({ nullable: true })
+  url: string;
+
+  @Column({ nullable: true })
+  apiKey: string;
+
+  @Column({ default: false })
+  isDefault: boolean;
+
+  @OneToMany(() => Collection, (collection) => collection.radarrSettings)
+  collections: Collection[];
+}

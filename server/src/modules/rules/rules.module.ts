@@ -28,6 +28,8 @@ import { RuleConstanstService } from './constants/constants.service';
 import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.service';
 import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { TautulliGetterService } from './getter/tautulli-getter.service';
+import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
+import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { TautulliGetterService } from './getter/tautulli-getter.service';
       Exclusion,
       CommunityRuleKarma,
       Settings,
+      RadarrSettings,
+      SonarrSettings,
     ]),
     OverseerrApiModule,
     TautulliApiModule,

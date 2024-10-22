@@ -1013,7 +1013,9 @@ export class PlexApiService {
     return handleMedia;
   }
 
-  public async getCorrectedUsers(realOwnerId: boolean = true): Promise<SimplePlexUser[]> {
+  public async getCorrectedUsers(
+    realOwnerId: boolean = true,
+  ): Promise<SimplePlexUser[]> {
     const thumbRegex = /https:\/\/plex\.tv\/users\/([a-z0-9]+)\/avatar\?c=\d+/;
 
     const plexTvUsers = await this.getUserDataFromPlexTv();
@@ -1048,7 +1050,7 @@ export class PlexApiService {
   private async setMachineId() {
     try {
       const response = await this.getStatus();
-      if (response.machineIdentifier) {
+      if (response?.machineIdentifier) {
         this.machineId = response.machineIdentifier;
         return response.machineIdentifier;
       } else {

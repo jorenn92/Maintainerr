@@ -34,6 +34,21 @@ interface ModalProps {
   loading?: boolean
   backdrop?: string
   children: React.ReactNode
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl'
+}
+
+const maxWidthMap = {
+  xs: 'sm:max-w-xs',
+  sm: 'sm:max-w-sm',
+  md: 'sm:max-w-md',
+  lg: 'sm:max-w-lg',
+  xl: 'sm:max-w-xl',
+  '2xl': 'sm:max-w-2xl',
+  '3xl': 'sm:max-w-3xl',
+  '4xl': 'sm:max-w-4xl',
+  '5xl': 'sm:max-w-5xl',
+  '6xl': 'sm:max-w-6xl',
+  '7xl': 'sm:max-w-7xl',
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -63,6 +78,7 @@ const Modal: React.FC<ModalProps> = ({
   specialText,
   onSpecial,
   backdrop,
+  size = '3xl',
 }) => {
   const modalRef = useRef<HTMLDivElement>(null)
   useClickOutside(modalRef, () => {
@@ -107,7 +123,7 @@ const Modal: React.FC<ModalProps> = ({
         show={!loading}
       >
         <div
-          className="relative inline-block w-full transform overflow-auto bg-zinc-700 px-4 pt-5 pb-4 text-left align-bottom shadow-xl ring-1 ring-zinc-700 transition-all sm:my-8 sm:max-w-3xl sm:rounded-lg sm:align-middle"
+          className={`relative inline-block w-full transform overflow-auto bg-zinc-700 px-4 pt-5 pb-4 text-left align-bottom shadow-xl ring-1 ring-zinc-700 transition-all sm:my-8 ${maxWidthMap[size]} sm:rounded-lg sm:align-middle`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-headline"
@@ -138,8 +154,8 @@ const Modal: React.FC<ModalProps> = ({
               {children}
             </div>
           )}
-          <div className="flex justify-center sm:justify-end mt-4">
-            {typeof onSpecial === 'function' && (
+          {typeof onSpecial === 'function' && (
+            <div className="flex justify-center sm:justify-end mt-4">
               <Button
                 buttonType={specialButtonType}
                 onClick={onSpecial}
@@ -147,8 +163,8 @@ const Modal: React.FC<ModalProps> = ({
               >
                 {specialText ? specialText : 'Special'}
               </Button>
-            )}
-          </div>
+            </div>
+          )}
           {(onCancel || onOk || onSecondary || onTertiary) && (
             <div className="relative mt-5 flex flex-row-reverse justify-center sm:mt-4 sm:justify-start">
               {typeof onOk === 'function' && (

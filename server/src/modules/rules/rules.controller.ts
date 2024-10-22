@@ -75,7 +75,7 @@ export class RulesController {
   }
   @Post('/execute')
   executeRules() {
-    this.ruleExecutorService.execute();
+    this.ruleExecutorService.execute().catch((e) => console.error(e));
   }
   @Post()
   async setRules(@Body() body: RulesDto): Promise<ReturnStatus> {

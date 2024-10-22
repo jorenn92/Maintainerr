@@ -13,7 +13,6 @@ import { SettingsModule } from '../modules/settings/settings.module';
 import { SettingsService } from '../modules/settings/settings.service';
 import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
 import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.service';
-import { ServarrService } from '../modules/api/servarr-api/servarr.service';
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
@@ -39,14 +38,12 @@ export class AppModule implements OnModuleInit {
     private readonly settings: SettingsService,
     private readonly plexApi: PlexApiService,
     private readonly overseerApi: OverseerrApiService,
-    private readonly servarr: ServarrService,
     private readonly tautulliApi: TautulliApiService,
   ) {}
   async onModuleInit() {
     // Initialize stuff needing settings here.. Otherwise problems
     await this.settings.init();
     await this.plexApi.initialize({});
-    await this.servarr.init();
     await this.overseerApi.init();
     await this.tautulliApi.init();
   }

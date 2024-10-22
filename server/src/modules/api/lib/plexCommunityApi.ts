@@ -28,7 +28,6 @@ export interface PlexCommunityWatchHistory {
 
 export class PlexCommunityApi extends ExternalApiService {
   private authToken: string;
-  private readonly logger = new Logger(PlexCommunityApi.name);
 
   constructor(authToken: string) {
     super(
@@ -44,6 +43,7 @@ export class PlexCommunityApi extends ExternalApiService {
       },
     );
     this.authToken = authToken;
+    this.logger = new Logger(PlexCommunityApi.name);
   }
 
   public async query(query: GraphQLQuery): Promise<any> {
