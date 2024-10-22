@@ -178,12 +178,16 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
           status: resp.code == 1 ? true : false,
           version: resp.message,
         })
-        setTestedSettings({
-          hostname,
-          baseUrl,
-          port,
-          apiKey,
-        })
+
+        if (resp.code == 1) {
+          setTestedSettings({
+            hostname,
+            baseUrl,
+            port,
+            apiKey,
+          })
+        }
+
         setTesting(false)
       })
       .catch((e) => {
