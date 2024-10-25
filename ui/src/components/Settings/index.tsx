@@ -51,6 +51,11 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
       route: '/settings/about',
       regex: /^\/settings(\/about)?$/,
     },
+    {
+      text: 'About-ALT',
+      route: '/settings/about-ALT',
+      regex: /^\/settings(\/about-ALT)?$/,
+    },
   ]
 
   useEffect(() => {
