@@ -54,7 +54,7 @@ const CollectionItem = (props: ICollectionItem) => {
                 : props.collection.title}
             </a>
           </div>
-          <div className="max-h-12 h-12 overflow-hidden whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll  sm:text-lg">
+          <div className="max-h-12 h-12 line-clamp-2 whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll sm:text-lg sm:h-14 sm:max-h-14">
             {props.collection.manualCollection
               ? `Handled by rule: '${props.collection.title}'`
               : props.collection.description}

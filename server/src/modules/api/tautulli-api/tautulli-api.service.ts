@@ -45,6 +45,7 @@ interface TautulliHistoryItem {
   user_id: number;
   user: string;
   watched_status: number;
+  percent_complete: number;
   stopped: number;
   rating_key: number;
   media_index: number;
@@ -101,7 +102,7 @@ export class TautulliApiService {
 
   public async init() {
     this.api = new TautulliApi({
-      url: `${this.settings.tautulli_url}api/v2`,
+      url: `${this.settings.tautulli_url}/api/v2`,
       apiKey: `${this.settings.tautulli_api_key}`,
     });
   }

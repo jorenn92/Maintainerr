@@ -18,6 +18,7 @@ export interface ICollection {
   manualCollection?: boolean;
   manualCollectionName?: string;
   keepLogsForMonths?: number;
+  tautulliWatchedPercentOverride?: number;
 }
 
 export enum ServarrAction {

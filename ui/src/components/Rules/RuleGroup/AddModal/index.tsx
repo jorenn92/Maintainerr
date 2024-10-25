@@ -4,7 +4,9 @@ import GetApiHandler, {
   PutApiHandler,
 } from '../../../../utils/ApiHandler'
 import RuleCreator, { IRule } from '../../Rule/RuleCreator'
-import { ConstantsContextProvider } from '../../../../contexts/constants-context'
+import ConstantsContext, {
+  Application,
+} from '../../../../contexts/constants-context'
 import LibrariesContext, {
   ILibrary,
 } from '../../../../contexts/libraries-context'
@@ -44,6 +46,7 @@ interface ICreateApiObject {
   useRules: boolean
   listExclusions: boolean
   forceOverseerr: boolean
+  tautulliWatchedPercentOverride?: number
   collection: {
     visibleOnHome: boolean
     deleteAfterDays: number
@@ -77,15 +80,13 @@ const AddModal = (props: AddModal) => {
   const collectionTypeRef = useRef<any>(EPlexDataType.MOVIES)
   const deleteAfterRef = useRef<any>()
   const keepLogsForMonthsRef = useRef<any>()
+  const tautulliWatchedPercentOverrideRef = useRef<any>()
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showHome, setShowHome] = useState<boolean>(true)
   const [listExclusion, setListExclusion] = useState<boolean>(true)
   const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
-
   const [manualCollection, setManualCollection] = useState<boolean>(false)
-  const [manualCollectionName, setManualCollectionName] = useState<string>(
-    'My custom collection',
-  )
+  const ConstantsCtx = useContext(ConstantsContext)
 
   const { addToast } = useToasts()
 
@@ -105,6 +106,14 @@ const AddModal = (props: AddModal) => {
   const [formIncomplete, setFormIncomplete] = useState<boolean>(false)
   const ruleCreatorVersion = useRef<number>(1)
   const LibrariesCtx = useContext(LibrariesContext)
+  const tautulliEnabled =
+    ConstantsCtx.constants.applications?.some(
+      (x) => x.id == Application.TAUTULLI,
+    ) ?? false
+  const overseerrEnabled =
+    ConstantsCtx.constants.applications?.some(
+      (x) => x.id == Application.OVERSEERR,
+    ) ?? false
 
   function setLibraryId(event: { target: { value: string } }) {
     setSelectedLibraryId(event.target.value)
@@ -201,32 +210,49 @@ const AddModal = (props: AddModal) => {
 
   useEffect(() => {
     setIsLoading(true)
-    if (LibrariesCtx.libraries.length <= 0) {
-      GetApiHandler('/plex/libraries/').then((resp) => {
-        if (resp) {
-          LibrariesCtx.addLibraries(resp)
+
+    const load = async () => {
+      const constantsPromise = GetApiHandler('/rules/constants')
+      const librariesPromise =
+        LibrariesCtx.libraries.length <= 0
+          ? GetApiHandler('/plex/libraries/')
+          : Promise.resolve(null)
+      const collectionPromise: Promise<ICollection> = props.editData
+        ? GetApiHandler(
+            `/collections/collection/${props.editData.collectionId}`,
+          )
+        : Promise.resolve(null)
+
+      const [constants, libraries, collection] = await Promise.all([
+        constantsPromise,
+        librariesPromise,
+        collectionPromise,
+      ])
+
+      ConstantsCtx.setConstants(constants)
+
+      if (libraries != null) {
+        if (libraries) {
+          LibrariesCtx.addLibraries(libraries)
         } else {
           LibrariesCtx.addLibraries([])
         }
-      })
-    }
-    if (props.editData) {
-      GetApiHandler(
-        `/collections/collection/${props.editData.collectionId}`,
-      ).then((resp: ICollection) => {
-        resp ? setCollection(resp) : undefined
-        resp ? setShowHome(resp.visibleOnHome!) : undefined
-        resp ? setListExclusion(resp.listExclusions!) : undefined
-        resp ? setForceOverseerr(resp.forceOverseerr!) : undefined
-        resp ? setArrOption(resp.arrAction) : undefined
-        resp && resp.type ? setSelectedType(resp.type.toString()) : '1'
-        resp ? setManualCollection(resp.manualCollection) : undefined
+      }
 
-        setIsLoading(false)
-      })
-    } else {
+      if (collection) {
+        setCollection(collection)
+        setShowHome(collection.visibleOnHome!)
+        setListExclusion(collection.listExclusions!)
+        setForceOverseerr(collection.forceOverseerr!)
+        setArrOption(collection.arrAction)
+        setSelectedType(collection.type ? collection.type.toString() : '1')
+        setManualCollection(collection.manualCollection)
+      }
+
       setIsLoading(false)
     }
+
+    load()
   }, [])
 
   useEffect(() => {
@@ -262,6 +288,10 @@ const AddModal = (props: AddModal) => {
         useRules: useRules,
         listExclusions: listExclusion,
         forceOverseerr: forceOverseerr,
+        tautulliWatchedPercentOverride:
+          tautulliWatchedPercentOverrideRef.current.value != ''
+            ? +tautulliWatchedPercentOverrideRef.current.value
+            : undefined,
         collection: {
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
@@ -433,12 +463,12 @@ const AddModal = (props: AddModal) => {
                             <option
                               key={
                                 EPlexDataType[
-                                data as keyof typeof EPlexDataType
+                                  data as keyof typeof EPlexDataType
                                 ]
                               }
                               value={
                                 EPlexDataType[
-                                data as keyof typeof EPlexDataType
+                                  data as keyof typeof EPlexDataType
                                 ]
                               }
                             >
@@ -459,49 +489,49 @@ const AddModal = (props: AddModal) => {
                 options={
                   +selectedType === EPlexDataType.SHOWS
                     ? [
-                      {
-                        id: 0,
-                        name: 'Delete entire show',
-                      },
-                      {
-                        id: 1,
-                        name: 'Unmonitor and delete all seasons / episodes',
-                      },
-                      {
-                        id: 2,
-                        name: 'Unmonitor and delete existing seasons / episodes',
-                      },
-                      {
-                        id: 3,
-                        name: 'Unmonitor show and keep files',
-                      },
-                    ]
-                    : +selectedType === EPlexDataType.SEASONS
-                      ? [
                         {
                           id: 0,
-                          name: 'Unmonitor and delete season',
+                          name: 'Delete entire show',
+                        },
+                        {
+                          id: 1,
+                          name: 'Unmonitor and delete all seasons / episodes',
                         },
                         {
                           id: 2,
-                          name: 'Unmonitor and delete existing episodes',
+                          name: 'Unmonitor and delete existing seasons / episodes',
                         },
                         {
                           id: 3,
-                          name: 'Unmonitor season and keep files',
+                          name: 'Unmonitor show and keep files',
                         },
                       ]
+                    : +selectedType === EPlexDataType.SEASONS
+                      ? [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete season',
+                          },
+                          {
+                            id: 2,
+                            name: 'Unmonitor and delete existing episodes',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor season and keep files',
+                          },
+                        ]
                       : // episodes
-                      [
-                        {
-                          id: 0,
-                          name: 'Unmonitor and delete episode',
-                        },
-                        {
-                          id: 3,
-                          name: 'Unmonitor and keep file',
-                        },
-                      ]
+                        [
+                          {
+                            id: 0,
+                            name: 'Unmonitor and delete episode',
+                          },
+                          {
+                            id: 3,
+                            name: 'Unmonitor and keep file',
+                          },
+                        ]
                 }
               />
             </>
@@ -548,6 +578,38 @@ const AddModal = (props: AddModal) => {
               </div>
             </div>
           </div>
+
+          {tautulliEnabled && (
+            <div className="form-row">
+              <label
+                htmlFor="tautulli_watched_percent_override"
+                className="text-label"
+              >
+                Tautulli watched percent override
+                <p className="text-xs font-normal">
+                  Overrides the configured Watched Percent in Tautulli which is
+                  used to determine when media is counted as watched
+                </p>
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    name="tautulli_watched_percent_override"
+                    id="tautulli_watched_percent_override"
+                    defaultValue={
+                      collection
+                        ? collection.tautulliWatchedPercentOverride
+                        : ''
+                    }
+                    ref={tautulliWatchedPercentOverrideRef}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="form-row">
             <label htmlFor="active" className="text-label">
@@ -616,29 +678,31 @@ const AddModal = (props: AddModal) => {
             </div>
           </div>
 
-          <div className="form-row">
-            <label htmlFor="force_overseerr" className="text-label">
-              Force reset Overseerr record
-              <p className="text-xs font-normal">
-                Resets the Overseerr record instead of relying on
-                availability-sync
-              </p>
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  type="checkbox"
-                  name="force_overseerr"
-                  id="force_overseerr"
-                  className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
-                  defaultChecked={forceOverseerr}
-                  onChange={() => {
-                    setForceOverseerr(!forceOverseerr)
-                  }}
-                />
+          {overseerrEnabled && (
+            <div className="form-row">
+              <label htmlFor="force_overseerr" className="text-label">
+                Force reset Overseerr record
+                <p className="text-xs font-normal">
+                  Resets the Overseerr record instead of relying on
+                  availability-sync
+                </p>
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <input
+                    type="checkbox"
+                    name="force_overseerr"
+                    id="force_overseerr"
+                    className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                    defaultChecked={forceOverseerr}
+                    onChange={() => {
+                      setForceOverseerr(!forceOverseerr)
+                    }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="form-row">
             <label htmlFor="use_rules" className="text-label">
@@ -773,22 +837,16 @@ const AddModal = (props: AddModal) => {
                 }}
               />
             ) : undefined}
-            <ConstantsContextProvider>
-              <RuleCreator
-                key={ruleCreatorVersion.current}
-                mediaType={
-                  selectedLibrary
-                    ? selectedLibrary.type === 'movie'
-                      ? 1
-                      : 2
-                    : 0
-                }
-                dataType={+selectedType as EPlexDataType}
-                editData={{ rules: rules }}
-                onCancel={cancel}
-                onUpdate={updateRules}
-              />
-            </ConstantsContextProvider>
+            <RuleCreator
+              key={ruleCreatorVersion.current}
+              mediaType={
+                selectedLibrary ? (selectedLibrary.type === 'movie' ? 1 : 2) : 0
+              }
+              dataType={+selectedType as EPlexDataType}
+              editData={{ rules: rules }}
+              onCancel={cancel}
+              onUpdate={updateRules}
+            />
           </div>
           <div className="mt-5 flex h-full w-full">
             {/* <AddButton text="Create" onClick={create} /> */}

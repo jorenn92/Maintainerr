@@ -28,6 +28,7 @@ export interface ICollection {
   handledMediaAmount: number
   lastDurationInSeconds: number
   keepLogsForMonths: number
+  tautulliWatchedPercentOverride?: number
 }
 
 export interface ICollectionMedia {
