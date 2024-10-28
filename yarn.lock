@@ -4475,12 +4475,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/web-push@npm:^3.6.3":
-  version: 3.6.3
-  resolution: "@types/web-push@npm:3.6.3"
+"@types/web-push@npm:^3.6.4":
+  version: 3.6.4
+  resolution: "@types/web-push@npm:3.6.4"
   dependencies:
     "@types/node": "npm:*"
-  checksum: 10c0/c08830b5568939ef4d5b40a347893284feb94bbacaffdf105556a4285f565c2396be99d7a4e7fa98ce72ec8de061a04f0283961f90c809d19a0aeae322d8e50e
+  checksum: 10c0/f3b656510241020f66615cb662702c0778e68f407fb59b3671758a3fe5b8982824a8b4b70339f3d3901458cdbfe5e981d84c1a75298807f2694a2b3390ebb2da
   languageName: node
   linkType: hard
 
@@ -11533,7 +11533,7 @@ __metadata:
     "@types/react": "npm:^18.2.73"
     "@types/react-dom": "npm:^18.3.0"
     "@types/react-transition-group": "npm:^4.4.11"
-    "@types/web-push": "npm:^3.6.3"
+    "@types/web-push": "npm:^3.6.4"
     "@types/xml2js": "npm:^0.4.14"
     "@typescript-eslint/eslint-plugin": "npm:^8.12.0"
     "@typescript-eslint/parser": "npm:^8.8.1"
