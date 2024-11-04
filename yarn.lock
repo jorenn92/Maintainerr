@@ -11716,7 +11716,7 @@ __metadata:
     react-transition-group: "npm:^4.4.5"
     reflect-metadata: "npm:^0.2.2"
     rxjs: "npm:^7.8.1"
-    semantic-release: "npm:^24.1.2"
+    semantic-release: "npm:^24.2.0"
     source-map-support: "npm:^0.5.21"
     sqlite3: "npm:^5.1.6"
     tailwindcss: "npm:^3.4.14"
@@ -14615,9 +14615,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semantic-release@npm:^24.1.2":
-  version: 24.1.2
-  resolution: "semantic-release@npm:24.1.2"
+"semantic-release@npm:^24.2.0":
+  version: 24.2.0
+  resolution: "semantic-release@npm:24.2.0"
   dependencies:
     "@semantic-release/commit-analyzer": "npm:^13.0.0-beta.1"
     "@semantic-release/error": "npm:^4.0.0"
@@ -14650,7 +14650,7 @@ __metadata:
     yargs: "npm:^17.5.1"
   bin:
     semantic-release: bin/semantic-release.js
-  checksum: 10c0/ff277e3fab5368f699e43132c25a198d54e5101e8c850705d856fb2353dc43d41bc56b2b78f5add8811ab59025880a424382e1859262fc017d9f88fdd9ca9a75
+  checksum: 10c0/c4594d862366c372a78700f1bde5791abb15c5348da4427295661ab87989d53e071d956d8cac44b84e7720d8775d0eead686941699056c4d8346458e964c7eb8
   languageName: node
   linkType: hard
 
