@@ -1,3 +1,23 @@
+# [2.2.0](https://github.com/jorenn92/Maintainerr/compare/v2.1.2...v2.2.0) (2024-11-05)
+
+
+### Bug Fixes
+
+* Add additional Tautulli rules ([#1287](https://github.com/jorenn92/Maintainerr/issues/1287)) ([e3bb69e](https://github.com/jorenn92/Maintainerr/commit/e3bb69ec4c3206978db6235a09e92128231dc65f))
+* Added Curl in the Docker-container so users can create healthchecks ([#1288](https://github.com/jorenn92/Maintainerr/issues/1288)) ([1aff795](https://github.com/jorenn92/Maintainerr/commit/1aff795eabb5d4a4b9db8fc77d820b56e8a396e7))
+* Align Tautulli username results with Overseerr ([#1339](https://github.com/jorenn92/Maintainerr/issues/1339)) ([5bab5d9](https://github.com/jorenn92/Maintainerr/commit/5bab5d976ad27569136f40be3129869cb08903f5))
+* Changed the hostname to :: to enable ipv6 compatibility ([#1259](https://github.com/jorenn92/Maintainerr/issues/1259)) ([a0f93d4](https://github.com/jorenn92/Maintainerr/commit/a0f93d43b3abdd85f0bbeb03332ee8468dea95ab))
+* Collection details not showing in Safari ([#1316](https://github.com/jorenn92/Maintainerr/issues/1316)) ([1e89cf6](https://github.com/jorenn92/Maintainerr/commit/1e89cf624520f036b056d55ff1e9182e918cca56))
+* Plex cache reset handling if not all apps configured ([#1291](https://github.com/jorenn92/Maintainerr/issues/1291)) ([09003c1](https://github.com/jorenn92/Maintainerr/commit/09003c1c82c27dd58fffcfa1981aa30e16e5d67a))
+* Tautulli Times viewed & Total views ([#1290](https://github.com/jorenn92/Maintainerr/issues/1290)) ([3f41a3c](https://github.com/jorenn92/Maintainerr/commit/3f41a3c25c838783ba6eb90d44baa1b72ae0a7de))
+
+
+### Features
+
+* Add base URL to Tautulli settings ([#1315](https://github.com/jorenn92/Maintainerr/issues/1315)) ([f569a95](https://github.com/jorenn92/Maintainerr/commit/f569a95a88a7d9e8b221483f7c75187a7654d376))
+* Add per collection override of the Tautulli watched percent ([#1300](https://github.com/jorenn92/Maintainerr/issues/1300)) (Thanks [@benscobie](https://github.com/benscobie)) ([96a73a6](https://github.com/jorenn92/Maintainerr/commit/96a73a6275e6a34efc3d7f9f54150571b3a9f275))
+* Add Tautulli integration (Thanks to [@benscobie](https://github.com/benscobie)) ([#1280](https://github.com/jorenn92/Maintainerr/issues/1280)) ([55aa547](https://github.com/jorenn92/Maintainerr/commit/55aa54750c956b29ea4633f3714faf6d2b752fb4))
+
 ## [2.1.2](https://github.com/jorenn92/Maintainerr/compare/v2.1.1...v2.1.2) (2024-09-13)
 
 
