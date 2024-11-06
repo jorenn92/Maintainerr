@@ -289,6 +289,7 @@ const AddModal = (props: AddModal) => {
         listExclusions: listExclusion,
         forceOverseerr: forceOverseerr,
         tautulliWatchedPercentOverride:
+          tautulliWatchedPercentOverrideRef.current &&
           tautulliWatchedPercentOverrideRef.current.value != ''
             ? +tautulliWatchedPercentOverrideRef.current.value
             : undefined,
