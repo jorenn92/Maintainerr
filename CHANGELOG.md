@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/jorenn92/Maintainerr/compare/v2.2.0...v2.2.1) (2024-11-06)
+
+
+### Bug Fixes
+
+* Saving rules when Tautulli not configured ([7f1211e](https://github.com/jorenn92/Maintainerr/commit/7f1211e074d9fc7ad33855596941b77b83564eed))
+
 # [2.2.0](https://github.com/jorenn92/Maintainerr/compare/v2.1.2...v2.2.0) (2024-11-05)
 
 
