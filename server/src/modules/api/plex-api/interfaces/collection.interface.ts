@@ -16,6 +16,7 @@ export class PlexCollection {
   childCount: string;
   maxYear: string;
   minYear: string;
+  smart?: boolean;
 }
 
 export interface CreateUpdateCollection {
