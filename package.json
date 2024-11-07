@@ -20,7 +20,7 @@
     "start:ui": "cd ui && next start -p 80",
     "start:server": "cd server && node dist/main",
     "lint:ui": "cd ui && next lint",
-    "lint:server": "cd server && eslint \"**/*.ts\" --fix",
+    "lint:server": "cd server && eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:clear": "jest --clearCache",
     "test:watch": "jest --watch",

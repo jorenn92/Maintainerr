@@ -93,7 +93,7 @@ class CacheManager {
   }
 
   public flushAll(): void {
-    for (const [key, value] of Object.entries(this.getAllCaches())) {
+    for (const [, value] of Object.entries(this.getAllCaches())) {
       value.flush();
     }
   }

@@ -1,10 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RuleDto } from '../dtos/rule.dto';
 import { ReturnStatus } from '../rules.service';
-import {
-  RuleOperators,
-  RulePossibility,
-} from '../constants/rules.constants';
+import { RuleOperators, RulePossibility } from '../constants/rules.constants';
 import YAML from 'yaml';
 import {
   EPlexDataType,

@@ -33,9 +33,11 @@ interface addCollectionDbResponse {
   deleteAfterDays: number;
   manualCollection: boolean;
 }
+
 @Injectable()
 export class CollectionsService {
   private readonly logger = new Logger(CollectionsService.name);
+
   constructor(
     @InjectRepository(Collection)
     private readonly collectionRepo: Repository<Collection>,
@@ -562,11 +564,11 @@ export class CollectionsService {
                 sharedHome: collection.visibleOnHome,
               });
             } else {
-              collection.manualCollection
-                ? this.logger.warn(
-                    `Manual Collection '${collection.manualCollectionName}' doesn't exist in Plex..`,
-                  )
-                : undefined;
+              if (collection.manualCollection) {
+                this.logger.warn(
+                  `Manual Collection '${collection.manualCollectionName}' doesn't exist in Plex..`,
+                );
+              }
             }
           }
           // add children to collection
@@ -696,9 +698,7 @@ export class CollectionsService {
       });
 
       if (!collection.manualCollection) {
-        const status = await this.plexApi.deleteCollection(
-          collection.plexId.toString(),
-        );
+        await this.plexApi.deleteCollection(collection.plexId.toString());
       }
 
       await this.CollectionMediaRepo.delete({ collectionId: collection.id });

@@ -201,10 +201,10 @@ export class OverseerrApiService {
       let hasNext = true;
       let skip = 0;
 
-      let users: OverseerrUserResponseResult[] = [];
+      const users: OverseerrUserResponseResult[] = [];
 
       while (hasNext) {
-        let resp: OverseerrUserResponse = await this.api.get(
+        const resp: OverseerrUserResponse = await this.api.get(
           `/user?take=${size}&skip=${skip}`,
         );
 

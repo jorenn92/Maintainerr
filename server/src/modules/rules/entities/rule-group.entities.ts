@@ -5,7 +5,6 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToMany,
-  ManyToOne,
   OneToOne,
   JoinColumn,
 } from 'typeorm';
@@ -37,7 +36,7 @@ export class RuleGroup {
   @Column({ nullable: true })
   dataType: number;
 
-  @OneToMany((type) => Rules, (rules) => rules.ruleGroup, {
+  @OneToMany(() => Rules, (rules) => rules.ruleGroup, {
     onDelete: 'CASCADE',
   })
   rules: Rules[];

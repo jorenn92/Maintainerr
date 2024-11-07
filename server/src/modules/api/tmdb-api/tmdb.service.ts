@@ -26,8 +26,6 @@ import {
   TmdbUpcomingMoviesResponse,
 } from './interfaces/tmdb.interface';
 
-const ANIME_KEYWORD_ID = 210024;
-
 export class TmdbApiService extends ExternalApiService {
   private region?: string;
   private originalLanguage?: string;

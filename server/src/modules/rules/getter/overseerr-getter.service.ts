@@ -5,14 +5,11 @@ import {
   OverSeerrMediaResponse,
   OverseerrMediaStatus,
   OverseerrRequest,
-} from '../../../modules/api/overseerr-api/overseerr-api.service';
-import {
-  PlexLibraryItem,
-  SimplePlexUser,
-} from '../../../modules/api/plex-api/interfaces/library.interfaces';
-import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
-import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
-import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
+} from '../../api/overseerr-api/overseerr-api.service';
+import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
+import { TmdbIdService } from '../../api/tmdb-api/tmdb-id.service';
+import { TmdbApiService } from '../../api/tmdb-api/tmdb.service';
 import {
   Application,
   Property,
@@ -120,10 +117,10 @@ export class OverseerrGetterService {
                       if (request.requestedBy?.userType === 2) {
                         userNames.push(request.requestedBy?.username);
                       } else {
-                        let user = plexUsers.find(
+                        const user = plexUsers.find(
                           (u) => u.plexId === request.requestedBy?.plexId,
                         )?.username;
-                        
+
                         if (user) {
                           userNames.push(user);
                         }
@@ -134,7 +131,7 @@ export class OverseerrGetterService {
                     if (request.requestedBy?.userType === 2) {
                       userNames.push(request.requestedBy?.username);
                     } else {
-                      let user = plexUsers.find(
+                      const user = plexUsers.find(
                         (u) => u.plexId === request.requestedBy?.plexId,
                       )?.username;
 

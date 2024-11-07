@@ -87,13 +87,13 @@ class PlexApi extends NodePlexAPI {
     }
   }
 
-  deleteQuery<T>(arg) {
+  deleteQuery(arg) {
     return super.deleteQuery(arg);
   }
-  postQuery<T>(arg) {
+  postQuery(arg) {
     return super.postQuery(arg);
   }
-  putQuery<T>(arg) {
+  putQuery(arg) {
     return super.putQuery(arg);
   }
 

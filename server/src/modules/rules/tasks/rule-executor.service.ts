@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import _ from 'lodash';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { CollectionsService } from '../../collections/collections.service';

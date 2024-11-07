@@ -780,7 +780,7 @@ export class RulesService {
           .execute();
         return groupId.identifiers[0].id;
       } else {
-        const groupId = await connection
+        await connection
           .update(RuleGroup)
           .set(values)
           .where({ id: id })

@@ -13,7 +13,7 @@ describe('RuleComparatorService', () => {
       .using({ get: jest.fn() })
       .compile();
 
-      ruleComparatorService = unit;
+    ruleComparatorService = unit;
   });
 
   describe('doRuleAction', () => {
