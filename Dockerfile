@@ -1,4 +1,4 @@
-FROM node:20-alpine3.19 AS builder
+FROM node:20-alpine3.19 as BUILDER
 LABEL Description="Contains the Maintainerr Docker image"
 
 WORKDIR /opt/app/
@@ -64,12 +64,6 @@ ENV NODE_ENV=${NODE_ENV}
 
 ARG DEBUG=false
 ENV DEBUG=${DEBUG}
-
-ARG API_PORT=3001
-ENV API_PORT=${API_PORT}
-
-ARG UI_PORT=6246
-ENV UI_PORT=${UI_PORT}
 
 # Hash of the last GIT commit
 ARG GIT_SHA

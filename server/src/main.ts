@@ -70,9 +70,7 @@ async function bootstrap() {
   // End Winston logger config
 
   app.enableCors({ origin: true });
-
-  const apiPort = process.env.API_PORT || 3001;
-  await app.listen(apiPort);
+  await app.listen(3001);
 }
 
 function createDataDirectoryStructure() {
