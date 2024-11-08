@@ -8,6 +8,7 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
   url.host = destination.host
   url.port = destination.port
+  url.protocol = destination.protocol
   return NextResponse.rewrite(url)
 }
 
