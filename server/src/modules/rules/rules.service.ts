@@ -204,75 +204,76 @@ export class RulesService {
         }
       }, this);
 
-      if (state.code === 1) {
-        // create the collection
-        const lib = (await this.plexApi.getLibraries()).find(
-          (el) => +el.key === +params.libraryId,
-        );
-        const collection = (
-          await this.collectionService.createCollection({
-            libraryId: +params.libraryId,
-            type:
-              lib.type === 'movie'
-                ? EPlexDataType.MOVIES
-                : params.dataType !== undefined
-                  ? params.dataType
-                  : EPlexDataType.SHOWS,
-            title: params.name,
-            description: params.description,
-            arrAction: params.arrAction ? params.arrAction : 0,
-            isActive: params.isActive,
-            listExclusions: params.listExclusions
-              ? params.listExclusions
-              : false,
-            forceOverseerr: params.forceOverseerr
-              ? params.forceOverseerr
-              : false,
-            tautulliWatchedPercentOverride:
-              params.tautulliWatchedPercentOverride ?? null,
-            visibleOnHome: params.collection?.visibleOnHome,
-            deleteAfterDays: +params.collection?.deleteAfterDays,
-            manualCollection: params.collection?.manualCollection,
-            manualCollectionName: params.collection?.manualCollectionName,
-            keepLogsForMonths: +params.collection?.keepLogsForMonths,
-          })
-        ).dbCollection;
-        // create group
-        const groupId = await this.createOrUpdateGroup(
-          params.name,
-          params.description,
-          params.libraryId,
-          collection.id,
-          params.useRules !== undefined ? params.useRules : true,
-          params.isActive !== undefined ? params.isActive : true,
-          params.dataType !== undefined ? params.dataType : undefined,
-        );
-        // create rules
-        if (params.useRules) {
-          for (const rule of params.rules) {
-            const ruleJson = JSON.stringify(rule);
-            await this.rulesRepository.save([
-              {
-                ruleJson: ruleJson,
-                ruleGroupId: groupId,
-                section: (rule as RuleDbDto).section,
-              },
-            ]);
-          }
-        } else {
-          // empty rule if not using rules
+      if (state.code !== 1) {
+        return state;
+      }
+
+      // create the collection
+      const lib = (await this.plexApi.getLibraries()).find(
+        (el) => +el.key === +params.libraryId,
+      );
+      const collection = (
+        await this.collectionService.createCollection({
+          libraryId: +params.libraryId,
+          type:
+            lib.type === 'movie'
+              ? EPlexDataType.MOVIES
+              : params.dataType !== undefined
+                ? params.dataType
+                : EPlexDataType.SHOWS,
+          title: params.name,
+          description: params.description,
+          arrAction: params.arrAction ? params.arrAction : 0,
+          isActive: params.isActive,
+          listExclusions: params.listExclusions ? params.listExclusions : false,
+          forceOverseerr: params.forceOverseerr ? params.forceOverseerr : false,
+          tautulliWatchedPercentOverride:
+            params.tautulliWatchedPercentOverride ?? null,
+          visibleOnHome: params.collection?.visibleOnHome,
+          deleteAfterDays: +params.collection?.deleteAfterDays,
+          manualCollection: params.collection?.manualCollection,
+          manualCollectionName: params.collection?.manualCollectionName,
+          keepLogsForMonths: +params.collection?.keepLogsForMonths,
+        })
+      )?.dbCollection;
+
+      if (!collection) {
+        return undefined;
+      }
+
+      // create group
+      const groupId = await this.createOrUpdateGroup(
+        params.name,
+        params.description,
+        params.libraryId,
+        collection.id,
+        params.useRules !== undefined ? params.useRules : true,
+        params.isActive !== undefined ? params.isActive : true,
+        params.dataType !== undefined ? params.dataType : undefined,
+      );
+      // create rules
+      if (params.useRules) {
+        for (const rule of params.rules) {
+          const ruleJson = JSON.stringify(rule);
           await this.rulesRepository.save([
             {
-              ruleJson: JSON.stringify(''),
+              ruleJson: ruleJson,
               ruleGroupId: groupId,
-              section: 0,
+              section: (rule as RuleDbDto).section,
             },
           ]);
         }
-        return state;
       } else {
-        return state;
+        // empty rule if not using rules
+        await this.rulesRepository.save([
+          {
+            ruleJson: JSON.stringify(''),
+            ruleGroupId: groupId,
+            section: 0,
+          },
+        ]);
       }
+      return state;
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       this.logger.debug(e);
@@ -732,8 +733,8 @@ export class RulesService {
     }
   }
 
-  private createReturnStatus(succes: boolean, result: string): ReturnStatus {
-    return { code: succes ? 1 : 0, result: result };
+  private createReturnStatus(success: boolean, result: string): ReturnStatus {
+    return { code: success ? 1 : 0, result: result };
   }
 
   private async createOrUpdateGroup(

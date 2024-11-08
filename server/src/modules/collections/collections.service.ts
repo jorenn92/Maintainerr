@@ -1018,7 +1018,7 @@ export class CollectionsService {
       const resp = await this.plexApi.getCollections(libraryId.toString());
       if (resp) {
         const found = resp.find((coll) => {
-          return coll.title.trim() === name.trim();
+          return coll.title.trim() === name.trim() && !coll.smart;
         });
 
         return found?.ratingKey !== undefined ? found : undefined;
@@ -1035,7 +1035,16 @@ export class CollectionsService {
 
   public async findPlexCollectionByID(id: number): Promise<PlexCollection> {
     try {
-      return await this.plexApi.getCollection(id);
+      const result = await this.plexApi.getCollection(id);
+
+      if (result.smart) {
+        this.logger.warn(
+          `Plex collection ${id} is a smart collection which is not supported.`,
+        );
+        return undefined;
+      }
+
+      return result;
     } catch (err) {
       this.logger.warn(
         'An error occurred while searching for a specific Plex collection.',
@@ -1045,7 +1054,7 @@ export class CollectionsService {
     }
   }
 
-  async getCollectionLogsWithhPaging(
+  async getCollectionLogsWithPaging(
     id: number,
     { offset = 0, size = 25 }: { offset?: number; size?: number } = {},
     search: string = undefined,
