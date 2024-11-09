@@ -64,7 +64,7 @@ export class CollectionsController {
 
   @Post('/handle')
   handleCollection() {
-    return this.collectionWorkerService.execute();
+    this.collectionWorkerService.execute().catch((e) => console.error(e));
   }
 
   @Put('/schedule/update')

@@ -111,7 +111,13 @@ const Rules: React.FC = () => {
             <AddButton onClick={showAddModal} text="New Rule" />
           </div>
           <div className="ml-2 mr-auto sm:mr-0 ">
-            <ExecuteButton onClick={debounce(sync, 5000)} text="Run Rules" />
+            <ExecuteButton
+              onClick={debounce(sync, 5000, {
+                leading: true,
+                trailing: false,
+              })}
+              text="Run Rules"
+            />
           </div>
         </div>
 

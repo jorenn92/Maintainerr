@@ -21,10 +21,6 @@ export interface ISettings {
   plex_ssl: number
   plex_auth_token: string | null
   overseerr_api_key: string
-  radarr_url: string
-  radarr_api_key: string
-  sonarr_url: string
-  sonarr_api_key: string
   tautulli_url: string
   tautulli_api_key: string
   collection_handler_job_cron: string

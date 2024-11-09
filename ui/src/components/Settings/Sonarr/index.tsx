@@ -1,253 +1,237 @@
-import { SaveIcon } from '@heroicons/react/solid'
-import { useContext, useEffect, useRef, useState } from 'react'
-import SettingsContext from '../../../contexts/settings-context'
-import { PostApiHandler } from '../../../utils/ApiHandler'
-import Alert from '../../Common/Alert'
-import Button from '../../Common/Button'
-import DocsButton from '../../Common/DocsButton'
-import TestButton from '../../Common/TestButton'
 import {
-  getHostname,
-  getBaseUrl,
-  getPortFromUrl,
-  addPortToUrl,
-  handleSettingsInputChange,
-} from '../../../utils/SettingsUtils'
+  DocumentAddIcon,
+  PlusCircleIcon,
+  TrashIcon,
+} from '@heroicons/react/solid'
+import { useEffect, useState } from 'react'
+import GetApiHandler, { DeleteApiHandler } from '../../../utils/ApiHandler'
+import Button from '../../Common/Button'
+import LoadingSpinner from '../../Common/LoadingSpinner'
+import SonarrSettingsModal from './SettingsModal'
+import { ICollection } from '../../Collection'
+import Modal from '../../Common/Modal'
+
+type DeleteSonarrSettingResponseDto =
+  | {
+      status: 'OK'
+      code: 1
+      message: string
+      data?: never
+    }
+  | {
+      status: 'NOK'
+      code: 0
+      message: string
+      data: {
+        collectionsInUse: ICollection[]
+      } | null
+    }
+
+export interface ISonarrSetting {
+  id: number
+  serverName: string
+  url: string
+  apiKey: string
+  isDefault: boolean
+}
 
 const SonarrSettings = () => {
-  const settingsCtx = useContext(SettingsContext)
-  const hostnameRef = useRef<HTMLInputElement>(null)
-  const baseUrlRef = useRef<HTMLInputElement>(null)
-  const portRef = useRef<HTMLInputElement>(null)
-  const apiKeyRef = useRef<HTMLInputElement>(null)
-  const [hostname, setHostname] = useState<string>()
-  const [baseURl, setBaseUrl] = useState<string>()
-  const [port, setPort] = useState<string>()
-  const [error, setError] = useState<boolean>()
-  const [changed, setChanged] = useState<boolean>()
-  const [testBanner, setTestbanner] = useState<{
-    status: Boolean
-    version: string
-  }>({ status: false, version: '0' })
+  const [loaded, setLoaded] = useState(false)
+  const [settings, setSettings] = useState<ISonarrSetting[]>([])
+  const [settingsModalActive, setSettingsModalActive] = useState<
+    ISonarrSetting | boolean
+  >()
+  const [collectionsInUseWarning, setCollectionsInUseWarning] = useState<
+    ICollection[] | undefined
+  >()
+
+  const handleSettingsSaved = (setting: ISonarrSetting) => {
+    const newSettings = [...settings]
+    const index = newSettings.findIndex((s) => s.id === setting.id)
+    if (index !== -1) {
+      newSettings[index] = setting
+    } else {
+      newSettings.push(setting)
+    }
+
+    if (setting.isDefault) {
+      newSettings.forEach((s) => {
+        if (s.id !== setting.id) {
+          s.isDefault = false
+        }
+      })
+    }
+
+    setSettings(newSettings)
+    setSettingsModalActive(undefined)
+  }
+
+  const confirmedDelete = (id: number) => {
+    DeleteApiHandler<DeleteSonarrSettingResponseDto>(`/settings/sonarr/${id}`)
+      .then((resp) => {
+        if (resp.code === 1) {
+          setSettings(settings.filter((s) => s.id !== id))
+        } else if (resp.data?.collectionsInUse) {
+          setCollectionsInUseWarning(resp.data.collectionsInUse)
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+
+  useEffect(() => {
+    if (loaded) return
+
+    GetApiHandler<ISonarrSetting[]>('/settings/sonarr').then((resp) => {
+      setSettings(resp)
+      setLoaded(true)
+    })
+  }, [])
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Sonarr'
   }, [])
 
-  useEffect(() => {
-    setHostname(getHostname(settingsCtx.settings.sonarr_url))
-    setBaseUrl(getBaseUrl(settingsCtx.settings.sonarr_url))
-    setPort(getPortFromUrl(settingsCtx.settings.sonarr_url))
-
-    // @ts-ignore
-    hostnameRef.current = {
-      value: getHostname(settingsCtx.settings.sonarr_url),
-    }
-    // @ts-ignore
-    baseUrlRef.current = {
-      value: getBaseUrl(settingsCtx.settings.sonarr_url),
-    }
-    // @ts-ignore
-    portRef.current = { value: getPortFromUrl(settingsCtx.settings.sonarr_url) }
-  }, [settingsCtx])
-
-  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    // if port not specified, but hostname is. Derive the port
-    if (!portRef.current?.value && hostnameRef.current?.value) {
-      const derivedPort = hostnameRef.current.value.includes('http://')
-        ? 80
-        : hostnameRef.current.value.includes('https://')
-          ? 443
-          : 80
-
-      if (derivedPort) {
-        setPort(derivedPort.toString())
-        // @ts-ignore
-        portRef.current = { value: derivedPort.toString() }
-      }
-    }
-
-    if (
-      hostnameRef.current?.value &&
-      portRef.current?.value &&
-      apiKeyRef.current?.value
-    ) {
-      const hostnameVal = hostnameRef.current.value.includes('http://')
-        ? hostnameRef.current.value
-        : hostnameRef.current.value.includes('https://')
-          ? hostnameRef.current.value
-          : portRef.current.value == '443'
-            ? 'https://' + hostnameRef.current.value
-            : 'http://' + hostnameRef.current.value
-
-      let url = `${addPortToUrl(hostnameVal, +portRef.current.value)}`
-      url = url.endsWith('/') ? url.slice(0, -1) : url
-
-      const payload = {
-        sonarr_url: `${url}${
-          baseUrlRef.current?.value ? `/${baseUrlRef.current?.value}` : ''
-        }`,
-        sonarr_api_key: apiKeyRef.current.value,
-      }
-      const resp: { code: 0 | 1; message: string } = await PostApiHandler(
-        '/settings',
-        {
-          ...settingsCtx.settings,
-          ...payload,
-        },
-      )
-      if (Boolean(resp.code)) {
-        settingsCtx.addSettings({
-          ...settingsCtx.settings,
-          ...payload,
-        })
-        setError(false)
-        setChanged(true)
-      } else setError(true)
-    } else {
-      setError(true)
-    }
+  const showAddModal = () => {
+    setSettingsModalActive(true)
   }
 
-  const appTest = (result: { status: boolean; version: string }) => {
-    setTestbanner({ status: result.status, version: result.version })
+  if (!loaded) {
+    return (
+      <>
+        <div className="mt-6">
+          <LoadingSpinner />
+        </div>
+      </>
+    )
   }
 
   return (
-    <div className="h-full w-full">
-      <div className="section h-full w-full">
-        <h3 className="heading">Sonarr Settings</h3>
-        <p className="description">Sonarr configuration</p>
+    <>
+      <div className="h-full w-full">
+        <div className="section h-full w-full">
+          <h3 className="heading">Sonarr Settings</h3>
+          <p className="description">Sonarr configuration</p>
+        </div>
+
+        <ul className="grid max-w-6xl grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+          {settings.map((setting) => (
+            <li
+              key={setting.id}
+              className="rounded-xl bg-zinc-800 p-4 text-zinc-400 shadow ring-1 ring-zinc-700 h-full"
+            >
+              <div className="flex gap-x-3 mb-2 items-center">
+                <div className="text-base font-medium text-white sm:text-lg">
+                  {setting.serverName}
+                </div>
+                {setting.isDefault && (
+                  <div className="bg-amber-600 px-2 py-0.5 rounded text-zinc-200 shadow-md text-xs">
+                    Default
+                  </div>
+                )}
+              </div>
+
+              <p className="text-gray-300 space-x-2 mb-4  truncate">
+                <span className="font-semibold">Address</span>
+                <a href={setting.url} className="hover:underline">
+                  {setting.url}
+                </a>
+              </p>
+              <div>
+                <Button
+                  buttonType="twin-primary-l"
+                  buttonSize="md"
+                  className="h-10 w-1/2"
+                  onClick={() => {
+                    setSettingsModalActive(setting)
+                  }}
+                >
+                  {<DocumentAddIcon className="m-auto" />}{' '}
+                  <p className="font-semibold m-auto">Edit</p>
+                </Button>
+                <DeleteButton
+                  onDeleteRequested={() => confirmedDelete(setting.id)}
+                />
+              </div>
+            </li>
+          ))}
+
+          <li className="rounded-xl bg-zinc-800 p-4 text-zinc-400 shadow border-2 border-dashed border-gray-400 flex items-center justify-center h-full">
+            <button
+              type="button"
+              className="add-button bg-amber-600 hover:bg-amber-500 flex m-auto h-9 rounded text-zinc-200 shadow-md px-4"
+              onClick={showAddModal}
+            >
+              {<PlusCircleIcon className="m-auto h-5" />}
+              <p className="m-auto font-semibold ml-1">Add server</p>
+            </button>
+          </li>
+        </ul>
       </div>
-
-      {error ? (
-        <Alert type="warning" title="Not all fields contain values" />
-      ) : changed ? (
-        <Alert type="info" title="Settings successfully updated" />
+      {settingsModalActive && (
+        <SonarrSettingsModal
+          settings={
+            typeof settingsModalActive === 'boolean'
+              ? undefined
+              : settingsModalActive
+          }
+          onUpdate={handleSettingsSaved}
+          onCancel={() => {
+            setSettingsModalActive(undefined)
+          }}
+        />
+      )}
+      {collectionsInUseWarning ? (
+        <Modal
+          title="Server in-use"
+          size="sm"
+          onOk={() => setCollectionsInUseWarning(undefined)}
+        >
+          <p className="mb-4">
+            This server is currently being used by the following rules:
+            <ul className="list-disc list-inside">
+              {collectionsInUseWarning.map((x) => (
+                <li key={x.id}>{x.title}</li>
+              ))}
+            </ul>
+          </p>
+          <p>
+            You must re-assign these rules to a different server before
+            deleting.
+          </p>
+        </Modal>
       ) : undefined}
+    </>
+  )
+}
 
-      {testBanner.version !== '0' ? (
-        testBanner.status ? (
-          <Alert
-            type="warning"
-            title={`Successfully connected to Sonarr (${testBanner.version})`}
-          />
-        ) : (
-          <Alert
-            type="error"
-            title="Connection failed! Please check and save your settings"
-          />
-        )
-      ) : undefined}
+const DeleteButton = ({
+  onDeleteRequested,
+}: {
+  onDeleteRequested: () => void
+}) => {
+  const [showSureDelete, setShowSureDelete] = useState(false)
 
-      <div className="section">
-        <form onSubmit={submit}>
-          <div className="form-row">
-            <label htmlFor="hostname" className="text-label">
-              Hostname or IP
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="hostname"
-                  id="hostname"
-                  type="text"
-                  ref={hostnameRef}
-                  defaultValue={hostname}
-                  value={hostnameRef.current?.value}
-                  onChange={(e) =>
-                    handleSettingsInputChange(e, hostnameRef, setHostname)
-                  }
-                ></input>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="port" className="text-label">
-              Port
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="port"
-                  id="port"
-                  type="number"
-                  ref={portRef}
-                  defaultValue={port}
-                  value={portRef.current?.value}
-                  onChange={(e) =>
-                    handleSettingsInputChange(e, portRef, setPort)
-                  }
-                ></input>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="baseUrl" className="text-label">
-              Base URL
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="baseUrl"
-                  id="baseUrl"
-                  type="text"
-                  ref={baseUrlRef}
-                  defaultValue={baseURl}
-                  value={baseUrlRef.current?.value}
-                  onChange={(e) =>
-                    handleSettingsInputChange(e, baseUrlRef, setBaseUrl)
-                  }
-                ></input>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="apikey" className="text-label">
-              Api key
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="apikey"
-                  id="apikey"
-                  type="password"
-                  ref={apiKeyRef}
-                  defaultValue={settingsCtx.settings.sonarr_api_key}
-                ></input>
-              </div>
-            </div>
-          </div>
-
-          <div className="actions mt-5 w-full">
-            <div className="flex w-full flex-wrap sm:flex-nowrap">
-              <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
-                <DocsButton page="Configuration" />
-              </span>
-              <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
-                <TestButton onClick={appTest} testUrl="/settings/test/sonarr" />
-
-                <span className="ml-3 inline-flex rounded-md shadow-sm">
-                  <Button
-                    buttonType="primary"
-                    type="submit"
-                    // disabled={isSubmitting || !isValid}
-                  >
-                    <SaveIcon />
-                    <span>Save Changes</span>
-                  </Button>
-                </span>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+  return (
+    <Button
+      buttonSize="md"
+      buttonType="twin-secondary-r"
+      className="h-10 w-1/2"
+      onClick={() => {
+        if (showSureDelete) {
+          onDeleteRequested()
+          setShowSureDelete(false)
+        } else {
+          setShowSureDelete(true)
+        }
+      }}
+    >
+      {<TrashIcon className="m-auto" />}{' '}
+      <p className="font-semibold m-auto">
+        {showSureDelete ? <>Are you sure?</> : <>Delete</>}
+      </p>
+    </Button>
   )
 }
 

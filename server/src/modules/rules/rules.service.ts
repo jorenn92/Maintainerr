@@ -30,6 +30,8 @@ import { RuleComparatorService } from './helpers/rule.comparator.service';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 import cacheManager from '../api/lib/cache';
+import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
+import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -60,6 +62,10 @@ export class RulesService {
     private readonly exclusionRepo: Repository<Exclusion>,
     @InjectRepository(Settings)
     private readonly settingsRepo: Repository<Settings>,
+    @InjectRepository(RadarrSettings)
+    private readonly radarrSettingsRepo: Repository<RadarrSettings>,
+    @InjectRepository(SonarrSettings)
+    private readonly sonarrSettingsRepo: Repository<SonarrSettings>,
     private readonly collectionService: CollectionsService,
     private readonly plexApi: PlexApiService,
     private readonly connection: DataSource,
@@ -70,6 +76,9 @@ export class RulesService {
   }
   async getRuleConstants(): Promise<RuleConstants> {
     const settings = await this.settingsRepo.findOne({ where: {} });
+    const radarrSettingsExist = await this.radarrSettingsRepo.exists();
+    const sonarrSettingsExist = await this.sonarrSettingsRepo.exists();
+
     const localConstants = _.cloneDeep(this.ruleConstants);
     if (settings) {
       // remove overseerr if not configured
@@ -80,14 +89,14 @@ export class RulesService {
       }
 
       // remove radarr if not configured
-      if (!settings.radarr_url || !settings.radarr_api_key) {
+      if (!radarrSettingsExist) {
         localConstants.applications = localConstants.applications.filter(
           (el) => el.id !== Application.RADARR,
         );
       }
 
       // remove sonarr if not configured
-      if (!settings.sonarr_url || !settings.sonarr_api_key) {
+      if (!sonarrSettingsExist) {
         localConstants.applications = localConstants.applications.filter(
           (el) => el.id !== Application.SONARR,
         );
@@ -300,14 +309,16 @@ export class RulesService {
           group.collectionId,
         );
 
-        // if datatype or manual collection settings changed then remove the collection media and specific exclusions. The Plex collection will be removed later by updateCollection()
+        // if datatype, manual collection settings or *arr server changed then remove the collection media and specific exclusions. The Plex collection will be removed later by updateCollection()
         if (
           group.dataType !== params.dataType ||
           params.collection.manualCollection !==
             dbCollection.manualCollection ||
           params.collection.manualCollectionName !==
             dbCollection.manualCollectionName ||
-          params.libraryId !== dbCollection.libraryId
+          params.libraryId !== dbCollection.libraryId ||
+          params.radarrSettingsId !== dbCollection.radarrSettingsId ||
+          params.sonarrSettingsId !== dbCollection.sonarrSettingsId
         ) {
           this.logger.log(
             `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media & specific exclusions`,
@@ -352,11 +363,13 @@ export class RulesService {
               : false,
             tautulliWatchedPercentOverride:
               params.tautulliWatchedPercentOverride ?? null,
-            visibleOnHome: params.collection?.visibleOnHome,
-            deleteAfterDays: +params.collection?.deleteAfterDays,
-            manualCollection: params.collection?.manualCollection,
-            manualCollectionName: params.collection?.manualCollectionName,
-            keepLogsForMonths: +params.collection?.keepLogsForMonths,
+            radarrSettingsId: params.radarrSettingsId ?? null,
+            sonarrSettingsId: params.sonarrSettingsId ?? null,
+            visibleOnHome: params.collection.visibleOnHome,
+            deleteAfterDays: +params.collection.deleteAfterDays,
+            manualCollection: params.collection.manualCollection,
+            manualCollectionName: params.collection.manualCollectionName,
+            keepLogsForMonths: +params.collection.keepLogsForMonths,
           })
         ).dbCollection;
 
@@ -955,9 +968,13 @@ export class RulesService {
     // flush caches
     this.plexApi.resetMetadataCache(mediaId);
     cacheManager.getCache('overseerr').data.flushAll();
-    cacheManager.getCache('radarr').data.flushAll();
-    cacheManager.getCache('sonarr').data.flushAll();
     cacheManager.getCache('tautulli').data.flushAll();
+    cacheManager
+      .getCachesByType('radarr')
+      .forEach((cache) => cache.data.flushAll());
+    cacheManager
+      .getCachesByType('sonarr')
+      .forEach((cache) => cache.data.flushAll());
 
     const mediaResp = await this.plexApi.getMetadata(mediaId);
     const group = await this.getRuleGroupById(rulegroupId);

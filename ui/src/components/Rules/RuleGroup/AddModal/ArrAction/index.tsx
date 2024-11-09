@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react'
+import GetApiHandler from '../../../../../utils/ApiHandler'
+import { IRadarrSetting } from '../../../../Settings/Radarr'
+import { ISonarrSetting } from '../../../../Settings/Sonarr'
+
+type ArrType = 'Radarr' | 'Sonarr'
 
 interface ArrActionProps {
-  title: string
-  default?: number
+  type: ArrType
+  arrAction?: number
+  settingId?: number
   options?: Option[]
-  onUpdate: (value: number) => void
+  onUpdate: (value: number, settingId?: number) => void
 }
 
 interface Option {
@@ -13,11 +19,46 @@ interface Option {
 }
 
 const ArrAction = (props: ArrActionProps) => {
-  const [state, setState] = useState<string>(props.default ? props.default.toString() : '0')
+  const [prevType, setPrevType] = useState<ArrType>(props.type)
+  const [settings, setSettings] = useState<(IRadarrSetting | ISonarrSetting)[]>(
+    [],
+  )
+  const [loading, setLoading] = useState<boolean>(true)
+  const action = props.arrAction ? props.arrAction : 0
+
+  const handleSelectedSettingIdChange = (id?: number) => {
+    props.onUpdate(action, id)
+  }
+
+  const handleActionChange = (value: number) => {
+    props.onUpdate(value, props.settingId)
+  }
+
+  const loadArrSettings = async (type: ArrType) => {
+    setLoading(true)
+    setSettings([])
+    const settingsResponse = await GetApiHandler<IRadarrSetting[]>(
+      `/settings/${type.toLowerCase()}`,
+    )
+    setPrevType(type)
+    setSettings(settingsResponse)
+    setLoading(false)
+
+    if (!props.settingId || type != prevType) {
+      if (settingsResponse.length > 0) {
+        const defaultServer = settingsResponse.find((s) => s.isDefault)
+        handleSelectedSettingIdChange(
+          defaultServer ? defaultServer.id : settingsResponse[0]?.id,
+        )
+      } else {
+        handleSelectedSettingIdChange(undefined)
+      }
+    }
+  }
 
   useEffect(() => {
-    setState(props.default ? props.default.toString() : '0')
-  }, [props.default])
+    loadArrSettings(props.type)
+  }, [props.type])
 
   const options: Option[] = props.options
     ? props.options
@@ -37,29 +78,65 @@ const ArrAction = (props: ArrActionProps) => {
       ]
 
   return (
-    <div className="form-row">
-      <label htmlFor={`${props.title}-action`} className="text-label">
-        {props.title} Action
-      </label>
-      <div className="form-input">
-        <div className="form-input-field">
-          <select
-            name={`${props.title}-action`}
-            id={`${props.title}-action`}
-            value={state}
-            onChange={(e: { target: { value: string } }) => {
-              setState(e.target.value)
-              props.onUpdate(+e.target.value)
-            }}
-          >
-            {options.map((e: Option) => {
-              return (
-                <option key={e.id} value={e.id}>
-                  {e.name}
+    <div>
+      <div className="form-row">
+        <label htmlFor={`${props.type}-server`} className="text-label">
+          {props.type} server
+        </label>
+        <div className="form-input">
+          <div className="form-input-field">
+            <select
+              name={`${props.type}-server`}
+              id={`${props.type}-server`}
+              value={props.settingId}
+              onChange={(e) => {
+                handleSelectedSettingIdChange(+e.target.value)
+              }}
+            >
+              {settings.map((e) => {
+                return (
+                  <option key={e.id} value={e.id}>
+                    {e.serverName}
+                  </option>
+                )
+              })}
+              {settings.length === 0 && (
+                <option value="" disabled>
+                  No servers added
                 </option>
-              )
-            })}
-          </select>
+              )}
+              {loading && (
+                <option value="" disabled>
+                  Loading servers...
+                </option>
+              )}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div className="form-row">
+        <label htmlFor={`${props.type}-action`} className="text-label">
+          {props.type} action
+        </label>
+        <div className="form-input">
+          <div className="form-input-field">
+            <select
+              name={`${props.type}-action`}
+              id={`${props.type}-action`}
+              value={action}
+              onChange={(e) => {
+                handleActionChange(+e.target.value)
+              }}
+            >
+              {options.map((e) => {
+                return (
+                  <option key={e.id} value={e.id}>
+                    {e.name}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
         </div>
       </div>
     </div>
