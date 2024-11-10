@@ -23,8 +23,8 @@ export class TmdbIdService {
               libItem.grandparentRatingKey.toString(),
             )
           : libItem.parentRatingKey
-          ? await this.plexApi.getMetadata(libItem.parentRatingKey.toString())
-          : libItem;
+            ? await this.plexApi.getMetadata(libItem.parentRatingKey.toString())
+            : libItem;
 
         return this.getTmdbIdFromPlexData(libItem);
       } else {

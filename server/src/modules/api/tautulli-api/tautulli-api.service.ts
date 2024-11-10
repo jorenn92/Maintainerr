@@ -84,7 +84,7 @@ interface Response<T> {
     | {
         message: string | null;
         result: 'error';
-        data: {};
+        data: object;
       };
 }
 

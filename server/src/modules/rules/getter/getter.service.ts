@@ -30,7 +30,7 @@ export class ValueGetterService {
         return await this.plexGetter.get(val2, libItem, dataType, ruleGroup);
       }
       case Application.RADARR: {
-        return await this.radarrGetter.get(val2, libItem, dataType, ruleGroup);
+        return await this.radarrGetter.get(val2, libItem, ruleGroup);
       }
       case Application.SONARR: {
         return await this.sonarrGetter.get(val2, libItem, dataType, ruleGroup);

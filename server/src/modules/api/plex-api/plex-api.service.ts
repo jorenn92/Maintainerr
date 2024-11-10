@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { PlexSettings } from '../../../modules/settings/interfaces/plex-settings.interface';
-import { SettingsService } from '../../..//modules/settings/settings.service';
+import { PlexSettings } from '../../settings/interfaces/plex-settings.interface';
+import { SettingsService } from '../../settings/settings.service';
 import { BasicResponseDto } from './dto/basic-response.dto';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
 import {
@@ -35,7 +35,6 @@ import PlexTvApi, { PlexUser } from '../lib/plextvApi';
 import cacheManager from '../../api/lib/cache';
 import { Settings } from '../../settings/entities/settings.entities';
 import PlexCommunityApi, {
-  GraphQLQuery,
   PlexCommunityWatchHistory,
   PlexCommunityWatchList,
 } from '../../api/lib/plexCommunityApi';
@@ -47,6 +46,7 @@ export class PlexApiService {
   private plexCommunityClient: PlexCommunityApi;
   private machineId: string;
   private readonly logger = new Logger(PlexApiService.name);
+
   constructor(
     @Inject(forwardRef(() => SettingsService))
     private readonly settings: SettingsService,
@@ -73,6 +73,7 @@ export class PlexApiService {
       webAppUrl: this.settings.plex_hostname,
     };
   }
+
   public async initialize({
     plexToken,
     timeout,
@@ -153,15 +154,17 @@ export class PlexApiService {
             }),
           )
         : [];
-      const fileteredResults: PlexMetadata[] = [];
+      const filteredResults: PlexMetadata[] = [];
       (await results).forEach((el: PlexMetadata) => {
-        fileteredResults.find(
-          (e: PlexMetadata) => e.ratingKey === el.ratingKey,
-        ) === undefined
-          ? fileteredResults.push(el)
-          : undefined;
+        if (
+          filteredResults.find(
+            (e: PlexMetadata) => e.ratingKey === el.ratingKey,
+          ) === undefined
+        ) {
+          filteredResults.push(el);
+        }
       });
-      return fileteredResults;
+      return filteredResults;
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
@@ -444,7 +447,7 @@ export class PlexApiService {
       `[Plex] Removed media with ID ${plexId} from Plex library.`,
     );
     try {
-      await this.plexClient.deleteQuery<void>({
+      await this.plexClient.deleteQuery({
         uri: `/library/metadata/${plexId}`,
       });
     } catch (e) {
@@ -480,7 +483,7 @@ export class PlexApiService {
 
   public async createCollection(params: CreateUpdateCollection) {
     try {
-      const response = await this.plexClient.postQuery<PlexLibraryResponse>({
+      const response = await this.plexClient.postQuery({
         uri: `/library/collections?type=${
           params.type
         }&title=${encodeURIComponent(params.title)}&sectionId=${
@@ -505,7 +508,7 @@ export class PlexApiService {
 
   public async updateCollection(body: CreateUpdateCollection) {
     try {
-      await this.plexClient.putQuery<PlexLibraryResponse>({
+      await this.plexClient.putQuery({
         uri: `/library/sections/${body.libraryId}/all?type=18&id=${
           body.collectionId
         }&title.value=${encodeURIComponent(
@@ -527,7 +530,7 @@ export class PlexApiService {
     collectionId: string,
   ): Promise<BasicResponseDto> {
     try {
-      await this.plexClient.deleteQuery<PlexLibraryResponse>({
+      await this.plexClient.deleteQuery({
         uri: `/library/collections/${collectionId}`,
       });
     } catch (err) {
@@ -955,15 +958,15 @@ export class PlexApiService {
           const data = await this.getChildrenMetadata(context.id.toString());
 
           // transform & add eps
-          data
-            ? handleMedia.push(
-                ...data.map((el) => {
-                  return {
-                    plexId: +el.ratingKey,
-                  };
-                }),
-              )
-            : undefined;
+          if (data) {
+            handleMedia.push(
+              ...data.map((el) => {
+                return {
+                  plexId: +el.ratingKey,
+                };
+              }),
+            );
+          }
           break;
         case EPlexDataType.EPISODES:
           // transform & push episode
@@ -993,15 +996,15 @@ export class PlexApiService {
               season.ratingKey.toString(),
             );
             // transform & add eps
-            eps
-              ? handleMedia.push(
-                  ...eps.map((el) => {
-                    return {
-                      plexId: +el.ratingKey,
-                    };
-                  }),
-                )
-              : undefined;
+            if (eps) {
+              handleMedia.push(
+                ...eps.map((el) => {
+                  return {
+                    plexId: +el.ratingKey,
+                  };
+                }),
+              );
+            }
           }
           break;
         case EPlexDataType.MOVIES:

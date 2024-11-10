@@ -20,7 +20,7 @@
     "start:ui": "cd ui && next start -p 80",
     "start:server": "cd server && node dist/main",
     "lint:ui": "cd ui && next lint",
-    "lint:server": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint:server": "cd server && eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:clear": "jest --clearCache",
     "test:watch": "jest --watch",
@@ -74,6 +74,8 @@
   "devDependencies": {
     "@automock/jest": "^1.4.0",
     "@babel/core": "^7.26.0",
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.13.0",
     "@nestjs/cli": "^10.4.5",
     "@nestjs/schematics": "^10.2.3",
     "@nestjs/testing": "^10.4.4",

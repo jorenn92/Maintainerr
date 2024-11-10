@@ -261,8 +261,6 @@ export class SonarrGetterService {
                         )
                       )?.seasonNumber
                   : false;
-              } else {
-                false;
               }
             }
           }

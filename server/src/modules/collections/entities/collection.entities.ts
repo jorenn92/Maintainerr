@@ -92,16 +92,14 @@ export class Collection {
   sonarrSettings: SonarrSettings;
 
   @OneToMany(
-    (type) => CollectionMedia,
+    () => CollectionMedia,
     (collectionMedia) => collectionMedia.collectionId,
     { onDelete: 'CASCADE' },
   )
   collectionMedia: CollectionMedia[];
 
-  @OneToMany(
-    (type) => CollectionLog,
-    (collectionLog) => collectionLog.collection,
-    { onDelete: 'CASCADE' },
-  )
+  @OneToMany(() => CollectionLog, (collectionLog) => collectionLog.collection, {
+    onDelete: 'CASCADE',
+  })
   collectionLog: CollectionLog[];
 }
