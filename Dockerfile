@@ -1,63 +1,49 @@
-FROM node:20-alpine3.19 AS builder
+FROM node:20-alpine3.19 AS base
 LABEL Description="Contains the Maintainerr Docker image"
 
-WORKDIR /opt/app/
+FROM base AS deps
 
-ARG TARGETPLATFORM
-ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
+WORKDIR /app
 
-COPY server/ ./server/
-COPY ui/ ./ui/
-COPY package.json ./package.json
-COPY yarn.lock ./yarn.lock
-COPY .yarnrc.yml ./.yarnrc.yml
-
-# Enable correct yarn version
-RUN corepack install && \
-    corepack enable
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn/releases ./.yarn/releases
 
 RUN apk --update --no-cache add python3 make g++ curl
 
 RUN yarn --immutable --network-timeout 99999999
 
-RUN \
-    case "${TARGETPLATFORM}" in ('linux/arm64' | 'linux/amd64') \
-    yarn add sharp \
-    ;; \
-    esac
+FROM base AS builder
+
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
 RUN yarn build:server
 
 RUN yarn build:ui
 
-# copy standalone UI 
-RUN mv ./ui/.next/standalone/ui/ ./standalone-ui/ && \
-    mv ./ui/.next/standalone/ ./standalone-ui/ && \
-    mv ./ui/.next/static ./standalone-ui/.next/static && \
-    mv ./ui/public ./standalone-ui/public && \
-    rm -rf ./ui && \
-    mv ./standalone-ui ./ui
+FROM base AS runner
+
+WORKDIR /opt/app
+
+# copy standalone UI
+COPY --from=builder --chmod=777 --chown=node:node /app/ui/.next/standalone/ui ./ui
+COPY --from=builder --chmod=777 --chown=node:node /app/ui/.next/static ./ui/.next/static
+COPY --from=builder --chmod=777 --chown=node:node /app/ui/public ./ui/public
 
 # Copy standalone server
-RUN mv ./server/dist ./standalone-server && \
-    rm -rf ./server && \
-    mv ./standalone-server ./server
+COPY --from=builder --chmod=777 --chown=node:node /app/server/dist ./server
+COPY --from=builder --chmod=777 --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder --chmod=777 --chown=node:node /app/package.json ./
 
-RUN rm -rf node_modules .yarn 
-
-RUN yarn workspaces focus --production
-
-RUN rm -rf .yarn && \
-    rm -rf /opt/yarn-* && \
-    chown -R node:node /opt/ && \
-    chmod -R 755 /opt/ && \
-    # Data dir
-    mkdir -m 777 /opt/data && \
-    mkdir -m 777 /opt/data/logs && \
+# Create required directories
+RUN mkdir -pm 777 /opt/data/logs && \
     chown -R node:node /opt/data
 
-# Final build
-FROM node:20-alpine3.19
+RUN apk --update --no-cache add curl supervisor
+
+COPY --from=builder /app/supervisord.conf /etc/supervisord.conf
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -79,35 +65,10 @@ ENV GIT_SHA=$GIT_SHA
 ARG VERSION_TAG=develop
 ENV VERSION_TAG=$VERSION_TAG
 
-# Set global yarn vars to a folder read/write able for all users
-ENV YARN_INSTALL_STATE_PATH=/tmp/.yarn/install-state.gz
-ENV YARN_GLOBAL_FOLDER=/tmp/.yarn/global
-ENV YARN_CACHE_FOLDER=/tmp/.yarn/cache
-
 # Temporary workaround for https://github.com/libuv/libuv/pull/4141
 ENV UV_USE_IO_URING=0
 
-COPY --from=builder --chown=node:node /opt /opt
-
-WORKDIR /opt/app
-
-COPY supervisord.conf /etc/supervisord.conf
-
-# Enable correct yarn version, add supervisor & chown root /opt dir
-RUN corepack install && \
-    corepack enable && \
-    apk add supervisor curl && \
-    chown node:node /opt && \
-    # This is required for docker user directive to work
-    chmod 777 /opt && \
-    mkdir -m 777 /.cache  && \
-    mkdir -pm 777 /opt/app/ui/.next/cache && \
-    chown -R node:node /opt/app/ui/.next/cache
-
 USER node
-
-# Picked up for Node's .cache directory.
-ENV HOME=/
 
 EXPOSE 6246
 

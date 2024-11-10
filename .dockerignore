@@ -1,3 +1,7 @@
 node_modules
-.yarn
+.git
 data/
+server/dist
+ui/.next
+Dockerfile
+**/*.md
