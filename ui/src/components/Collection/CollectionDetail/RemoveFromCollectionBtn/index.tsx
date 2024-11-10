@@ -43,7 +43,7 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
         <Button
           buttonType="primary"
           buttonSize="md"
-          className="mt-2 mb-1 h-6 w-full text-zinc-200 shadow-md"
+          className="mb-1 mt-2 h-6 w-full text-zinc-200 shadow-md"
           onClick={() => setSure(true)}
         >
           {<TrashIcon className="m-auto ml-3 h-3" />}{' '}
@@ -53,7 +53,7 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
         <Button
           buttonType="primary"
           buttonSize="md"
-          className="mt-2 mb-1 h-6 w-full text-zinc-200 shadow-md"
+          className="mb-1 mt-2 h-6 w-full text-zinc-200 shadow-md"
           onClick={props.popup ? handlePopup : handle}
         >
           <p className="rules-button-text m-auto mr-2">{'Are you sure?'}</p>

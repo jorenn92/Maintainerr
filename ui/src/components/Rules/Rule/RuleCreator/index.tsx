@@ -39,15 +39,15 @@ const calculateRuleAmount = (
   sections: number,
 ): [number, number[]] => {
   const sectionAmounts = [] as number[]
-  data
-    ? data.rules.forEach((el) =>
-        el.section !== undefined
-          ? sectionAmounts[el.section]
-            ? sectionAmounts[el.section]++
-            : (sectionAmounts[el.section] = 1)
-          : (sectionAmounts[0] = 1),
-      )
-    : undefined
+  if (data) {
+    data.rules.forEach((el) =>
+      el.section !== undefined
+        ? sectionAmounts[el.section]
+          ? sectionAmounts[el.section]++
+          : (sectionAmounts[el.section] = 1)
+        : (sectionAmounts[0] = 1),
+    )
+  }
 
   return [
     sections,
@@ -57,12 +57,17 @@ const calculateRuleAmount = (
 
 const calculateRuleAmountArr = (ruleAmount: [number, number[]]) => {
   let s = 0,
-    r = 0,
-    lenS = ruleAmount[0]
+    r = 0
+  const lenS = ruleAmount[0]
 
   const worker: [number[], [number[]]] = [[], [[]]]
 
-  while (++s <= lenS) worker[0].push(s), s > 1 ? worker[1].push([]) : undefined
+  while (++s <= lenS) {
+    worker[0].push(s)
+    if (s > 1) {
+      worker[1].push([])
+    }
+  }
 
   for (const sec of worker[0]) {
     r = 0
@@ -73,10 +78,10 @@ const calculateRuleAmountArr = (ruleAmount: [number, number[]]) => {
 }
 
 const RuleCreator = (props: iRuleCreator) => {
-  const initialSections = props.editData
-    ? (props.editData.rules[props.editData.rules.length - 1]?.section! + 1 ??
-      undefined)
-    : undefined
+  const initialSections =
+    props.editData && props.editData.rules.length > 0
+      ? props.editData.rules[props.editData.rules.length - 1].section! + 1
+      : undefined
   const initialRuleAmount: [number, number[]] = initialSections
     ? calculateRuleAmount(props.editData, initialSections)
     : [1, [1]]
@@ -151,11 +156,13 @@ const RuleCreator = (props: iRuleCreator) => {
     added.current = [...added.current, ruleId]
 
     rulesCreated.current.map((e) => {
-      e.id >= ruleId ? (e.id = e.id + 1) : e.id
+      if (e.id >= ruleId) {
+        e.id = e.id + 1
+      }
       return e
     })
 
-    let rules = [...ruleAmount[1]]
+    const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] + 1
 
     updateRuleAmount([ruleAmount[0], rules])
@@ -250,7 +257,7 @@ const RuleCreator = (props: iRuleCreator) => {
               title={`Add a new section`}
             >
               {<ClipboardListIcon className="m-auto ml-5 h-5" />}
-              <p className="button-text m-auto ml-1 mr-5  text-zinc-200">
+              <p className="button-text m-auto ml-1 mr-5 text-zinc-200">
                 New Section
               </p>
             </button>

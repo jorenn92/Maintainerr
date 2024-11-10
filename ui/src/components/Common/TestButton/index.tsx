@@ -10,7 +10,7 @@ interface ITestButton {
 }
 
 interface TestStatus {
-  clicked: Boolean
+  clicked: boolean
   status: boolean
 }
 
@@ -32,12 +32,10 @@ const TestButton = (props: ITestButton) => {
     setLoading(true)
     await GetApiHandler(props.testUrl).then((resp: BasicResponse) => {
       setClicked({ clicked: true, status: resp.code == 1 ? true : false })
-      props.onClick
-        ? props.onClick({
-            status: resp.code === 1 ? true : false,
-            version: resp.message,
-          })
-        : undefined
+      props.onClick?.({
+        status: resp.code === 1 ? true : false,
+        version: resp.message,
+      })
       setLoading(false)
     })
   }

@@ -27,8 +27,8 @@ const SectionHeading = (props: ISectionHeading) => {
               onClick={addRule}
               title={`Add rule to section ${props.id}`}
             >
-              {<DocumentAddIcon className="m-auto h-5 ml-5 text-zinc-200" />}
-              <p className="m-auto ml-1 mr-5 text-zinc-100 button-text">Add</p>
+              {<DocumentAddIcon className="m-auto ml-5 h-5 text-zinc-200" />}
+              <p className="button-text m-auto ml-1 mr-5 text-zinc-100">Add</p>
             </button>
           ) : undefined}
         </div>

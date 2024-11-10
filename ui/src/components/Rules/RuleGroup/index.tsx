@@ -49,7 +49,7 @@ const RuleGroup = (props: {
   return (
     <div className="relative mb-5 flex w-full flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:flex-row">
       <div className="relative z-10 flex w-full min-w-0 flex-col pr-4 sm:w-5/6 sm:flex-row">
-        <div className="mb-3 flex flex-col sm:mb-0 sm:w-5/6 ">
+        <div className="mb-3 flex flex-col sm:mb-0 sm:w-5/6">
           <div className="flex text-xs font-medium text-white">
             <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-base font-bold text-white sm:text-lg">
               {props.group.name}
@@ -57,11 +57,13 @@ const RuleGroup = (props: {
           </div>
 
           <div className="my-0.5 flex text-sm sm:my-1">
-            <span className="mr-2 font-bold w-full overflow-hidden overflow-ellipsis">{props.group.description}</span>
+            <span className="mr-2 w-full overflow-hidden overflow-ellipsis font-bold">
+              {props.group.description}
+            </span>
           </div>
         </div>
 
-        <div className="w-full flex-col text-left sm:w-1/6 ">
+        <div className="w-full flex-col text-left sm:w-1/6">
           <span className="text-sm font-medium">Status </span>
           {props.group.isActive ? (
             <span className="text-sm font-bold text-green-900">Active</span>
@@ -71,7 +73,7 @@ const RuleGroup = (props: {
           <div className="m-auto mr-2 flex text-sm font-medium">
             {`Library ${
               LibrariesCtx.libraries.find(
-                (el) => +el.key === +props.group.libraryId
+                (el) => +el.key === +props.group.libraryId,
               )?.title
             }`}
           </div>
@@ -88,7 +90,7 @@ const RuleGroup = (props: {
       </div>
 
       <div className="m-auto w-full sm:w-1/6">
-        <div className="mb-2 flex h-auto ">
+        <div className="mb-2 flex h-auto">
           <EditButton
             onClick={onEdit}
             text="Edit"

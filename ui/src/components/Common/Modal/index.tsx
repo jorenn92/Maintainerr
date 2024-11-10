@@ -82,21 +82,20 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement>(null)
   useClickOutside(modalRef, () => {
-    typeof onCancel === 'function' && backgroundClickable
-      ? onCancel()
-      : undefined
+    if (typeof onCancel === 'function' && backgroundClickable) {
+      onCancel()
+    }
   })
   useLockBodyScroll(true, disableScrollLock)
 
   return ReactDOM.createPortal(
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
-      className="fixed top-0 bottom-0 left-0 right-0 z-50 flex h-full w-full items-center justify-center bg-zinc-800 bg-opacity-70"
+      className="fixed bottom-0 left-0 right-0 top-0 z-50 flex h-full w-full items-center justify-center bg-zinc-800 bg-opacity-70"
       onKeyDown={(e) => {
         if (e.key === 'Escape') {
-          typeof onCancel === 'function' && backgroundClickable
-            ? onCancel()
-            : undefined
+          if (typeof onCancel === 'function' && backgroundClickable) {
+            onCancel()
+          }
         }
       }}
     >
@@ -123,7 +122,7 @@ const Modal: React.FC<ModalProps> = ({
         show={!loading}
       >
         <div
-          className={`relative inline-block w-full transform overflow-auto bg-zinc-700 px-4 pt-5 pb-4 text-left align-bottom shadow-xl ring-1 ring-zinc-700 transition-all sm:my-8 ${maxWidthMap[size]} sm:rounded-lg sm:align-middle`}
+          className={`relative inline-block w-full transform overflow-auto bg-zinc-700 px-4 pb-4 pt-5 text-left align-bottom shadow-xl ring-1 ring-zinc-700 transition-all sm:my-8 ${maxWidthMap[size]} sm:rounded-lg sm:align-middle`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-headline"
@@ -155,7 +154,7 @@ const Modal: React.FC<ModalProps> = ({
             </div>
           )}
           {typeof onSpecial === 'function' && (
-            <div className="flex justify-center sm:justify-end mt-4">
+            <div className="mt-4 flex justify-center sm:justify-end">
               <Button
                 buttonType={specialButtonType}
                 onClick={onSpecial}

@@ -37,7 +37,7 @@ const Rules: React.FC = () => {
   }, [selectedLibrary])
 
   const showAddModal = () => {
-    addModalActive ? setAddModal(false) : setAddModal(true)
+    setAddModal(!addModalActive)
   }
 
   const onSwitchLibrary = (libraryId: number) => {
@@ -106,11 +106,11 @@ const Rules: React.FC = () => {
       <div className="w-full">
         <LibrarySwitcher onSwitch={onSwitchLibrary} />
 
-        <div className="m-auto mb-5 flex ">
+        <div className="m-auto mb-5 flex">
           <div className="ml-auto sm:ml-0">
             <AddButton onClick={showAddModal} text="New Rule" />
           </div>
-          <div className="ml-2 mr-auto sm:mr-0 ">
+          <div className="ml-2 mr-auto sm:mr-0">
             <ExecuteButton
               onClick={debounce(sync, 5000, {
                 leading: true,

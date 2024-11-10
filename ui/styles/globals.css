@@ -135,15 +135,11 @@
   }
 
   .edit-button {
-    @apply /*
-
-    background-color: #3f3f46; */ bg-amber-900;
+    @apply /* background-color: #3f3f46; */ bg-amber-900;
   }
 
   .edit-button:hover {
-    @apply /*
-
-    background: #3a3a42; */ bg-amber-800;
+    @apply /* background: #3a3a42; */ bg-amber-800;
   }
 
   .delete-button {
@@ -177,7 +173,7 @@
   }
 
   .slider-header {
-    @apply relative mt-6 mb-4 flex;
+    @apply relative mb-4 mt-6 flex;
   }
 
   .slider-title {
@@ -244,7 +240,7 @@
   }
 
   .media-overview {
-    @apply flex flex-col pt-8 pb-4 text-white lg:flex-row;
+    @apply flex flex-col pb-4 pt-8 text-white lg:flex-row;
   }
 
   .media-overview-left {
@@ -302,7 +298,7 @@
   }
 
   .error-message {
-    @apply relative top-0 bottom-0 left-0 right-0 flex h-screen flex-col items-center justify-center text-center text-zinc-300;
+    @apply relative bottom-0 left-0 right-0 top-0 flex h-screen flex-col items-center justify-center text-center text-zinc-300;
   }
 
   .heading {
@@ -338,7 +334,7 @@
   }
 
   .section {
-    @apply mt-6 mb-10 text-white;
+    @apply mb-10 mt-6 text-white;
   }
 
   .form-row {
@@ -346,7 +342,7 @@
   }
 
   .form-input {
-    @apply text-sm text-white sm:col-span-2 border-0 bg-inherit;
+    @apply border-0 bg-inherit text-sm text-white sm:col-span-2;
   }
 
   .form-input-field {
@@ -548,7 +544,7 @@
   .react-select-container .react-select__input-container,
   .react-select-container .react-select__placeholder,
   .react-select-container .react-select__single-value {
-    @apply text-white font-semibold;
+    @apply font-semibold text-white;
   }
 }
 

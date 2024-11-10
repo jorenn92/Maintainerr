@@ -8,11 +8,11 @@ interface IAddButton {
 const AddButton = (props: IAddButton) => {
   return (
     <button
-      className="add-button bg-amber-600 hover:bg-amber-500 flex m-auto h-9 rounded text-zinc-200 shadow-md"
+      className="add-button m-auto flex h-9 rounded bg-amber-600 text-zinc-200 shadow-md hover:bg-amber-500"
       onClick={props.onClick}
     >
-      {<PlusCircleIcon className="m-auto h-5 ml-4" />}
-      <p className="m-auto rules-button-text ml-1 mr-4">{props.text}</p>
+      {<PlusCircleIcon className="m-auto ml-4 h-5" />}
+      <p className="rules-button-text m-auto ml-1 mr-4">{props.text}</p>
     </button>
   )
 }

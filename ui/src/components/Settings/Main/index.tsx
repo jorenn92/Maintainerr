@@ -143,8 +143,8 @@ const MainSettings = () => {
 
           <div className="actions mt-5 w-full">
             <div className="flex justify-end">
-              <div className="w-full flex">
-                <span className="mr-auto flex  rounded-md shadow-sm">
+              <div className="flex w-full">
+                <span className="mr-auto flex rounded-md shadow-sm">
                   <DocsButton />
                 </span>
                 <span className="ml-auto flex rounded-md shadow-sm">

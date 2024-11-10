@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
-import { IsNull, Not, Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { isValidCron } from 'cron-validator';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';

@@ -15,4 +15,4 @@ const ormConfig: TypeOrmModuleOptions = {
   autoLoadEntities: true,
   migrationsRun: true,
 };
-export = ormConfig;
+export default ormConfig;

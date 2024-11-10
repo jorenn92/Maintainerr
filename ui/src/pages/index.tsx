@@ -8,7 +8,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     router.push('/overview')
   }, [router])
-  
+
   return <></>
 }
 

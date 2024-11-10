@@ -66,7 +66,7 @@ const Collection = () => {
       id != 9999
         ? LibrariesCtx.libraries.find((el) => +el.key === id)
         : undefined
-    lib ? setLibrary(lib) : setLibrary(undefined)
+    setLibrary(lib)
   }
 
   useEffect(() => {

@@ -181,7 +181,7 @@ const MediaCard: React.FC<IMediaCard> = ({
 
           {/* on collection page and for manually added */}
           {collectionPage && isManual && !showDetail ? (
-            <div className="absolute left-1/2 transform -translate-x-1/2 bottom-0 flex items-center justify-between p-2">
+            <div className="absolute bottom-0 left-1/2 flex -translate-x-1/2 transform items-center justify-between p-2">
               <div
                 className={`pointer-events-none z-40 rounded-full shadow ${
                   mediaType === 'movie'
@@ -252,7 +252,12 @@ const MediaCard: React.FC<IMediaCard> = ({
             leaveTo="opacity-0"
           >
             <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-zinc-800 bg-opacity-75 text-zinc-200">
-              <Spinner className="h-10 w-10" />
+              <CachedImage
+                priority
+                src={Spinner}
+                className="h-10 w-10"
+                alt=""
+              />
             </div>
           </Transition>
 
@@ -315,7 +320,7 @@ const MediaCard: React.FC<IMediaCard> = ({
                         <Button
                           buttonType="twin-primary-l"
                           buttonSize="md"
-                          className="mb-1 mt-2  h-6 w-1/2 text-zinc-200 shadow-md"
+                          className="mb-1 mt-2 h-6 w-1/2 text-zinc-200 shadow-md"
                           onClick={() => {
                             setAddModal(true)
                           }}

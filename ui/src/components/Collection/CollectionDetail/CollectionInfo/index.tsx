@@ -180,7 +180,7 @@ const CollectionInfo = (props: ICollectionInfo) => {
         </li>
       </ul>
 
-      <div className="text-zinc-300 font-bold heading mt-5">
+      <div className="heading mt-5 font-bold text-zinc-300">
         <h2>{'Logs'}</h2>
       </div>
 
@@ -188,7 +188,7 @@ const CollectionInfo = (props: ICollectionInfo) => {
         {/* full container */}
         <div className="mb-2 flex flex-grow flex-col sm:flex-grow-0 sm:flex-row sm:justify-end">
           {/* search */}
-          <div className="mt-4 flex flex-grow mr-2 sm:w-1/2 w-full">
+          <div className="mr-2 mt-4 flex w-full flex-grow sm:w-1/2">
             <span className="inline-flex cursor-default items-center rounded-l-md border border-r-0 border-gray-500 bg-zinc-800 px-3 text-sm text-gray-100">
               <SearchIcon className="h-6 w-6" />
             </span>
@@ -203,7 +203,7 @@ const CollectionInfo = (props: ICollectionInfo) => {
           {/* sort/filter container */}
           <div className="mb-2 flex flex-1 flex-row justify-between sm:mb-0 sm:flex-none">
             {/* sort */}
-            <div className="mt-4 mr-2 flex flex-grow sm:w-1/2">
+            <div className="mr-2 mt-4 flex flex-grow sm:w-1/2">
               <span className="inline-flex cursor-default items-center rounded-l-md border border-r-0 border-gray-500 bg-zinc-800 px-3 text-sm text-gray-100">
                 {currentSort === 'DESC' ? (
                   <SortDescendingIcon className="h-6 w-6" />
@@ -311,7 +311,7 @@ const CollectionInfo = (props: ICollectionInfo) => {
                 {loadingExtraRef.current ? (
                   <tr>
                     <Table.TD colSpan={2} noPadding>
-                      <SmallLoadingSpinner className="w-8 m-auto mt-2 mb-2" />
+                      <SmallLoadingSpinner className="m-auto mb-2 mt-2 w-8" />
                     </Table.TD>
                   </tr>
                 ) : undefined}

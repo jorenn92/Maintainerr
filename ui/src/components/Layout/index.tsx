@@ -51,7 +51,7 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
             WebkitBackdropFilter: isScrolled ? 'blur(5px)' : undefined,
           }}
         >
-          <div className="flex flex-1 items-center justify-between pr-4 md:pr-4 md:pl-4 transparent-glass-bg">
+          <div className="transparent-glass-bg flex flex-1 items-center justify-between pr-4 md:pl-4 md:pr-4">
             <button
               className={`px-4 text-white ${
                 isScrolled ? 'opacity-90' : 'opacity-70'

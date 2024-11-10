@@ -69,7 +69,7 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
               <label htmlFor="name" className="text-label">
                 Name *
               </label>
-              <div className="form-input ">
+              <div className="form-input">
                 <div className="form-input-field">
                   <input
                     className="!bg-zinc-800"

@@ -20,13 +20,13 @@ const SearchBar = (props: ISearchBar) => {
     props.onSearch(text)
   }, [text])
 
-  let inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
+  const inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value.toLowerCase())
   }
 
   return (
     <div className="relative flex w-full items-center text-white focus-within:text-zinc-200">
-      <div className="pointer-events-none absolute  left-4 flex items-center">
+      <div className="pointer-events-none absolute left-4 flex items-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"

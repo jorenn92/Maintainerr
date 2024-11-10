@@ -16,8 +16,8 @@ const CollectionOverview = (props: ICollectionOverview) => {
     <div>
       <LibrarySwitcher onSwitch={props.onSwitchLibrary} />
 
-      <div className="m-auto mb-3 flex ">
-        <div className="m-auto sm:m-0 ">
+      <div className="m-auto mb-3 flex">
+        <div className="m-auto sm:m-0">
           <ExecuteButton
             onClick={debounce(props.doActions, 5000, {
               leading: true,
@@ -38,7 +38,7 @@ const CollectionOverview = (props: ICollectionOverview) => {
           {props.collections?.map((col) => (
             <li
               key={+col.id!}
-              className="collection relative mb-5 flex h-fit flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:mb-0 sm:mr-5 xs:w-full transform-gpu"
+              className="collection relative mb-5 flex h-fit transform-gpu flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 xs:w-full sm:mb-0 sm:mr-5"
             >
               <CollectionItem
                 key={col.id}

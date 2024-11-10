@@ -14,7 +14,7 @@ interface IInteractionProvider {
 }
 
 export const InteractionProvider: React.FC<IInteractionProvider> = (
-  props: IInteractionProvider
+  props: IInteractionProvider,
 ) => {
   const isTouch = useInteraction()
 

@@ -9,7 +9,7 @@ interface IDocsButton {
 
 const DocsButton = (props: IDocsButton) => {
   return (
-    <span className="h-full w-full inline-flex">
+    <span className="inline-flex h-full w-full">
       <Link
         legacyBehavior
         href={`https://docs.maintainerr.info/${props.page ? props.page : ''}`}
