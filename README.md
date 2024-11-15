@@ -94,6 +94,7 @@ services:
         environment:
           - TZ=Europe/Brussels
 #      - DEBUG=true # uncomment to enable debug logs
+#      - UI_HOSTNAME=:: # uncomment if you want to listen on IPv6 instead (default 0.0.0.0)
 #      - UI_PORT=6247 # uncomment to change the UI port (default 6246). Useful if you're on a network where the port is already in use
 #      - API_PORT=3002 # uncomment to change the API port (default 3001). Useful if you're on a network where the port is already in use
         ports:
