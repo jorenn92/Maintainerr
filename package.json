@@ -45,7 +45,7 @@
     "axios": "^1.7.7",
     "bowser": "^2.11.0",
     "chalk": "^4.1.2",
-    "cron": "3.1.3",
+    "cron": "3.2.1",
     "cron-validator": "^1.3.1",
     "crypto": "^1.0.1",
     "http-server": "^14.1.1",
