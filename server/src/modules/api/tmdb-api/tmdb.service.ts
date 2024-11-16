@@ -26,18 +26,13 @@ import {
   TmdbUpcomingMoviesResponse,
 } from './interfaces/tmdb.interface';
 
-const ANIME_KEYWORD_ID = 210024;
-
 export class TmdbApiService extends ExternalApiService {
   private region?: string;
   private originalLanguage?: string;
-  constructor(
-    private logger: Logger,
-    {
-      region,
-      originalLanguage,
-    }: { region?: string; originalLanguage?: string } = {},
-  ) {
+  constructor({
+    region,
+    originalLanguage,
+  }: { region?: string; originalLanguage?: string } = {}) {
     super(
       'https://api.themoviedb.org/3',
       {
@@ -49,6 +44,7 @@ export class TmdbApiService extends ExternalApiService {
     );
     this.region = region;
     this.originalLanguage = originalLanguage;
+    this.logger = new Logger(TmdbApiService.name);
   }
 
   public searchMulti = async ({

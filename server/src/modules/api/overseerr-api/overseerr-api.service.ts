@@ -154,8 +154,7 @@ export class OverseerrApiService {
 
   public async init() {
     this.api = new OverseerrApi({
-      url: `${this.settings.overseerr_url}/api/v1`,
-      cacheName: 'overseerr',
+      url: `${this.settings.overseerr_url?.replace(/\/$/, '')}/api/v1`,
       apiKey: `${this.settings.overseerr_api_key}`,
     });
   }
@@ -202,10 +201,10 @@ export class OverseerrApiService {
       let hasNext = true;
       let skip = 0;
 
-      let users: OverseerrUserResponseResult[] = [];
+      const users: OverseerrUserResponseResult[] = [];
 
       while (hasNext) {
-        let resp: OverseerrUserResponse = await this.api.get(
+        const resp: OverseerrUserResponse = await this.api.get(
           `/user?take=${size}&skip=${skip}`,
         );
 

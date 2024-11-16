@@ -74,29 +74,26 @@ class PlexApi extends NodePlexAPI {
         uri: options,
       };
     }
-    try {
-      const cacheKey = this.serializeCacheKey(options);
-      const cachedItem = this.cache.data.get<T>(cacheKey);
 
-      if (cachedItem && doCache) {
-        return cachedItem;
-      } else {
-        const response = await super.query<T>(options);
-        if (doCache) this.cache.data.set(cacheKey, response);
-        return response;
-      }
-    } catch (err) {
-      return undefined;
+    const cacheKey = this.serializeCacheKey(options);
+    const cachedItem = this.cache.data.get<T>(cacheKey);
+
+    if (cachedItem && doCache) {
+      return cachedItem;
+    } else {
+      const response = await super.query<T>(options);
+      if (doCache) this.cache.data.set(cacheKey, response);
+      return response;
     }
   }
 
-  deleteQuery<T>(arg) {
+  deleteQuery(arg) {
     return super.deleteQuery(arg);
   }
-  postQuery<T>(arg) {
+  postQuery(arg) {
     return super.postQuery(arg);
   }
-  putQuery<T>(arg) {
+  putQuery(arg) {
     return super.putQuery(arg);
   }
 

@@ -27,14 +27,6 @@ export class SettingDto {
 
   overseerr_api_key: string;
 
-  radarr_url: string;
-
-  radarr_api_key: string;
-
-  sonarr_url: string;
-
-  sonarr_api_key: string;
-
   tautulli_url: string;
 
   tautulli_api_key: string;

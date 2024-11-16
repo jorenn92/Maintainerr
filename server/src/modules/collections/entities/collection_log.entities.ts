@@ -19,7 +19,7 @@ export class CollectionLog {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Collection, (collection) => collection.collectionLog, {
+  @ManyToOne(() => Collection, (collection) => collection.collectionLog, {
     onDelete: 'CASCADE',
   })
   collection: Collection;

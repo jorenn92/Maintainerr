@@ -64,7 +64,7 @@ export class CollectionsController {
 
   @Post('/handle')
   handleCollection() {
-    return this.collectionWorkerService.execute();
+    this.collectionWorkerService.execute().catch((e) => console.error(e));
   }
 
   @Put('/schedule/update')
@@ -183,7 +183,7 @@ export class CollectionsController {
   ) {
     const size = amount ? amount : 25;
     const offset = (page - 1) * size;
-    return this.collectionService.getCollectionLogsWithhPaging(
+    return this.collectionService.getCollectionLogsWithPaging(
       id,
       {
         offset: offset,

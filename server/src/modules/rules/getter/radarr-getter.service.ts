@@ -1,18 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
-import { RadarrApi } from '../../../modules/api/servarr-api/helpers/radarr.helper';
-import { ServarrService } from '../../../modules/api/servarr-api/servarr.service';
-import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
+import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
+import { ServarrService } from '../../api/servarr-api/servarr.service';
+import { TmdbIdService } from '../../api/tmdb-api/tmdb-id.service';
 import {
   Application,
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import { RulesDto } from '../dtos/rules.dto';
 
 @Injectable()
 export class RadarrGetterService {
-  api: RadarrApi;
   plexProperties: Property[];
   private readonly logger = new Logger(RadarrGetterService.name);
 
@@ -20,14 +18,20 @@ export class RadarrGetterService {
     private readonly servarrService: ServarrService,
     private readonly tmdbIdHelper: TmdbIdService,
   ) {
-    this.api = servarrService.RadarrApi;
     const ruleConstanst = new RuleConstants();
     this.plexProperties = ruleConstanst.applications.find(
       (el) => el.id === Application.RADARR,
     ).props;
   }
 
-  async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
+  async get(id: number, libItem: PlexLibraryItem, ruleGroup?: RulesDto) {
+    if (!ruleGroup.collection?.radarrSettingsId) {
+      this.logger.error(
+        `No Radarr server configured for ${ruleGroup.collection?.title}`,
+      );
+      return null;
+    }
+
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
@@ -41,8 +45,11 @@ export class RadarrGetterService {
         return null;
       }
 
-      const movieResponse =
-        await this.servarrService.RadarrApi.getMovieByTmdbId(tmdb.id);
+      const radarrApiClient = await this.servarrService.getRadarrApiClient(
+        ruleGroup.collection.radarrSettingsId,
+      );
+
+      const movieResponse = await radarrApiClient.getMovieByTmdbId(tmdb.id);
       if (movieResponse) {
         switch (prop.name) {
           case 'addDate': {
@@ -85,14 +92,14 @@ export class RadarrGetterService {
           }
           case 'tags': {
             const movieTags = movieResponse?.tags;
-            return (await this.servarrService.RadarrApi.getTags())
+            return (await radarrApiClient.getTags())
               ?.filter((el) => movieTags.includes(el.id))
               .map((el) => el.label);
           }
           case 'profile': {
             const movieProfile = movieResponse?.qualityProfileId;
 
-            return (await this.servarrService.RadarrApi.getProfiles())?.find(
+            return (await radarrApiClient.getProfiles())?.find(
               (el) => el.id === movieProfile,
             ).name;
           }

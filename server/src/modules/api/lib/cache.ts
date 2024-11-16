@@ -1,30 +1,38 @@
 import NodeCache from 'node-cache';
 
-export type AvailableCacheIds =
+type AvailableCacheIds =
   | 'tmdb'
-  | 'radarr'
-  | 'sonarr'
   | 'plexguid'
   | 'plextv'
   | 'overseerr'
   | 'plexcommunity'
   | 'tautulli';
 
+type CacheType = AvailableCacheIds | 'radarr' | 'sonarr';
+
 const DEFAULT_TTL = 300; // 5 min
 const DEFAULT_CHECK_PERIOD = 120; // 2 min
 
+type CacheOptions = {
+  stdTtl?: number;
+  checkPeriod?: number;
+};
+
 export class Cache {
-  public id: AvailableCacheIds;
+  public id: string;
   public data: NodeCache;
   public name: string;
+  public type?: CacheType;
 
   constructor(
-    id: AvailableCacheIds,
+    id: string,
     name: string,
-    options: { stdTtl?: number; checkPeriod?: number } = {},
+    type: CacheType,
+    options: CacheOptions = {},
   ) {
     this.id = id;
     this.name = name;
+    this.type = type;
     this.data = new NodeCache({
       stdTTL: options.stdTtl ?? DEFAULT_TTL,
       checkperiod: options.checkPeriod ?? DEFAULT_CHECK_PERIOD,
@@ -42,21 +50,42 @@ export class Cache {
 
 class CacheManager {
   private availableCaches: Record<AvailableCacheIds, Cache> = {
-    tmdb: new Cache('tmdb', 'The Movie Database API', {
+    tmdb: new Cache('tmdb', 'The Movie Database API', 'tmdb', {
       stdTtl: 21600, // 6 hours
       checkPeriod: 60 * 30,
     }),
-    radarr: new Cache('radarr', 'Radarr API'),
-    sonarr: new Cache('sonarr', 'Sonarr API'),
-    plexguid: new Cache('plexguid', 'Plex GUID'),
-    plextv: new Cache('plextv', 'Plex.tv'),
-    overseerr: new Cache('overseerr', 'Overseerr API'),
-    plexcommunity: new Cache('plexcommunity', 'community.Plex.tv'),
-    tautulli: new Cache('tautulli', 'Tautulli API'),
+    plexguid: new Cache('plexguid', 'Plex GUID', 'plexguid'),
+    plextv: new Cache('plextv', 'Plex.tv', 'plextv'),
+    overseerr: new Cache('overseerr', 'Overseerr API', 'overseerr'),
+    plexcommunity: new Cache(
+      'plexcommunity',
+      'community.Plex.tv',
+      'plexcommunity',
+    ),
+    tautulli: new Cache('tautulli', 'Tautulli API', 'tautulli'),
   };
 
-  public getCache(id: AvailableCacheIds): Cache {
+  public createCache(
+    id: string,
+    name: string,
+    type: CacheType,
+    options?: CacheOptions,
+  ): Cache {
+    if (this.availableCaches[id]) {
+      throw new Error(`Cache with id ${id} already exists.`);
+    }
+
+    return (this.availableCaches[id] = new Cache(id, name, type, options));
+  }
+
+  public getCache(id: string): Cache | undefined {
     return this.availableCaches[id];
+  }
+
+  public getCachesByType(type: CacheType): Cache[] {
+    return Object.values(this.availableCaches).filter(
+      (cache) => cache.type === type,
+    );
   }
 
   public getAllCaches(): Record<string, Cache> {
@@ -64,7 +93,7 @@ class CacheManager {
   }
 
   public flushAll(): void {
-    for (const [key, value] of Object.entries(this.getAllCaches())) {
+    for (const [, value] of Object.entries(this.getAllCaches())) {
       value.flush();
     }
   }
