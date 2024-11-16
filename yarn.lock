@@ -4442,13 +4442,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/luxon@npm:~3.3.0":
-  version: 3.3.8
-  resolution: "@types/luxon@npm:3.3.8"
-  checksum: 10c0/f2ffa31364eb94ca0474a196f533d301025a203bb2758ce0cf209f338cece0af169edea230b5c0b1a68a71adb02f369faa5ec0bd824deb8f0a08cac6803b1b06
-  languageName: node
-  linkType: hard
-
 "@types/luxon@npm:~3.4.0":
   version: 3.4.2
   resolution: "@types/luxon@npm:3.4.2"
@@ -7044,16 +7037,6 @@ __metadata:
   version: 1.3.1
   resolution: "cron-validator@npm:1.3.1"
   checksum: 10c0/80d276a729959ceaf394a3ffd579579895ca3cf956e552aef351e4d3695c7baf5594e3f2ac8a11514520c94eeef66ad0b91424f938a7e0609e5557175f41349b
-  languageName: node
-  linkType: hard
-
-"cron@npm:3.1.3":
-  version: 3.1.3
-  resolution: "cron@npm:3.1.3"
-  dependencies:
-    "@types/luxon": "npm:~3.3.0"
-    luxon: "npm:~3.4.0"
-  checksum: 10c0/bc9048376a7fef8bc2abfaf99406be728370b94efd423c74c71085e7bf98ccb51656d16b5f0065c1fbe358aebc8ec1ea11eac3228b76a2e7a352ce41b3b28281
   languageName: node
   linkType: hard
 
@@ -11715,7 +11698,6 @@ __metadata:
     axios: "npm:^1.7.7"
     bowser: "npm:^2.11.0"
     chalk: "npm:^4.1.2"
-    cron: "npm:3.1.3"
     cron-validator: "npm:^1.3.1"
     crypto: "npm:^1.0.1"
     eslint: "npm:^9.12.0"
