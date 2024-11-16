@@ -2,6 +2,7 @@ import { InformationCircleIcon, HeartIcon } from '@heroicons/react/solid'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
+import Releases from './Releases'
 
 interface VersionResponse {
   status: 1 | 0
@@ -253,6 +254,11 @@ const AboutSettings = () => {
         </div>
       </div>
       {/* End Userful Links */}
+      {/* Show Releases */}
+      <div className="section">
+        {/* <Releases currentVersion={data.version} /> */}
+      </div>
+      {/* End Showing Releases */}
     </div>
   )
 }
