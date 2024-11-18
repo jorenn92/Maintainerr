@@ -29,6 +29,8 @@ export interface ICollection {
   lastDurationInSeconds: number
   keepLogsForMonths: number
   tautulliWatchedPercentOverride?: number
+  radarrSettingsId?: number
+  sonarrSettingsId?: number
 }
 
 export interface ICollectionMedia {

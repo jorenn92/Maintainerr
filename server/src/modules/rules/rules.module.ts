@@ -31,6 +31,8 @@ import { TautulliGetterService } from './getter/tautulli-getter.service';
 import { NotificationService } from '../notifications/notifications.service';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { Notification } from '../notifications/entities/notification.entities';
+import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
+import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { Notification } from '../notifications/entities/notification.entities';
       Exclusion,
       CommunityRuleKarma,
       Settings,
+      RadarrSettings,
+      SonarrSettings,
       Notification
     ]),
     OverseerrApiModule,

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://docs.maintainerr.info
+    about: Please consult the documentation before opening any issues.
+  - name: 🚀 Feature Requests
+    url: https://features.maintainerr.info
+    about: Please share and vote on feature ideas here.
+  - name: 🙋 Discord Support
+    url: https://discord.gg/WP4ZW2QYwk
+    about: Join our Discord community to ask questions and get help.

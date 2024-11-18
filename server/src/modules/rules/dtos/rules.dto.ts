@@ -20,5 +20,7 @@ export class RulesDto {
   manualCollectionName?: string;
   dataType: EPlexDataType;
   tautulliWatchedPercentOverride?: number;
-  notifications?: Notification[]
+  notifications?: Notification[];
+  radarrSettingsId?: number;
+  sonarrSettingsId?: number;
 }

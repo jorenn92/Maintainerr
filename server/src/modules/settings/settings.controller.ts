@@ -1,7 +1,18 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { SettingDto } from "./dto's/setting.dto";
 import { SettingsService } from './settings.service';
 import { CronScheduleDto } from "./dto's/cron.schedule.dto";
+import { RadarrSettingRawDto } from "./dto's/radarr-setting.dto";
+import { SonarrSettingRawDto } from "./dto's/sonarr-setting.dto";
 
 @Controller('/api/settings')
 export class SettingsController {
@@ -10,6 +21,14 @@ export class SettingsController {
   @Get()
   getSettings() {
     return this.settingsService.getSettings();
+  }
+  @Get('/radarr')
+  getRadarrSettings() {
+    return this.settingsService.getRadarrSettings();
+  }
+  @Get('/sonarr')
+  getSonarrSettings() {
+    return this.settingsService.getSonarrSettings();
   }
   @Get('/version')
   getVersion() {
@@ -41,14 +60,58 @@ export class SettingsController {
   testOverseerr() {
     return this.settingsService.testOverseerr();
   }
-  @Get('/test/radarr')
-  testRadarr() {
-    return this.settingsService.testRadarr();
+  @Post('/test/radarr')
+  testRadarr(@Body() payload: RadarrSettingRawDto) {
+    return this.settingsService.testRadarr(payload);
   }
-  @Get('/test/sonarr')
-  testSonarr() {
-    return this.settingsService.testSonarr();
+
+  @Post('/radarr')
+  async addRadarrSetting(@Body() payload: RadarrSettingRawDto) {
+    return await this.settingsService.addRadarrSetting(payload);
   }
+
+  @Put('/radarr/:id')
+  async updateRadarrSetting(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body() payload: RadarrSettingRawDto,
+  ) {
+    return await this.settingsService.updateRadarrSetting({
+      id,
+      ...payload,
+    });
+  }
+
+  @Delete('/radarr/:id')
+  async deleteRadarrSetting(@Param('id', new ParseIntPipe()) id: number) {
+    return await this.settingsService.deleteRadarrSetting(id);
+  }
+
+  @Post('/test/sonarr')
+  testSonarr(@Body() payload: SonarrSettingRawDto) {
+    return this.settingsService.testSonarr(payload);
+  }
+
+  @Post('/sonarr')
+  async addSonarrSetting(@Body() payload: SonarrSettingRawDto) {
+    return await this.settingsService.addSonarrSetting(payload);
+  }
+
+  @Put('/sonarr/:id')
+  async updateSonarrSetting(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body() payload: SonarrSettingRawDto,
+  ) {
+    return await this.settingsService.updateSonarrSetting({
+      id,
+      ...payload,
+    });
+  }
+
+  @Delete('/sonarr/:id')
+  async deleteSonarrSetting(@Param('id', new ParseIntPipe()) id: number) {
+    return await this.settingsService.deleteSonarrSetting(id);
+  }
+
   @Get('/test/plex')
   testPlex() {
     return this.settingsService.testPlex();
