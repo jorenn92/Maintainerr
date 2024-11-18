@@ -79,12 +79,7 @@ class EmailAgent implements NotificationAgent {
     type: NotificationType,
     payload: NotificationPayload,
   ): Promise<boolean> {
-    this.logger.log('Sending email notification', {
-      label: 'Notifications',
-      recipient: this.settings.options.emailTo,
-      type: NotificationType[type],
-      subject: payload.subject,
-    });
+    this.logger.log('Sending email notification');
 
     try {
       const email = new PreparedEmail(
@@ -100,13 +95,8 @@ class EmailAgent implements NotificationAgent {
         ),
       );
     } catch (e) {
-      this.logger.error('Error sending email notification', {
-        label: 'Notifications',
-        recipient: this.getSettings().options.emailTo,
-        type: NotificationType[type],
-        subject: payload.subject,
-        errorMessage: e.message,
-      });
+      this.logger.error('Error sending email notification');
+      this.logger.debug(e);
 
       return false;
     }

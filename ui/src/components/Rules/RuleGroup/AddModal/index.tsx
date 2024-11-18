@@ -98,7 +98,9 @@ const AddModal = (props: AddModal) => {
   const [
     configuredNotificationConfigurations,
     setConfiguredNotificationConfigurations,
-  ] = useState<AgentConfiguration[]>([])
+  ] = useState<AgentConfiguration[]>(
+    props.editData?.notifications ? props.editData?.notifications : [],
+  )
 
   const { addToast } = useToasts()
 
@@ -943,6 +945,7 @@ const AddModal = (props: AddModal) => {
                   onCancel={() => {
                     setConfigureNotificationModal(false)
                   }}
+                  selectedAgents={configuredNotificationConfigurations}
                 />
               ) : undefined}
 

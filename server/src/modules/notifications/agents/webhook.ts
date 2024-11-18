@@ -102,11 +102,7 @@ class WebhookAgent implements NotificationAgent {
       return true;
     }
 
-    this.logger.debug('Sending webhook notification', {
-      label: 'Notifications',
-      type: NotificationType[type],
-      subject: payload.subject,
-    });
+    this.logger.debug('Sending webhook notification');
 
     try {
       await axios.post(
@@ -123,13 +119,8 @@ class WebhookAgent implements NotificationAgent {
 
       return true;
     } catch (e) {
-      this.logger.error('Error sending webhook notification', {
-        label: 'Notifications',
-        type: NotificationType[type],
-        subject: payload.subject,
-        errorMessage: e.message,
-        response: e.response?.data,
-      });
+      this.logger.error('Error sending webhook notification');
+      this.logger.debug(e);
 
       return false;
     }

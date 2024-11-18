@@ -7,11 +7,10 @@ export class NotificationsController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @Post('/test')
-  public async sendNotification() {
-    // this.notificationService.handleNotification(NotificationType.TEST_NOTIFICATION, null);
+  public async sendTestNotification() {
     this.notificationService.handleNotification(
-      NotificationType.MEDIA_HANDLED,
-      [{ plexId: 22423 }, { plexId: 22424 }], 'My name is Josh', 7
+      NotificationType.TEST_NOTIFICATION,
+      null,
     );
   }
 
@@ -29,11 +28,12 @@ export class NotificationsController {
   async addNotificationConfiguration(
     @Body()
     payload: {
+      id?: number;
       agent: string;
       name: string;
       enabled: boolean;
       types: number[];
-      options: {};
+      options: object;
     },
   ) {
     return this.notificationService.addNotificationConfiguration(payload);

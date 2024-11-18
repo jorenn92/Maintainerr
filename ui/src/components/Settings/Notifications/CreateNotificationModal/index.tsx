@@ -27,13 +27,7 @@ export interface AgentConfiguration {
 }
 
 interface CreateNotificationModal {
-  selected?: {
-    id: number
-    name: string
-    enabled: boolean
-    agent: string
-    types: number[]
-  }
+  selected?: AgentConfiguration
   onSave: (status: boolean) => void
   onTest: () => void
   onCancel: () => void
@@ -42,9 +36,9 @@ interface CreateNotificationModal {
 const CreateNotificationModal = (props: CreateNotificationModal) => {
   const [availableAgents, setAvailableAgents] = useState<agentSpec[]>()
   const [availableTypes, setAvailableTypes] = useState<typeSpec[]>()
-  const nameRef = useRef<string>('null')
+  const nameRef = useRef<string>('')
   const enabledRef = useRef<boolean>(false)
-  const [formValues, setFormValues] = useState({})
+  const [formValues, setFormValues] = useState<any>()
 
   const [targetAgent, setTargetAgent] = useState<agentSpec>()
   const [targetTypes, setTargetTypes] = useState<typeSpec[]>([])
@@ -54,6 +48,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
 
     if (targetAgent && nameRef.current !== null) {
       const payload: AgentConfiguration = {
+        id: props.selected?.id,
         name: nameRef.current,
         agent: targetAgent.name,
         enabled: enabledRef.current,
@@ -93,10 +88,9 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
 
     // load rest of data if editing
     if (props.selected) {
-      console.log(props.selected)
-
       nameRef.current = props.selected.name
       enabledRef.current = props.selected.enabled
+      setFormValues(JSON.parse(props.selected.options as string))
     }
   }, [])
 
@@ -109,7 +103,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
   }
 
   const handleInputChange = (fieldName: string, value: any) => {
-    setFormValues((prevValues) => ({
+    setFormValues((prevValues: any) => ({
       ...prevValues,
       [fieldName]: value,
     }))
@@ -146,6 +140,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                   <input
                     type="text"
                     name="name"
+                    defaultValue={props.selected?.name}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                       (nameRef.current = event.target.value)
                     }
@@ -164,6 +159,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                     type="checkbox"
                     name="enabled"
                     id="enabled"
+                    defaultChecked={props.selected?.enabled}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                       event.target.value === 'on'
                         ? (enabledRef.current = true)
@@ -190,7 +186,15 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                     className="rounded-l-only"
                   >
                     {availableAgents?.map((agent, index) => (
-                      <option key={`agent-${index}`} value={index}>
+                      <option
+                        key={`agent-${index}`}
+                        value={index}
+                        selected={
+                          props.selected
+                            ? agent.name === props.selected?.agent
+                            : false
+                        }
+                      >
                         {`${agent.name}`}
                       </option>
                     ))}
@@ -220,8 +224,21 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                           type={option.type}
                           required={option.required}
                           key={`${targetAgent.name}-option-${option.field}`}
+                          defaultValue={
+                            formValues?.[option.field]
+                              ? formValues?.[option.field]
+                              : undefined
+                          }
+                          defaultChecked={
+                            option.type == 'checkbox'
+                              ? formValues?.[option.field]
+                              : false
+                          }
                           onChange={(e) =>
-                            handleInputChange(option.field, e.target.value)
+                            handleInputChange(
+                              option.field,
+                              e.target.value || e.target.checked,
+                            )
                           }
                         ></input>
                       </div>

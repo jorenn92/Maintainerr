@@ -7,6 +7,7 @@ import ToggleItem from '../../../../Common/ToggleButton'
 interface ConfigureNotificationModal {
   onCancel: () => void
   onSuccess: (selectedConfigurations: AgentConfiguration[]) => void
+  selectedAgents?: AgentConfiguration[]
 }
 const ConfigureNotificationModal = (props: ConfigureNotificationModal) => {
   const [notifications, setNotifications] = useState<AgentConfiguration[]>()
@@ -19,6 +20,9 @@ const ConfigureNotificationModal = (props: ConfigureNotificationModal) => {
     GetApiHandler('/notifications/configurations').then(
       (notificationConfigs) => {
         setNotifications(notificationConfigs)
+        if (props.selectedAgents) {
+          setActivatedNotifications(props.selectedAgents)
+        }
         setIsloading(false)
       },
     )
@@ -33,26 +37,47 @@ const ConfigureNotificationModal = (props: ConfigureNotificationModal) => {
       onOk={() => props.onSuccess(activatedNotifications)}
       okText={'OK'}
       okButtonType={'primary'}
-      title={'Configure Notifications'}
+      title={'Notification Agents'}
       iconSvg={''}
     >
       <div>
-        {!isLoading
-          ? notifications!.map((n) => (
-              <ToggleItem
-                label={n.name}
-                onStateChange={(state) => {
-                  state
-                    ? setActivatedNotifications([...activatedNotifications, n])
-                    : setActivatedNotifications([
-                        ...activatedNotifications.filter(
-                          (el) => el.id !== n.id,
-                        ),
-                      ])
-                }}
-              />
-            ))
-          : undefined}
+        <form className="space-y-4">
+          {/* Config Name */}
+          <div className="form-row">
+            <label htmlFor="name" className="text-label">
+              Agents
+            </label>
+            <div className="form-input">
+              <div className="form-input-field flex flex-col gap-2">
+                {!isLoading
+                  ? notifications!.map((n) => (
+                      <ToggleItem
+                        key={n.id}
+                        label={`${n.name} - ${n.agent} ${!n.enabled ? ' (disabled)' : ''}`}
+                        toggled={
+                          activatedNotifications.find((an) => an.id === n.id)
+                            ? true
+                            : false
+                        }
+                        onStateChange={(state) => {
+                          state
+                            ? setActivatedNotifications([
+                                ...activatedNotifications,
+                                n,
+                              ])
+                            : setActivatedNotifications([
+                                ...activatedNotifications.filter(
+                                  (el) => el.id !== n.id,
+                                ),
+                              ])
+                        }}
+                      />
+                    ))
+                  : undefined}
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
     </Modal>
   )

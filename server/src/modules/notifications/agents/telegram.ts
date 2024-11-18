@@ -1,7 +1,5 @@
 import axios from 'axios';
-import {
-  hasNotificationType,
-} from '../notifications.service';
+import { hasNotificationType } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
@@ -57,8 +55,6 @@ class TelegramAgent implements NotificationAgent {
     type: NotificationType,
     payload: NotificationPayload,
   ): Partial<TelegramMessagePayload | TelegramPhotoPayload> {
-    const { applicationUrl, applicationTitle } = this.appSettings;
-
     let message = `\*${this.escapeText(
       payload.event ? `${payload.event} - ${payload.subject}` : payload.subject,
     )}\*`;
@@ -96,11 +92,7 @@ class TelegramAgent implements NotificationAgent {
       hasNotificationType(type, settings.types ?? [0]) &&
       settings.options.chatId
     ) {
-      this.logger.debug('Sending Telegram notification', {
-        label: 'Notifications',
-        type: NotificationType[type],
-        subject: payload.subject,
-      });
+      this.logger.debug('Sending Telegram notification');
 
       try {
         await axios.post(endpoint, {
@@ -109,13 +101,8 @@ class TelegramAgent implements NotificationAgent {
           disable_notification: !!settings.options.sendSilently,
         } as TelegramMessagePayload | TelegramPhotoPayload);
       } catch (e) {
-        this.logger.error('Error sending Telegram notification', {
-          label: 'Notifications',
-          type: NotificationType[type],
-          subject: payload.subject,
-          errorMessage: e.message,
-          response: e.response?.data,
-        });
+        this.logger.error('Error sending Telegram notification');
+        this.logger.debug(e);
 
         return false;
       }

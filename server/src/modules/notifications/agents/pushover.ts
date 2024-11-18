@@ -77,11 +77,9 @@ class PushoverAgent implements NotificationAgent {
     type: NotificationType,
     payload: NotificationPayload,
   ): Promise<Partial<PushoverPayload>> {
-    const { applicationUrl, applicationTitle } = this.appSettings;
-
     const title = payload.event ?? payload.subject;
     let message = payload.event ? `<b>${payload.subject}</b>` : '';
-    let priority = 0;
+    const priority = 0;
 
     if (payload.message) {
       message += `<small>${message ? '\n' : ''}${payload.message}</small>`;
@@ -124,11 +122,7 @@ class PushoverAgent implements NotificationAgent {
 
     // Send notification
     if (hasNotificationType(type, settings.types ?? [0]) && this.shouldSend()) {
-      this.logger.log('Sending Pushover notification', {
-        label: 'Notifications',
-        type: NotificationType[type],
-        subject: payload.subject,
-      });
+      this.logger.log('Sending Pushover notification');
 
       try {
         await axios.post(endpoint, {
@@ -138,13 +132,8 @@ class PushoverAgent implements NotificationAgent {
           sound: settings.options.sound,
         } as PushoverPayload);
       } catch (e) {
-        this.logger.error('Error sending Pushover notification', {
-          label: 'Notifications',
-          type: NotificationType[type],
-          subject: payload.subject,
-          errorMessage: e.message,
-          response: e.response?.data,
-        });
+        this.logger.error('Error sending Pushover notification');
+        this.logger.debug(e);
 
         return false;
       }

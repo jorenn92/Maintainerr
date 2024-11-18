@@ -1,7 +1,5 @@
 import axios from 'axios';
-import {
-  hasNotificationType,
-} from '../notifications.service';
+import { hasNotificationType } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
@@ -61,11 +59,7 @@ class LunaSeaAgent implements NotificationAgent {
       return true;
     }
 
-    this.logger.debug('Sending LunaSea notification', {
-      label: 'Notifications',
-      type: NotificationType[type],
-      subject: payload.subject,
-    });
+    this.logger.log('Sending LunaSea notification');
 
     try {
       await axios.post(
@@ -84,13 +78,8 @@ class LunaSeaAgent implements NotificationAgent {
 
       return true;
     } catch (e) {
-      this.logger.error('Error sending LunaSea notification', {
-        label: 'Notifications',
-        type: NotificationType[type],
-        subject: payload.subject,
-        errorMessage: e.message,
-        response: e.response?.data,
-      });
+      this.logger.error('Error sending LunaSea notification');
+      this.logger.debug(e);
 
       return false;
     }

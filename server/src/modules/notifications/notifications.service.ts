@@ -13,6 +13,13 @@ import PushoverAgent from './agents/pushover';
 import { SettingsService } from '../settings/settings.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
+import EmailAgent from './agents/email';
+import GotifyAgent from './agents/gotify';
+import LunaSeaAgent from './agents/lunasea';
+import PushbulletAgent from './agents/pushbullet';
+import SlackAgent from './agents/slack';
+import TelegramAgent from './agents/telegram';
+import WebhookAgent from './agents/webhook';
 
 export const hasNotificationType = (
   type: NotificationType,
@@ -67,25 +74,45 @@ export class NotificationService {
   }
 
   async addNotificationConfiguration(payload: {
+    id?: number;
     agent: string;
     name: string;
     enabled: boolean;
     types: number[];
-    options: {};
+    options: object;
   }) {
     try {
-      await this.connection
-        .createQueryBuilder()
-        .insert()
-        .into(Notification)
-        .values({
-          name: payload.name,
-          agent: payload.agent,
-          enabled: payload.enabled,
-          types: JSON.stringify(payload.types),
-          options: JSON.stringify(payload.options),
-        })
-        .execute();
+      if (payload.id !== undefined) {
+        // update
+        await this.connection
+          .createQueryBuilder()
+          .update(Notification)
+          .set({
+            name: payload.name,
+            agent: payload.agent,
+            enabled: payload.enabled,
+            types: JSON.stringify(payload.types),
+            options: JSON.stringify(payload.options),
+          })
+          .where('id = :id', { id: payload.id })
+          .execute();
+      } else {
+        await this.connection
+          .createQueryBuilder()
+          .insert()
+          .into(Notification)
+          .values({
+            name: payload.name,
+            agent: payload.agent,
+            enabled: payload.enabled,
+            types: JSON.stringify(payload.types),
+            options: JSON.stringify(payload.options),
+          })
+          .execute();
+      }
+      // reset & reload notification agents
+      this.activeAgents = [];
+      this.registerConfiguredAgents();
       return { code: 1, result: 'success' };
     } catch (err) {
       this.logger.warn('Adding a new notification configuration failed');
@@ -165,7 +192,7 @@ export class NotificationService {
     const configuredAgents = await this.getNotificationConfigurations();
 
     const agents: NotificationAgent[] = configuredAgents.map((agent) => {
-      switch (agent.name) {
+      switch (agent.agent) {
         case NotificationAgentKey.DISCORD:
           return new DiscordAgent({
             enabled: agent.enabled,
@@ -174,6 +201,48 @@ export class NotificationService {
           });
         case NotificationAgentKey.PUSHOVER:
           return new PushoverAgent(this.settings, {
+            enabled: agent.enabled,
+            types: JSON.parse(agent.types),
+            options: JSON.parse(agent.options),
+          });
+        case NotificationAgentKey.EMAIL:
+          return new EmailAgent(this.settings, {
+            enabled: agent.enabled,
+            types: JSON.parse(agent.types),
+            options: JSON.parse(agent.options),
+          });
+        case NotificationAgentKey.GOTIFY:
+          return new GotifyAgent(this.settings, {
+            enabled: agent.enabled,
+            types: JSON.parse(agent.types),
+            options: JSON.parse(agent.options),
+          });
+        case NotificationAgentKey.LUNASEA:
+          return new LunaSeaAgent(this.settings, {
+            enabled: agent.enabled,
+            types: JSON.parse(agent.types),
+            options: JSON.parse(agent.options),
+          });
+        case NotificationAgentKey.PUSHBULLET:
+          return new PushbulletAgent(this.settings, {
+            enabled: agent.enabled,
+            types: JSON.parse(agent.types),
+            options: JSON.parse(agent.options),
+          });
+        case NotificationAgentKey.SLACK:
+          return new SlackAgent(this.settings, {
+            enabled: agent.enabled,
+            types: JSON.parse(agent.types),
+            options: JSON.parse(agent.options),
+          });
+        case NotificationAgentKey.TELEGRAM:
+          return new TelegramAgent(this.settings, {
+            enabled: agent.enabled,
+            types: JSON.parse(agent.types),
+            options: JSON.parse(agent.options),
+          });
+        case NotificationAgentKey.WEBHOOK:
+          return new WebhookAgent(this.settings, {
             enabled: agent.enabled,
             types: JSON.parse(agent.types),
             options: JSON.parse(agent.options),

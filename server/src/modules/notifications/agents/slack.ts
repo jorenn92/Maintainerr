@@ -1,7 +1,5 @@
 import axios from 'axios';
-import {
-  hasNotificationType,
-} from '../notifications.service';
+import { hasNotificationType } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
@@ -64,8 +62,6 @@ class SlackAgent implements NotificationAgent {
     type: NotificationType,
     payload: NotificationPayload,
   ): SlackBlockEmbed {
-    const { applicationUrl, applicationTitle } = this.appSettings;
-
     const fields: EmbedField[] = [];
 
     for (const extra of payload.extra ?? []) {

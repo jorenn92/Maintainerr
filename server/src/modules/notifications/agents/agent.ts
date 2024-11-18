@@ -17,5 +17,5 @@ export interface NotificationAgent {
   shouldSend(): boolean;
   send(type: NotificationType, payload: NotificationPayload): Promise<boolean>;
   getIdentifier(): NotificationAgentKey;
-  getSettings(): NotificationAgentConfig
+  getSettings(): NotificationAgentConfig;
 }
