@@ -189,7 +189,7 @@ class PGPEncryptor extends Transform {
 export const openpgpEncrypt = (options: EncryptorOptions) => {
   // Disabling this line because I don't want to fix it but I am tired
   // of seeing the lint warning
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   return function (mail: any, callback: () => unknown): void {
     if (!options.encryptionKeys.length) {
       setImmediate(callback);
