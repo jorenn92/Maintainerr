@@ -12,6 +12,7 @@ const nextConfig = {
       },
     ],
   },
+  basePath: '',
   async redirects() {
     return [
       {
