@@ -207,7 +207,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
               {/* Load fields */}
               {targetAgent?.options.map((option) => {
                 return (
-                  <div className="form-row">
+                  <div className="form-row" key={`form-row-${option.field}`}>
                     <label htmlFor="name" className="text-label">
                       {camelCaseToPrettyText(
                         option.field + (option.required ? ' *' : ''),
@@ -255,6 +255,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                 <div className="form-input">
                   {availableTypes.map((n) => (
                     <ToggleItem
+                      key={n.id}
                       label={n.title}
                       toggled={props.selected?.types.includes(n.id)}
                       onStateChange={(state) => {

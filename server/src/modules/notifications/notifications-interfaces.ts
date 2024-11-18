@@ -102,20 +102,3 @@ export enum NotificationType {
   COLLECTION_HANDLING_FAILED = 64,
   TEST_NOTIFICATION = 128,
 }
-
-interface NotificationAgents {
-  discord: NotificationAgentDiscord;
-  email: NotificationAgentEmail;
-  gotify: NotificationAgentGotify;
-  lunasea: NotificationAgentLunaSea;
-  pushbullet: NotificationAgentPushbullet;
-  pushover: NotificationAgentPushover;
-  slack: NotificationAgentSlack;
-  telegram: NotificationAgentTelegram;
-  webhook: NotificationAgentWebhook;
-  webpush: NotificationAgentConfig;
-}
-
-interface NotificationSettings {
-  agents: NotificationAgents;
-}

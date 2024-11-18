@@ -31,7 +31,7 @@ import { NotificationService } from '../modules/notifications/notifications.serv
     TautulliApiModule,
     RulesModule,
     CollectionsModule,
-    NotificationsModule
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -42,7 +42,7 @@ export class AppModule implements OnModuleInit {
     private readonly plexApi: PlexApiService,
     private readonly overseerApi: OverseerrApiService,
     private readonly tautulliApi: TautulliApiService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {}
   async onModuleInit() {
     // Initialize modules requiring settings
@@ -50,8 +50,8 @@ export class AppModule implements OnModuleInit {
     await this.plexApi.initialize({});
     await this.overseerApi.init();
     await this.tautulliApi.init();
-    
-    // intialize notification agents 
+
+    // intialize notification agents
     await this.notificationService.registerConfiguredAgents();
   }
 }

@@ -48,14 +48,14 @@ import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
       Settings,
       RadarrSettings,
       SonarrSettings,
-      Notification
+      Notification,
     ]),
     OverseerrApiModule,
     TautulliApiModule,
     TmdbApiModule,
     CollectionsModule,
     TasksModule,
-    NotificationsModule
+    NotificationsModule,
   ],
   providers: [
     RulesService,
@@ -71,7 +71,7 @@ import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
     RuleYamlService,
     RuleComparatorService,
     RuleConstanstService,
-    NotificationService
+    NotificationService,
   ],
   controllers: [RulesController],
 })

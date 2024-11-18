@@ -1,5 +1,4 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { SonarrSettingDto } from "../dto's/sonarr-setting.dto";
 import { Collection } from '../../collections/entities/collection.entities';
 
 @Entity()
