@@ -76,7 +76,7 @@
   "devDependencies": {
     "@automock/jest": "^1.4.0",
     "@babel/core": "^7.26.0",
-    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.13.0",
     "@nestjs/cli": "^10.4.7",
     "@nestjs/schematics": "^10.2.3",
