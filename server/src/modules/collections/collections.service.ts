@@ -26,7 +26,6 @@ import { Exclusion } from '../rules/entities/exclusion.entities';
 import { CollectionLog } from '../../modules/collections/entities/collection_log.entities';
 import { ECollectionLogType } from '../../modules/collections/entities/collection_log.entities';
 import { NotificationService } from '../notifications/notifications.service';
-import { NotificationType } from '../notifications/notifications-interfaces';
 
 interface addCollectionDbResponse {
   id: number;
