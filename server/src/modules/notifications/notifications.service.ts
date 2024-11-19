@@ -61,16 +61,27 @@ export class NotificationService {
     }
   };
 
+  public getActiveAgents = () => {
+    return this.activeAgents;
+  };
+
   public sendNotification(
     type: NotificationType,
     payload: NotificationPayload,
   ): void {
     this.activeAgents.forEach((agent) => {
-      if (agent.shouldSend()) {
-        if (agent.getSettings().types?.includes(type))
-          agent.send(type, payload);
-      }
+      this.sendNotificationToAgent(type, payload, agent);
     });
+  }
+
+  public sendNotificationToAgent(
+    type: NotificationType,
+    payload: NotificationPayload,
+    agent: NotificationAgent,
+  ): void {
+    if (agent.shouldSend()) {
+      if (agent.getSettings().types?.includes(type)) agent.send(type, payload);
+    }
   }
 
   async addNotificationConfiguration(payload: {
@@ -79,6 +90,7 @@ export class NotificationService {
     name: string;
     enabled: boolean;
     types: number[];
+    aboutScale: number;
     options: object;
   }) {
     try {
@@ -91,6 +103,7 @@ export class NotificationService {
             name: payload.name,
             agent: payload.agent,
             enabled: payload.enabled,
+            aboutScale: payload.aboutScale,
             types: JSON.stringify(payload.types),
             options: JSON.stringify(payload.options),
           })
@@ -105,14 +118,15 @@ export class NotificationService {
             name: payload.name,
             agent: payload.agent,
             enabled: payload.enabled,
+            aboutScale: payload.aboutScale,
+
             types: JSON.stringify(payload.types),
             options: JSON.stringify(payload.options),
           })
           .execute();
       }
       // reset & reload notification agents
-      this.activeAgents = [];
-      this.registerConfiguredAgents();
+      this.registerConfiguredAgents(true);
       return { code: 1, result: 'success' };
     } catch (err) {
       this.logger.warn('Adding a new notification configuration failed');
@@ -141,10 +155,10 @@ export class NotificationService {
           return { code: 1, result: 'success' };
         }
       }
-      this.logger.warn('Adding a new notification configuration failed');
+      this.logger.warn('Connecting the notification configuration failed');
       return { code: 0, result: 'failed' };
     } catch (err) {
-      this.logger.error('Adding a new notification configuration failed');
+      this.logger.error('Connecting the notification configuration failed');
       this.logger.debug(err);
       return { code: 0, result: err };
     }
@@ -173,14 +187,27 @@ export class NotificationService {
 
       return { code: 0, result: 'failed' };
     } catch (err) {
-      this.logger.warn('Removing a notification configuration failed');
+      this.logger.error('Disconnecting the notification configuration failed');
       this.logger.debug(err);
       return { code: 0, result: err };
     }
   }
 
-  async getNotificationConfigurations() {
+  async getNotificationConfigurations(withRelation = false) {
     try {
+      if (withRelation) {
+        const notifConfigs = await this.notificationRepo.find();
+        // hack to get the relationship working. I was tired of the typeORM headache
+        return await Promise.all(
+          notifConfigs.map(async (n) => {
+            n.rulegroups = await this.ruleGroupRepo.find({
+              where: { notifications: { id: n.id } },
+            });
+            return n;
+          }),
+        );
+      }
+
       return await this.notificationRepo.find();
     } catch (err) {
       this.logger.warn('Fetching Notification configurations failed');
@@ -189,66 +216,104 @@ export class NotificationService {
   }
 
   public async registerConfiguredAgents(skiplog = false) {
+    this.activeAgents = [];
     const configuredAgents = await this.getNotificationConfigurations();
 
-    const agents: NotificationAgent[] = configuredAgents.map((agent) => {
-      switch (agent.agent) {
-        case NotificationAgentKey.DISCORD:
-          return new DiscordAgent({
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-        case NotificationAgentKey.PUSHOVER:
-          return new PushoverAgent(this.settings, {
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-        case NotificationAgentKey.EMAIL:
-          return new EmailAgent(this.settings, {
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-        case NotificationAgentKey.GOTIFY:
-          return new GotifyAgent(this.settings, {
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-        case NotificationAgentKey.LUNASEA:
-          return new LunaSeaAgent(this.settings, {
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-        case NotificationAgentKey.PUSHBULLET:
-          return new PushbulletAgent(this.settings, {
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-        case NotificationAgentKey.SLACK:
-          return new SlackAgent(this.settings, {
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-        case NotificationAgentKey.TELEGRAM:
-          return new TelegramAgent(this.settings, {
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-        case NotificationAgentKey.WEBHOOK:
-          return new WebhookAgent(this.settings, {
-            enabled: agent.enabled,
-            types: JSON.parse(agent.types),
-            options: JSON.parse(agent.options),
-          });
-      }
-    });
+    const agents: NotificationAgent[] = configuredAgents?.map(
+      (notification) => {
+        switch (notification.agent) {
+          case NotificationAgentKey.DISCORD:
+            return new DiscordAgent(
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.PUSHOVER:
+            return new PushoverAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.EMAIL:
+            return new EmailAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.GOTIFY:
+            return new GotifyAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.LUNASEA:
+            return new LunaSeaAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.PUSHBULLET:
+            return new PushbulletAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.SLACK:
+            return new SlackAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.TELEGRAM:
+            return new TelegramAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+          case NotificationAgentKey.WEBHOOK:
+            return new WebhookAgent(
+              this.settings,
+              {
+                enabled: notification.enabled,
+                types: JSON.parse(notification.types),
+                options: JSON.parse(notification.options),
+              },
+              notification,
+            );
+        }
+      },
+    );
 
     this.registerAgents(agents, skiplog);
   }
@@ -256,9 +321,13 @@ export class NotificationService {
   async deleteNotificationConfiguration(notificationId: number) {
     try {
       await this.notificationRepo.delete(notificationId);
+
+      // reset & reload notification agents
+      this.registerConfiguredAgents(true);
+
       return { code: 1, result: 'success' };
     } catch (err) {
-      this.logger.warn('Notification configuration removal failed');
+      this.logger.error('Notification configuration removal failed');
       this.logger.debug(err);
       return { code: 0, result: err };
     }
@@ -434,6 +503,7 @@ export class NotificationService {
     mediaItems: { plexId: number }[],
     collectionName?: string,
     dayAmount?: number,
+    agent?: NotificationAgent,
   ) {
     const payload: NotificationPayload = {
       subject: '',
@@ -448,7 +518,11 @@ export class NotificationService {
       dayAmount,
     );
 
-    this.sendNotification(type, payload);
+    if (agent) {
+      this.sendNotificationToAgent(type, payload, agent);
+    } else {
+      this.sendNotification(type, payload);
+    }
   }
 
   private getMessageContent(type: NotificationType, multiple: boolean): string {

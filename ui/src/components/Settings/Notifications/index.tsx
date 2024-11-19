@@ -157,6 +157,7 @@ const NotificationSettings = () => {
                   agent: editConfig.agent!,
                   types: editConfig.types!,
                   options: editConfig.options!,
+                  aboutScale: editConfig.aboutScale!,
                 },
               }
             : {})}

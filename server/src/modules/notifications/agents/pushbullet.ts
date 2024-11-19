@@ -8,6 +8,7 @@ import {
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
+import { Notification } from '../entities/notification.entities';
 
 interface PushbulletPayload {
   type: string;
@@ -20,8 +21,14 @@ class PushbulletAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentConfig,
-  ) {}
+    readonly notification: Notification,
+  ) {
+    this.notification = notification;
+  }
+
   private readonly logger = new Logger(PushbulletAgent.name);
+
+  getNotification = () => this.notification;
 
   getSettings = () => this.settings;
 

@@ -23,6 +23,7 @@ export interface AgentConfiguration {
   agent: string
   enabled: boolean
   types: number[]
+  aboutScale: number
   options: {}
 }
 
@@ -37,6 +38,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
   const [availableAgents, setAvailableAgents] = useState<agentSpec[]>()
   const [availableTypes, setAvailableTypes] = useState<typeSpec[]>()
   const nameRef = useRef<string>('')
+  const aboutScaleRef = useRef<number>(3)
   const enabledRef = useRef<boolean>(false)
   const [formValues, setFormValues] = useState<any>()
 
@@ -53,6 +55,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
         agent: targetAgent.name,
         enabled: enabledRef.current,
         types: types,
+        aboutScale: aboutScaleRef.current,
         options: formValues,
       }
       postNotificationConfig(payload)
@@ -199,6 +202,26 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                       </option>
                     ))}
                   </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="about-scale" className="text-label">
+                Days for About To Be Handled
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <input
+                    type="number"
+                    name="about-scale"
+                    defaultValue={
+                      props.selected?.aboutScale || aboutScaleRef.current
+                    }
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      (aboutScaleRef.current = +event.target.value)
+                    }
+                  ></input>
                 </div>
               </div>
             </div>

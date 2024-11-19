@@ -55,7 +55,6 @@ export class RuleExecutorService extends TaskBase {
 
   protected onBootstrapHook(): void {
     this.cronSchedule = this.settings.rules_handler_job_cron;
-    this.notificationService.registerConfiguredAgents(true); // re register notification agents for scheduled job
   }
 
   public async execute() {
@@ -67,6 +66,7 @@ export class RuleExecutorService extends TaskBase {
       return;
     }
 
+    this.notificationService.registerConfiguredAgents(true); // re-register notification agents, to avoid flukes
     await super.execute();
 
     this.logger.log('Starting Execution of all active rules');
@@ -322,7 +322,7 @@ export class RuleExecutorService extends TaskBase {
         );
       }
     } catch (err) {
-      this.logger.warn(`Execption occurred whild handling rule: `, err);
+      this.logger.error(`Execption occurred while handling rule: `, err);
       this.notificationService.handleNotification(
         NotificationType.RULE_HANDLING_FAILED,
         undefined,

@@ -21,6 +21,9 @@ export class Notification {
   @Column({ type: 'simple-json', nullable: false })
   options: string;
 
+  @Column({ default: 3, nullable: false })
+  aboutScale: number;
+
   @ManyToMany(() => RuleGroup, (rulegroup) => rulegroup.notifications, {
     onDelete: 'CASCADE',
   })

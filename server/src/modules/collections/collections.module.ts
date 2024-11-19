@@ -27,19 +27,19 @@ import { NotificationService } from '../notifications/notifications.service';
       CollectionLog,
       RuleGroup,
       Exclusion,
-      Notification
+      Notification,
     ]),
     OverseerrApiModule,
     TautulliApiModule,
     TmdbApiModule,
     ServarrApiModule,
-    TasksModule
+    TasksModule,
   ],
   providers: [
     CollectionsService,
     CollectionWorkerService,
     CollectionLogCleanerService,
-    NotificationService
+    NotificationService,
   ],
   controllers: [CollectionsController],
   exports: [CollectionsService],

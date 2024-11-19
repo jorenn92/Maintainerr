@@ -10,13 +10,20 @@ import {
   NotificationType,
 } from '../notifications-interfaces';
 import { SettingsService } from '../../settings/settings.service';
+import { Notification } from '../entities/notification.entities';
 
 class EmailAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentConfig,
-  ) {}
+    readonly notification: Notification,
+  ) {
+    this.notification = notification;
+  }
+
   private readonly logger = new Logger(EmailAgent.name);
+
+  getNotification = () => this.notification;
 
   getSettings = () => this.settings;
   getIdentifier = () => NotificationAgentKey.EMAIL;

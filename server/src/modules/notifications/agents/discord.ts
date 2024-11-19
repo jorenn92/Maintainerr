@@ -7,6 +7,7 @@ import {
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
+import { Notification } from '../entities/notification.entities';
 
 enum EmbedColors {
   DEFAULT = 0,
@@ -82,9 +83,16 @@ interface DiscordWebhookPayload {
 }
 
 class DiscordAgent implements NotificationAgent {
-  constructor(private readonly settings: NotificationAgentConfig) {}
+  constructor(
+    private readonly settings: NotificationAgentConfig,
+    readonly notification: Notification,
+  ) {
+    this.notification = notification;
+  }
 
   private readonly logger = new Logger(DiscordAgent.name);
+
+  getNotification = () => this.notification;
 
   getSettings = () => this.settings;
 

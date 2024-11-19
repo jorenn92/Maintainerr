@@ -8,6 +8,7 @@ import {
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
+import { Notification } from '../entities/notification.entities';
 
 interface GotifyPayload {
   title: string;
@@ -20,8 +21,14 @@ class GotifyAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentConfig,
-  ) {}
+    readonly notification: Notification,
+  ) {
+    this.notification = notification;
+  }
+
   private readonly logger = new Logger(GotifyAgent.name);
+
+  getNotification = () => this.notification;
 
   getSettings = () => this.settings;
 

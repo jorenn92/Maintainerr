@@ -33,6 +33,7 @@ export class NotificationsController {
       name: string;
       enabled: boolean;
       types: number[];
+      aboutScale: number;
       options: object;
     },
   ) {
