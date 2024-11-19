@@ -46,7 +46,6 @@ export class CollectionWorkerService extends TaskBase {
 
   protected onBootstrapHook(): void {
     this.cronSchedule = this.settings.collection_handler_job_cron;
-    this.notificationService.registerConfiguredAgents(true); // re register notification agents for scheduled job
   }
 
   public async execute() {
@@ -59,6 +58,7 @@ export class CollectionWorkerService extends TaskBase {
         return;
       }
 
+      this.notificationService.registerConfiguredAgents(true); // re-register notification agents, to avoid flukes
       await super.execute();
 
       // wait 5 seconds to make sure we're not executing together with the rule handler
