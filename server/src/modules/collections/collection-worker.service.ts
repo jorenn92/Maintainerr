@@ -256,7 +256,7 @@ export class CollectionWorkerService extends TaskBase {
 
         if (tvdbId) {
           let sonarrMedia = await sonarrApiClient.getSeriesByTvdbId(tvdbId);
-          if (sonarrMedia) {
+          if (sonarrMedia?.id) {
             switch (collection.arrAction) {
               case ServarrAction.DELETE:
                 switch (collection.type) {
@@ -322,12 +322,16 @@ export class CollectionWorkerService extends TaskBase {
                       'all',
                       false,
                     );
-                    // unmonitor show
-                    sonarrMedia.monitored = false;
-                    sonarrApiClient.updateSeries(sonarrMedia);
-                    this.infoLogger(
-                      `[Sonarr] Unmonitored show '${sonarrMedia.title}'`,
-                    );
+
+                    if (sonarrMedia) {
+                      // unmonitor show
+                      sonarrMedia.monitored = false;
+                      sonarrApiClient.updateSeries(sonarrMedia);
+                      this.infoLogger(
+                        `[Sonarr] Unmonitored show '${sonarrMedia.title}'`,
+                      );
+                    }
+
                     break;
                 }
                 break;
@@ -360,12 +364,16 @@ export class CollectionWorkerService extends TaskBase {
                       'all',
                       true,
                     );
-                    // unmonitor show
-                    sonarrMedia.monitored = false;
-                    sonarrApiClient.updateSeries(sonarrMedia);
-                    this.infoLogger(
-                      `[Sonarr] Unmonitored show '${sonarrMedia.title}' and removed all episodes`,
-                    );
+
+                    if (sonarrMedia) {
+                      // unmonitor show
+                      sonarrMedia.monitored = false;
+                      sonarrApiClient.updateSeries(sonarrMedia);
+                      this.infoLogger(
+                        `[Sonarr] Unmonitored show '${sonarrMedia.title}' and removed all episodes`,
+                      );
+                    }
+
                     break;
                 }
                 break;
@@ -399,12 +407,16 @@ export class CollectionWorkerService extends TaskBase {
                       'existing',
                       true,
                     );
-                    // unmonitor show
-                    sonarrMedia.monitored = false;
-                    sonarrApiClient.updateSeries(sonarrMedia);
-                    this.infoLogger(
-                      `[Sonarr] Unmonitored show '${sonarrMedia.title}' and Removed exisiting episodes`,
-                    );
+
+                    if (sonarrMedia) {
+                      // unmonitor show
+                      sonarrMedia.monitored = false;
+                      sonarrApiClient.updateSeries(sonarrMedia);
+                      this.infoLogger(
+                        `[Sonarr] Unmonitored show '${sonarrMedia.title}' and Removed exisiting episodes`,
+                      );
+                    }
+
                     break;
                 }
                 break;
