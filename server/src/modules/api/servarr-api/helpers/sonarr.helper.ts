@@ -370,6 +370,13 @@ export class SonarrApi extends ServarrApi<{
           }
         }
       }
+
+      this.logger.log(
+        `Unmonitored ${
+          typeof type === 'number' ? `season ${type}` : 'seasons'
+        } from Sonarr show with ID ${seriesId}`,
+      );
+
       return data;
     } catch (e) {
       this.logger.log("Couldn't unmonitor/delete. Does it exist in sonarr?", {
@@ -379,11 +386,6 @@ export class SonarrApi extends ServarrApi<{
       });
       this.logger.debug(e);
     }
-    this.logger.log(
-      `Unmonitored ${
-        typeof type === 'number' ? `season ${type}` : 'seasons'
-      } from Sonarr show with ID ${seriesId}`,
-    );
   }
 
   private buildSeasonList(

@@ -9,8 +9,8 @@ import { SonarrSettingRawDto } from "../../settings/dto's/sonarr-setting.dto";
 @Injectable()
 export class ServarrService {
   SonarrApi: SonarrApi;
-  private radarrApiCache?: Record<string, RadarrApi> = {};
-  private sonarrApiCache?: Record<string, SonarrApi> = {};
+  private radarrApiCache: Record<string, RadarrApi> = {};
+  private sonarrApiCache: Record<string, SonarrApi> = {};
 
   constructor(
     @Inject(forwardRef(() => SettingsService))
@@ -27,7 +27,7 @@ export class ServarrService {
       if (!this.sonarrApiCache[id]) {
         const setting = await this.settings.getSonarrSetting(id);
 
-        if (!('id' in setting)) {
+        if (setting == null || !('id' in setting)) {
           throw new Error('Sonarr setting not found');
         }
 
@@ -57,7 +57,7 @@ export class ServarrService {
       if (!this.radarrApiCache[id]) {
         const setting = await this.settings.getRadarrSetting(id);
 
-        if (!('id' in setting)) {
+        if (setting == null || !('id' in setting)) {
           throw new Error('Radarr setting not found');
         }
 

@@ -175,12 +175,12 @@ export class CollectionWorkerService extends TaskBase {
 
     this.collectionService.saveCollection(collection);
 
-    const radarrApiClient = collection.radarrSettings.id
-      ? await this.servarrApi.getRadarrApiClient(collection.radarrSettings.id)
+    const radarrApiClient = collection.radarrSettingsId
+      ? await this.servarrApi.getRadarrApiClient(collection.radarrSettingsId)
       : undefined;
 
-    const sonarrApiClient = collection.sonarrSettings.id
-      ? await this.servarrApi.getSonarrApiClient(collection.sonarrSettings.id)
+    const sonarrApiClient = collection.sonarrSettingsId
+      ? await this.servarrApi.getSonarrApiClient(collection.sonarrSettingsId)
       : undefined;
 
     if (plexLibrary.type === 'movie') {
