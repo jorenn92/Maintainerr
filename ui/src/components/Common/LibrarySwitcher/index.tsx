@@ -16,7 +16,7 @@ const LibrarySwitcher = (props: ILibrarySwitcher) => {
 
   useEffect(() => {
     if (LibrariesCtx.libraries.length <= 0) {
-      GetApiHandler('/plex/libraries/').then((resp) => {
+      GetApiHandler('/plex/libraries').then((resp) => {
         if (resp) {
           LibrariesCtx.addLibraries(resp)
           props.allPossible !== undefined && !props.allPossible
@@ -32,8 +32,11 @@ const LibrarySwitcher = (props: ILibrarySwitcher) => {
   return (
     <>
       <div className="mb-5 w-full">
-        <form >
-          <select className='border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0' onChange={onSwitchLibrary}>
+        <form>
+          <select
+            className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+            onChange={onSwitchLibrary}
+          >
             {props.allPossible === undefined || props.allPossible ? (
               <option value={9999}>All</option>
             ) : undefined}

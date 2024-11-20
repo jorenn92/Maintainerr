@@ -28,6 +28,13 @@ RUN \
 
 RUN yarn build:server
 
+
+RUN <<EOF cat >> ./ui/.env
+NEXT_PUBLIC_BASE_PATH=/__PATH_PREFIX__
+EOF
+
+RUN sed -i "s,basePath: '',basePath: '/__PATH_PREFIX__',g" ./ui/next.config.js
+
 RUN yarn build:ui
 
 # copy standalone UI 
@@ -71,6 +78,9 @@ ENV API_PORT=${API_PORT}
 ARG UI_PORT=6246
 ENV UI_PORT=${UI_PORT}
 
+ARG UI_HOSTNAME=0.0.0.0
+ENV UI_HOSTNAME=${UI_HOSTNAME}
+
 # Hash of the last GIT commit
 ARG GIT_SHA
 ENV GIT_SHA=$GIT_SHA
@@ -78,6 +88,9 @@ ENV GIT_SHA=$GIT_SHA
 # container version type. develop, stable, edge,.. a release=stable
 ARG VERSION_TAG=develop
 ENV VERSION_TAG=$VERSION_TAG
+
+ARG BASE_PATH
+ENV BASE_PATH=${BASE_PATH}
 
 # Set global yarn vars to a folder read/write able for all users
 ENV YARN_INSTALL_STATE_PATH=/tmp/.yarn/install-state.gz
@@ -91,7 +104,8 @@ COPY --from=builder --chown=node:node /opt /opt
 
 WORKDIR /opt/app
 
-COPY supervisord.conf /etc/supervisord.conf
+COPY docker/supervisord.conf /etc/supervisord.conf
+COPY docker/start.sh /opt/app/start.sh
 
 # Enable correct yarn version, add supervisor & chown root /opt dir
 RUN corepack install && \
@@ -100,6 +114,7 @@ RUN corepack install && \
     chown node:node /opt && \
     # This is required for docker user directive to work
     chmod 777 /opt && \
+    chmod 777 /opt/app/start.sh && \
     mkdir -m 777 /.cache  && \
     mkdir -pm 777 /opt/app/ui/.next/cache && \
     chown -R node:node /opt/app/ui/.next/cache
@@ -112,4 +127,4 @@ ENV HOME=/
 EXPOSE 6246
 
 VOLUME [ "/opt/data" ]
-ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+ENTRYPOINT ["/opt/app/start.sh"]
