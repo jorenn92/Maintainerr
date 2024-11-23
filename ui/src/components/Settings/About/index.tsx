@@ -107,7 +107,7 @@ const AboutSettings = () => {
           <div className="ml-3 flex-1 md:flex md:justify-between">
             <p className="text-sm leading-5 text-gray-100">
               This is BETA software. Features may be broken and/or unstable.
-              Please report any issues on GitHub!'
+              Please report any issues on GitHub!
             </p>
             <p className="mt-3 text-sm leading-5 md:mt-0 md:ml-6">
               <a
