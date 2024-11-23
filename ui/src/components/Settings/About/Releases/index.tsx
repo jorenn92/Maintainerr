@@ -1,11 +1,9 @@
 import Badge from '../../../Common/Badge'
 import Button from '../../../Common/Button'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
-import ChangeLogModal from '../ChangeLogModal'
-import { DocumentTextIcon } from '@heroicons/react/outline'
-import dynamic from 'next/dynamic'
-import { Fragment, useEffect, useState } from 'react'
 import Modal from '../../../Common/Modal'
+import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
 
 // Dynamic import for markdown
 const ReactMarkdown = dynamic(() => import('react-markdown'), {
@@ -18,7 +16,7 @@ const messages = {
   versionChangelog: '{version} Changelog',
   viewongithub: 'View on GitHub',
   latestversion: 'Latest',
-  currentversion: 'Currently Installed',
+  currentversion: 'Current',
   viewchangelog: 'View Changelog',
   close: 'Close',
 }
@@ -44,6 +42,11 @@ interface GitHubRelease {
   zipball_url: string
   body: string
 }
+interface ReleaseProps {
+  release: GitHubRelease
+  isLatest: boolean
+  currentVersion: string
+}
 interface ModalProps {
   title: string
   children: React.ReactNode
@@ -52,12 +55,6 @@ interface ModalProps {
   onOk?: () => void
   cancelText?: string
   okText?: string
-}
-
-interface ReleaseProps {
-  release: GitHubRelease
-  isLatest: boolean
-  currentVersion: string
 }
 
 const calculateRelativeTime = (dateString: string): string => {
@@ -75,25 +72,27 @@ const calculateRelativeTime = (dateString: string): string => {
 }
 
 const Release = ({ currentVersion, release, isLatest }: ReleaseProps) => {
-  const [AboutModalActive, setModalActive] = useState()
+  const [isModalOpen, setModalOpen] = useState(false)
 
   return (
     <div className="flex w-full flex-col space-y-3 rounded-md bg-gray-800 px-4 py-2 shadow-md ring-1 ring-gray-700 sm:flex-row sm:space-y-0 sm:space-x-3">
-      <Modal
-        loading={false}
-        backgroundClickable={false}
-        onCancel={() => setModalActive(false)}
-        title={messages.versionChangelog.replace('{version}', release.name)}
-        cancelText={messages.close}
-        okText={messages.viewongithub}
-        onOk={() => {
-          window.open(release.html_url, '_blank')
-        }}
-      >
-        <div className="prose">
-          <ReactMarkdown>{release.body}</ReactMarkdown>
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <Modal
+            onCancel={() => setModalOpen(false)}
+            title={messages.versionChangelog.replace('{version}', release.name)}
+            cancelText={messages.close}
+            okText={messages.viewongithub}
+            onOk={() => {
+              window.open(release.html_url, '_blank')
+            }}
+          >
+            <div className="prose">
+              <ReactMarkdown>{release.body}</ReactMarkdown>
+            </div>
+          </Modal>
         </div>
-      </Modal>
+      )}
       <div className="flex w-full flex-grow items-center justify-center space-x-2 truncate sm:justify-start">
         <span className="truncate text-lg font-bold">
           <span className="mr-2 whitespace-nowrap text-xs font-normal">
@@ -108,8 +107,7 @@ const Release = ({ currentVersion, release, isLatest }: ReleaseProps) => {
           <Badge badgeType="primary">{messages.currentversion}</Badge>
         )}
       </div>
-      <Button buttonType="primary" onClick={showChangeLogModal}>
-        <DocumentTextIcon />
+      <Button buttonType="primary" onClick={() => setModalOpen(true)}>
         <span>{messages.viewchangelog}</span>
       </Button>
     </div>
@@ -153,7 +151,7 @@ const Releases = ({ currentVersion }: ReleasesProps) => {
     <div>
       <h3 className="heading">{messages.releases}</h3>
       <div className="section space-y-3">
-        {data!.map((release, index) => (
+        {data?.map((release, index) => (
           <div key={`release-${release.id}`}>
             <Release
               release={release}
