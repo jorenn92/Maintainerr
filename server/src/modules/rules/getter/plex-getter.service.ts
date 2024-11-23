@@ -56,7 +56,7 @@ export class PlexGetterService {
 
           const viewers: PlexSeenBy[] = await this.plexApi
             .getWatchHistory(metadata.ratingKey)
-            .catch((_err) => {
+            .catch(() => {
               return null;
             });
           if (viewers) {
@@ -236,7 +236,7 @@ export class PlexGetterService {
                 return null;
               }
             })
-            .catch((_err) => {
+            .catch(() => {
               return null;
             });
         }
@@ -281,7 +281,7 @@ export class PlexGetterService {
             for (const episode of episodes) {
               const viewers: PlexSeenBy[] = await this.plexApi
                 .getWatchHistory(episode.ratingKey)
-                .catch((_err) => {
+                .catch(() => {
                   return null;
                 });
 
@@ -365,7 +365,9 @@ export class PlexGetterService {
               const views = await this.plexApi.getWatchHistory(
                 episode.ratingKey,
               );
-              views?.length > 0 ? viewCount++ : undefined;
+              if (views?.length > 0) {
+                viewCount++;
+              }
             }
           }
           return viewCount;
@@ -447,7 +449,8 @@ export class PlexGetterService {
               : metadata.guid;
           const media_uuid = guid.match(/plex:\/\/[a-z]+\/([a-z0-9]+)$/);
 
-          const plexUsers: SimplePlexUser[] = await this.plexApi.getCorrectedUsers();
+          const plexUsers: SimplePlexUser[] =
+            await this.plexApi.getCorrectedUsers();
 
           const userFilterPromises = plexUsers.map(async (u) => {
             if (u.uuid === undefined || media_uuid === undefined) return false; // break if uuids are unavailable

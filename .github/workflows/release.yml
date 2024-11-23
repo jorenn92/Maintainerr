@@ -14,7 +14,6 @@ on:
 
 jobs:
   semantic-release:
-    if: ${{ github.triggering_actor == github.repository_owner }}
     name: Tag and release latest version
     runs-on: ubuntu-22.04
     steps:
@@ -23,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -45,7 +44,7 @@ jobs:
           fi
 
   build-docker-image:
-    if: ${{ github.triggering_actor == github.repository_owner && github.event.inputs.with-docker-images == 'true' }}
+    if: ${{ github.event.inputs.with-docker-images == 'true' }}
     name: Build and push docker images
     needs: semantic-release
     runs-on: ubuntu-latest

@@ -13,6 +13,8 @@ import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
 import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
 import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
 import { SonarrSeason } from '../../../modules/api/servarr-api/interfaces/sonarr.interface';
+import { RulesDto } from '../dtos/rules.dto';
+import { SonarrApi } from '../../api/servarr-api/helpers/sonarr.helper';
 
 @Injectable()
 export class SonarrGetterService {
@@ -30,7 +32,19 @@ export class SonarrGetterService {
       (el) => el.id === Application.SONARR,
     ).props;
   }
-  async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
+  async get(
+    id: number,
+    libItem: PlexLibraryItem,
+    dataType?: EPlexDataType,
+    ruleGroup?: RulesDto,
+  ) {
+    if (!ruleGroup.collection?.sonarrSettingsId) {
+      this.logger.error(
+        `No Sonarr server configured for ${ruleGroup.collection?.title}`,
+      );
+      return null;
+    }
+
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
       let origLibItem = undefined;
@@ -63,8 +77,11 @@ export class SonarrGetterService {
       }
 
       if (tvdbId) {
-        const showResponse =
-          await this.servarrService.SonarrApi.getSeriesByTvdbId(tvdbId);
+        const sonarrApiClient = await this.servarrService.getSonarrApiClient(
+          ruleGroup.collection.sonarrSettingsId,
+        );
+
+        const showResponse = await sonarrApiClient.getSeriesByTvdbId(tvdbId);
 
         season = season
           ? showResponse.seasons.find((el) => el.seasonNumber === season)
@@ -75,7 +92,7 @@ export class SonarrGetterService {
           [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType) &&
           showResponse.added !== '0001-01-01T00:00:00Z'
             ? (showResponse.id
-                ? await this.servarrService.SonarrApi.getEpisodes(
+                ? await sonarrApiClient.getEpisodes(
                     showResponse.id,
                     origLibItem.grandparentRatingKey
                       ? origLibItem.parentIndex
@@ -87,9 +104,7 @@ export class SonarrGetterService {
 
         const episodeFile =
           episode && dataType === EPlexDataType.EPISODES
-            ? await this.servarrService.SonarrApi.getEpisodeFile(
-                episode.episodeFileId,
-              )
+            ? await sonarrApiClient.getEpisodeFile(episode.episodeFileId)
             : undefined;
 
         if (tvdbId && showResponse?.id) {
@@ -124,7 +139,7 @@ export class SonarrGetterService {
             }
             case 'tags': {
               const tagIds = showResponse.tags;
-              return (await this.servarrService.SonarrApi.getTags())
+              return (await sonarrApiClient.getTags())
                 .filter((el) => tagIds.includes(el.id))
                 .map((el) => el.label);
             }
@@ -242,11 +257,10 @@ export class SonarrGetterService {
                         await this.getLastSeason(
                           showResponse.seasons,
                           showResponse.id,
+                          sonarrApiClient,
                         )
                       )?.seasonNumber
                   : false;
-              } else {
-                false;
               }
             }
           }
@@ -273,15 +287,12 @@ export class SonarrGetterService {
   private async getLastSeason(
     seasons: SonarrSeason[],
     showId: number,
+    apiClient: SonarrApi,
   ): Promise<SonarrSeason> {
     // array find doesn't work as expected.. so keep this a for loop
     for (const s of seasons.reverse()) {
       const epResp = showId
-        ? await this.servarrService.SonarrApi.getEpisodes(
-            showId,
-            s.seasonNumber,
-            [1],
-          )
+        ? await apiClient.getEpisodes(showId, s.seasonNumber, [1])
         : [];
 
       const resp =

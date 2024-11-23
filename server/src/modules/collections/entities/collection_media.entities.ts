@@ -32,7 +32,7 @@ export class CollectionMedia {
   @Column({ default: false, nullable: true })
   isManual: boolean;
 
-  @ManyToOne((type) => Collection, (collection) => collection.collectionMedia, {
+  @ManyToOne(() => Collection, (collection) => collection.collectionMedia, {
     onDelete: 'CASCADE',
   })
   collection: Collection;

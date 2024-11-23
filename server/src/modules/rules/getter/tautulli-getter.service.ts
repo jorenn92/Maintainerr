@@ -16,6 +16,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Collection } from '../../collections/entities/collection.entities';
 import { RulesDto } from '../dtos/rules.dto';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
 
 @Injectable()
 export class TautulliGetterService {
@@ -24,6 +25,7 @@ export class TautulliGetterService {
 
   constructor(
     private readonly tautulliApi: TautulliApiService,
+    private readonly plexApi: PlexApiService,
     @InjectRepository(Collection)
     private readonly collectionRepository: Repository<Collection>,
   ) {
@@ -54,17 +56,19 @@ export class TautulliGetterService {
           const history = await this.getHistoryForMetadata(metadata);
 
           if (history.length > 0) {
-            const viewers = history
+            const viewerIds = history
               .filter((x) =>
                 tautulliWatchedPercentOverride != null
                   ? x.percent_complete >= tautulliWatchedPercentOverride
                   : x.watched_status == 1,
               )
-              .map((el) => el.user);
+              .map((el) => el.user_id);
 
-            const uniqueViewers = [...new Set(viewers)];
+            const uniqueViewerIds = [...new Set(viewerIds)];
+            const plexUsernames =
+              await this.getPlexUsernamesForIds(uniqueViewerIds);
 
-            return uniqueViewers;
+            return plexUsernames;
           } else {
             return [];
           }
@@ -113,11 +117,11 @@ export class TautulliGetterService {
             }
           }
 
-          if (allViewers && allViewers.length > 0) {
-            const viewerIds = allViewers.map((el) => el.user_id);
-            return users
-              .filter((el) => viewerIds.includes(el.user_id))
-              .map((el) => el.username);
+          if (allViewers.length > 0) {
+            const plexUsernames = await this.getPlexUsernamesForIds(
+              allViewers.map((x) => x.user_id),
+            );
+            return plexUsernames;
           }
 
           return [];
@@ -193,7 +197,6 @@ export class TautulliGetterService {
         }
       }
     } catch (e) {
-      console.log(e);
       this.logger.warn(`Tautulli-Getter - Action failed : ${e.message}`);
       return undefined;
     }
@@ -215,4 +218,18 @@ export class TautulliGetterService {
     const history = await this.tautulliApi.getHistory(options);
     return history;
   }
+
+  private getPlexUsernamesForIds = async (plexIds: number[]) => {
+    const plexUsers = await this.plexApi.getCorrectedUsers();
+
+    return plexIds.reduce((acc, x) => {
+      const plexUsername = plexUsers.find((u) => u.plexId === x)?.username;
+
+      if (plexUsername) {
+        acc.push(plexUsername);
+      }
+
+      return acc;
+    }, [] as string[]);
+  };
 }

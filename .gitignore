@@ -2,3 +2,4 @@ data/
 docs-output/
 node_modules
 .yarn
+.idea

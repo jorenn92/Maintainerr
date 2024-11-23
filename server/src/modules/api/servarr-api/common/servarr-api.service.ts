@@ -9,7 +9,8 @@ import {
   SystemStatus,
   Tag,
 } from '../interfaces/servarr.interface';
-import cacheManager, { AvailableCacheIds } from '../../lib/cache';
+import cacheManager from '../../lib/cache';
+import { Logger } from '@nestjs/common';
 
 export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
   static buildUrl(settings: DVRSettings, path?: string): string {
@@ -26,7 +27,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
   }: {
     url: string;
     apiKey: string;
-    cacheName: AvailableCacheIds;
+    cacheName?: string;
     apiName: string;
   }) {
     super(
@@ -34,12 +35,13 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
       {
         apikey: apiKey,
       },
-      {
-        nodeCache: cacheManager.getCache(cacheName).data,
-      },
+      cacheName
+        ? { nodeCache: cacheManager.getCache(cacheName).data }
+        : undefined,
     );
 
     this.apiName = apiName;
+    this.logger = new Logger(ServarrApi.name);
   }
 
   public getSystemStatus = async (): Promise<SystemStatus> => {
@@ -141,7 +143,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     }
   }
 
-  protected async runPut(command: string, body: string): Promise<void>{
+  protected async runPut(command: string, body: string): Promise<void> {
     try {
       await this.put(`/${command}`, body);
     } catch (e) {

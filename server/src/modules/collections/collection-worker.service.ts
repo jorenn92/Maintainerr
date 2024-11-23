@@ -57,7 +57,8 @@ export class CollectionWorkerService extends TaskBase {
     await super.execute();
 
     // wait 5 seconds to make sure we're not executing together with the rule handler
-    setTimeout(() => {}, 5000);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     // if we are, then wait..
     await this.taskService.waitUntilTaskIsFinished('Rule Handler', this.name);
 
@@ -114,7 +115,7 @@ export class CollectionWorkerService extends TaskBase {
         'Not all applications are reachable.. Skipping collection handling',
       );
     }
-    this.finish();
+    await this.finish();
   }
 
   private async handleMedia(collection: Collection, media: CollectionMedia) {
@@ -142,8 +143,16 @@ export class CollectionWorkerService extends TaskBase {
 
     this.collectionService.saveCollection(collection);
 
+    const radarrApiClient = collection.radarrSettings.id
+      ? await this.servarrApi.getRadarrApiClient(collection.radarrSettings.id)
+      : undefined;
+
+    const sonarrApiClient = collection.sonarrSettings.id
+      ? await this.servarrApi.getSonarrApiClient(collection.sonarrSettings.id)
+      : undefined;
+
     if (plexLibrary.type === 'movie') {
-      if (this.settings.radarrConfigured()) {
+      if (radarrApiClient) {
         // find tmdbid
         const tmdbid = media.tmdbId
           ? media.tmdbId
@@ -154,12 +163,11 @@ export class CollectionWorkerService extends TaskBase {
             )?.id;
 
         if (tmdbid) {
-          const radarrMedia =
-            await this.servarrApi.RadarrApi.getMovieByTmdbId(tmdbid);
+          const radarrMedia = await radarrApiClient.getMovieByTmdbId(tmdbid);
           if (radarrMedia && radarrMedia.id) {
             switch (collection.arrAction) {
               case ServarrAction.DELETE:
-                await this.servarrApi.RadarrApi.deleteMovie(
+                await radarrApiClient.deleteMovie(
                   radarrMedia.id,
                   true,
                   collection.listExclusions,
@@ -167,21 +175,15 @@ export class CollectionWorkerService extends TaskBase {
                 this.infoLogger('Removed movie from filesystem & Radarr');
                 break;
               case ServarrAction.UNMONITOR:
-                await this.servarrApi.RadarrApi.unmonitorMovie(
-                  radarrMedia.id,
-                  false,
-                );
+                await radarrApiClient.unmonitorMovie(radarrMedia.id, false);
                 this.infoLogger('Unmonitored movie in Radarr');
                 break;
               case ServarrAction.UNMONITOR_DELETE_ALL:
-                await this.servarrApi.RadarrApi.unmonitorMovie(
-                  radarrMedia.id,
-                  true,
-                );
+                await radarrApiClient.unmonitorMovie(radarrMedia.id, true);
                 this.infoLogger('Unmonitored movie in Radarr & removed files');
                 break;
               case ServarrAction.UNMONITOR_DELETE_EXISTING:
-                await this.servarrApi.RadarrApi.deleteMovie(
+                await radarrApiClient.deleteMovie(
                   radarrMedia.id,
                   true,
                   collection.listExclusions,
@@ -208,7 +210,7 @@ export class CollectionWorkerService extends TaskBase {
         }
       }
     } else {
-      if (this.settings.sonarrConfigured()) {
+      if (sonarrApiClient) {
         // get the tvdb id
         let tvdbId = undefined;
         switch (collection.type) {
@@ -253,14 +255,13 @@ export class CollectionWorkerService extends TaskBase {
         }
 
         if (tvdbId) {
-          let sonarrMedia =
-            await this.servarrApi.SonarrApi.getSeriesByTvdbId(tvdbId);
+          let sonarrMedia = await sonarrApiClient.getSeriesByTvdbId(tvdbId);
           if (sonarrMedia) {
             switch (collection.arrAction) {
               case ServarrAction.DELETE:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await sonarrApiClient.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       true,
@@ -270,7 +271,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   case EPlexDataType.EPISODES:
-                    await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
+                    await sonarrApiClient.UnmonitorDeleteEpisodes(
                       sonarrMedia.id,
                       plexData.parentIndex,
                       [plexData.index],
@@ -281,7 +282,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    await this.servarrApi.SonarrApi.deleteShow(
+                    await sonarrApiClient.deleteShow(
                       sonarrMedia.id,
                       true,
                       collection.listExclusions,
@@ -295,7 +296,7 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await sonarrApiClient.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       false,
@@ -305,7 +306,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   case EPlexDataType.EPISODES:
-                    await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
+                    await sonarrApiClient.UnmonitorDeleteEpisodes(
                       sonarrMedia.id,
                       plexData.parentIndex,
                       [plexData.index],
@@ -316,14 +317,14 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await sonarrApiClient.unmonitorSeasons(
                       sonarrMedia.id,
                       'all',
                       false,
                     );
                     // unmonitor show
                     sonarrMedia.monitored = false;
-                    this.servarrApi.SonarrApi.updateSeries(sonarrMedia);
+                    sonarrApiClient.updateSeries(sonarrMedia);
                     this.infoLogger(
                       `[Sonarr] Unmonitored show '${sonarrMedia.title}'`,
                     );
@@ -333,7 +334,7 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR_DELETE_ALL:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await sonarrApiClient.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       true,
@@ -343,7 +344,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   case EPlexDataType.EPISODES:
-                    await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
+                    await sonarrApiClient.UnmonitorDeleteEpisodes(
                       sonarrMedia.id,
                       plexData.parentIndex,
                       [plexData.index],
@@ -354,14 +355,14 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await sonarrApiClient.unmonitorSeasons(
                       sonarrMedia.id,
                       'all',
                       true,
                     );
                     // unmonitor show
                     sonarrMedia.monitored = false;
-                    this.servarrApi.SonarrApi.updateSeries(sonarrMedia);
+                    sonarrApiClient.updateSeries(sonarrMedia);
                     this.infoLogger(
                       `[Sonarr] Unmonitored show '${sonarrMedia.title}' and removed all episodes`,
                     );
@@ -371,7 +372,7 @@ export class CollectionWorkerService extends TaskBase {
               case ServarrAction.UNMONITOR_DELETE_EXISTING:
                 switch (collection.type) {
                   case EPlexDataType.SEASONS:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await sonarrApiClient.unmonitorSeasons(
                       sonarrMedia.id,
                       plexData.index,
                       true,
@@ -382,7 +383,7 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   case EPlexDataType.EPISODES:
-                    await this.servarrApi.SonarrApi.UnmonitorDeleteEpisodes(
+                    await sonarrApiClient.UnmonitorDeleteEpisodes(
                       sonarrMedia.id,
                       plexData.parentIndex,
                       [plexData.index],
@@ -393,14 +394,14 @@ export class CollectionWorkerService extends TaskBase {
                     );
                     break;
                   default:
-                    sonarrMedia = await this.servarrApi.SonarrApi.unmonitorSeasons(
+                    sonarrMedia = await sonarrApiClient.unmonitorSeasons(
                       sonarrMedia.id,
                       'existing',
                       true,
                     );
                     // unmonitor show
                     sonarrMedia.monitored = false;
-                    this.servarrApi.SonarrApi.updateSeries(sonarrMedia);
+                    sonarrApiClient.updateSeries(sonarrMedia);
                     this.infoLogger(
                       `[Sonarr] Unmonitored show '${sonarrMedia.title}' and Removed exisiting episodes`,
                     );
@@ -464,11 +465,7 @@ export class CollectionWorkerService extends TaskBase {
       }
 
       // If *arr not configured, remove media through Plex
-      if (
-        !(plexLibrary.type === 'movie'
-          ? this.settings.radarrConfigured()
-          : this.settings.sonarrConfigured())
-      )
+      if (!(plexLibrary.type === 'movie' ? radarrApiClient : sonarrApiClient))
         if (collection.arrAction !== ServarrAction.UNMONITOR) {
           await this.plexApi.deleteMediaFromDisk(media.plexId.toString());
           this.infoLogger(
