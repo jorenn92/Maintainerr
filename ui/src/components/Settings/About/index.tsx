@@ -9,6 +9,10 @@ interface VersionResponse {
   commitTag: string
   updateAvailable: boolean
 }
+interface RulesResponse {
+  id: number
+  name: string
+}
 
 const AboutSettings = () => {
   useEffect(() => {
@@ -32,6 +36,19 @@ const AboutSettings = () => {
     })
   }, [])
   // End Maintainerr Version
+  // Maintainerr Rules Count
+  const [idCount, setIdCount] = useState<number | null>(null) // To store the count
+  useEffect(() => {
+    GetApiHandler('/rules').then((resp: RulesResponse) => {
+      if (resp) {
+        let totalCount = 0
+        if (Array.isArray(resp)) {
+          totalCount = resp.length
+        }
+        setIdCount(totalCount)
+      }
+    })
+  })
 
   return (
     <div className="h-full w-full">
@@ -110,7 +127,7 @@ const AboutSettings = () => {
           <div className="form-input">
             <div className="form-input-field">
               <span className="">
-                <code>"Value goes here"</code>
+                <code>{<>{idCount}</>}</code>
               </span>
             </div>
           </div>
@@ -164,22 +181,6 @@ const AboutSettings = () => {
       <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
       <div className="section my-2">
         <div className="form-row my-2">
-          <label className="text-label"> Releases </label>
-          <div className="form-input">
-            <div className="form-input-field text-amber-600 font-bold underline">
-              <a
-                href="https://github.com/jorenn92/Maintainerr/releases"
-                target="_blank"
-              >
-                https://github.com/jorenn92/Maintainerr/releases
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-      <div className="section my-2">
-        <div className="form-row my-2">
           <label className="text-label"> Feature Requests </label>
           <div className="form-input">
             <div className="form-input-field text-amber-600 font-bold underline">
@@ -221,6 +222,14 @@ const AboutSettings = () => {
                 target="_blank"
               >
                 Github Sponsors
+              </a>
+              <p className="my-2 pr-2 !no-underline">or</p>
+              <a
+                className="my-2 pr-2"
+                href="https://ko-fi.com/maintainerr_app"
+                target="_blank"
+              >
+                Ko-fi
               </a>
             </div>
           </div>
