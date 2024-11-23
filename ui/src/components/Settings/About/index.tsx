@@ -9,9 +9,29 @@ interface VersionResponse {
   commitTag: string
   updateAvailable: boolean
 }
-interface RulesResponse {
+interface CollectionsResponse {
   id: number
-  name: string
+  plexId: number
+  libraryId: number
+  title: string
+  description: string
+  isActive: boolean
+  arrAction: number
+  visibleOnHome: boolean
+  deleteAfterDays: number
+  manualCollection: boolean
+  manualCollectionName: string
+  listExclusions: boolean
+  forceOverseerr: boolean
+  type: string
+  keepLogsForMonths: number
+  addDate: Date
+  handledMediaAmount: number
+  lastDurationInSeconds: number
+  tautulliWatchedPercentOverride: string
+  radarrSettingsId: number
+  sonarrSettingsId: number
+  media: string[]
 }
 
 const AboutSettings = () => {
@@ -37,19 +57,46 @@ const AboutSettings = () => {
   }, [])
   // End Maintainerr Version
   // Maintainerr Rules Count
-  const [idCount, setIdCount] = useState<number | null>(null) // To store the count
+  const [ruleCount, setRuleCount] = useState<number | null>(null) // To store the count
   useEffect(() => {
-    GetApiHandler('/rules').then((resp: RulesResponse) => {
+    GetApiHandler('/rules').then((resp) => {
       if (resp) {
         let totalCount = 0
         if (Array.isArray(resp)) {
           totalCount = resp.length
         }
-        setIdCount(totalCount)
+        setRuleCount(totalCount)
       }
     })
   })
-
+  // End Maintainerr Rules Count
+  // Maintainerr Collection Items
+  const [itemCount, setItemCount] = useState<number | null>(null) // To store the count
+  useEffect(() => {
+    GetApiHandler('/collections/media').then((resp) => {
+      if (resp) {
+        let totalCount = 0
+        if (Array.isArray(resp)) {
+          totalCount = resp.length
+        }
+        setItemCount(totalCount)
+      }
+    })
+  })
+  // End Maintainerr Collection Items
+  // Maintainerr Community Rules Count
+  const [communityCount, setCommunityCount] = useState<number | null>(null) // To store the count
+  useEffect(() => {
+    GetApiHandler('/rules/community').then((resp) => {
+      if (resp) {
+        let totalCount = 0
+        if (Array.isArray(resp)) {
+          totalCount = resp.length
+        }
+        setCommunityCount(totalCount)
+      }
+    })
+  })
   return (
     <div className="h-full w-full">
       <div className="mt-6 rounded-md border border-amber-600 bg-amber-500 bg-opacity-20 p-4 backdrop-blur">
@@ -127,7 +174,7 @@ const AboutSettings = () => {
           <div className="form-input">
             <div className="form-input-field">
               <span className="">
-                <code>{<>{idCount}</>}</code>
+                <code>{<>{ruleCount}</>}</code>
               </span>
             </div>
           </div>
@@ -140,7 +187,20 @@ const AboutSettings = () => {
           <div className="form-input">
             <div className="form-input-field">
               <span className="">
-                <code>"Value goes here"</code>
+                <code>{<>{itemCount}</>}</code>
+              </span>
+            </div>
+          </div>
+        </div>
+        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+        <div className="form-row my-2">
+          <label htmlFor="name" className="text-label">
+            Community Rules
+          </label>
+          <div className="form-input">
+            <div className="form-input-field">
+              <span className="">
+                <code>{<>{communityCount}</>}</code>
               </span>
             </div>
           </div>
@@ -158,7 +218,11 @@ const AboutSettings = () => {
           <label className="text-label"> Documentation </label>
           <div className="form-input">
             <div className="form-input-field text-amber-600 font-bold underline">
-              <a href="https://docs.maintainerr.info" target="_blank">
+              <a
+                className="hover:text-amber-800"
+                href="https://docs.maintainerr.info"
+                target="_blank"
+              >
                 https://docs.maintainerr.info
               </a>
             </div>
@@ -171,7 +235,11 @@ const AboutSettings = () => {
           <label className="text-label"> Discord </label>
           <div className="form-input">
             <div className="form-input-field text-amber-600 font-bold underline">
-              <a href="https://discord.gg/WP4ZW2QYwk" target="_blank">
+              <a
+                className="hover:text-amber-800"
+                href="https://discord.gg/WP4ZW2QYwk"
+                target="_blank"
+              >
                 https://discord.gg/WP4ZW2QYwk
               </a>
             </div>
@@ -184,7 +252,11 @@ const AboutSettings = () => {
           <label className="text-label"> Feature Requests </label>
           <div className="form-input">
             <div className="form-input-field text-amber-600 font-bold underline">
-              <a href="https://features.maintainerr.info" target="_blank">
+              <a
+                className="hover:text-amber-800"
+                href="https://features.maintainerr.info"
+                target="_blank"
+              >
                 https://features.maintainerr.info
               </a>
             </div>
@@ -197,7 +269,11 @@ const AboutSettings = () => {
           <label className="text-label"> Services Status </label>
           <div className="form-input">
             <div className="form-input-field text-amber-600 font-bold underline">
-              <a href="https://status.maintainerr.info" target="_blank">
+              <a
+                className="hover:text-amber-800"
+                href="https://status.maintainerr.info"
+                target="_blank"
+              >
                 https://status.maintainerr.info
               </a>
             </div>
@@ -205,27 +281,25 @@ const AboutSettings = () => {
         </div>
       </div>
       <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-      {/* End Userful Links */}
-      {/* Useful Links */}
       <div className="section h-full w-full mb-2">
         <h3 className="heading">Loving Maintainerr?</h3>
       </div>
       <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
       <div className="section my-2">
         <div className="form-row my-2">
-          <label className="text-label"> Donations Welcome </label>
+          <label className="text-label">Donations Welcome</label>
           <div className="form-input">
-            <div className="form-input-field text-amber-600 font-bold underline">
+            <div className="form-input-field text-amber-600 font-bold">
               <a
-                className="my-2 pr-2"
+                className="pr-2 underline hover:text-amber-800"
                 href="https://github.com/sponsors/jorenn92"
                 target="_blank"
               >
                 Github Sponsors
               </a>
-              <p className="my-2 pr-2 !no-underline">or</p>
+              <p className="pr-2 !no-underline">or</p>
               <a
-                className="my-2 pr-2"
+                className="pr-2 underline hover:text-amber-800"
                 href="https://ko-fi.com/maintainerr_app"
                 target="_blank"
               >
@@ -235,19 +309,7 @@ const AboutSettings = () => {
           </div>
         </div>
       </div>
-      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-      <div className="section my-2">
-        <div className="form-row my-2">
-          <label className="text-label"></label>
-          <div className="form-input">
-            <div className="form-input-field text-amber-600 font-bold underline">
-              <a href="https://ko-fi.com/maintainerr_app" target="_blank">
-                Ko-fi
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700"></hr>
       {/* End Userful Links */}
       {/* Show Releases */}
       <div className="section">

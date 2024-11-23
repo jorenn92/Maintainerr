@@ -75,7 +75,7 @@ const Release = ({ currentVersion, release, isLatest }: ReleaseProps) => {
   const [isModalOpen, setModalOpen] = useState(false)
 
   return (
-    <div className="flex w-full flex-col space-y-3 rounded-md bg-gray-800 px-4 py-2 shadow-md ring-1 ring-gray-700 sm:flex-row sm:space-y-0 sm:space-x-3">
+    <div className="flex w-full flex-col space-y-3 rounded-md bg-zinc-700 px-4 py-2 shadow-md ring-1 ring-gray-700 sm:flex-row sm:space-y-0 sm:space-x-3">
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <Modal
@@ -87,7 +87,7 @@ const Release = ({ currentVersion, release, isLatest }: ReleaseProps) => {
               window.open(release.html_url, '_blank')
             }}
           >
-            <div className="prose">
+            <div className="prose prose:sm">
               <ReactMarkdown>{release.body}</ReactMarkdown>
             </div>
           </Modal>
