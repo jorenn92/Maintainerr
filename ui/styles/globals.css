@@ -8,7 +8,12 @@
     padding: env(safe-area-inset-top) env(safe-area-inset-right)
       env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
-
+  .prose a {
+    color: #ed7924;
+  }
+  .prose a:hover {
+    color: #8d4c1c;
+  }
   body {
     @apply bg-zinc-900;
     font-family:
