@@ -1,8 +1,7 @@
-import { RefreshIcon, SaveIcon } from '@heroicons/react/solid'
 import { InformationCircleIcon } from '@heroicons/react/solid'
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import SettingsContext from '../../../contexts/settings-context'
-import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
+import GetApiHandler from '../../../utils/ApiHandler'
+import Releases from './Releases'
 
 interface VersionResponse {
   status: 1 | 0
@@ -129,139 +128,123 @@ const AboutSettings = () => {
             </div>
           </div>
         </div>
-        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <div className="form-row my-2">
-          <label htmlFor="name" className="text-label">
-            Space Saved
-          </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              <span className="">
-                <code>"Value goes here"</code>
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
       <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
       {/* End Maintainerr Portion */}
-      {/* Radarr Portion */}
+      {/* Useful Links */}
       <div className="section h-full w-full mb-2">
-        <h3 className="heading">Radarr Statistics</h3>
+        <h3 className="heading">Useful Links</h3>
       </div>
       <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
       <div className="section my-2">
         <div className="form-row my-2">
-          <label className="text-label"> Version </label>
+          <label className="text-label"> Documentation </label>
           <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
+            <div className="form-input-field text-amber-600 font-bold underline">
+              <a href="https://docs.maintainerr.info" target="_blank">
+                https://docs.maintainerr.info
+              </a>
             </div>
           </div>
         </div>
-        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <div className="form-row my-2">
-          <label className="text-label"> Status </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
-            </div>
-          </div>
-        </div>
-        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <div className="form-row my-2">
-          <label className="text-label"> Diskspace Remaining </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
-            </div>
-          </div>
-        </div>
-        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <div className="form-row my-2">
-          <label className="text-label"> Number of Movies </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
-            </div>
-          </div>
-        </div>
-      </div>
-      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-      {/* End Radarr Portion */}
-      {/* Sonarr Portion */}
-      <div className="section h-full w-full mb-2">
-        <h3 className="heading">Sonarr Statistics</h3>
       </div>
       <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
       <div className="section my-2">
         <div className="form-row my-2">
-          <label className="text-label"> Version </label>
+          <label className="text-label"> Discord </label>
           <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
+            <div className="form-input-field text-amber-600 font-bold underline">
+              <a href="https://discord.gg/WP4ZW2QYwk" target="_blank">
+                https://discord.gg/WP4ZW2QYwk
+              </a>
             </div>
           </div>
         </div>
-        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <div className="form-row my-2">
-          <label className="text-label"> Status </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
-            </div>
-          </div>
-        </div>
-        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <div className="form-row my-2">
-          <label className="text-label"> Diskspace Remaining </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
-            </div>
-          </div>
-        </div>
-        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <div className="form-row my-2">
-          <label className="text-label">
-            {' '}
-            Number of Shows/Seasons/Episodes{' '}
-          </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
-            </div>
-          </div>
-        </div>
-      </div>
-      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-      {/* End Sonarr Portion */}
-      {/* Overseerr Portion */}
-      <div className="section h-full w-full mb-2">
-        <h3 className="heading">Overseerr Statistics</h3>
       </div>
       <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
       <div className="section my-2">
         <div className="form-row my-2">
-          <label className="text-label"> Version </label>
+          <label className="text-label"> Releases </label>
           <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
-            </div>
-          </div>
-        </div>
-        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-        <div className="form-row my-2">
-          <label className="text-label"> Requests </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              <code>"Value goes here"</code>
+            <div className="form-input-field text-amber-600 font-bold underline">
+              <a
+                href="https://github.com/jorenn92/Maintainerr/releases"
+                target="_blank"
+              >
+                https://github.com/jorenn92/Maintainerr/releases
+              </a>
             </div>
           </div>
         </div>
       </div>
       <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-      {/* End Overseerr Portion */}
+      <div className="section my-2">
+        <div className="form-row my-2">
+          <label className="text-label"> Feature Requests </label>
+          <div className="form-input">
+            <div className="form-input-field text-amber-600 font-bold underline">
+              <a href="https://features.maintainerr.info" target="_blank">
+                https://features.maintainerr.info
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+      <div className="section my-2">
+        <div className="form-row my-2">
+          <label className="text-label"> Services Status </label>
+          <div className="form-input">
+            <div className="form-input-field text-amber-600 font-bold underline">
+              <a href="https://status.maintainerr.info" target="_blank">
+                https://status.maintainerr.info
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+      {/* End Userful Links */}
+      {/* Useful Links */}
+      <div className="section h-full w-full mb-2">
+        <h3 className="heading">Loving Maintainerr?</h3>
+      </div>
+      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+      <div className="section my-2">
+        <div className="form-row my-2">
+          <label className="text-label"> Donations Welcome </label>
+          <div className="form-input">
+            <div className="form-input-field text-amber-600 font-bold underline">
+              <a
+                className="my-2 pr-2"
+                href="https://github.com/sponsors/jorenn92"
+                target="_blank"
+              >
+                Github Sponsors
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+      <div className="section my-2">
+        <div className="form-row my-2">
+          <label className="text-label"></label>
+          <div className="form-input">
+            <div className="form-input-field text-amber-600 font-bold underline">
+              <a href="https://ko-fi.com/maintainerr_app" target="_blank">
+                Ko-fi
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* End Userful Links */}
+      {/* Show Releases */}
+      <div className="section">
+        <Releases currentVersion={version} />
+      </div>
+      {/* End Showing Releases */}
     </div>
   )
 }
