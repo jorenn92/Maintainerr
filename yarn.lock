@@ -2223,18 +2223,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@headlessui/react@npm:2.1.9":
-  version: 2.1.9
-  resolution: "@headlessui/react@npm:2.1.9"
+"@headlessui/react@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@headlessui/react@npm:2.2.0"
   dependencies:
     "@floating-ui/react": "npm:^0.26.16"
     "@react-aria/focus": "npm:^3.17.1"
     "@react-aria/interactions": "npm:^3.21.3"
     "@tanstack/react-virtual": "npm:^3.8.1"
   peerDependencies:
-    react: ^18
-    react-dom: ^18
-  checksum: 10c0/bcee8b0a6d331ad6a55761f51f0c6cc68416e7dff161b18cda1477f71a6d0d7c83d17fb743adddedb88c5733fc0a222cb45d6c6744ee8e19ccfeed617bcc1feb
+    react: ^18 || ^19 || ^19.0.0-rc
+    react-dom: ^18 || ^19 || ^19.0.0-rc
+  checksum: 10c0/af64ef2868405e629f55925d06ab6723b40a9d0802c1bd91e8ae834b6d50e51e0942bcdee44f4b51ce3b82be7c23df49e93713a29486a899d0d56b7ddce78039
   languageName: node
   linkType: hard
 
@@ -11618,7 +11618,7 @@ __metadata:
     "@babel/core": "npm:^7.26.0"
     "@eslint/eslintrc": "npm:^3.2.0"
     "@eslint/js": "npm:^9.13.0"
-    "@headlessui/react": "npm:2.1.9"
+    "@headlessui/react": "npm:2.2.0"
     "@heroicons/react": "npm:^1.0.6"
     "@monaco-editor/react": "npm:^4.6.0"
     "@nestjs/cli": "npm:^10.4.7"
