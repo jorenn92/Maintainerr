@@ -28,6 +28,9 @@ import { RuleConstanstService } from './constants/constants.service';
 import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.service';
 import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { TautulliGetterService } from './getter/tautulli-getter.service';
+import { NotificationService } from '../notifications/notifications.service';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { Notification } from '../notifications/entities/notification.entities';
 import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
 
@@ -45,12 +48,14 @@ import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
       Settings,
       RadarrSettings,
       SonarrSettings,
+      Notification,
     ]),
     OverseerrApiModule,
     TautulliApiModule,
     TmdbApiModule,
     CollectionsModule,
     TasksModule,
+    NotificationsModule,
   ],
   providers: [
     RulesService,
@@ -66,6 +71,7 @@ import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
     RuleYamlService,
     RuleComparatorService,
     RuleConstanstService,
+    NotificationService,
   ],
   controllers: [RulesController],
 })

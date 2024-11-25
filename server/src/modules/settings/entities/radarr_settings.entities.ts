@@ -1,5 +1,4 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { RadarrSettingDto } from "../dto's/radarr-setting.dto";
 import { Collection } from '../../collections/entities/collection.entities';
 
 @Entity()

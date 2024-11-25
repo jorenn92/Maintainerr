@@ -6,7 +6,6 @@ import {
   RuleConstants,
 } from '../constants/rules.constants';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
-import _ from 'lodash';
 import {
   TautulliApiService,
   TautulliHistoryRequestOptions,

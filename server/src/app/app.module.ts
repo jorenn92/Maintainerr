@@ -16,6 +16,8 @@ import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { NotificationsModule } from '../modules/notifications/notifications.module';
+import { NotificationService } from '../modules/notifications/notifications.service';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.ser
     TautulliApiModule,
     RulesModule,
     CollectionsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -39,12 +42,16 @@ export class AppModule implements OnModuleInit {
     private readonly plexApi: PlexApiService,
     private readonly overseerApi: OverseerrApiService,
     private readonly tautulliApi: TautulliApiService,
+    private readonly notificationService: NotificationService,
   ) {}
   async onModuleInit() {
-    // Initialize stuff needing settings here.. Otherwise problems
+    // Initialize modules requiring settings
     await this.settings.init();
     await this.plexApi.initialize({});
     await this.overseerApi.init();
     await this.tautulliApi.init();
+
+    // intialize notification agents
+    await this.notificationService.registerConfiguredAgents();
   }
 }
