@@ -164,6 +164,9 @@ const TautulliSettings = () => {
           <div className="form-row">
             <label htmlFor="baseUrl" className="text-label">
               Base URL
+              <span className="label-tip">
+                {`No Leading Slash`}
+              </span>
             </label>
             <div className="form-input">
               <div className="form-input-field">
