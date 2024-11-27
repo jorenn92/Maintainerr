@@ -58,4 +58,13 @@ export class Settings implements SettingDto {
 
   @Column({ nullable: false, default: CronExpression.EVERY_8_HOURS })
   rules_handler_job_cron: string;
+
+  @Column({ nullable: false, default: 'info' })
+  log_level: string;
+
+  @Column({ nullable: false, default: 20 })
+  log_max_size: number;
+
+  @Column({ nullable: false, default: 7 })
+  log_max_files: number;
 }

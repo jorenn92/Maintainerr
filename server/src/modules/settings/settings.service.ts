@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  LogLevel,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
@@ -23,6 +29,7 @@ import {
   SonarrSettingRawDto,
   SonarrSettingResponseDto,
 } from "./dto's/sonarr-setting.dto";
+import { LogSettings } from '../logging/dtos/logSettings.dto';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -62,6 +69,12 @@ export class SettingsService implements SettingDto {
   collection_handler_job_cron: string;
 
   rules_handler_job_cron: string;
+
+  log_level: string;
+
+  log_max_size: number;
+
+  log_max_files: number;
 
   constructor(
     @Inject(forwardRef(() => PlexApiService))
@@ -106,6 +119,9 @@ export class SettingsService implements SettingDto {
       this.collection_handler_job_cron =
         settingsDb?.collection_handler_job_cron;
       this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;
+      this.log_level = settingsDb?.log_level;
+      this.log_max_files = settingsDb?.log_max_files;
+      this.log_max_size = settingsDb?.log_max_size;
     } else {
       this.logger.log('Settings not found.. Creating initial settings');
       await this.settingsRepo.insert({
@@ -608,5 +624,45 @@ export class SettingsService implements SettingDto {
 
   public async getPlexServers() {
     return await this.plexApi.getAvailableServers();
+  }
+}
+
+@Injectable()
+export class LogSettingsService {
+  private readonly logger = new Logger(LogSettingsService.name);
+
+  constructor(
+    @InjectRepository(Settings)
+    private readonly settingsRepo: Repository<Settings>,
+  ) {}
+
+  public async get(): Promise<LogSettings> {
+    const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+    return {
+      level: settingsDb.log_level,
+      max_size: settingsDb.log_max_size,
+      max_files: settingsDb.log_max_files,
+    };
+  }
+
+  public async update(settings: LogSettings) {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      const data = {
+        ...settingsDb,
+        log_level: settings.level,
+        log_max_size: settings.max_size,
+        log_max_files: settings.max_files,
+      };
+
+      await this.settingsRepo.save(data);
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error while updating log settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
   }
 }

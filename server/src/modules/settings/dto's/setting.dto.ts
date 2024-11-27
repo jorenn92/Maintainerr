@@ -34,4 +34,10 @@ export class SettingDto {
   collection_handler_job_cron: string;
 
   rules_handler_job_cron: string;
+
+  log_level: string;
+
+  log_max_size: number;
+
+  log_max_files: number;
 }

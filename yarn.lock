@@ -1491,6 +1491,7 @@ __metadata:
     "@nestjs/cli": "npm:^10.4.9"
     "@nestjs/common": "npm:^11.0.6"
     "@nestjs/core": "npm:^11.0.3"
+    "@nestjs/event-emitter": "npm:^2.1.1"
     "@nestjs/platform-express": "npm:^11.0.3"
     "@nestjs/schedule": "npm:^5.0.0"
     "@nestjs/schematics": "npm:^10.2.3"
@@ -1498,6 +1499,7 @@ __metadata:
     "@nestjs/typeorm": "npm:^11.0.0"
     "@types/jest": "npm:^29.5.14"
     "@types/lodash": "npm:^4.17.14"
+    "@types/mime-types": "npm:^2"
     "@types/node": "npm:^22"
     "@types/xml2js": "npm:^0.4.14"
     "@typescript-eslint/eslint-plugin": "npm:^8.20.0"
@@ -1509,10 +1511,12 @@ __metadata:
     eslint-config-prettier: "npm:^10.0.1"
     jest: "npm:^29.7.0"
     lodash: "npm:^4.17.21"
+    mime-types: "npm:^2.1.35"
     nest-winston: "npm:^1.10.2"
     node-cache: "npm:^5.1.2"
     plex-api: "npm:^5.3.2"
     prettier: "npm:^3.4.2"
+    read-last-lines: "npm:^1.8.0"
     reflect-metadata: "npm:^0.2.2"
     rxjs: "npm:^7.8.1"
     sqlite3: "npm:^5.1.6"
@@ -1679,6 +1683,18 @@ __metadata:
     "@nestjs/websockets":
       optional: true
   checksum: 10c0/5d05b4f1a85b9909d70e78ad48e1c755e65d1c7e11a6eb1cd5f9a8cada092412134a0de2c2c83da4e51e7581531b455f013b56b0f9c6c2dbcc747e33a4f76af4
+  languageName: node
+  linkType: hard
+
+"@nestjs/event-emitter@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "@nestjs/event-emitter@npm:2.1.1"
+  dependencies:
+    eventemitter2: "npm:6.4.9"
+  peerDependencies:
+    "@nestjs/common": ^8.0.0 || ^9.0.0 || ^10.0.0
+    "@nestjs/core": ^8.0.0 || ^9.0.0 || ^10.0.0
+  checksum: 10c0/7c9eb5656c0b8cb4f865f7bee6b6e10df9aed889f5f6ee859f9a841799569b8b276596ae0870d8fd3a70a61f2cf88dce46da8a0357f44bb3867e5243d64e807a
   languageName: node
   linkType: hard
 
@@ -2874,6 +2890,13 @@ __metadata:
   dependencies:
     "@types/unist": "npm:*"
   checksum: 10c0/84f403dbe582ee508fd9c7643ac781ad8597fcbfc9ccb8d4715a2c92e4545e5772cbd0dbdf18eda65789386d81b009967fdef01b24faf6640f817287f54d9c82
+  languageName: node
+  linkType: hard
+
+"@types/mime-types@npm:^2":
+  version: 2.1.4
+  resolution: "@types/mime-types@npm:2.1.4"
+  checksum: 10c0/a10d57881d14a053556b3d09292de467968d965b0a06d06732c748da39b3aa569270b5b9f32529fd0e9ac1e5f3b91abb894f5b1996373254a65cb87903c86622
   languageName: node
   linkType: hard
 
@@ -6661,6 +6684,13 @@ __metadata:
   version: 1.8.1
   resolution: "etag@npm:1.8.1"
   checksum: 10c0/12be11ef62fb9817314d790089a0a49fae4e1b50594135dcb8076312b7d7e470884b5100d249b28c18581b7fd52f8b485689ffae22a11ed9ec17377a33a08f84
+  languageName: node
+  linkType: hard
+
+"eventemitter2@npm:6.4.9":
+  version: 6.4.9
+  resolution: "eventemitter2@npm:6.4.9"
+  checksum: 10c0/b2adf7d9f1544aa2d95ee271b0621acaf1e309d85ebcef1244fb0ebc7ab0afa6ffd5e371535d0981bc46195ad67fd6ff57a8d1db030584dee69aa5e371a27ea7
   languageName: node
   linkType: hard
 
@@ -12886,6 +12916,15 @@ __metadata:
   version: 4.0.0
   resolution: "read-cmd-shim@npm:4.0.0"
   checksum: 10c0/e62db17ec9708f1e7c6a31f0a46d43df2069d85cf0df3b9d1d99e5ed36e29b1e8b2f8a427fd8bbb9bc40829788df1471794f9b01057e4b95ed062806e4df5ba9
+  languageName: node
+  linkType: hard
+
+"read-last-lines@npm:^1.8.0":
+  version: 1.8.0
+  resolution: "read-last-lines@npm:1.8.0"
+  dependencies:
+    mz: "npm:^2.7.0"
+  checksum: 10c0/c1431136bad1ce85ce9d7e63ab5a20839de09226c5699f01bba3ce8cba1c2d83fa17e6a46d4d2c33f69fd8dafccb2bf91e061406909a35cc86a01704db650b0c
   languageName: node
   linkType: hard
 
