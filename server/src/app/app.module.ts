@@ -16,11 +16,15 @@ import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { LogsModule } from '../modules/logging/logs.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
+    EventEmitterModule.forRoot(),
     SettingsModule,
+    LogsModule,
     PlexApiModule,
     ExternalApiModule,
     TmdbApiModule,

@@ -3,6 +3,10 @@ import { randomUUID } from 'crypto';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { SettingDto } from "../dto's/setting.dto";
 
+export const DEFAULT_LOG_LEVEL = 'info';
+export const DEFAULT_LOG_MAX_SIZE = 20;
+export const DEFAULT_LOG_MAX_FILES = 7;
+
 @Entity()
 export class Settings implements SettingDto {
   @PrimaryGeneratedColumn()
@@ -58,4 +62,13 @@ export class Settings implements SettingDto {
 
   @Column({ nullable: false, default: CronExpression.EVERY_8_HOURS })
   rules_handler_job_cron: string;
+
+  @Column({ nullable: false, default: DEFAULT_LOG_LEVEL })
+  log_level: string;
+
+  @Column({ nullable: false, default: DEFAULT_LOG_MAX_SIZE })
+  log_max_size: number;
+
+  @Column({ nullable: false, default: DEFAULT_LOG_MAX_FILES })
+  log_max_files: number;
 }
