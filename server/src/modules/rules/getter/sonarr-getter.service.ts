@@ -263,6 +263,11 @@ export class SonarrGetterService {
                   : false;
               }
             }
+            case 'originalLanguage': {
+              return showResponse.originalLanguage?.name
+                ? showResponse.originalLanguage.name
+                : null;
+            }
           }
         } else return null;
       } else {
