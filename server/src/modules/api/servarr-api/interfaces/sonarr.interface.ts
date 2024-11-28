@@ -83,6 +83,7 @@ export interface SonarrEpisode {
 export interface SonarrSeries {
   title: string;
   sortTitle: string;
+  originalLanguage: SonarrLanguage;
   seasonCount: number;
   status: string;
   overview: string;
@@ -129,6 +130,11 @@ export interface SonarrSeries {
   };
   statistics?: SonarrStatistics;
   ended?: boolean;
+}
+
+export interface SonarrLanguage {
+  id: number;
+  name: string | null;
 }
 
 export interface AddSeriesOptions {
