@@ -1014,7 +1014,9 @@ export class RulesService {
         );
 
         //test first value
-        const first = firstValApplication.props[parsedRule.firstVal[1]];
+        const first = firstValApplication.props.find(
+          (x) => x.id == parsedRule.firstVal[1],
+        );
 
         result = first.cacheReset ? true : result;
 
@@ -1023,7 +1025,9 @@ export class RulesService {
           : undefined;
 
         // test second value
-        const second = secondValApplication?.props[parsedRule.lastVal[1]];
+        const second = secondValApplication?.props.find(
+          (x) => x.id == parsedRule.lastVal[1],
+        );
 
         result = second?.cacheReset ? true : result;
       }
