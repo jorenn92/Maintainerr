@@ -238,6 +238,8 @@ export class RulesService {
           forceOverseerr: params.forceOverseerr ? params.forceOverseerr : false,
           tautulliWatchedPercentOverride:
             params.tautulliWatchedPercentOverride ?? null,
+          radarrSettingsId: params.radarrSettingsId ?? null,
+          sonarrSettingsId: params.sonarrSettingsId ?? null,
           visibleOnRecommended: params.collection?.visibleOnRecommended,
           visibleOnHome: params.collection?.visibleOnHome,
           deleteAfterDays: +params.collection?.deleteAfterDays,
