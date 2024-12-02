@@ -65,7 +65,7 @@
     "typeorm": "^0.3.20",
     "typescript": "^5.3.3",
     "web-push": "^3.6.6",
-    "winston": "^3.16.0",
+    "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
     "xml2js": "^0.6.2",
     "yaml": "^2.6.0"
