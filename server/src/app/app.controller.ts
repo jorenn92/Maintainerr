@@ -9,4 +9,9 @@ export class AppController {
   async getAppStatus() {
     return JSON.stringify(await this.appService.getAppVersionStatus());
   }
+
+  @Get('/timezone')
+  async getAppTimezone() {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
 }

@@ -35,6 +35,11 @@ export class RulesController {
     return await this.rulesService.getCommunityRules();
   }
 
+  @Get('/community/count')
+  async getCommunityRuleCount() {
+    return this.rulesService.getCommunityRuleCount();
+  }
+
   @Get('/community/karma/history')
   async getCommunityRuleKarmaHistory() {
     return await this.rulesService.getCommunityRuleKarmaHistory();
@@ -44,6 +49,12 @@ export class RulesController {
   getExclusion(@Query() query: { rulegroupId?: number; plexId?: number }) {
     return this.rulesService.getExclusions(query.rulegroupId, query.plexId);
   }
+
+  @Get('/count')
+  async getRuleGroupCount() {
+    return this.rulesService.getRuleGroupCount();
+  }
+
   @Get('/:id')
   getRules(@Param('id') id: string) {
     return this.rulesService.getRules(id);
