@@ -13,8 +13,8 @@ on:
         default: true
 
 jobs:
-  semantic-release:
-    name: Tag and release latest version
+  semantic-release-dry:
+    name: Generate version
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -34,19 +34,19 @@ jobs:
       - name: Install dependencies
         run: yarn --immutable
       - name: Release
+        id: release-version
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          if [ "${{ github.event.inputs.dry-run-semantic-release }}" == "true" ]; then
           npx semantic-release --dry-run
-          else
-          npx semantic-release
-          fi
+    outputs:
+      version: ${{ steps.release-version.outputs.version }}
+      tag: ${{ steps.release-version.outputs.tag }}
 
   build-docker-image:
     if: ${{ github.event.inputs.with-docker-images == 'true' }}
-    name: Build and push docker images
-    needs: semantic-release
+    name: Build and push Docker images
+    needs: semantic-release-dry
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -81,10 +81,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME  }}
           password: ${{ secrets.DOCKERHUB_TOKEN  }}
 
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-
       - name: Build & Push docker images
         uses: docker/build-push-action@v5
         with:
@@ -95,11 +91,146 @@ jobs:
             GIT_SHA=${{ github.sha }}
             VERSION_TAG=stable
           tags: |
-            ghcr.io/jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
+            ghcr.io/jorenn92/maintainerr:${{ needs.semantic-release-dry.outputs.version }}
             ghcr.io/jorenn92/maintainerr:latest
-            jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
+            jorenn92/maintainerr:${{ needs.semantic-release-dry.outputs.version }}
             jorenn92/maintainerr:latest
           labels: ${{ steps.meta.outputs.labels }}
+
+  build_artifacts:
+    name: Build artifacts
+    needs: semantic-release-dry
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux
+            architecture: x64
+            yarn_setup: yarn config set supportedArchitectures.cpu "x64"
+          - os: ubuntu-24.04-arm
+            name: linux
+            architecture: arm64
+            yarn_setup: yarn config set supportedArchitectures.cpu "arm64"
+          #- os: windows-latest
+          #  name: win
+          #  architecture: x64
+          #  yarn_setup: yarn config set supportedArchitectures.cpu "x64"
+          #- os: macos-latest
+          #  name: osx
+          #  architecture: x64
+          #  yarn_setup: yarn config set supportedArchitectures.cpu "x64"
+          #- os: macos-latest
+          #  name: osx
+          #  architecture: arm64
+          #  yarn_setup: yarn config set supportedArchitectures.cpu "arm64"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          architecture: ${{ matrix.architecture }}
+
+      - name: Setup yarn architecture
+        run: ${{ matrix.yarn_setup }}
+
+      - name: Activate corepack
+        run: |
+          corepack install
+          corepack enable
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build
+        run: yarn turbo build
+
+      - name: Prepare artifact
+        shell: bash
+        run: |
+          mkdir _output
+          mkdir _artifacts
+          cp -r ui/.next/standalone/ui _output/ui
+          cp -r ui/.next/static _output/ui/.next/static
+          cp -r ui/public _output/ui/public
+          cp -r server/dist _output/server
+          cp server/package.json _output/server/package.json
+          cp -r server/node_modules _output/server/node_modules
+          cp -rT distribution/${{ matrix.name }} _output
+          sed -i 's/%GIT_SHA%/${{ github.sha }}/g' _output/server/.env
+
+      - name: Create zip
+        uses: thedoctor0/zip-release@0.7.5
+        if: ${{ matrix.name == 'win' || matrix.name == 'osx' }}
+        with:
+          type: "zip"
+          directory: "./_output/"
+          path: "."
+          filename: "../_artifacts/Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.zip"
+
+      - name: Publish zip artifact
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.name == 'win' || matrix.name == 'osx' }}
+        with:
+          name: Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.zip
+          path: ${{ github.workspace }}/_artifacts/
+
+      - name: Create tar
+        uses: thedoctor0/zip-release@0.7.5
+        if: ${{ matrix.name == 'osx' || matrix.name == 'linux' }}
+        with:
+          type: "tar"
+          directory: "./_output/"
+          path: "."
+          filename: "../_artifacts/Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.tar.gz"
+
+      - name: Publish tar artifact
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.name == 'osx' || matrix.name == 'linux' }}
+        with:
+          name: Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.tar.gz
+          path: ${{ github.workspace }}/_artifacts/
+
+  semantic-release:
+    name: Tag and release latest version
+    needs: [build_artifacts, build-docker-image]
+    if: ${{ always() && !cancelled() && !contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+          merge-multiple: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Activate corepack
+        run: |
+          corepack install
+          corepack enable
+      - name: Install dependencies
+        run: yarn --immutable
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.dry-run-semantic-release }}" == "true" ]; then
+          npx semantic-release --dry-run
+          else
+          npx semantic-release
+          fi
 
       - name: Mkdocs Deploy
         if: ${{ success() }}
@@ -113,4 +244,4 @@ jobs:
             {
               "ref": "refs/heads/main",
               "versionInput": "${{ steps.package-version.outputs.current-version}}"
-            }          
+            }

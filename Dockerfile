@@ -33,8 +33,8 @@ COPY --from=builder --chmod=777 --chown=node:node /app/server/dist ./server
 COPY --from=builder --chmod=777 --chown=node:node /app/server/package.json ./server/package.json
 COPY --from=builder --chmod=777 --chown=node:node /app/server/node_modules ./server/node_modules
 
-COPY docker/supervisord.conf /etc/supervisord.conf
-COPY --chmod=777 --chown=node:node docker/start.sh /opt/app/start.sh
+COPY distribution/docker/supervisord.conf /etc/supervisord.conf
+COPY --chmod=777 --chown=node:node distribution/docker/start.sh /opt/app/start.sh
 
 # Create required directories
 RUN mkdir -m 777 /opt/data && \

@@ -10,7 +10,7 @@ const ormConfig: TypeOrmModuleOptions = {
   subscribers: ['./**/*.subscriber{.ts,.js}'],
   migrations:
     process.env.NODE_ENV === 'production'
-      ? ['/opt/app/server/database/migrations/**/*{.js,.ts}']
+      ? ['/opt/app/server/database/migrations/**/*{.js,.ts}'] // TODO: Update this path for the archives
       : ['./dist/database/migrations/**/*{.js,.ts}'],
   autoLoadEntities: true,
   migrationsRun: true,
