@@ -63,12 +63,10 @@ interface ICreateApiObject {
 
 const AddModal = (props: AddModal) => {
   const [selectedLibraryId, setSelectedLibraryId] = useState<string>(
-    props.editData ? props.editData.libraryId.toString() : '1',
+    props.editData ? props.editData.libraryId.toString() : '',
   )
   const [selectedType, setSelectedType] = useState<string>(
-    props.editData && props.editData.type
-      ? props.editData.type.toString()
-      : '1',
+    props.editData?.type ? props.editData.type.toString() : '',
   )
   const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
   const [collection, setCollection] = useState<ICollection>()
@@ -80,7 +78,7 @@ const AddModal = (props: AddModal) => {
   const nameRef = useRef<any>()
   const descriptionRef = useRef<any>()
   const libraryRef = useRef<any>()
-  const collectionTypeRef = useRef<any>(EPlexDataType.MOVIES)
+  const collectionTypeRef = useRef<any>()
   const deleteAfterRef = useRef<any>()
   const keepLogsForMonthsRef = useRef<any>()
   const tautulliWatchedPercentOverrideRef = useRef<any>()
@@ -97,12 +95,18 @@ const AddModal = (props: AddModal) => {
     props.editData ? props.editData.useRules : true,
   )
   const [arrOption, setArrOption] = useState<number>()
-  const [radarrSettingsId, setRadarrSettingsId] = useState<number>()
-  const [sonarrSettingsId, setSonarrSettingsId] = useState<number>()
-  const [originalRadarrSettingsId, setOriginalRadarrSettingsId] =
-    useState<number>()
-  const [originalSonarrSettingsId, setOriginalSonarrSettingsId] =
-    useState<number>()
+  const [radarrSettingsId, setRadarrSettingsId] = useState<
+    number | null | undefined
+  >(props.editData ? null : undefined)
+  const [sonarrSettingsId, setSonarrSettingsId] = useState<
+    number | null | undefined
+  >(props.editData ? null : undefined)
+  const [originalRadarrSettingsId, setOriginalRadarrSettingsId] = useState<
+    number | null | undefined
+  >(props.editData ? null : undefined)
+  const [originalSonarrSettingsId, setOriginalSonarrSettingsId] = useState<
+    number | null | undefined
+  >(props.editData ? null : undefined)
   const [showArrServerChangeWarning, setShowArrServerChangeWarning] =
     useState<boolean>(false)
   const [active, setActive] = useState<boolean>(
@@ -126,9 +130,27 @@ const AddModal = (props: AddModal) => {
       (x) => x.id == Application.OVERSEERR,
     ) ?? false
 
-  function setLibraryId(event: { target: { value: string } }) {
-    setSelectedLibraryId(event.target.value)
+  function updateLibraryId(value: string) {
+    setLibraryId(value)
+    setRadarrSettingsId(undefined)
+    setSonarrSettingsId(undefined)
     setArrOption(0)
+  }
+
+  function setLibraryId(value: string) {
+    const lib = LibrariesCtx.libraries.find(
+      (el: ILibrary) => +el.key === +value,
+    )
+
+    if (lib) {
+      setSelectedLibraryId(lib.key)
+      setSelectedLibrary(lib)
+      setSelectedType(
+        lib.type === 'movie'
+          ? EPlexDataType.MOVIES.toString()
+          : EPlexDataType.SHOWS.toString(),
+      )
+    }
   }
 
   function setCollectionType(event: { target: { value: string } }) {
@@ -139,7 +161,7 @@ const AddModal = (props: AddModal) => {
   const handleUpdateArrAction = (
     type: 'Radarr' | 'Sonarr',
     e: number,
-    settingId?: number,
+    settingId?: number | null,
   ) => {
     setArrOption(e)
 
@@ -150,7 +172,6 @@ const AddModal = (props: AddModal) => {
 
       if (
         props.editData &&
-        originalRadarrSettingsId != null &&
         originalRadarrSettingsId != settingId &&
         settingId != radarrSettingsId
       ) {
@@ -163,7 +184,6 @@ const AddModal = (props: AddModal) => {
 
       if (
         props.editData &&
-        originalSonarrSettingsId != null &&
         originalSonarrSettingsId != settingId &&
         settingId != sonarrSettingsId
       ) {
@@ -248,14 +268,6 @@ const AddModal = (props: AddModal) => {
   }
 
   useEffect(() => {
-    const lib = LibrariesCtx.libraries.find(
-      (el: ILibrary) => +el.key === +selectedLibraryId,
-    )
-    setSelectedLibrary(lib)
-    setSelectedType(lib?.type === 'movie' ? '1' : '2')
-  }, [selectedLibraryId])
-
-  useEffect(() => {
     setIsLoading(true)
 
     const load = async () => {
@@ -292,12 +304,13 @@ const AddModal = (props: AddModal) => {
         setListExclusion(collection.listExclusions!)
         setForceOverseerr(collection.forceOverseerr!)
         setArrOption(collection.arrAction)
-        setSelectedType(collection.type ? collection.type.toString() : '1')
+        setSelectedType(collection.type.toString())
         setManualCollection(collection.manualCollection)
-        setRadarrSettingsId(collection.radarrSettingsId)
-        setSonarrSettingsId(collection.sonarrSettingsId)
-        setOriginalRadarrSettingsId(collection.radarrSettingsId)
-        setOriginalSonarrSettingsId(collection.sonarrSettingsId)
+        setRadarrSettingsId(collection.radarrSettingsId ?? null)
+        setSonarrSettingsId(collection.sonarrSettingsId ?? null)
+        setOriginalRadarrSettingsId(collection.radarrSettingsId ?? null)
+        setOriginalSonarrSettingsId(collection.sonarrSettingsId ?? null)
+        setLibraryId(collection.libraryId.toString())
       }
 
       setIsLoading(false)
@@ -326,6 +339,7 @@ const AddModal = (props: AddModal) => {
       nameRef.current.value &&
       libraryRef.current.value &&
       deleteAfterRef.current.value &&
+      (radarrSettingsId !== undefined || sonarrSettingsId !== undefined) &&
       ((useRules && rules.length > 0) || !useRules)
     ) {
       setFormIncomplete(false)
@@ -344,8 +358,8 @@ const AddModal = (props: AddModal) => {
           tautulliWatchedPercentOverrideRef.current.value != ''
             ? +tautulliWatchedPercentOverrideRef.current.value
             : undefined,
-        radarrSettingsId: radarrSettingsId,
-        sonarrSettingsId: sonarrSettingsId,
+        radarrSettingsId: radarrSettingsId ?? undefined,
+        sonarrSettingsId: sonarrSettingsId ?? undefined,
         collection: {
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
@@ -472,9 +486,12 @@ const AddModal = (props: AddModal) => {
                     name="library"
                     id="library"
                     value={selectedLibraryId}
-                    onChange={setLibraryId}
+                    onChange={(e) => updateLibraryId(e.target.value)}
                     ref={libraryRef}
                   >
+                    {selectedLibraryId === '' && (
+                      <option value="" disabled></option>
+                    )}
                     {LibrariesCtx.libraries.map((data: ILibrary) => {
                       return (
                         <option key={data.key} value={data.key}>
@@ -486,7 +503,7 @@ const AddModal = (props: AddModal) => {
                 </div>
               </div>
             </div>
-            {selectedLibrary && selectedLibrary!.type === 'movie' ? (
+            {selectedLibrary && selectedLibrary!.type === 'movie' && (
               <ArrAction
                 type="Radarr"
                 arrAction={arrOption}
@@ -495,7 +512,9 @@ const AddModal = (props: AddModal) => {
                   handleUpdateArrAction('Radarr', e, settingId)
                 }}
               />
-            ) : (
+            )}
+
+            {selectedLibrary && selectedLibrary!.type !== 'movie' && (
               <>
                 <div className="form-row">
                   <label htmlFor="type" className="text-label">
