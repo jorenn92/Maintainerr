@@ -1,12 +1,12 @@
-import { DataSource } from "typeorm";
+import { DataSource } from 'typeorm';
 
 const datasource = new DataSource({
-  type: "sqlite",
-  database: "./data/maintainerr.sqlite",
-  entities: ["./server/dist/**/*.entities{.ts,.js}"],
+  type: 'sqlite',
+  database: './data/maintainerr.sqlite',
+  entities: ['./dist/**/*.entities{.ts,.js}'],
   synchronize: false,
-  migrationsTableName: "migrations",
-  migrations: ["./server/dist/database/migrations/**/*{.js,.ts}"],
+  migrationsTableName: 'migrations',
+  migrations: ['./dist/database/migrations/**/*{.js,.ts}'],
 });
 
 datasource

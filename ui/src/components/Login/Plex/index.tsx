@@ -46,8 +46,8 @@ const PlexLoginButton: React.FC<PlexLoginButtonProps> = ({
           {loading
             ? 'Loading'
             : isProcessing
-            ? 'Authenticating..'
-            : 'Authenticate with Plex'}
+              ? 'Authenticating..'
+              : 'Authenticate with Plex'}
         </span>
       </button>
     </span>

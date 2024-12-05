@@ -1,12 +1,12 @@
 export interface IRuleJson {
-    id: number
-    ruleJson: string
-    ruleGroupId: number
-    isActive: boolean
-  }
+  id: number
+  ruleJson: string
+  ruleGroupId: number
+  isActive: boolean
+}
 
-  const Rule = () => {
-return <></>
-  }
+const Rule = () => {
+  return <></>
+}
 
-  export default Rule;
+export default Rule

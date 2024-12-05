@@ -31,4 +31,4 @@ jobs:
         run: yarn --immutable
 
       - name: Run tests
-        run: yarn test
+        run: yarn turbo test

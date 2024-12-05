@@ -54,7 +54,7 @@ interface ICreateApiObject {
     visibleOnHome: boolean
     deleteAfterDays: number
     manualCollection?: boolean
-    manualCollectionName?: String
+    manualCollectionName?: string
     keepLogsForMonths?: number
   }
   rules: IRule[]
@@ -840,9 +840,9 @@ const AddModal = (props: AddModal) => {
                       Specify the rules this group needs to enforce
                     </p>
                   </div>
-                  <div className="ml-auto ">
+                  <div className="ml-auto">
                     <button
-                      className="ml-3 flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
+                      className="ml-3 flex h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
                       onClick={toggleCommunityRuleModal}
                     >
                       {
@@ -854,9 +854,9 @@ const AddModal = (props: AddModal) => {
                     </button>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center justify-center sm:justify-end max-width-form-head">
+                <div className="max-width-form-head mt-4 flex items-center justify-center sm:justify-end">
                   <button
-                    className="ml-3 flex  h-fit rounded bg-amber-600 p-1 text-zinc-900 shadow-md hover:bg-amber-500 md:h-10"
+                    className="ml-3 flex h-fit rounded bg-amber-600 p-1 text-zinc-900 shadow-md hover:bg-amber-500 md:h-10"
                     onClick={toggleYamlImporter}
                   >
                     {
@@ -868,7 +868,7 @@ const AddModal = (props: AddModal) => {
                   </button>
 
                   <button
-                    className="ml-3 flex  h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
+                    className="ml-3 flex h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
                     onClick={toggleYamlExporter}
                   >
                     {

@@ -7,18 +7,12 @@ import {
   CodeIcon,
   ServerIcon,
 } from '@heroicons/react/outline'
+import type { VersionResponse } from '@maintainerr/server/app/dto/version-response.dto'
 
 enum messages {
   DEVELOP = 'Maintainerr Develop',
   STABLE = 'Maintainerr Stable',
   OUT_OF_DATE = 'Out of Date',
-}
-
-interface VersionResponse {
-  status: 1 | 0
-  version: string
-  commitTag: string
-  updateAvailable: boolean
 }
 
 interface VersionStatusProps {

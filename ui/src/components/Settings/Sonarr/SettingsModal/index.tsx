@@ -134,7 +134,7 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
     const sonarrUrl = constructUrl(port)
 
     if (hostname && port && apiKey && serverName) {
-      let payload: SonarrSettingSaveRequest = {
+      const payload: SonarrSettingSaveRequest = {
         url: `${sonarrUrl}${baseUrl ? `/${baseUrl}` : ''}`,
         apiKey: apiKey,
         serverName: serverName,
@@ -301,9 +301,7 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
       <div className="form-row">
         <label htmlFor="baseUrl" className="text-label">
           Base URL
-          <span className="label-tip">
-            {`No Leading Slash`}
-          </span>
+          <span className="label-tip">{`No Leading Slash`}</span>
         </label>
         <div className="form-input">
           <div className="form-input-field">
@@ -337,7 +335,7 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
 
       <div className="actions mt-5 w-full">
         <div className="flex w-full flex-wrap sm:flex-nowrap">
-          <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
+          <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
             <DocsButton page="Configuration" />
           </span>
         </div>

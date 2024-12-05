@@ -180,15 +180,15 @@ const RuleInput = (props: IRuleInput) => {
               ? customValType === RuleType.DATE
                 ? customValType
                 : customValType === RuleType.NUMBER
-                ? customValType
-                : customValType === RuleType.TEXT &&
-                  secondVal === CustomParams.CUSTOM_DAYS
-                ? RuleType.NUMBER
-                : customValType === RuleType.TEXT
-                ? customValType
-                : customValType === RuleType.BOOL
-                ? customValType
-                : +ruleType
+                  ? customValType
+                  : customValType === RuleType.TEXT &&
+                      secondVal === CustomParams.CUSTOM_DAYS
+                    ? RuleType.NUMBER
+                    : customValType === RuleType.TEXT
+                      ? customValType
+                      : customValType === RuleType.BOOL
+                        ? customValType
+                        : +ruleType
               : +ruleType,
             value: customVal,
           },
@@ -247,7 +247,6 @@ const RuleInput = (props: IRuleInput) => {
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firstval])
 
   useEffect(() => {
@@ -267,13 +266,14 @@ const RuleInput = (props: IRuleInput) => {
       } else if (secondVal === CustomParams.CUSTOM_BOOLEAN) {
         setCustomValActive(true)
         setCustomValType(RuleType.BOOL)
-        customVal !== '0' ? setCustomVal('1') : undefined
+        if (customVal !== '0') {
+          setCustomVal('1')
+        }
       } else {
         setCustomValActive(false)
         setCustomVal(undefined)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [secondVal])
 
   const getPropFromTuple = (
@@ -299,8 +299,8 @@ const RuleInput = (props: IRuleInput) => {
             {props.tagId
               ? `Rule #${props.tagId}`
               : props.id
-              ? `Rule #${props.id}`
-              : `Rule #1`}
+                ? `Rule #${props.id}`
+                : `Rule #1`}
           </div>
 
           {props.id && props.id > 1 ? (

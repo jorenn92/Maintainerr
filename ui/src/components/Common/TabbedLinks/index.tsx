@@ -23,11 +23,11 @@ export interface ITabbedLink {
 }
 
 const TabbedLink = (props: ITabbedLink) => {
-  let linkClasses =
+  const linkClasses =
     (props.disabled ? 'pointer-events-none touch-none ' : 'cursor-pointer ') +
     'px-1 py-4 ml-8 text-md font-semibold leading-5 transition duration-300 leading-5 whitespace-nowrap first:ml-0'
-  let activeLinkColor = ' border-b text-amber-500 border-amber-600'
-  let inactiveLinkColor =
+  const activeLinkColor = ' border-b text-amber-500 border-amber-600'
+  const inactiveLinkColor =
     'border-transparent text-zinc-500 hover:border-b focus:border-b hover:text-zinc-300 hover:border-zinc-400 focus:text-zinc-300 focus:border-zinc-400'
 
   return (

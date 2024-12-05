@@ -11,7 +11,7 @@ interface CSSTransitionProps {
   leaveFrom?: string
   leaveTo?: string
   appear?: boolean
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }
 
 const TransitionContext = React.createContext<{
@@ -47,11 +47,15 @@ const CSSTransition: React.FC<CSSTransitionProps> = ({
   const leaveToClasses = leaveTo.split(' ').filter((s) => s.length)
 
   const addClasses = (node: HTMLElement, classes: string[]) => {
-    classes.length && node.classList.add(...classes)
+    if (classes.length) {
+      node.classList.add(...classes)
+    }
   }
 
   const removeClasses = (node: HTMLElement, classes: string[]) => {
-    classes.length && node.classList.remove(...classes)
+    if (classes.length) {
+      node.classList.remove(...classes)
+    }
   }
 
   return (

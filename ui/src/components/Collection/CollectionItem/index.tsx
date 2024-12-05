@@ -40,10 +40,10 @@ const CollectionItem = (props: ICollectionItem) => {
             <div className="collection-backdrop"></div>
           </div>
         ) : undefined}
-        <div className="inset-0 z-0 h-fit p-3 ">
+        <div className="inset-0 z-0 h-fit p-3">
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-base font-bold text-white sm:text-lg">
             <a
-              className="hover:underline hover:cursor-pointer"
+              className="hover:cursor-pointer hover:underline"
               // onClick={() => props.onClick(props.collection)}
               {...(props.onClick
                 ? { onClick: () => props.onClick!(props.collection) }
@@ -54,7 +54,7 @@ const CollectionItem = (props: ICollectionItem) => {
                 : props.collection.title}
             </a>
           </div>
-          <div className="max-h-12 h-12 line-clamp-2 whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll sm:text-lg sm:h-14 sm:max-h-14">
+          <div className="line-clamp-2 h-12 max-h-12 whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll sm:h-14 sm:max-h-14 sm:text-lg">
             {props.collection.manualCollection
               ? `Handled by rule: '${props.collection.title}'`
               : props.collection.description}

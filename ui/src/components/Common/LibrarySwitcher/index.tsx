@@ -4,7 +4,7 @@ import GetApiHandler from '../../../utils/ApiHandler'
 
 interface ILibrarySwitcher {
   onSwitch: (libraryId: number) => void
-  allPossible?: Boolean
+  allPossible?: boolean
 }
 
 const LibrarySwitcher = (props: ILibrarySwitcher) => {
@@ -19,9 +19,9 @@ const LibrarySwitcher = (props: ILibrarySwitcher) => {
       GetApiHandler('/plex/libraries').then((resp) => {
         if (resp) {
           LibrariesCtx.addLibraries(resp)
-          props.allPossible !== undefined && !props.allPossible
-            ? props.onSwitch(+resp[0].key)
-            : undefined
+          if (props.allPossible !== undefined && !props.allPossible) {
+            props.onSwitch(+resp[0].key)
+          }
         } else {
           LibrariesCtx.addLibraries([])
         }

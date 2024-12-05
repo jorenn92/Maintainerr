@@ -7,7 +7,7 @@ import {
 } from 'react'
 
 export interface ISearch {
-  text: String
+  text: string
 }
 
 const SearchContext = createContext({

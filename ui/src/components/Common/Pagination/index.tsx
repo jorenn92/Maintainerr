@@ -12,7 +12,9 @@ const Pagination = (props: IPagination) => {
       <span className="mb-2 text-sm text-zinc-200">
         Showing{' '}
         <span className="font-bold text-zinc-400">
-          {(props.totalItems === 0) ? 0 : (props.currentPage - 1) * props.pageSize + 1}
+          {props.totalItems === 0
+            ? 0
+            : (props.currentPage - 1) * props.pageSize + 1}
         </span>{' '}
         to{' '}
         <span className="font-bold text-zinc-400">
@@ -27,7 +29,7 @@ const Pagination = (props: IPagination) => {
         {props.currentPage === 1 ? undefined : (
           <button
             onClick={() => props.handleBackward()}
-            className="rounded-l bg-zinc-900 py-2 px-4 text-sm font-medium text-white hover:bg-zinc-800"
+            className="rounded-l bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
           >
             Prev{' '}
           </button>
@@ -36,7 +38,7 @@ const Pagination = (props: IPagination) => {
           <button
             onClick={() => props.handleForward()}
             className={
-              'rounded-r border-0 border-l border-gray-700 bg-zinc-900 py-2 px-4 text-sm font-medium text-white hover:bg-zinc-800 '
+              'rounded-r border-0 border-l border-gray-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800'
             }
           >
             Next
