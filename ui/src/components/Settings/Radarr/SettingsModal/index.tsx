@@ -47,7 +47,6 @@ interface RadarrSettingSaveRequest {
   url: string
   apiKey: string
   serverName: string
-  isDefault: boolean
 }
 
 const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
@@ -66,14 +65,12 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
     : ''
   const initialApiKey = props.settings?.apiKey ?? ''
   const initialServerName = props.settings?.serverName ?? ''
-  const initialIsDefault = props.settings?.isDefault ?? false
 
   const [hostname, setHostname] = useState<string>(initialHostname)
   const [baseUrl, setBaseUrl] = useState<string>(initialBaseUrl)
   const [port, setPort] = useState<string>(initialPort)
   const [apiKey, setApiKey] = useState<string>(initialApiKey)
   const [serverName, setServerName] = useState<string>(initialServerName)
-  const [isDefault, setIsDefault] = useState<boolean>(initialIsDefault)
 
   const [error, setError] = useState<boolean>()
   const [testedSettings, setTestedSettings] = useState(
@@ -138,7 +135,6 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
         url: `${radarrUrl}${baseUrl ? `/${baseUrl}` : ''}`,
         apiKey: apiKey,
         serverName: serverName,
-        isDefault: isDefault,
         ...(props.settings?.id && { id: props.settings?.id }),
       }
 
@@ -229,23 +225,6 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
           <Alert type="error" title="Failed to connect to Radarr" />
         )
       ) : undefined}
-
-      <div className="form-row">
-        <label htmlFor="isDefault" className="text-label">
-          Default Server
-        </label>
-        <div className="form-input">
-          <div className="form-input-field">
-            <input
-              type="checkbox"
-              name="isDefault"
-              id="isDefault"
-              checked={isDefault}
-              onChange={(e) => setIsDefault(e.target.checked)}
-            />
-          </div>
-        </div>
-      </div>
 
       <div className="form-row">
         <label htmlFor="serverName" className="text-label">

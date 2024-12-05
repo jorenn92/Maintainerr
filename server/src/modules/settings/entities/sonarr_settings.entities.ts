@@ -15,9 +15,6 @@ export class SonarrSettings {
   @Column({ nullable: true })
   apiKey: string;
 
-  @Column({ default: false })
-  isDefault: boolean;
-
   @OneToMany(() => Collection, (collection) => collection.sonarrSettings)
   collections: Collection[];
 }

@@ -8,9 +8,9 @@ type ArrType = 'Radarr' | 'Sonarr'
 interface ArrActionProps {
   type: ArrType
   arrAction?: number
-  settingId?: number
+  settingId?: number | null // null for when the user has selected 'None', undefined for when this is a new rule
   options?: Option[]
-  onUpdate: (value: number, settingId?: number) => void
+  onUpdate: (value: number, settingId?: number | null) => void
 }
 
 interface Option {
@@ -19,14 +19,15 @@ interface Option {
 }
 
 const ArrAction = (props: ArrActionProps) => {
-  const [prevType, setPrevType] = useState<ArrType>(props.type)
+  const selectedSetting =
+    props.settingId === undefined ? '-1' : (props.settingId?.toString() ?? '')
   const [settings, setSettings] = useState<(IRadarrSetting | ISonarrSetting)[]>(
     [],
   )
   const [loading, setLoading] = useState<boolean>(true)
   const action = props.arrAction ? props.arrAction : 0
 
-  const handleSelectedSettingIdChange = (id?: number) => {
+  const handleSelectedSettingIdChange = (id?: number | null) => {
     props.onUpdate(action, id)
   }
 
@@ -40,19 +41,15 @@ const ArrAction = (props: ArrActionProps) => {
     const settingsResponse = await GetApiHandler<IRadarrSetting[]>(
       `/settings/${type.toLowerCase()}`,
     )
-    setPrevType(type)
     setSettings(settingsResponse)
     setLoading(false)
 
-    if (!props.settingId || type != prevType) {
-      if (settingsResponse.length > 0) {
-        const defaultServer = settingsResponse.find((s) => s.isDefault)
-        handleSelectedSettingIdChange(
-          defaultServer ? defaultServer.id : settingsResponse[0]?.id,
-        )
-      } else {
-        handleSelectedSettingIdChange(undefined)
-      }
+    // The selected server does not exist anymore (old client data potentially) so deselect
+    if (
+      props.settingId &&
+      settingsResponse.find((x) => x.id === props.settingId) == null
+    ) {
+      handleSelectedSettingIdChange(undefined)
     }
   }
 
@@ -81,18 +78,24 @@ const ArrAction = (props: ArrActionProps) => {
     <div>
       <div className="form-row">
         <label htmlFor={`${props.type}-server`} className="text-label">
-          {props.type} server
+          {props.type} server *
         </label>
         <div className="form-input">
           <div className="form-input-field">
             <select
               name={`${props.type}-server`}
               id={`${props.type}-server`}
-              value={props.settingId}
+              value={selectedSetting}
               onChange={(e) => {
-                handleSelectedSettingIdChange(+e.target.value)
+                handleSelectedSettingIdChange(
+                  e.target.value == '' ? null : +e.target.value,
+                )
               }}
             >
+              {selectedSetting === '-1' && (
+                <option value="-1" disabled></option>
+              )}
+              <option value="">None</option>
               {settings.map((e) => {
                 return (
                   <option key={e.id} value={e.id}>
@@ -100,11 +103,6 @@ const ArrAction = (props: ArrActionProps) => {
                   </option>
                 )
               })}
-              {settings.length === 0 && (
-                <option value="" disabled>
-                  No servers added
-                </option>
-              )}
               {loading && (
                 <option value="" disabled>
                   Loading servers...

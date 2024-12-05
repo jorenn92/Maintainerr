@@ -443,13 +443,13 @@ export class PlexApiService {
   }
 
   public async deleteMediaFromDisk(plexId: number | string): Promise<void> {
-    this.logger.log(
-      `[Plex] Removed media with ID ${plexId} from Plex library.`,
-    );
     try {
       await this.plexClient.deleteQuery({
         uri: `/library/metadata/${plexId}`,
       });
+      this.logger.log(
+        `[Plex] Removed media with ID ${plexId} from Plex library.`,
+      );
     } catch (e) {
       this.logger.warn('Something went wrong while removing media from Plex.', {
         label: 'Plex API',
