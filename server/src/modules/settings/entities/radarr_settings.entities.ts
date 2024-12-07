@@ -15,9 +15,6 @@ export class RadarrSettings {
   @Column({ nullable: true })
   apiKey: string;
 
-  @Column({ default: false })
-  isDefault: boolean;
-
   @OneToMany(() => Collection, (collection) => collection.radarrSettings)
   collections: Collection[];
 }
