@@ -18,6 +18,7 @@ export interface ICollectionMedia {
   description?: string
   isActive?: boolean
   arrAction?: number
+  visibleOnRecommended?: boolean
   visibleOnHome?: boolean
   deleteAfterDays?: number
   type?: EPlexDataType

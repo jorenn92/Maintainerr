@@ -39,6 +39,9 @@ export class Collection {
   arrAction: number;
 
   @Column({ default: false })
+  visibleOnRecommended: boolean;
+
+  @Column({ default: false })
   visibleOnHome: boolean;
 
   @Column({ nullable: true, default: null })
