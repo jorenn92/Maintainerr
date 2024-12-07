@@ -162,35 +162,35 @@ const AddModal = (props: AddModal) => {
 
   const handleUpdateArrAction = (
     type: 'Radarr' | 'Sonarr',
-    e: number,
+    arrAction: number,
     settingId?: number | null,
   ) => {
-    setArrOption(e)
+    setArrOption(arrAction)
 
     if (type === 'Radarr') {
-      setSonarrSettingsId(undefined)
-      setOriginalSonarrSettingsId(undefined)
-      setRadarrSettingsId(settingId)
-
       if (
         props.editData &&
+        originalRadarrSettingsId !== undefined &&
         originalRadarrSettingsId != settingId &&
         settingId != radarrSettingsId
       ) {
         setShowArrServerChangeWarning(true)
       }
-    } else if (type === 'Sonarr') {
-      setRadarrSettingsId(undefined)
-      setOriginalRadarrSettingsId(undefined)
-      setSonarrSettingsId(settingId)
 
+      setSonarrSettingsId(undefined)
+      setRadarrSettingsId(settingId)
+    } else if (type === 'Sonarr') {
       if (
         props.editData &&
+        originalSonarrSettingsId !== undefined &&
         originalSonarrSettingsId != settingId &&
         settingId != sonarrSettingsId
       ) {
         setShowArrServerChangeWarning(true)
       }
+
+      setRadarrSettingsId(undefined)
+      setSonarrSettingsId(settingId)
     }
   }
 
@@ -512,9 +512,23 @@ const AddModal = (props: AddModal) => {
                 type="Radarr"
                 arrAction={arrOption}
                 settingId={radarrSettingsId}
-                onUpdate={(e: number, settingId) => {
-                  handleUpdateArrAction('Radarr', e, settingId)
+                onUpdate={(arrAction: number, settingId) => {
+                  handleUpdateArrAction('Radarr', arrAction, settingId)
                 }}
+                options={[
+                  {
+                    id: 0,
+                    name: 'Delete',
+                  },
+                  {
+                    id: 1,
+                    name: 'Unmonitor and delete files',
+                  },
+                  {
+                    id: 3,
+                    name: 'Unmonitor and keep files',
+                  },
+                ]}
               />
             )}
 

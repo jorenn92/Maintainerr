@@ -9,8 +9,8 @@ interface ArrActionProps {
   type: ArrType
   arrAction?: number
   settingId?: number | null // null for when the user has selected 'None', undefined for when this is a new rule
-  options?: Option[]
-  onUpdate: (value: number, settingId?: number | null) => void
+  options: Option[]
+  onUpdate: (arrAction: number, settingId?: number | null) => void
 }
 
 interface Option {
@@ -25,10 +25,11 @@ const ArrAction = (props: ArrActionProps) => {
     [],
   )
   const [loading, setLoading] = useState<boolean>(true)
-  const action = props.arrAction ? props.arrAction : 0
+  const action = props.arrAction ?? 0
 
   const handleSelectedSettingIdChange = (id?: number | null) => {
-    props.onUpdate(action, id)
+    const actionUpdate = id == null ? 0 : action
+    props.onUpdate(actionUpdate, id)
   }
 
   const handleActionChange = (value: number) => {
@@ -57,22 +58,16 @@ const ArrAction = (props: ArrActionProps) => {
     loadArrSettings(props.type)
   }, [props.type])
 
-  const options: Option[] = props.options
-    ? props.options
-    : [
+  const noneServerSelected = selectedSetting === ''
+
+  const options: Option[] = noneServerSelected
+    ? [
         {
           id: 0,
           name: 'Delete',
         },
-        {
-          id: 1,
-          name: 'Unmonitor and delete files',
-        },
-        {
-          id: 3,
-          name: 'Unmonitor and keep files',
-        },
       ]
+    : props.options
 
   return (
     <div>
@@ -114,7 +109,7 @@ const ArrAction = (props: ArrActionProps) => {
       </div>
       <div className="form-row">
         <label htmlFor={`${props.type}-action`} className="text-label">
-          {props.type} action
+          {noneServerSelected ? 'Plex' : props.type} action
         </label>
         <div className="form-input">
           <div className="form-input-field">
