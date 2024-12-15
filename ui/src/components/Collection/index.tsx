@@ -15,6 +15,7 @@ export interface ICollection {
   title: string
   description?: string
   isActive: boolean
+  visibleOnRecommended?: boolean
   visibleOnHome?: boolean
   deleteAfterDays?: number
   listExclusions?: boolean

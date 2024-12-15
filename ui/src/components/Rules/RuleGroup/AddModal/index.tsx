@@ -51,6 +51,7 @@ interface ICreateApiObject {
   radarrSettingsId?: number
   sonarrSettingsId?: number
   collection: {
+    visibleOnRecommended: boolean
     visibleOnHome: boolean
     deleteAfterDays: number
     manualCollection?: boolean
@@ -85,6 +86,7 @@ const AddModal = (props: AddModal) => {
   const keepLogsForMonthsRef = useRef<any>()
   const tautulliWatchedPercentOverrideRef = useRef<any>()
   const manualCollectionNameRef = useRef<any>('My custom collection')
+  const [showRecommended, setShowRecommended] = useState<boolean>(true)
   const [showHome, setShowHome] = useState<boolean>(true)
   const [listExclusion, setListExclusion] = useState<boolean>(true)
   const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
@@ -288,6 +290,7 @@ const AddModal = (props: AddModal) => {
 
       if (collection) {
         setCollection(collection)
+        setShowRecommended(collection.visibleOnRecommended!)
         setShowHome(collection.visibleOnHome!)
         setListExclusion(collection.listExclusions!)
         setForceOverseerr(collection.forceOverseerr!)
@@ -347,6 +350,7 @@ const AddModal = (props: AddModal) => {
         radarrSettingsId: radarrSettingsId,
         sonarrSettingsId: sonarrSettingsId,
         collection: {
+          visibleOnRecommended: showRecommended,
           visibleOnHome: showHome,
           deleteAfterDays: +deleteAfterRef.current.value,
           manualCollection: manualCollection,
@@ -686,6 +690,29 @@ const AddModal = (props: AddModal) => {
                     defaultChecked={active}
                     onChange={() => {
                       setActive(!active)
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="collection_visible" className="text-label">
+                Show on library recommended
+                <p className="text-xs font-normal">
+                  Show the collection on the Plex library recommended screen
+                </p>
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <input
+                    type="checkbox"
+                    name="collection_visible_library"
+                    id="collection_visible_library"
+                    className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                    defaultChecked={showRecommended}
+                    onChange={() => {
+                      setShowRecommended(!showRecommended)
                     }}
                   />
                 </div>

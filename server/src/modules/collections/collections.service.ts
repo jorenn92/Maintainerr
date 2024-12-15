@@ -29,6 +29,7 @@ import { ECollectionLogType } from '../../modules/collections/entities/collectio
 interface addCollectionDbResponse {
   id: number;
   isActive: boolean;
+  visibleOnRecommended: boolean;
   visibleOnHome: boolean;
   deleteAfterDays: number;
   manualCollection: boolean;
@@ -252,7 +253,7 @@ export class CollectionsService {
         await this.plexApi.UpdateCollectionSettings({
           libraryId: collectionObj.libraryId,
           collectionId: plexCollection.ratingKey,
-          recommended: false,
+          recommended: collection.visibleOnRecommended,
           ownHome: collection.visibleOnHome,
           sharedHome: collection.visibleOnHome,
         });
@@ -267,7 +268,7 @@ export class CollectionsService {
           await this.plexApi.UpdateCollectionSettings({
             libraryId: collection.libraryId,
             collectionId: plexCollection.ratingKey,
-            recommended: false,
+            recommended: collection.visibleOnRecommended,
             ownHome: collection.visibleOnHome,
             sharedHome: collection.visibleOnHome,
           });
@@ -360,7 +361,7 @@ export class CollectionsService {
           await this.plexApi.UpdateCollectionSettings({
             libraryId: dbCollection.libraryId,
             collectionId: dbCollection.plexId,
-            recommended: false,
+            recommended: collection.visibleOnRecommended,
             ownHome: collection.visibleOnHome,
             sharedHome: collection.visibleOnHome,
           });
@@ -559,7 +560,7 @@ export class CollectionsService {
               await this.plexApi.UpdateCollectionSettings({
                 libraryId: collection.libraryId,
                 collectionId: collection.plexId,
-                recommended: false,
+                recommended: collection.visibleOnRecommended,
                 ownHome: collection.visibleOnHome,
                 sharedHome: collection.visibleOnHome,
               });
@@ -918,6 +919,7 @@ export class CollectionsService {
                 libraryId: collection.libraryId,
                 arrAction: collection.arrAction ? collection.arrAction : 0,
                 isActive: collection.isActive,
+                visibleOnRecommended: collection.visibleOnRecommended,
                 visibleOnHome: collection.visibleOnHome,
                 deleteAfterDays: collection.deleteAfterDays,
                 listExclusions: collection.listExclusions,
