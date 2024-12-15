@@ -107,7 +107,9 @@ const PlexSettings = () => {
         plex_auth_token?: string
       } = {
         plex_hostname: sslRef.current?.checked
-          ? `https://${hostnameRef.current.value.replace('http://', '').replace('https://', '')}`
+          ? `https://${hostnameRef.current.value
+              .replace('http://', '')
+              .replace('https://', '')}`
           : hostnameRef.current.value
               .replace('http://', '')
               .replace('https://', ''),
@@ -502,7 +504,7 @@ const PlexSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
               <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
-                <DocsButton page="Configuration" />
+                <DocsButton page="Configuration.html#plex" />
               </span>
               <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
                 <TestButton onClick={appTest} testUrl="/settings/test/plex" />
