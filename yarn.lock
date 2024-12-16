@@ -1475,7 +1475,7 @@ __metadata:
     "@eslint/js": "npm:^9.16.0"
     "@nestjs/cli": "npm:^10.4.7"
     "@nestjs/common": "npm:^10.4.9"
-    "@nestjs/core": "npm:^10.4.7"
+    "@nestjs/core": "npm:^10.4.15"
     "@nestjs/platform-express": "npm:^10.4.12"
     "@nestjs/schedule": "npm:^4.1.2"
     "@nestjs/schematics": "npm:^10.2.3"
@@ -1638,15 +1638,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/core@npm:^10.4.7":
-  version: 10.4.7
-  resolution: "@nestjs/core@npm:10.4.7"
+"@nestjs/core@npm:^10.4.15":
+  version: 10.4.15
+  resolution: "@nestjs/core@npm:10.4.15"
   dependencies:
     "@nuxtjs/opencollective": "npm:0.3.2"
     fast-safe-stringify: "npm:2.1.1"
     iterare: "npm:1.2.1"
     path-to-regexp: "npm:3.3.0"
-    tslib: "npm:2.7.0"
+    tslib: "npm:2.8.1"
     uid: "npm:2.0.2"
   peerDependencies:
     "@nestjs/common": ^10.0.0
@@ -1662,7 +1662,7 @@ __metadata:
       optional: true
     "@nestjs/websockets":
       optional: true
-  checksum: 10c0/34c1601bd09ef7ca56ec57a9e7a729480ffc5ea102bf60427e34ae3642e8a8baa475b3f425b9258c076d110c29aa5b0027acdfb8dca290ad49566cd97be20d60
+  checksum: 10c0/68958efca25b28ea38bcfc810751c626a913a848d9ec86aab0a6021e708632b95585f0da5d5c2b0513bb64cacfc97d391b45ec002b718a8e90fdda1b4354bed1
   languageName: node
   linkType: hard
 
