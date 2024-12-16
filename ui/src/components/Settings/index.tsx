@@ -46,6 +46,11 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
       route: '/settings/jobs',
       regex: /^\/settings(\/jobs)?$/,
     },
+    {
+      text: 'About',
+      route: '/settings/about',
+      regex: /^\/settings(\/about)?$/,
+    },
   ]
 
   useEffect(() => {
