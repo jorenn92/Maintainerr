@@ -1474,7 +1474,7 @@ __metadata:
     "@eslint/eslintrc": "npm:^3.2.0"
     "@eslint/js": "npm:^9.16.0"
     "@nestjs/cli": "npm:^10.4.9"
-    "@nestjs/common": "npm:^10.4.9"
+    "@nestjs/common": "npm:^10.4.15"
     "@nestjs/core": "npm:^10.4.15"
     "@nestjs/platform-express": "npm:^10.4.12"
     "@nestjs/schedule": "npm:^4.1.2"
@@ -1617,12 +1617,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:^10.4.9":
-  version: 10.4.9
-  resolution: "@nestjs/common@npm:10.4.9"
+"@nestjs/common@npm:^10.4.15":
+  version: 10.4.15
+  resolution: "@nestjs/common@npm:10.4.15"
   dependencies:
     iterare: "npm:1.2.1"
-    tslib: "npm:2.7.0"
+    tslib: "npm:2.8.1"
     uid: "npm:2.0.2"
   peerDependencies:
     class-transformer: "*"
@@ -1634,7 +1634,7 @@ __metadata:
       optional: true
     class-validator:
       optional: true
-  checksum: 10c0/6edff33e8e3693cb599722ab222431e9ae7dbdda33e6951c78ee8d1182dfe67082eb404591197ef074d056ecf72e04d0ff16e3951476b8653a98d73a7babc6c8
+  checksum: 10c0/9566993fd3f805df2be632f5a16ca90d81b0deeb50e1e7cde4a49d4948c0d8d7db58b42ded70f35061e95e91a40d2adcd9e19cb2771090114eb737f62d2ea4c6
   languageName: node
   linkType: hard
 
@@ -13512,13 +13512,6 @@ __metadata:
     minimist: "npm:^1.2.6"
     strip-bom: "npm:^3.0.0"
   checksum: 10c0/5b4f301a2b7a3766a986baf8fc0e177eb80bdba6e396792ff92dc23b5bca8bb279fc96517dcaaef63a3b49bebc6c4c833653ec58155780bc906bdbcf7dda0ef5
-  languageName: node
-  linkType: hard
-
-"tslib@npm:2.7.0":
-  version: 2.7.0
-  resolution: "tslib@npm:2.7.0"
-  checksum: 10c0/469e1d5bf1af585742128827000711efa61010b699cb040ab1800bcd3ccdd37f63ec30642c9e07c4439c1db6e46345582614275daca3e0f4abae29b0083f04a6
   languageName: node
   linkType: hard
 
