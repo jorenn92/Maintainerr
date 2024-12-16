@@ -14,6 +14,7 @@ export interface RadarrMovieOptions {
 export interface RadarrMovie {
   id: number;
   title: string;
+  originalLanguage: RadarrLanguage;
   isAvailable: boolean;
   monitored: boolean;
   tmdbId: number;
@@ -32,6 +33,11 @@ export interface RadarrMovie {
   digitalRelease: string;
   inCinemas: string;
   tags: number[];
+}
+
+export interface RadarrLanguage {
+  id: number;
+  name: string | null;
 }
 
 export interface RadarrInfo {

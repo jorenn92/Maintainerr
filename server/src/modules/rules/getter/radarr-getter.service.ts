@@ -56,27 +56,27 @@ export class RadarrGetterService {
             return movieResponse.added ? new Date(movieResponse.added) : null;
           }
           case 'fileDate': {
-            return movieResponse?.movieFile?.dateAdded
+            return movieResponse.movieFile?.dateAdded
               ? new Date(movieResponse.movieFile.dateAdded)
               : null;
           }
           case 'filePath': {
-            return movieResponse?.movieFile?.path
+            return movieResponse.movieFile?.path
               ? movieResponse.movieFile.path
               : null;
           }
           case 'fileQuality': {
-            return movieResponse?.movieFile?.quality?.quality?.resolution
+            return movieResponse.movieFile?.quality?.quality?.resolution
               ? movieResponse.movieFile.quality.quality.resolution
               : null;
           }
           case 'fileAudioChannels': {
-            return movieResponse?.movieFile
+            return movieResponse.movieFile
               ? movieResponse.movieFile.mediaInfo?.audioChannels
               : null;
           }
           case 'runTime': {
-            if (movieResponse?.movieFile?.mediaInfo?.runTime) {
+            if (movieResponse.movieFile?.mediaInfo?.runTime) {
               const hms = movieResponse.movieFile.mediaInfo.runTime;
               const splitted = hms.split(':');
               return +splitted[0] * 60 + +splitted[1];
@@ -84,35 +84,34 @@ export class RadarrGetterService {
             return null;
           }
           case 'monitored': {
-            return movieResponse?.monitored
+            return movieResponse.monitored
               ? movieResponse.monitored
                 ? 1
                 : 0
               : null;
           }
           case 'tags': {
-            const movieTags = movieResponse?.tags;
+            const movieTags = movieResponse.tags;
             return (await radarrApiClient.getTags())
               ?.filter((el) => movieTags.includes(el.id))
               .map((el) => el.label);
           }
           case 'profile': {
-            const movieProfile = movieResponse?.qualityProfileId;
+            const movieProfile = movieResponse.qualityProfileId;
 
             return (await radarrApiClient.getProfiles())?.find(
               (el) => el.id === movieProfile,
             ).name;
           }
           case 'fileSize': {
-            return movieResponse?.sizeOnDisk
+            return movieResponse.sizeOnDisk
               ? Math.round(movieResponse.sizeOnDisk / 1048576)
               : movieResponse.movieFile?.size
                 ? Math.round(movieResponse.movieFile.size / 1048576)
                 : null;
           }
           case 'releaseDate': {
-            return movieResponse?.physicalRelease &&
-              movieResponse?.digitalRelease
+            return movieResponse.physicalRelease && movieResponse.digitalRelease
               ? (await new Date(movieResponse.physicalRelease)) >
                 new Date(movieResponse.digitalRelease)
                 ? new Date(movieResponse.digitalRelease)
@@ -124,8 +123,13 @@ export class RadarrGetterService {
                   : null;
           }
           case 'inCinemas': {
-            return movieResponse?.inCinemas
+            return movieResponse.inCinemas
               ? new Date(movieResponse.inCinemas)
+              : null;
+          }
+          case 'originalLanguage': {
+            return movieResponse.originalLanguage?.name
+              ? movieResponse.originalLanguage.name
               : null;
           }
         }

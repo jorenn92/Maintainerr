@@ -430,6 +430,13 @@ export class RuleConstants {
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
         } as Property,
+        {
+          id: 13,
+          name: 'originalLanguage',
+          humanName: 'Original language',
+          mediaType: MediaType.MOVIE,
+          type: RuleType.TEXT,
+        } as Property,
       ],
     },
     {
@@ -552,6 +559,13 @@ export class RuleConstants {
           id: 14,
           name: 'filePath',
           humanName: 'Base file path',
+          mediaType: MediaType.SHOW,
+          type: RuleType.TEXT,
+        } as Property,
+        {
+          id: 15,
+          name: 'originalLanguage',
+          humanName: 'Original language',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT,
         } as Property,

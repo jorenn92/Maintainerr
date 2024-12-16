@@ -32,7 +32,6 @@ export interface IRadarrSetting {
   serverName: string
   url: string
   apiKey: string
-  isDefault: boolean
 }
 
 const RadarrSettings = () => {
@@ -52,14 +51,6 @@ const RadarrSettings = () => {
       newSettings[index] = setting
     } else {
       newSettings.push(setting)
-    }
-
-    if (setting.isDefault) {
-      newSettings.forEach((s) => {
-        if (s.id !== setting.id) {
-          s.isDefault = false
-        }
-      })
     }
 
     setSettings(newSettings)
@@ -121,17 +112,9 @@ const RadarrSettings = () => {
               key={setting.id}
               className="h-full rounded-xl bg-zinc-800 p-4 text-zinc-400 shadow ring-1 ring-zinc-700"
             >
-              <div className="mb-2 flex items-center gap-x-3">
-                <div className="text-base font-medium text-white sm:text-lg">
-                  {setting.serverName}
-                </div>
-                {setting.isDefault && (
-                  <div className="rounded bg-amber-600 px-2 py-0.5 text-xs text-zinc-200 shadow-md">
-                    Default
-                  </div>
-                )}
+              <div className="mb-2 flex items-center gap-x-3 text-base font-medium text-white sm:text-lg">
+                {setting.serverName}
               </div>
-
               <p className="mb-4 space-x-2 truncate text-gray-300">
                 <span className="font-semibold">Address</span>
                 <a href={setting.url} className="hover:underline">
