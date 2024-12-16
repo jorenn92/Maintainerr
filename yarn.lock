@@ -1479,7 +1479,7 @@ __metadata:
     "@nestjs/platform-express": "npm:^10.4.12"
     "@nestjs/schedule": "npm:^4.1.2"
     "@nestjs/schematics": "npm:^10.2.3"
-    "@nestjs/testing": "npm:^10.4.12"
+    "@nestjs/testing": "npm:^10.4.15"
     "@nestjs/typeorm": "npm:^10.0.2"
     "@types/jest": "npm:^29.5.14"
     "@types/lodash": "npm:^4.17.13"
@@ -1710,9 +1710,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/testing@npm:^10.4.12":
-  version: 10.4.12
-  resolution: "@nestjs/testing@npm:10.4.12"
+"@nestjs/testing@npm:^10.4.15":
+  version: 10.4.15
+  resolution: "@nestjs/testing@npm:10.4.15"
   dependencies:
     tslib: "npm:2.8.1"
   peerDependencies:
@@ -1725,7 +1725,7 @@ __metadata:
       optional: true
     "@nestjs/platform-express":
       optional: true
-  checksum: 10c0/5b1aba39010c7da48146e9c785ba5147ad7f1f9f25d7833358d921630974fe49d6f67735aeedb0f038893842114c3dd3fa6175ef729b08438a674d1fff115df2
+  checksum: 10c0/6d6b76791677bf6b0ae6c82f2a4b43fda489169fde7858037dd3483cc17b8885d353e9b7c51f5736cad86526afc2c2ebd0b6a1e88f5daa0be87a1546f4a6e511
   languageName: node
   linkType: hard
 
