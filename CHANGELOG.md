@@ -1,3 +1,31 @@
+# [2.3.0](https://github.com/jorenn92/Maintainerr/compare/v2.2.1...v2.3.0) (2024-12-17)
+
+
+### Bug Fixes
+
+* __PATH_PREFIX__ not replaced when using user directive ([#1394](https://github.com/jorenn92/Maintainerr/issues/1394)) ([9b237ea](https://github.com/jorenn92/Maintainerr/commit/9b237ea403224f9742bcb2cde7ba586a8a5fdcd1))
+* changed all docs URLs to match new docs URL generations. ([c8161a3](https://github.com/jorenn92/Maintainerr/commit/c8161a3a1fd62c5765681e4eb843f16f9f0bd278))
+* Docker startup ([ce4e7ad](https://github.com/jorenn92/Maintainerr/commit/ce4e7ad06ecca1d3fcb2112e85ca8a4641098041))
+* error when overseerr URL is null ([a2aeb99](https://github.com/jorenn92/Maintainerr/commit/a2aeb994757acdaacd0de694e253a327f1fdaeea))
+* Handling collections failure after multi arr ([e299c15](https://github.com/jorenn92/Maintainerr/commit/e299c1508ecf0718f8acf6f4cfdbbc24777fe3be))
+* Ignore Plex smart collections due to library corruption ([#1355](https://github.com/jorenn92/Maintainerr/issues/1355)) ([7cf6780](https://github.com/jorenn92/Maintainerr/commit/7cf6780e62ef7a4332a5e089da5823be4bf93226))
+* lint issues ([149dc78](https://github.com/jorenn92/Maintainerr/commit/149dc78d08beed8df967e8da576307b8cf02f1ce))
+* Only allow saving successfully tested settings ([bd88567](https://github.com/jorenn92/Maintainerr/commit/bd88567f60a6371d3804b5b898fa19037714caa4))
+* **package.json:** lint:server script ([575a6c5](https://github.com/jorenn92/Maintainerr/commit/575a6c58ea678ef87e4ae2ab1e9200462ef257b7))
+* Remove cached arr API client on setting changes ([3081105](https://github.com/jorenn92/Maintainerr/commit/308110509a83f526162d0c2cd245081c2c6eb4a6))
+* Revert defaulting to ipv6 ([8ee4888](https://github.com/jorenn92/Maintainerr/commit/8ee4888d44ffafa99ced262f9316d626884fb9ed))
+* Sonarr media existence check in collection handling ([8cd0030](https://github.com/jorenn92/Maintainerr/commit/8cd00301410c7eef1c2ac973834bafd6416e73d0))
+* Trim trailing slash in Overseerr URL ([d3dab2d](https://github.com/jorenn92/Maintainerr/commit/d3dab2d964200d9df70957288237bd4892f10960))
+
+
+### Features
+
+* Add "Original Language" rule to Sonarr & Radarr ([#1407](https://github.com/jorenn92/Maintainerr/issues/1407)) ([bf6bf49](https://github.com/jorenn92/Maintainerr/commit/bf6bf4918bab5116044a002d904b839618169d42))
+* Add "Show on library recommended" option ([ccc13ba](https://github.com/jorenn92/Maintainerr/commit/ccc13ba526117691670b1eb741a14e4b36416dd4))
+* Add base path support ([#1373](https://github.com/jorenn92/Maintainerr/issues/1373)) ([9597bfa](https://github.com/jorenn92/Maintainerr/commit/9597bfa69f29e508e8762ddfad1d2c3cccd39528))
+* Add envars to control service ports ([#1333](https://github.com/jorenn92/Maintainerr/issues/1333)) ([b418975](https://github.com/jorenn92/Maintainerr/commit/b4189752ce265b16e2b28a7c4eecc0385903fe07))
+* Support mutiple *arr servers ([156aca1](https://github.com/jorenn92/Maintainerr/commit/156aca12fd599e490dd68a60100c9f2a210a859a))
+
 ## [2.2.1](https://github.com/jorenn92/Maintainerr/compare/v2.2.0...v2.2.1) (2024-11-06)
 
 
