@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/jorenn92/Maintainerr/compare/v2.3.0...v2.3.1) (2024-12-17)
+
+
+### Bug Fixes
+
+* Container startup failing for some ([3a18d2e](https://github.com/jorenn92/Maintainerr/commit/3a18d2e8c2a1f3144f2b5831b11b3723b0f0c64f))
+
 # [2.3.0](https://github.com/jorenn92/Maintainerr/compare/v2.2.1...v2.3.0) (2024-12-17)
 
 
