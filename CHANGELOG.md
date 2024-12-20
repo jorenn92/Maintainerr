@@ -1,3 +1,16 @@
+# [2.4.0](https://github.com/jorenn92/Maintainerr/compare/v2.3.1...v2.4.0) (2024-12-20)
+
+
+### Bug Fixes
+
+* Community rules & incorrect out of date ([#1448](https://github.com/jorenn92/Maintainerr/issues/1448)) ([1797104](https://github.com/jorenn92/Maintainerr/commit/17971044d88e84bb66fd80a772206ed7dda4d030))
+* Media type selection not reflecting what is saved ([#1444](https://github.com/jorenn92/Maintainerr/issues/1444)) ([47a9651](https://github.com/jorenn92/Maintainerr/commit/47a9651fa579c38e23012a2b6d4878b88ceaf0dc))
+
+
+### Features
+
+* add about page ([#1408](https://github.com/jorenn92/Maintainerr/issues/1408)) ([56fda5c](https://github.com/jorenn92/Maintainerr/commit/56fda5c129183feafd867839b92fc94e6ed52b9e))
+
 ## [2.3.1](https://github.com/jorenn92/Maintainerr/compare/v2.3.0...v2.3.1) (2024-12-17)
 
 
