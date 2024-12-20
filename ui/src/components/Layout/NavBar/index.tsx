@@ -59,6 +59,7 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
   const navRef = useRef<HTMLDivElement>(null)
   const SearchCtx = useContext(SearchContext)
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
   useEffect(() => {
     setTimeout(() => {
@@ -132,7 +133,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                             width={0}
                             height={0}
                             style={{ width: '100%', height: 'auto' }}
-                            src="/logo.svg"
+                            src={`${basePath}/logo.svg`}
                             alt="Logo"
                             priority
                           />
@@ -195,7 +196,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                       width={0}
                       height={0}
                       style={{ width: '100%', height: 'auto' }}
-                      src="/logo.svg"
+                      src={`${basePath}/logo.svg`}
                       alt="Logo"
                       priority
                     />
