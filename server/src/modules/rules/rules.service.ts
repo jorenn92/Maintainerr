@@ -156,6 +156,10 @@ export class RulesService {
     }
   }
 
+  async getRuleGroupCount(): Promise<number> {
+    return this.ruleGroupRepository.count();
+  }
+
   async getRuleGroupById(ruleGroupId: number): Promise<RuleGroup> {
     try {
       return await this.ruleGroupRepository.findOne({
@@ -815,6 +819,16 @@ export class RulesService {
         this.logger.debug(e);
         return this.createReturnStatus(false, 'Failed');
       });
+  }
+
+  public async getCommunityRuleCount(): Promise<number> {
+    const response = await axios.get<CommunityRule[]>(this.communityUrl, {
+      headers: {
+        Authorization: 'token ' + this.key,
+      },
+    });
+
+    return response.data.length;
   }
 
   public async addToCommunityRules(rule: CommunityRule): Promise<ReturnStatus> {

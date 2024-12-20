@@ -136,9 +136,15 @@ export class CollectionsController {
       ]);
     }
   }
+
   @Get('/media/')
   getMediaInCollection(@Query('collectionId') collectionId: number) {
     return this.collectionService.getCollectionMedia(collectionId);
+  }
+
+  @Get('/media/count')
+  getMediaInCollectionCount(@Query('collectionId') collectionId: number) {
+    return this.collectionService.getCollectionMediaCount(collectionId);
   }
 
   @Get('/media/:id/content/:page')

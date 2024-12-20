@@ -84,6 +84,12 @@ export class CollectionsService {
     }
   }
 
+  public async getCollectionMediaCount(id?: number) {
+    return await this.CollectionMediaRepo.count({
+      where: { collectionId: id },
+    });
+  }
+
   public async getCollectionMediaWitPlexDataAndhPaging(
     id: number,
     { offset = 0, size = 25 }: { offset?: number; size?: number } = {},
