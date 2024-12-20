@@ -15,12 +15,10 @@ const CollectionItem = (props: ICollectionItem) => {
     <>
       <a
         className="hover:none hover:cursor-pointer"
-        // onClick={() => props.onClick(props.collection)}
         {...(props.onClick
           ? { onClick: () => props.onClick!(props.collection) }
           : {})}
       >
-        {/* <div className="collection relative mb-5 flex h-fit w-full flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:mb-0 sm:mr-5 sm:w-1/3"> */}
         {props.collection.media && props.collection.media.length > 1 ? (
           <div className="z-1 absolute inset-0 flex flex-row overflow-hidden">
             <CachedImage
@@ -44,7 +42,6 @@ const CollectionItem = (props: ICollectionItem) => {
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-base font-bold text-white sm:text-lg">
             <a
               className="hover:cursor-pointer hover:underline"
-              // onClick={() => props.onClick(props.collection)}
               {...(props.onClick
                 ? { onClick: () => props.onClick!(props.collection) }
                 : {})}
@@ -54,7 +51,7 @@ const CollectionItem = (props: ICollectionItem) => {
                 : props.collection.title}
             </a>
           </div>
-          <div className="line-clamp-2 h-12 max-h-12 whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll sm:h-14 sm:max-h-14 sm:text-lg">
+          <div className="h-12 max-h-12 overflow-y-hidden whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll">
             {props.collection.manualCollection
               ? `Handled by rule: '${props.collection.title}'`
               : props.collection.description}
@@ -65,19 +62,16 @@ const CollectionItem = (props: ICollectionItem) => {
           <div className="mr-5 flex flex-row sm:mr-0 sm:mt-auto sm:flex-col">
             <div className="mb-5 mr-5 sm:mr-0">
               <p className="font-bold">Library</p>
-              <p className="">
-                {' '}
-                {
-                  LibrariesCtx.libraries.find(
-                    (el) => +el.key === +props.collection.libraryId,
-                  )?.title
-                }
+              <p>
+                {LibrariesCtx.libraries.find(
+                  (el) => +el.key === +props.collection.libraryId,
+                )?.title ?? <>&nbsp;</>}
               </p>
             </div>
 
             <div className="mr-5 sm:mr-0">
               <p className="font-bold">Items</p>
-              <p className="">
+              <p>
                 {' '}
                 {`${
                   props.collection.media ? props.collection.media.length : 0
@@ -89,8 +83,7 @@ const CollectionItem = (props: ICollectionItem) => {
           <div className="ml-auto flex flex-row text-right sm:mt-auto sm:flex-col">
             <div className="mb-5 mr-5 sm:mr-0">
               <p className="font-bold">Status</p>
-              <p className="">
-                {' '}
+              <p>
                 {props.collection.isActive ? (
                   <span className="text-green-900">Active</span>
                 ) : (
@@ -101,7 +94,7 @@ const CollectionItem = (props: ICollectionItem) => {
 
             <div className="mr-0 sm:mr-0">
               <p className="font-bold">Delete</p>
-              <p className="">{` After ${props.collection.deleteAfterDays} days`}</p>
+              <p>{` After ${props.collection.deleteAfterDays} days`}</p>
             </div>
           </div>
         </div>
