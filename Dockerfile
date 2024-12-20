@@ -30,6 +30,7 @@ COPY --from=builder --chmod=777 --chown=node:node /app/ui/public ./ui/public
 
 # Copy standalone server
 COPY --from=builder --chmod=777 --chown=node:node /app/server/dist ./server
+COPY --from=builder --chmod=777 --chown=node:node /app/server/package.json ./server/package.json
 COPY --from=builder --chmod=777 --chown=node:node /app/server/node_modules ./server/node_modules
 
 COPY docker/supervisord.conf /etc/supervisord.conf
