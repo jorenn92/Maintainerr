@@ -464,6 +464,13 @@
     @apply mt-6 text-white;
   }
 
+  .prose a {
+    color: #ed7924;
+  }
+  .prose a:hover {
+    color: #8d4c1c;
+  }
+
   .toast {
     width: 360px;
   }
