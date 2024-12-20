@@ -133,7 +133,20 @@ const AddModal = (props: AddModal) => {
     ) ?? false
 
   function updateLibraryId(value: string) {
-    setLibraryId(value)
+    const lib = LibrariesCtx.libraries.find(
+      (el: ILibrary) => +el.key === +value,
+    )
+
+    if (lib) {
+      setSelectedLibraryId(lib.key)
+      setSelectedLibrary(lib)
+      setSelectedType(
+        lib.type === 'movie'
+          ? EPlexDataType.MOVIES.toString()
+          : EPlexDataType.SHOWS.toString(),
+      )
+    }
+
     setRadarrSettingsId(undefined)
     setSonarrSettingsId(undefined)
     setArrOption(0)
@@ -147,11 +160,6 @@ const AddModal = (props: AddModal) => {
     if (lib) {
       setSelectedLibraryId(lib.key)
       setSelectedLibrary(lib)
-      setSelectedType(
-        lib.type === 'movie'
-          ? EPlexDataType.MOVIES.toString()
-          : EPlexDataType.SHOWS.toString(),
-      )
     }
   }
 
