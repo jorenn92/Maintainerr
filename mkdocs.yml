@@ -1,0 +1,218 @@
+
+# Copyright (c) 2016-2024 Martin Donath <martin.donath@squidfunk.com>
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+# Project information
+site_name: Maintainerr Documentation
+site_url: https://docs.maintainerr.info
+site_author: ydkmlt84
+site_description: >-
+  Documentation for the wildly popular Maintainerr project.
+use_directory_urls: false
+# Repository
+repo_name: jorenn92/maintainerr
+repo_url: https://github.com/jorenn92/maintainerr
+
+# Configuration
+theme:
+  name: material
+  custom_dir: docs/overrides
+  features:
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - content.footnote.tooltips
+    - content.tabs.link
+    # - header.autohide
+    # - navigation.expand
+    - navigation.indexes
+    - navigation.instant
+    # - navigation.instant.prefetch
+    - navigation.instant.progress
+    # - navigation.instant.preview
+    # - navigation.path
+    # - navigation.prune
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    # - navigation.tracking
+    - search.highlight
+    - search.share
+    - toc.follow
+    # - toc.integrate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: grey
+      accent: orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: grey
+      accent: orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  favicon: images/favicon.ico
+  logo: images/logo_icon.svg
+
+# Plugins
+plugins:
+  - blog:
+      blog_toc: true
+      post_url_format: "/{categories}/{slug}"
+      categories_slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  #- meta
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - social:
+      cards_layout: default/variant
+  - glightbox
+  - swagger-ui-tag
+# Hooks
+hooks:
+  - docs/overrides/hooks/shortcodes.py
+  - docs/overrides/hooks/translations.py
+
+# Additional configuration
+extra_css:
+  - assets/stylesheets/extra.css
+extra:
+  annotate:
+    json: [.s2]
+  analytics:
+    provider: matomo
+    property: docs
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/jorenn92/maintainerr
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/jorenn92/maintainerr/
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/WP4ZW2QYwk
+  status:
+    new: Recently Added
+    deprecated: Deprecated
+    recent: New Updates
+# Extensions
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  #- material.extensions.preview:
+  #    targets:
+  #      include:
+  #        - changelog/index.md
+  #        - customization.md
+  #        - insiders/changelog/*
+  #        - docs/extensions/*
+  - pymdownx.critic
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: squidfunk
+      repo: mkdocs-material
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/mkdocs.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Page tree
+nav:
+  - Home: index.md
+  - Getting started:
+    - Installation: Installation.md
+    - Configuring Maintainerr: Configuration.md
+    - Common Issues: Common.md
+  - Rules:
+    - Rule Explanations: Rules.md
+    - Rules Glossary: Glossary.md
+  - Collections: 
+    - Collections: Collections.md
+    - Test Media: Test-Media.md
+  - Community:
+    - Introduction.md
+    - Contributing.md
+    - Testing.md
+  - API:
+    - API.md  
+  - Walkthroughs:
+    - blog/index.md
+
+# Custom Homepage Elements
+home_cover_image: # This path starts at your root mkdocs directory.
+home_tagline: The Perfect Media Janitor
+home_description: |
+  Documentation for the wildly popular Maintainerr project.
+
+# Gradient Color
+home_gradient_hsla: hsla(0deg,47%,55%,1) # Default Green: hsla(160deg,47%,55%,1)
+
+# Custom Homepage Button(s)
+home_button1_name: Learn More            # Comment this parameter out to remove the button.
+home_button1_url: docs/Introduction.md                       # This path starts at your root mkdocs directory.
+home_button1_theme: md-button md-button--primary # Options: "md-button", "md-button md-button--primary"
+
+home_button2_name: Get Started   # Comment this parameter out to remove the button.
+home_button2_url: Installation    # This path starts at your root mkdocs directory.
+home_button2_theme: md-button # Options: "md-button", "md-button md-button--primary"

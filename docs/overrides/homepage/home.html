@@ -1,0 +1,272 @@
+<!-- Elements added to "home.html" will only be displayed on the home page -->
+
+{% extends "main.html" %}
+{% block tabs %}
+{{ super() }}
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+<!-- Stole this styling from the "up42-py" project (link: https://sdk.up42.com/) -->
+<style>
+
+    .md-main {
+        flex-grow: 0
+    }
+
+    .md-main__inner {
+        display: flex;
+        height: 100%;
+    }
+    .md-typeset pre {
+        color: white !important;
+    }
+    .tx-container {
+        padding-top: 3rem;
+    }
+
+    .tx-hero {
+        margin: 32px 2.8rem;
+        color: var(--md-primary-bg-color);
+        justify-content: center;
+    }
+
+    .tx-hero h1 {
+        letter-spacing: -.025em;
+    	font-size: 2.9rem;
+    	line-height: 1.25;
+    	color: transparent;
+    	background-clip: text;
+    			--tw-gradient-to: #f8ba53;
+    			--tw-gradient-from: #d97706;
+    	background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+    			--tw-gradient-stops: var(--tw-gradient-to), var(--tw-gradient-from), rgba(255, 255, 255, 0.7);
+    	display: block;
+    	margin-bottom: 1rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .tx-hero__content {
+        padding-bottom: 1rem;
+        margin: 0 auto;
+        max-width: 37rem !important;
+        margin: auto;
+    }
+    .nav-buttons {
+        text-align: center;
+    }
+    .md-container {
+        background-image:  linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(images/banner3.png);
+	background-repeat: no-repeat;
+        background-position: top;
+	background-size: cover;
+    }		
+
+    .tx-hero .md-button {
+        margin-top: .5rem;
+        margin-right: .5rem;
+        border-radius: 10px;
+        color: var(--md-primary-bg-color)
+    }
+
+    .tx-hero .md-button--primary {
+        background-color: var(--md-primary-bg-color);
+        color: orange;
+        border-color: var(--md-primary-bg-color)
+    }
+
+    .tx-hero .md-button:focus,
+    .tx-hero .md-button:hover {
+        background-color: var(--md-accent-fg-color);
+        color: var(--md-default-bg-color);
+        border-color: var(--md-accent-fg-color)
+    }
+
+    @media screen and (max-width:30em) {
+        .tx-hero h1 {
+            font-size: 1.4rem
+        }
+    }
+
+    @media screen and (min-width:60em) {
+        .md-sidebar--secondary {
+            display: none
+        }
+
+        .tx-hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tx-hero__content {
+            max-width: 22rem;
+            margin-top: 3.5rem;
+            margin-bottom: 3.5rem;
+            margin: auto;
+            align-items: center;
+        }
+    }
+
+    @media screen and (min-width:76.25em) {
+        .md-sidebar--primary {
+            display: none
+        }
+
+        .top-hr {
+            width: 100%;
+            display: flex;
+            max-width: 61rem;
+            margin-right: auto;
+            margin-left: auto;
+            padding: 0 .2rem;
+        }
+
+        .bottom-hr {
+            margin-top: 10px;
+            width: 100%;
+            display: flex;
+            max-width: 61rem;
+            margin-right: auto;
+            margin-left: auto;
+            padding: 0 .2rem;
+        }
+
+        .feature-item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .feature-item:hover {
+            background-color: #526cfe47;
+            border-radius: 3px;
+        }
+    }
+
+    .hr {
+        border-bottom: 1px solid #eee;
+        width: 100%;
+        margin: 20px 0;
+    }
+
+    .text-center {
+        text-align: center;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+        margin-top: 15px;
+        font-family: 'Lato', sans-serif;
+        font-size: 23px;
+        font-weight: 300;
+        padding-bottom: 10px;
+    }
+
+    .logos {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-flow: row wrap;
+        margin: 0 auto;
+    }
+
+    .logos img {
+        flex: 1 1 auto;
+        padding: 25px;
+        max-height: 130px;
+        vertical-align: middle;
+    }
+
+    .hr-logos {
+        margin-top: 0;
+        margin-bottom: 30px;
+    }
+
+    .md-footer-meta__inner {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 1.0rem;
+    }
+
+    .md-footer-social {
+        padding-top: 20px;
+    }
+/* Styling for Quick Start Area */
+    .quick-start h1 {
+        letter-spacing: -.025em;
+        font-size: .75rem;
+        line-height: 1;
+        text-align: center;
+        color: transparent;
+        background-clip: text;
+                        --tw-gradient-to: #f8ba53;
+                        --tw-gradient-from: #d97706;
+        background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+                        --tw-gradient-stops: var(--tw-gradient-to), var(--tw-gradient-from), rgba(255, 255, 255, 0.7);
+        display: block;
+        margin-bottom: 1rem;
+        font-weight: 700        	
+    }
+    .code-content {
+        display: flex;
+	justify-content: center;
+    	max-width: 95rem;
+    	margin-left: auto;
+    	margin-right: auto;
+    }
+    .code-content-box {
+	font-size: .7rem;
+	border-radius: 8px;
+        background-color: rgba(0,0,0,.5);
+        padding: 10px;
+    color: white !important;
+    }
+    .code {
+        padding: 2px;
+    }
+</style>
+<!-- Main site entry button descriptions -->
+<section class="tx-container">
+    <div class="md-grid md-typeset">
+      <div class="tx-hero">
+	
+	<!-- Main Tagline -->
+        <div class="tx-hero__content">
+          <h1> The Perfect Media Janitor <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#F19E39"><path d="M160-391h45l23-66h104l24 66h44l-97-258h-46l-97 258Zm81-103 38-107h2l38 107h-78Zm319-80v-48q33-14 67.5-21t72.5-7q26 0 51 4t49 10v44q-24-9-48.5-13.5T700-610q-38 0-73 9.5T560-574Zm0 220v-49q33-13.5 67.5-20.25T700-430q26 0 51 4t49 10v44q-24-9-48.5-13.5T700-390q-38 0-73 9t-67 27Zm0-110v-48q33-14 67.5-21t72.5-7q26 0 51 4t49 10v44q-24-9-48.5-13.5T700-500q-38 0-73 9.5T560-464ZM248-300q53.57 0 104.28 12.5Q403-275 452-250v-427q-45-30-97.62-46.5Q301.76-740 248-740q-38 0-74.5 9.5T100-707v434q31-14 70.5-20.5T248-300Zm264 50q50-25 98-37.5T712-300q38 0 78.5 6t69.5 16v-429q-34-17-71.82-25-37.82-8-76.18-8-54 0-104.5 16.5T512-677v427Zm-30 90q-51-38-111-58.5T248-239q-36.54 0-71.77 9T106-208q-23.1 11-44.55-3Q40-225 40-251v-463q0-15 7-27.5T68-761q42-20 87.39-29.5 45.4-9.5 92.61-9.5 63 0 122.5 17T482-731q51-35 109.5-52T712-800q46.87 0 91.93 9.5Q849-781 891-761q14 7 21.5 19.5T920-714v463q0 27.89-22.5 42.45Q875-194 853-208q-34-14-69.23-22.5Q748.54-239 712-239q-63 0-121 21t-109 58ZM276-495Z"/></svg></h1>
+          <p style="text-align: center;"> Documentation for the wildly popular Maintainerr project. </p>
+	  <!-- Added Buttons (up to 3) -->
+        <div class="nav-buttons">
+	        <a href="https://docs.maintainerr.info/Installation.html" title="Get Started" class="md-button md-button--primary">
+                Get Started</a>
+            <a href="https://docs.maintainerr.info/Introduction.html" title="Introduction" class="md-button">
+                Introduction</a>
+	        <a href="https://docs.maintainerr.info/blog/index.html" title="View our Blog" class="md-button">
+	            View The Guides</a>
+	    </div>
+       </div>
+      </div>
+    </div>
+<div class="quick-start md-grid md-typeset">
+    <h1> Docker Run - Quick Start </h1>
+   <div class="code-content tx-hero">
+	<div class="code-content-box">
+  	  <pre>
+docker run -d \
+  --name maintainerr \
+  -e TZ=Europe/Brussels \
+  -v ./data:/opt/data \
+  -u 1000:1000 \
+  -p 6246:6246 \ 
+  --restart unless-stopped \
+  ghcr.io/jorenn92/maintainerr:latest
+   	  </pre>
+   	</div>
+  </div>
+</div>
+</section>
+
+{% endblock %}
+{% block content %}{% endblock %}
+{% block footer %}{% endblock %}

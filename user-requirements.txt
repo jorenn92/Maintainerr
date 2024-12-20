@@ -1,0 +1,2 @@
+mkdocs-glightbox
+mkdocs-swagger-ui-tag
