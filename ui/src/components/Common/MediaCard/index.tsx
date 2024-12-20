@@ -40,7 +40,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   libraryId,
   type,
   collectionId = 0,
-  daysLeft = 999,
+  daysLeft = 9999,
   exclusionId = undefined,
   tmdbid = undefined,
   canExpand = false,
@@ -201,21 +201,23 @@ const MediaCard: React.FC<IMediaCard> = ({
           ) : undefined}
 
           {/* on collection page and for the media items */}
-          {collectionPage && !exclusionType && daysLeft !== 999 ? (
+          {collectionPage && !exclusionType && daysLeft !== 9999 ? (
             <div className="absolute right-0 flex items-center justify-between p-2">
               <div
                 className={`pointer-events-none z-40 rounded-full shadow ${
-                  mediaType === 'movie'
-                    ? 'bg-zinc-900'
-                    : mediaType === 'show'
-                      ? 'bg-amber-900'
-                      : mediaType === 'season'
-                        ? 'bg-yellow-700'
-                        : 'bg-rose-900'
-                }`}
+                  daysLeft < 0
+                    ? 'bg-red-700'
+                    : mediaType === 'movie'
+                      ? 'bg-zinc-900'
+                      : mediaType === 'show'
+                        ? 'bg-amber-900'
+                        : mediaType === 'season'
+                          ? 'bg-yellow-700'
+                          : 'bg-rose-900'
+                } `}
               >
                 <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
-                  {daysLeft > 0 ? daysLeft : 0}
+                  {daysLeft}
                 </div>
               </div>
             </div>

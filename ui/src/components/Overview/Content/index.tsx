@@ -120,7 +120,7 @@ const OverviewContent = (props: IOverviewContent) => {
           date.getDate() + collectionData.collection.deleteAfterDays!,
         )
 
-        const diffTime = Math.abs(date.getTime() - today.getTime())
+        const diffTime = date.getTime() - today.getTime()
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
         return diffDays
       }
