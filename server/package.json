@@ -1,5 +1,6 @@
 {
   "name": "@maintainerr/server",
+  "version": "2.3.1",
   "private": true,
   "exports": {
     "./*": "./src/*.ts"
@@ -11,6 +12,7 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main",
+    "start:release": "node main",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "format": "prettier --write --ignore-path .gitignore .",
     "format:check": "prettier --check --ignore-path .gitignore .",

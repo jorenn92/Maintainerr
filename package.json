@@ -46,10 +46,18 @@
       ],
       "@semantic-release/npm",
       [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "yarn --cwd server version ${nextRelease.version} && yarn --cwd ui version ${nextRelease.version}"
+        }
+      ],
+      [
         "@semantic-release/git",
         {
           "assets": [
             "package.json",
+            "server/package.json",
+            "ui/package.json",
             "CHANGELOG.md"
           ],
           "message": "chore(release): ${nextRelease.version}"
