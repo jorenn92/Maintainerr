@@ -25,7 +25,7 @@ site_url: https://docs.maintainerr.info
 site_author: ydkmlt84
 site_description: >-
   Documentation for the wildly popular Maintainerr project.
-use_directory_urls: false
+use_directory_urls: true
 # Repository
 repo_name: jorenn92/maintainerr
 repo_url: https://github.com/jorenn92/maintainerr
@@ -198,21 +198,3 @@ nav:
     - API.md  
   - Walkthroughs:
     - blog/index.md
-
-# Custom Homepage Elements
-home_cover_image: # This path starts at your root mkdocs directory.
-home_tagline: The Perfect Media Janitor
-home_description: |
-  Documentation for the wildly popular Maintainerr project.
-
-# Gradient Color
-home_gradient_hsla: hsla(0deg,47%,55%,1) # Default Green: hsla(160deg,47%,55%,1)
-
-# Custom Homepage Button(s)
-home_button1_name: Learn More            # Comment this parameter out to remove the button.
-home_button1_url: docs/Introduction.md                       # This path starts at your root mkdocs directory.
-home_button1_theme: md-button md-button--primary # Options: "md-button", "md-button md-button--primary"
-
-home_button2_name: Get Started   # Comment this parameter out to remove the button.
-home_button2_url: Installation    # This path starts at your root mkdocs directory.
-home_button2_theme: md-button # Options: "md-button", "md-button md-button--primary"

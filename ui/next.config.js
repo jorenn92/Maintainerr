@@ -1,27 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  output: "standalone",
   reactStrictMode: true,
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'image.tmdb.org',
-        port: '',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "image.tmdb.org",
+        port: "",
+        pathname: "/**",
       },
     ],
   },
-  basePath: '',
+  basePath: "",
   async redirects() {
     return [
       {
-        source: '/docs',
-        destination: 'https://docs.maintainerr.info/Introduction.html',
+        source: "/docs",
+        destination: "https://docs.maintainerr.info/Introduction",
         permanent: true,
       },
-    ]
+    ];
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

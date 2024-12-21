@@ -1,67 +1,67 @@
-import { SaveIcon } from '@heroicons/react/solid'
-import { useContext, useEffect, useRef, useState } from 'react'
-import SettingsContext from '../../../contexts/settings-context'
-import { PostApiHandler } from '../../../utils/ApiHandler'
-import Alert from '../../Common/Alert'
-import Button from '../../Common/Button'
-import DocsButton from '../../Common/DocsButton'
-import TestButton from '../../Common/TestButton'
+import { SaveIcon } from "@heroicons/react/solid";
+import { useContext, useEffect, useRef, useState } from "react";
+import SettingsContext from "../../../contexts/settings-context";
+import { PostApiHandler } from "../../../utils/ApiHandler";
+import Alert from "../../Common/Alert";
+import Button from "../../Common/Button";
+import DocsButton from "../../Common/DocsButton";
+import TestButton from "../../Common/TestButton";
 import {
   addPortToUrl,
   getPortFromUrl,
   handleSettingsInputChange,
   removePortFromUrl,
-} from '../../../utils/SettingsUtils'
+} from "../../../utils/SettingsUtils";
 
 const OverseerrSettings = () => {
-  const settingsCtx = useContext(SettingsContext)
-  const hostnameRef = useRef<HTMLInputElement>(null)
-  const portRef = useRef<HTMLInputElement>(null)
-  const apiKeyRef = useRef<HTMLInputElement>(null)
-  const [hostname, setHostname] = useState<string>()
-  const [port, setPort] = useState<string>()
-  const [error, setError] = useState<boolean>()
-  const [changed, setChanged] = useState<boolean>()
+  const settingsCtx = useContext(SettingsContext);
+  const hostnameRef = useRef<HTMLInputElement>(null);
+  const portRef = useRef<HTMLInputElement>(null);
+  const apiKeyRef = useRef<HTMLInputElement>(null);
+  const [hostname, setHostname] = useState<string>();
+  const [port, setPort] = useState<string>();
+  const [error, setError] = useState<boolean>();
+  const [changed, setChanged] = useState<boolean>();
   const [testBanner, setTestbanner] = useState<{
-    status: boolean
-    version: string
-  }>({ status: false, version: '0' })
+    status: boolean;
+    version: string;
+  }>({ status: false, version: "0" });
 
   useEffect(() => {
-    document.title = 'Maintainerr - Settings - Overseerr'
-  }, [])
+    document.title = "Maintainerr - Settings - Overseerr";
+  }, []);
 
   useEffect(() => {
     // hostname
-    setHostname(removePortFromUrl(settingsCtx.settings.overseerr_url))
+    setHostname(removePortFromUrl(settingsCtx.settings.overseerr_url));
     // @ts-ignore
     hostnameRef.current = {
       value: removePortFromUrl(settingsCtx.settings.overseerr_url),
-    }
+    };
 
     // port
-    setPort(getPortFromUrl(settingsCtx.settings.overseerr_url))
+    setPort(getPortFromUrl(settingsCtx.settings.overseerr_url));
     // @ts-ignore
     portRef.current = {
       value: getPortFromUrl(settingsCtx.settings.overseerr_url),
-    }
-  }, [settingsCtx])
+    };
+  }, [settingsCtx]);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // if port not specified, but hostname is. Derive the port
     if (!portRef.current?.value && hostnameRef.current?.value) {
-      const derivedPort = hostnameRef.current.value.includes('http://')
+      const derivedPort = hostnameRef.current.value.includes("http://")
         ? 80
-        : hostnameRef.current.value.includes('https://')
-          ? 443
-          : 80
+        : hostnameRef.current.value.includes("https://")
+        ? 443
+        : 80;
 
       if (derivedPort) {
-        setPort(derivedPort.toString())
+        setPort(derivedPort.toString());
         // @ts-ignore
-        portRef.current = { value: derivedPort.toString() }
+        portRef.current = { value: derivedPort.toString() };
       }
     }
 
@@ -70,41 +70,41 @@ const OverseerrSettings = () => {
       apiKeyRef.current?.value &&
       portRef.current?.value
     ) {
-      const hostnameVal = hostnameRef.current.value.includes('http://')
+      const hostnameVal = hostnameRef.current.value.includes("http://")
         ? hostnameRef.current.value
-        : hostnameRef.current.value.includes('https://')
-          ? hostnameRef.current.value
-          : portRef.current.value == '443'
-            ? 'https://' + hostnameRef.current.value
-            : 'http://' + hostnameRef.current.value
+        : hostnameRef.current.value.includes("https://")
+        ? hostnameRef.current.value
+        : portRef.current.value == "443"
+        ? "https://" + hostnameRef.current.value
+        : "http://" + hostnameRef.current.value;
 
       const payload = {
         overseerr_url: addPortToUrl(hostnameVal, +portRef.current.value),
         overseerr_api_key: apiKeyRef.current.value,
-      }
+      };
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
-        '/settings',
+        "/settings",
         {
           ...settingsCtx.settings,
           ...payload,
-        },
-      )
+        }
+      );
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
           ...settingsCtx.settings,
           ...payload,
-        })
-        setError(false)
-        setChanged(true)
-      } else setError(true)
+        });
+        setError(false);
+        setChanged(true);
+      } else setError(true);
     } else {
-      setError(true)
+      setError(true);
     }
-  }
+  };
 
   const appTest = (result: { status: boolean; version: string }) => {
-    setTestbanner({ status: result.status, version: result.version })
-  }
+    setTestbanner({ status: result.status, version: result.version });
+  };
 
   return (
     <div className="h-full w-full">
@@ -118,7 +118,7 @@ const OverseerrSettings = () => {
         <Alert type="info" title="Settings successfully updated" />
       ) : undefined}
 
-      {testBanner.version !== '0' ? (
+      {testBanner.version !== "0" ? (
         testBanner.status ? (
           <Alert
             type="warning"
@@ -196,7 +196,7 @@ const OverseerrSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
               <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
-                <DocsButton page="Configuration.html#overseerr" />
+                <DocsButton page="Configuration#overseerr" />
               </span>
               <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
                 <TestButton
@@ -219,7 +219,7 @@ const OverseerrSettings = () => {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default OverseerrSettings
+export default OverseerrSettings;
