@@ -1,351 +1,351 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import GetApiHandler, {
   PostApiHandler,
   PutApiHandler,
-} from "../../../../utils/ApiHandler";
-import RuleCreator, { IRule } from "../../Rule/RuleCreator";
+} from '../../../../utils/ApiHandler'
+import RuleCreator, { IRule } from '../../Rule/RuleCreator'
 import ConstantsContext, {
   Application,
-} from "../../../../contexts/constants-context";
+} from '../../../../contexts/constants-context'
 import LibrariesContext, {
   ILibrary,
-} from "../../../../contexts/libraries-context";
-import Alert from "../../../Common/Alert";
-import ArrAction from "./ArrAction";
-import { IRuleGroup } from "..";
-import { ICollection } from "../../../Collection";
+} from '../../../../contexts/libraries-context'
+import Alert from '../../../Common/Alert'
+import ArrAction from './ArrAction'
+import { IRuleGroup } from '..'
+import { ICollection } from '../../../Collection'
 import {
   BanIcon,
   DownloadIcon,
   QuestionMarkCircleIcon,
   SaveIcon,
   UploadIcon,
-} from "@heroicons/react/solid";
-import Router from "next/router";
-import Link from "next/link";
-import Button from "../../../Common/Button";
-import CommunityRuleModal from "../../../Common/CommunityRuleModal";
-import { EPlexDataType } from "../../../../utils/PlexDataType-enum";
-import CachedImage from "../../../Common/CachedImage";
-import YamlImporterModal from "../../../Common/YamlImporterModal";
-import { CloudDownloadIcon } from "@heroicons/react/outline";
-import { useToasts } from "react-toast-notifications";
-import Modal from "../../../Common/Modal";
+} from '@heroicons/react/solid'
+import Router from 'next/router'
+import Link from 'next/link'
+import Button from '../../../Common/Button'
+import CommunityRuleModal from '../../../Common/CommunityRuleModal'
+import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
+import CachedImage from '../../../Common/CachedImage'
+import YamlImporterModal from '../../../Common/YamlImporterModal'
+import { CloudDownloadIcon } from '@heroicons/react/outline'
+import { useToasts } from 'react-toast-notifications'
+import Modal from '../../../Common/Modal'
 
 interface AddModal {
-  editData?: IRuleGroup;
-  onCancel: () => void;
-  onSuccess: () => void;
+  editData?: IRuleGroup
+  onCancel: () => void
+  onSuccess: () => void
 }
 
 interface ICreateApiObject {
-  name: string;
-  description: string;
-  libraryId: number;
-  arrAction: number;
-  isActive: boolean;
-  useRules: boolean;
-  listExclusions: boolean;
-  forceOverseerr: boolean;
-  tautulliWatchedPercentOverride?: number;
-  radarrSettingsId?: number;
-  sonarrSettingsId?: number;
+  name: string
+  description: string
+  libraryId: number
+  arrAction: number
+  isActive: boolean
+  useRules: boolean
+  listExclusions: boolean
+  forceOverseerr: boolean
+  tautulliWatchedPercentOverride?: number
+  radarrSettingsId?: number
+  sonarrSettingsId?: number
   collection: {
-    visibleOnRecommended: boolean;
-    visibleOnHome: boolean;
-    deleteAfterDays: number;
-    manualCollection?: boolean;
-    manualCollectionName?: string;
-    keepLogsForMonths?: number;
-  };
-  rules: IRule[];
-  dataType: EPlexDataType;
+    visibleOnRecommended: boolean
+    visibleOnHome: boolean
+    deleteAfterDays: number
+    manualCollection?: boolean
+    manualCollectionName?: string
+    keepLogsForMonths?: number
+  }
+  rules: IRule[]
+  dataType: EPlexDataType
 }
 
 const AddModal = (props: AddModal) => {
   const [selectedLibraryId, setSelectedLibraryId] = useState<string>(
-    props.editData ? props.editData.libraryId.toString() : ""
-  );
+    props.editData ? props.editData.libraryId.toString() : '',
+  )
   const [selectedType, setSelectedType] = useState<string>(
-    props.editData?.type ? props.editData.type.toString() : ""
-  );
-  const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>();
-  const [collection, setCollection] = useState<ICollection>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [CommunityModal, setCommunityModal] = useState(false);
-  const [yamlImporterModal, setYamlImporterModal] = useState(false);
-  const yaml = useRef<string>();
+    props.editData?.type ? props.editData.type.toString() : '',
+  )
+  const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
+  const [collection, setCollection] = useState<ICollection>()
+  const [isLoading, setIsLoading] = useState(true)
+  const [CommunityModal, setCommunityModal] = useState(false)
+  const [yamlImporterModal, setYamlImporterModal] = useState(false)
+  const yaml = useRef<string>()
 
-  const nameRef = useRef<any>();
-  const descriptionRef = useRef<any>();
-  const libraryRef = useRef<any>();
-  const collectionTypeRef = useRef<any>();
-  const deleteAfterRef = useRef<any>();
-  const keepLogsForMonthsRef = useRef<any>();
-  const tautulliWatchedPercentOverrideRef = useRef<any>();
-  const manualCollectionNameRef = useRef<any>("My custom collection");
-  const [showRecommended, setShowRecommended] = useState<boolean>(true);
-  const [showHome, setShowHome] = useState<boolean>(true);
-  const [listExclusion, setListExclusion] = useState<boolean>(true);
-  const [forceOverseerr, setForceOverseerr] = useState<boolean>(false);
-  const [manualCollection, setManualCollection] = useState<boolean>(false);
-  const ConstantsCtx = useContext(ConstantsContext);
+  const nameRef = useRef<any>()
+  const descriptionRef = useRef<any>()
+  const libraryRef = useRef<any>()
+  const collectionTypeRef = useRef<any>()
+  const deleteAfterRef = useRef<any>()
+  const keepLogsForMonthsRef = useRef<any>()
+  const tautulliWatchedPercentOverrideRef = useRef<any>()
+  const manualCollectionNameRef = useRef<any>('My custom collection')
+  const [showRecommended, setShowRecommended] = useState<boolean>(true)
+  const [showHome, setShowHome] = useState<boolean>(true)
+  const [listExclusion, setListExclusion] = useState<boolean>(true)
+  const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
+  const [manualCollection, setManualCollection] = useState<boolean>(false)
+  const ConstantsCtx = useContext(ConstantsContext)
 
-  const { addToast } = useToasts();
+  const { addToast } = useToasts()
 
   const [useRules, setUseRules] = useState<boolean>(
-    props.editData ? props.editData.useRules : true
-  );
-  const [arrOption, setArrOption] = useState<number>();
+    props.editData ? props.editData.useRules : true,
+  )
+  const [arrOption, setArrOption] = useState<number>()
   const [radarrSettingsId, setRadarrSettingsId] = useState<
     number | null | undefined
-  >(props.editData ? null : undefined);
+  >(props.editData ? null : undefined)
   const [sonarrSettingsId, setSonarrSettingsId] = useState<
     number | null | undefined
-  >(props.editData ? null : undefined);
+  >(props.editData ? null : undefined)
   const [originalRadarrSettingsId, setOriginalRadarrSettingsId] = useState<
     number | null | undefined
-  >(props.editData ? null : undefined);
+  >(props.editData ? null : undefined)
   const [originalSonarrSettingsId, setOriginalSonarrSettingsId] = useState<
     number | null | undefined
-  >(props.editData ? null : undefined);
+  >(props.editData ? null : undefined)
   const [showArrServerChangeWarning, setShowArrServerChangeWarning] =
-    useState<boolean>(false);
+    useState<boolean>(false)
   const [active, setActive] = useState<boolean>(
-    props.editData ? props.editData.isActive : true
-  );
+    props.editData ? props.editData.isActive : true,
+  )
   const [rules, setRules] = useState<IRule[]>(
     props.editData
       ? props.editData.rules.map((r) => JSON.parse(r.ruleJson) as IRule)
-      : []
-  );
-  const [error, setError] = useState<boolean>(false);
-  const [formIncomplete, setFormIncomplete] = useState<boolean>(false);
-  const ruleCreatorVersion = useRef<number>(1);
-  const LibrariesCtx = useContext(LibrariesContext);
+      : [],
+  )
+  const [error, setError] = useState<boolean>(false)
+  const [formIncomplete, setFormIncomplete] = useState<boolean>(false)
+  const ruleCreatorVersion = useRef<number>(1)
+  const LibrariesCtx = useContext(LibrariesContext)
   const tautulliEnabled =
     ConstantsCtx.constants.applications?.some(
-      (x) => x.id == Application.TAUTULLI
-    ) ?? false;
+      (x) => x.id == Application.TAUTULLI,
+    ) ?? false
   const overseerrEnabled =
     ConstantsCtx.constants.applications?.some(
-      (x) => x.id == Application.OVERSEERR
-    ) ?? false;
+      (x) => x.id == Application.OVERSEERR,
+    ) ?? false
 
   function updateLibraryId(value: string) {
     const lib = LibrariesCtx.libraries.find(
-      (el: ILibrary) => +el.key === +value
-    );
+      (el: ILibrary) => +el.key === +value,
+    )
 
     if (lib) {
-      setSelectedLibraryId(lib.key);
-      setSelectedLibrary(lib);
+      setSelectedLibraryId(lib.key)
+      setSelectedLibrary(lib)
       setSelectedType(
-        lib.type === "movie"
+        lib.type === 'movie'
           ? EPlexDataType.MOVIES.toString()
-          : EPlexDataType.SHOWS.toString()
-      );
+          : EPlexDataType.SHOWS.toString(),
+      )
     }
 
-    setRadarrSettingsId(undefined);
-    setSonarrSettingsId(undefined);
-    setArrOption(0);
+    setRadarrSettingsId(undefined)
+    setSonarrSettingsId(undefined)
+    setArrOption(0)
   }
 
   function setLibraryId(value: string) {
     const lib = LibrariesCtx.libraries.find(
-      (el: ILibrary) => +el.key === +value
-    );
+      (el: ILibrary) => +el.key === +value,
+    )
 
     if (lib) {
-      setSelectedLibraryId(lib.key);
-      setSelectedLibrary(lib);
+      setSelectedLibraryId(lib.key)
+      setSelectedLibrary(lib)
     }
   }
 
   function setCollectionType(event: { target: { value: string } }) {
-    setSelectedType(event.target.value);
-    setArrOption(0);
+    setSelectedType(event.target.value)
+    setArrOption(0)
   }
 
   const handleUpdateArrAction = (
-    type: "Radarr" | "Sonarr",
+    type: 'Radarr' | 'Sonarr',
     arrAction: number,
-    settingId?: number | null
+    settingId?: number | null,
   ) => {
-    setArrOption(arrAction);
+    setArrOption(arrAction)
 
-    if (type === "Radarr") {
+    if (type === 'Radarr') {
       if (
         props.editData &&
         originalRadarrSettingsId !== undefined &&
         originalRadarrSettingsId != settingId &&
         settingId != radarrSettingsId
       ) {
-        setShowArrServerChangeWarning(true);
+        setShowArrServerChangeWarning(true)
       }
 
-      setSonarrSettingsId(undefined);
-      setRadarrSettingsId(settingId);
-    } else if (type === "Sonarr") {
+      setSonarrSettingsId(undefined)
+      setRadarrSettingsId(settingId)
+    } else if (type === 'Sonarr') {
       if (
         props.editData &&
         originalSonarrSettingsId !== undefined &&
         originalSonarrSettingsId != settingId &&
         settingId != sonarrSettingsId
       ) {
-        setShowArrServerChangeWarning(true);
+        setShowArrServerChangeWarning(true)
       }
 
-      setRadarrSettingsId(undefined);
-      setSonarrSettingsId(settingId);
+      setRadarrSettingsId(undefined)
+      setSonarrSettingsId(settingId)
     }
-  };
+  }
 
   function updateRules(rules: IRule[]) {
-    setRules(rules);
+    setRules(rules)
   }
 
   const toggleCommunityRuleModal = (e: any) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (CommunityModal) {
-      setCommunityModal(false);
+      setCommunityModal(false)
     } else {
-      setCommunityModal(true);
+      setCommunityModal(true)
     }
-  };
+  }
 
   const toggleYamlExporter = async (e: any) => {
-    e.preventDefault();
-    const response = await PostApiHandler("/rules/yaml/encode", {
+    e.preventDefault()
+    const response = await PostApiHandler('/rules/yaml/encode', {
       rules: JSON.stringify(rules),
       mediaType: selectedType,
-    });
+    })
 
     if (response.code === 1) {
-      yaml.current = response.result;
+      yaml.current = response.result
 
       if (!yamlImporterModal) {
-        setYamlImporterModal(true);
+        setYamlImporterModal(true)
       } else {
-        setYamlImporterModal(false);
+        setYamlImporterModal(false)
       }
     }
-  };
+  }
 
   const toggleYamlImporter = (e: any) => {
-    e.preventDefault();
-    yaml.current = undefined;
+    e.preventDefault()
+    yaml.current = undefined
     if (!yamlImporterModal) {
-      setYamlImporterModal(true);
+      setYamlImporterModal(true)
     } else {
-      setYamlImporterModal(false);
+      setYamlImporterModal(false)
     }
-  };
+  }
 
   const importRulesFromYaml = async (yaml: string) => {
-    const response = await PostApiHandler("/rules/yaml/decode", {
+    const response = await PostApiHandler('/rules/yaml/decode', {
       yaml: yaml,
       mediaType: selectedType,
-    });
+    })
 
     if (response && response.code === 1) {
       const result: { mediaType: string; rules: IRule[] } = JSON.parse(
-        response.result
-      );
-      handleLoadRules(result.rules);
-      addToast("Successfully imported rules from Yaml.", {
+        response.result,
+      )
+      handleLoadRules(result.rules)
+      addToast('Successfully imported rules from Yaml.', {
         autoDismiss: true,
-        appearance: "success",
-      });
+        appearance: 'success',
+      })
     } else {
       addToast(response.message, {
         autoDismiss: true,
-        appearance: "error",
-      });
+        appearance: 'error',
+      })
     }
-  };
+  }
 
   const handleLoadRules = (rules: IRule[]) => {
-    updateRules(rules);
-    ruleCreatorVersion.current = ruleCreatorVersion.current + 1;
-    setCommunityModal(false);
-  };
+    updateRules(rules)
+    ruleCreatorVersion.current = ruleCreatorVersion.current + 1
+    setCommunityModal(false)
+  }
 
   const cancel = () => {
-    props.onCancel();
-  };
+    props.onCancel()
+  }
 
   useEffect(() => {
-    setIsLoading(true);
+    setIsLoading(true)
 
     const load = async () => {
-      const constantsPromise = GetApiHandler("/rules/constants");
+      const constantsPromise = GetApiHandler('/rules/constants')
       const librariesPromise =
         LibrariesCtx.libraries.length <= 0
-          ? GetApiHandler("/plex/libraries/")
-          : Promise.resolve(null);
+          ? GetApiHandler('/plex/libraries/')
+          : Promise.resolve(null)
       const collectionPromise: Promise<ICollection | null> = props.editData
         ? GetApiHandler(
-            `/collections/collection/${props.editData.collectionId}`
+            `/collections/collection/${props.editData.collectionId}`,
           )
-        : Promise.resolve(null);
+        : Promise.resolve(null)
 
       const [constants, libraries, collection] = await Promise.all([
         constantsPromise,
         librariesPromise,
         collectionPromise,
-      ]);
+      ])
 
-      ConstantsCtx.setConstants(constants);
+      ConstantsCtx.setConstants(constants)
 
       if (libraries != null) {
         if (libraries) {
-          LibrariesCtx.addLibraries(libraries);
+          LibrariesCtx.addLibraries(libraries)
         } else {
-          LibrariesCtx.addLibraries([]);
+          LibrariesCtx.addLibraries([])
         }
       }
 
       if (collection) {
-        setCollection(collection);
-        setShowRecommended(collection.visibleOnRecommended!);
-        setShowHome(collection.visibleOnHome!);
-        setListExclusion(collection.listExclusions!);
-        setForceOverseerr(collection.forceOverseerr!);
-        setArrOption(collection.arrAction);
-        setSelectedType(collection.type.toString());
-        setManualCollection(collection.manualCollection);
-        setRadarrSettingsId(collection.radarrSettingsId ?? null);
-        setSonarrSettingsId(collection.sonarrSettingsId ?? null);
-        setOriginalRadarrSettingsId(collection.radarrSettingsId ?? null);
-        setOriginalSonarrSettingsId(collection.sonarrSettingsId ?? null);
-        setLibraryId(collection.libraryId.toString());
+        setCollection(collection)
+        setShowRecommended(collection.visibleOnRecommended!)
+        setShowHome(collection.visibleOnHome!)
+        setListExclusion(collection.listExclusions!)
+        setForceOverseerr(collection.forceOverseerr!)
+        setArrOption(collection.arrAction)
+        setSelectedType(collection.type.toString())
+        setManualCollection(collection.manualCollection)
+        setRadarrSettingsId(collection.radarrSettingsId ?? null)
+        setSonarrSettingsId(collection.sonarrSettingsId ?? null)
+        setOriginalRadarrSettingsId(collection.radarrSettingsId ?? null)
+        setOriginalSonarrSettingsId(collection.sonarrSettingsId ?? null)
+        setLibraryId(collection.libraryId.toString())
       }
 
-      setIsLoading(false);
-    };
+      setIsLoading(false)
+    }
 
-    load();
-  }, []);
+    load()
+  }, [])
 
   useEffect(() => {
     // trapping next router before-pop-state to manipulate router change on browser back button
     Router.beforePopState(() => {
-      props.onCancel();
-      window.history.forward();
-      return false;
-    });
+      props.onCancel()
+      window.history.forward()
+      return false
+    })
     return () => {
       Router.beforePopState(() => {
-        return true;
-      });
-    };
-  }, []);
+        return true
+      })
+    }
+  }, [])
 
   const create = (e: any) => {
-    e.preventDefault();
+    e.preventDefault()
     if (
       nameRef.current.value &&
       libraryRef.current.value &&
@@ -353,7 +353,7 @@ const AddModal = (props: AddModal) => {
       (radarrSettingsId !== undefined || sonarrSettingsId !== undefined) &&
       ((useRules && rules.length > 0) || !useRules)
     ) {
-      setFormIncomplete(false);
+      setFormIncomplete(false)
       const creationObj: ICreateApiObject = {
         name: nameRef.current.value,
         description: descriptionRef.current.value,
@@ -366,7 +366,7 @@ const AddModal = (props: AddModal) => {
         forceOverseerr: forceOverseerr,
         tautulliWatchedPercentOverride:
           tautulliWatchedPercentOverrideRef.current &&
-          tautulliWatchedPercentOverrideRef.current.value != ""
+          tautulliWatchedPercentOverrideRef.current.value != ''
             ? +tautulliWatchedPercentOverrideRef.current.value
             : undefined,
         radarrSettingsId: radarrSettingsId ?? undefined,
@@ -380,38 +380,38 @@ const AddModal = (props: AddModal) => {
           keepLogsForMonths: +keepLogsForMonthsRef.current.value,
         },
         rules: useRules ? rules : [],
-      };
+      }
 
       if (!props.editData) {
-        PostApiHandler("/rules", creationObj)
+        PostApiHandler('/rules', creationObj)
           .then((resp) => {
-            if (resp.code === 1) props.onSuccess();
-            else setError(true);
+            if (resp.code === 1) props.onSuccess()
+            else setError(true)
           })
           .catch((err) => {
-            setError(true);
-          });
+            setError(true)
+          })
       } else {
-        PutApiHandler("/rules", { id: props.editData.id, ...creationObj })
+        PutApiHandler('/rules', { id: props.editData.id, ...creationObj })
           .then((resp) => {
-            if (resp.code === 1) props.onSuccess();
-            else setError(true);
+            if (resp.code === 1) props.onSuccess()
+            else setError(true)
           })
           .catch((err) => {
-            setError(true);
-          });
+            setError(true)
+          })
       }
     } else {
-      setFormIncomplete(true);
+      setFormIncomplete(true)
     }
-  };
+  }
 
   if (isLoading) {
     return (
       <span>
         <CachedImage fill src="/spinner.svg" alt="Loading..." />
       </span>
-    );
+    )
   }
 
   return (
@@ -501,7 +501,7 @@ const AddModal = (props: AddModal) => {
                     onChange={(e) => updateLibraryId(e.target.value)}
                     ref={libraryRef}
                   >
-                    {selectedLibraryId === "" && (
+                    {selectedLibraryId === '' && (
                       <option value="" disabled></option>
                     )}
                     {LibrariesCtx.libraries.map((data: ILibrary) => {
@@ -509,38 +509,38 @@ const AddModal = (props: AddModal) => {
                         <option key={data.key} value={data.key}>
                           {data.title}
                         </option>
-                      );
+                      )
                     })}
                   </select>
                 </div>
               </div>
             </div>
-            {selectedLibrary && selectedLibrary!.type === "movie" && (
+            {selectedLibrary && selectedLibrary!.type === 'movie' && (
               <ArrAction
                 type="Radarr"
                 arrAction={arrOption}
                 settingId={radarrSettingsId}
                 onUpdate={(arrAction: number, settingId) => {
-                  handleUpdateArrAction("Radarr", arrAction, settingId);
+                  handleUpdateArrAction('Radarr', arrAction, settingId)
                 }}
                 options={[
                   {
                     id: 0,
-                    name: "Delete",
+                    name: 'Delete',
                   },
                   {
                     id: 1,
-                    name: "Unmonitor and delete files",
+                    name: 'Unmonitor and delete files',
                   },
                   {
                     id: 3,
-                    name: "Unmonitor and keep files",
+                    name: 'Unmonitor and keep files',
                   },
                 ]}
               />
             )}
 
-            {selectedLibrary && selectedLibrary!.type !== "movie" && (
+            {selectedLibrary && selectedLibrary!.type !== 'movie' && (
               <>
                 <div className="form-row">
                   <label htmlFor="type" className="text-label">
@@ -560,7 +560,7 @@ const AddModal = (props: AddModal) => {
                       >
                         {Object.keys(EPlexDataType)
                           .filter((v) => isNaN(Number(v)))
-                          .filter((v) => v !== "MOVIES") // We don't need movies here.
+                          .filter((v) => v !== 'MOVIES') // We don't need movies here.
                           .map((data: string) => {
                             return (
                               <option
@@ -578,7 +578,7 @@ const AddModal = (props: AddModal) => {
                                 {data[0].toUpperCase() +
                                   data.slice(1).toLowerCase()}
                               </option>
-                            );
+                            )
                           })}
                       </select>
                     </div>
@@ -590,54 +590,54 @@ const AddModal = (props: AddModal) => {
                   arrAction={arrOption}
                   settingId={sonarrSettingsId}
                   onUpdate={(e: number, settingId) => {
-                    handleUpdateArrAction("Sonarr", e, settingId);
+                    handleUpdateArrAction('Sonarr', e, settingId)
                   }}
                   options={
                     +selectedType === EPlexDataType.SHOWS
                       ? [
                           {
                             id: 0,
-                            name: "Delete entire show",
+                            name: 'Delete entire show',
                           },
                           {
                             id: 1,
-                            name: "Unmonitor and delete all seasons / episodes",
+                            name: 'Unmonitor and delete all seasons / episodes',
                           },
                           {
                             id: 2,
-                            name: "Unmonitor and delete existing seasons / episodes",
+                            name: 'Unmonitor and delete existing seasons / episodes',
                           },
                           {
                             id: 3,
-                            name: "Unmonitor show and keep files",
+                            name: 'Unmonitor show and keep files',
                           },
                         ]
                       : +selectedType === EPlexDataType.SEASONS
-                      ? [
-                          {
-                            id: 0,
-                            name: "Unmonitor and delete season",
-                          },
-                          {
-                            id: 2,
-                            name: "Unmonitor and delete existing episodes",
-                          },
-                          {
-                            id: 3,
-                            name: "Unmonitor season and keep files",
-                          },
-                        ]
-                      : // episodes
-                        [
-                          {
-                            id: 0,
-                            name: "Unmonitor and delete episode",
-                          },
-                          {
-                            id: 3,
-                            name: "Unmonitor and keep file",
-                          },
-                        ]
+                        ? [
+                            {
+                              id: 0,
+                              name: 'Unmonitor and delete season',
+                            },
+                            {
+                              id: 2,
+                              name: 'Unmonitor and delete existing episodes',
+                            },
+                            {
+                              id: 3,
+                              name: 'Unmonitor season and keep files',
+                            },
+                          ]
+                        : // episodes
+                          [
+                            {
+                              id: 0,
+                              name: 'Unmonitor and delete episode',
+                            },
+                            {
+                              id: 3,
+                              name: 'Unmonitor and keep file',
+                            },
+                          ]
                   }
                 />
               </>
@@ -708,7 +708,7 @@ const AddModal = (props: AddModal) => {
                       defaultValue={
                         collection
                           ? collection.tautulliWatchedPercentOverride
-                          : ""
+                          : ''
                       }
                       ref={tautulliWatchedPercentOverrideRef}
                     />
@@ -730,7 +730,7 @@ const AddModal = (props: AddModal) => {
                     className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
                     defaultChecked={active}
                     onChange={() => {
-                      setActive(!active);
+                      setActive(!active)
                     }}
                   />
                 </div>
@@ -753,7 +753,7 @@ const AddModal = (props: AddModal) => {
                     className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
                     defaultChecked={showRecommended}
                     onChange={() => {
-                      setShowRecommended(!showRecommended);
+                      setShowRecommended(!showRecommended)
                     }}
                   />
                 </div>
@@ -776,7 +776,7 @@ const AddModal = (props: AddModal) => {
                     className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
                     defaultChecked={showHome}
                     onChange={() => {
-                      setShowHome(!showHome);
+                      setShowHome(!showHome)
                     }}
                   />
                 </div>
@@ -787,8 +787,8 @@ const AddModal = (props: AddModal) => {
               <label htmlFor="list_exclusions" className="text-label">
                 Add list exclusions
                 <p className="text-xs font-normal">
-                  Prevent lists to re-add removed{" "}
-                  {selectedLibrary ? selectedLibrary.type : "movie"}
+                  Prevent lists to re-add removed{' '}
+                  {selectedLibrary ? selectedLibrary.type : 'movie'}
                 </p>
               </label>
               <div className="form-input">
@@ -800,7 +800,7 @@ const AddModal = (props: AddModal) => {
                     className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
                     defaultChecked={listExclusion}
                     onChange={() => {
-                      setListExclusion(!listExclusion);
+                      setListExclusion(!listExclusion)
                     }}
                   />
                 </div>
@@ -825,7 +825,7 @@ const AddModal = (props: AddModal) => {
                       className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
                       defaultChecked={forceOverseerr}
                       onChange={() => {
-                        setForceOverseerr(!forceOverseerr);
+                        setForceOverseerr(!forceOverseerr)
                       }}
                     />
                   </div>
@@ -847,7 +847,7 @@ const AddModal = (props: AddModal) => {
                     className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
                     defaultChecked={useRules}
                     onChange={() => {
-                      setUseRules(!useRules);
+                      setUseRules(!useRules)
                     }}
                   />
                 </div>
@@ -870,7 +870,7 @@ const AddModal = (props: AddModal) => {
                     className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
                     defaultChecked={manualCollection}
                     onChange={() => {
-                      setManualCollection(!manualCollection);
+                      setManualCollection(!manualCollection)
                     }}
                   />
                 </div>
@@ -951,7 +951,7 @@ const AddModal = (props: AddModal) => {
               {CommunityModal ? (
                 <CommunityRuleModal
                   currentRules={rules}
-                  type={selectedLibrary ? selectedLibrary.type : "movie"}
+                  type={selectedLibrary ? selectedLibrary.type : 'movie'}
                   onUpdate={handleLoadRules}
                   onCancel={() => setCommunityModal(false)}
                 />
@@ -960,11 +960,11 @@ const AddModal = (props: AddModal) => {
                 <YamlImporterModal
                   yaml={yaml.current ? yaml.current : undefined}
                   onImport={(yaml: string) => {
-                    importRulesFromYaml(yaml);
-                    setYamlImporterModal(false);
+                    importRulesFromYaml(yaml)
+                    setYamlImporterModal(false)
                   }}
                   onCancel={() => {
-                    setYamlImporterModal(false);
+                    setYamlImporterModal(false)
                   }}
                 />
               ) : undefined}
@@ -972,7 +972,7 @@ const AddModal = (props: AddModal) => {
                 key={ruleCreatorVersion.current}
                 mediaType={
                   selectedLibrary
-                    ? selectedLibrary.type === "movie"
+                    ? selectedLibrary.type === 'movie'
                       ? 1
                       : 2
                     : 0
@@ -1023,7 +1023,7 @@ const AddModal = (props: AddModal) => {
         </Modal>
       ) : undefined}
     </>
-  );
-};
+  )
+}
 
-export default AddModal;
+export default AddModal

@@ -1,78 +1,78 @@
-import { useState } from "react";
+import { useState } from 'react'
 import {
   addPortToUrl,
   getBaseUrl,
   getHostname,
   getPortFromUrl,
-} from "../../../../utils/SettingsUtils";
-import DocsButton from "../../../Common/DocsButton";
-import Modal from "../../../Common/Modal";
-import { PostApiHandler, PutApiHandler } from "../../../../utils/ApiHandler";
-import Alert from "../../../Common/Alert";
-import { IRadarrSetting } from "..";
+} from '../../../../utils/SettingsUtils'
+import DocsButton from '../../../Common/DocsButton'
+import Modal from '../../../Common/Modal'
+import { PostApiHandler, PutApiHandler } from '../../../../utils/ApiHandler'
+import Alert from '../../../Common/Alert'
+import { IRadarrSetting } from '..'
 
 interface IRadarrSettingsModal {
-  onUpdate: (setting: IRadarrSetting) => void;
-  onCancel: () => void;
-  settings?: IRadarrSetting;
+  onUpdate: (setting: IRadarrSetting) => void
+  onCancel: () => void
+  settings?: IRadarrSetting
 }
 
 interface TestStatus {
-  status: boolean;
-  version: string;
+  status: boolean
+  version: string
 }
 
 type RadarrSettingSaveResponse =
   | {
-      status: "OK";
-      code: 1;
-      message: string;
-      data: IRadarrSetting;
+      status: 'OK'
+      code: 1
+      message: string
+      data: IRadarrSetting
     }
   | {
-      status: "NOK";
-      code: 0;
-      message: string;
-      data?: never;
-    };
+      status: 'NOK'
+      code: 0
+      message: string
+      data?: never
+    }
 
 interface RadarrSettingTestResponse {
-  status: "OK" | "NOK";
-  code: 0 | 1;
-  message: string;
+  status: 'OK' | 'NOK'
+  code: 0 | 1
+  message: string
 }
 
 interface RadarrSettingSaveRequest {
-  id?: number;
-  url: string;
-  apiKey: string;
-  serverName: string;
+  id?: number
+  url: string
+  apiKey: string
+  serverName: string
 }
 
 const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
   const handleCancel = () => {
-    props.onCancel();
-  };
+    props.onCancel()
+  }
 
   const initialHostname = props.settings?.url
-    ? getHostname(props.settings.url) ?? ""
-    : "";
+    ? (getHostname(props.settings.url) ?? '')
+    : ''
   const initialBaseUrl = props.settings?.url
-    ? getBaseUrl(props.settings.url) ?? ""
-    : "";
+    ? (getBaseUrl(props.settings.url) ?? '')
+    : ''
   const initialPort = props.settings?.url
-    ? getPortFromUrl(props.settings.url) ?? ""
-    : "";
-  const initialApiKey = props.settings?.apiKey ?? "";
-  const initialServerName = props.settings?.serverName ?? "";
+    ? (getPortFromUrl(props.settings.url) ?? '')
+    : ''
+  const initialApiKey = props.settings?.apiKey ?? ''
+  const initialServerName = props.settings?.serverName ?? ''
 
-  const [hostname, setHostname] = useState<string>(initialHostname);
-  const [baseUrl, setBaseUrl] = useState<string>(initialBaseUrl);
-  const [port, setPort] = useState<string>(initialPort);
-  const [apiKey, setApiKey] = useState<string>(initialApiKey);
-  const [serverName, setServerName] = useState<string>(initialServerName);
+  const [hostname, setHostname] = useState<string>(initialHostname)
+  const [baseUrl, setBaseUrl] = useState<string>(initialBaseUrl)
+  const [port, setPort] = useState<string>(initialPort)
+  const [apiKey, setApiKey] = useState<string>(initialApiKey)
+  const [serverName, setServerName] = useState<string>(initialServerName)
 
-  const [error, setError] = useState<boolean>();
+  const [error, setError] = useState<boolean>()
   const [testedSettings, setTestedSettings] = useState(
     props.settings
       ? {
@@ -81,99 +81,99 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
           port,
           apiKey,
         }
-      : undefined
-  );
-  const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<TestStatus>();
+      : undefined,
+  )
+  const [testing, setTesting] = useState(false)
+  const [testResult, setTestResult] = useState<TestStatus>()
 
   const requiresTest =
     (hostname != testedSettings?.hostname ||
       baseUrl != testedSettings?.baseUrl ||
       port != testedSettings?.port ||
       apiKey != testedSettings?.apiKey) &&
-    !testResult?.status;
+    !testResult?.status
 
   const constructUrl = (port: string) => {
-    const hostnameVal = hostname.includes("http://")
+    const hostnameVal = hostname.includes('http://')
       ? hostname
-      : hostname.includes("https://")
-      ? hostname
-      : port == "443"
-      ? "https://" + hostname
-      : "http://" + hostname;
+      : hostname.includes('https://')
+        ? hostname
+        : port == '443'
+          ? 'https://' + hostname
+          : 'http://' + hostname
 
-    let radarrUrl = `${addPortToUrl(hostnameVal, +port)}`;
-    radarrUrl = radarrUrl.endsWith("/") ? radarrUrl.slice(0, -1) : radarrUrl;
+    let radarrUrl = `${addPortToUrl(hostnameVal, +port)}`
+    radarrUrl = radarrUrl.endsWith('/') ? radarrUrl.slice(0, -1) : radarrUrl
 
-    return radarrUrl;
-  };
+    return radarrUrl
+  }
 
   const derivePort = () => {
     // if port not specified, but hostname is. Derive the port
     if (!port && hostname) {
-      const derivedPort = hostname.includes("http://")
-        ? "80"
-        : hostname.includes("https://")
-        ? "443"
-        : "80";
+      const derivedPort = hostname.includes('http://')
+        ? '80'
+        : hostname.includes('https://')
+          ? '443'
+          : '80'
 
       if (derivedPort) {
-        setPort(derivedPort.toString());
-        return derivedPort;
+        setPort(derivedPort.toString())
+        return derivedPort
       }
     }
 
-    return port;
-  };
+    return port
+  }
 
   const handleSubmit = async () => {
-    const port = derivePort();
-    const radarrUrl = constructUrl(port);
+    const port = derivePort()
+    const radarrUrl = constructUrl(port)
 
     if (hostname && port && apiKey && serverName) {
       const payload: RadarrSettingSaveRequest = {
-        url: `${radarrUrl}${baseUrl ? `/${baseUrl}` : ""}`,
+        url: `${radarrUrl}${baseUrl ? `/${baseUrl}` : ''}`,
         apiKey: apiKey,
         serverName: serverName,
         ...(props.settings?.id && { id: props.settings?.id }),
-      };
+      }
 
       if (props.settings?.id) {
-        payload.id = props.settings.id;
+        payload.id = props.settings.id
       }
 
       const endpoint = props.settings?.id
         ? `/settings/radarr/${props.settings.id}`
-        : "/settings/radarr";
+        : '/settings/radarr'
 
-      const handler = props.settings?.id ? PutApiHandler : PostApiHandler;
+      const handler = props.settings?.id ? PutApiHandler : PostApiHandler
 
-      const resp = await handler<RadarrSettingSaveResponse>(endpoint, payload);
+      const resp = await handler<RadarrSettingSaveResponse>(endpoint, payload)
       if (resp.code == 1) {
-        props.onUpdate(resp.data);
-        setError(false);
-      } else setError(true);
+        props.onUpdate(resp.data)
+        setError(false)
+      } else setError(true)
     } else {
-      setError(true);
+      setError(true)
     }
-  };
+  }
 
   const performTest = async () => {
-    if (testing) return;
+    if (testing) return
 
-    setTesting(true);
-    const port = derivePort();
-    const radarrUrl = constructUrl(port);
+    setTesting(true)
+    const port = derivePort()
+    const radarrUrl = constructUrl(port)
 
-    await PostApiHandler<RadarrSettingTestResponse>("/settings/test/radarr", {
+    await PostApiHandler<RadarrSettingTestResponse>('/settings/test/radarr', {
       apiKey: apiKey,
-      url: `${radarrUrl}${baseUrl ? `/${baseUrl}` : ""}`,
+      url: `${radarrUrl}${baseUrl ? `/${baseUrl}` : ''}`,
     })
       .then((resp) => {
         setTestResult({
           status: resp.code == 1 ? true : false,
           version: resp.message,
-        });
+        })
 
         if (resp.code == 1) {
           setTestedSettings({
@@ -181,21 +181,21 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
             baseUrl,
             port,
             apiKey,
-          });
+          })
         }
 
-        setTesting(false);
+        setTesting(false)
       })
       .catch((e) => {
         setTestResult({
           status: false,
-          version: "0",
-        });
+          version: '0',
+        })
       })
       .finally(() => {
-        setTesting(false);
-      });
-  };
+        setTesting(false)
+      })
+  }
 
   return (
     <Modal
@@ -203,15 +203,15 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
       backgroundClickable={false}
       onCancel={handleCancel}
       onOk={handleSubmit}
-      okText={"Save Changes"}
-      okButtonType={"primary"}
+      okText={'Save Changes'}
+      okButtonType={'primary'}
       okDisabled={requiresTest}
       secondaryButtonType="success"
-      secondaryText={testing ? "Testing..." : "Test"}
+      secondaryText={testing ? 'Testing...' : 'Test'}
       secondaryDisabled={testing}
       onSecondary={performTest}
-      title={"Radarr Settings"}
-      iconSvg={""}
+      title={'Radarr Settings'}
+      iconSvg={''}
     >
       {error && <Alert type="warning" title="Not all fields contain values" />}
 
@@ -320,6 +320,6 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
         </div>
       </div>
     </Modal>
-  );
-};
-export default RadarrSettingsModal;
+  )
+}
+export default RadarrSettingsModal
