@@ -30,7 +30,6 @@ import CachedImage from '../../../Common/CachedImage'
 import YamlImporterModal from '../../../Common/YamlImporterModal'
 import { CloudDownloadIcon } from '@heroicons/react/outline'
 import { useToasts } from 'react-toast-notifications'
-import Modal from '../../../Common/Modal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -103,14 +102,6 @@ const AddModal = (props: AddModal) => {
   const [sonarrSettingsId, setSonarrSettingsId] = useState<
     number | null | undefined
   >(props.editData ? null : undefined)
-  const [originalRadarrSettingsId, setOriginalRadarrSettingsId] = useState<
-    number | null | undefined
-  >(props.editData ? null : undefined)
-  const [originalSonarrSettingsId, setOriginalSonarrSettingsId] = useState<
-    number | null | undefined
-  >(props.editData ? null : undefined)
-  const [showArrServerChangeWarning, setShowArrServerChangeWarning] =
-    useState<boolean>(false)
   const [active, setActive] = useState<boolean>(
     props.editData ? props.editData.isActive : true,
   )
@@ -176,27 +167,9 @@ const AddModal = (props: AddModal) => {
     setArrOption(arrAction)
 
     if (type === 'Radarr') {
-      if (
-        props.editData &&
-        originalRadarrSettingsId !== undefined &&
-        originalRadarrSettingsId != settingId &&
-        settingId != radarrSettingsId
-      ) {
-        setShowArrServerChangeWarning(true)
-      }
-
       setSonarrSettingsId(undefined)
       setRadarrSettingsId(settingId)
     } else if (type === 'Sonarr') {
-      if (
-        props.editData &&
-        originalSonarrSettingsId !== undefined &&
-        originalSonarrSettingsId != settingId &&
-        settingId != sonarrSettingsId
-      ) {
-        setShowArrServerChangeWarning(true)
-      }
-
       setRadarrSettingsId(undefined)
       setSonarrSettingsId(settingId)
     }
@@ -319,8 +292,6 @@ const AddModal = (props: AddModal) => {
         setManualCollection(collection.manualCollection)
         setRadarrSettingsId(collection.radarrSettingsId ?? null)
         setSonarrSettingsId(collection.sonarrSettingsId ?? null)
-        setOriginalRadarrSettingsId(collection.radarrSettingsId ?? null)
-        setOriginalSonarrSettingsId(collection.sonarrSettingsId ?? null)
         setLibraryId(collection.libraryId.toString())
       }
 
@@ -1010,18 +981,6 @@ const AddModal = (props: AddModal) => {
           </form>
         </div>
       </div>
-      {showArrServerChangeWarning ? (
-        <Modal
-          title="Warning"
-          size="sm"
-          onOk={() => setShowArrServerChangeWarning(false)}
-        >
-          <p>
-            Changing server will result in all collection media and specific
-            exclusions being removed.
-          </p>
-        </Modal>
-      ) : undefined}
     </>
   )
 }
