@@ -1488,7 +1488,7 @@ __metadata:
     "@nestjs/typeorm": "npm:^10.0.2"
     "@types/jest": "npm:^29.5.14"
     "@types/lodash": "npm:^4.17.13"
-    "@types/node": "npm:^20"
+    "@types/node": "npm:^22"
     "@types/xml2js": "npm:^0.4.14"
     "@typescript-eslint/eslint-plugin": "npm:^8.18.1"
     "@typescript-eslint/parser": "npm:^8.18.0"
@@ -1531,7 +1531,7 @@ __metadata:
     "@tailwindcss/forms": "npm:^0.5.9"
     "@tailwindcss/typography": "npm:^0.5.15"
     "@types/lodash": "npm:^4.17.13"
-    "@types/node": "npm:^20"
+    "@types/node": "npm:^22"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
     "@types/react-transition-group": "npm:^4.4.12"
@@ -2834,7 +2834,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^22.9.4":
+"@types/node@npm:*":
   version: 22.9.4
   resolution: "@types/node@npm:22.9.4"
   dependencies:
@@ -2843,12 +2843,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20":
-  version: 20.17.6
-  resolution: "@types/node@npm:20.17.6"
+"@types/node@npm:^22, @types/node@npm:^22.10.2":
+  version: 22.10.2
+  resolution: "@types/node@npm:22.10.2"
   dependencies:
-    undici-types: "npm:~6.19.2"
-  checksum: 10c0/5918c7ff8368bbe6d06d5e739c8ae41a9db41628f28760c60cda797be7d233406f07c4d0e6fdd960a0a342ec4173c2217eb6624e06bece21c1f1dd1b92805c15
+    undici-types: "npm:~6.20.0"
+  checksum: 10c0/2c7b71a040f1ef5320938eca8ebc946e6905caa9bbf3d5665d9b3774a8d15ea9fab1582b849a6d28c7fc80756a62c5666bc66b69f42f4d5dafd1ccb193cdb4ac
   languageName: node
   linkType: hard
 
@@ -9620,7 +9620,7 @@ __metadata:
     "@semantic-release/commit-analyzer": "npm:^13.0.0"
     "@semantic-release/exec": "npm:^6.0.3"
     "@semantic-release/git": "npm:^10.0.1"
-    "@types/node": "npm:^22.9.4"
+    "@types/node": "npm:^22.10.2"
     knip: "npm:^5.41.1"
     semantic-release: "npm:^24.2.0"
     turbo: "npm:^2.2.3"
@@ -14617,10 +14617,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~6.19.2, undici-types@npm:~6.19.8":
+"undici-types@npm:~6.19.8":
   version: 6.19.8
   resolution: "undici-types@npm:6.19.8"
   checksum: 10c0/078afa5990fba110f6824823ace86073b4638f1d5112ee26e790155f481f2a868cc3e0615505b6f4282bdf74a3d8caad715fd809e870c2bb0704e3ea6082f344
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.20.0":
+  version: 6.20.0
+  resolution: "undici-types@npm:6.20.0"
+  checksum: 10c0/68e659a98898d6a836a9a59e6adf14a5d799707f5ea629433e025ac90d239f75e408e2e5ff086afc3cace26f8b26ee52155293564593fbb4a2f666af57fc59bf
   languageName: node
   linkType: hard
 
