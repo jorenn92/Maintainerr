@@ -135,6 +135,8 @@ const TestMediaItem = (props: ITestMediaItem) => {
   }, [selectedSeasons])
 
   const onSubmit = async () => {
+    setComparisonResult(undefined)
+
     if (ruleGroup) {
       const result = await PostApiHandler(`/rules/test`, {
         rulegroupId: ruleGroup.id,
@@ -268,9 +270,9 @@ const TestMediaItem = (props: ITestMediaItem) => {
               options={{ readOnly: true, minimap: { enabled: false } }}
               defaultLanguage="yaml"
               theme="vs-dark"
-              {...(comparisonResult
-                ? { value: YAML.stringify(comparisonResult.result) }
-                : undefined)}
+              value={
+                comparisonResult ? YAML.stringify(comparisonResult.result) : ''
+              }
               onMount={handleEditorDidMount}
             />
           </div>
