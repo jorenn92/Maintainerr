@@ -316,16 +316,14 @@ export class RulesService {
           group.collectionId,
         );
 
-        // if datatype, manual collection settings or *arr server changed then remove the collection media and specific exclusions. The Plex collection will be removed later by updateCollection()
+        // if datatype or manual collection settings changed then remove the collection media and specific exclusions. The Plex collection will be removed later by updateCollection()
         if (
           group.dataType !== params.dataType ||
           params.collection.manualCollection !==
             dbCollection.manualCollection ||
           params.collection.manualCollectionName !==
             dbCollection.manualCollectionName ||
-          params.libraryId !== dbCollection.libraryId ||
-          params.radarrSettingsId !== dbCollection.radarrSettingsId ||
-          params.sonarrSettingsId !== dbCollection.sonarrSettingsId
+          params.libraryId !== dbCollection.libraryId
         ) {
           this.logger.log(
             `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media & specific exclusions`,
