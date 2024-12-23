@@ -1,0 +1,12 @@
+# robots.txt for https://docs.maintainerr.info
+
+# Allow all web crawlers to access the site
+User-agent: *
+Disallow: 
+
+# Disallow specific directories (adjust paths as necessary)
+Disallow: /private/
+Disallow: /temp/
+
+# Specify the location of your sitemap
+Sitemap: https://docs.maintainerr.info/sitemap.xml

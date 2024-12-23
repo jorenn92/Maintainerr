@@ -5,3 +5,6 @@ server/dist
 ui/.next
 Dockerfile
 **/*.md
+mkdocs.yml
+user-requirements.txt
+docs/
