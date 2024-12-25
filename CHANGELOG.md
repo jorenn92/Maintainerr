@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/jorenn92/Maintainerr/compare/v2.4.0...v2.4.1) (2024-12-25)
+
+
+### Bug Fixes
+
+* Do not reset collection on *arr server change ([#1467](https://github.com/jorenn92/Maintainerr/issues/1467)) ([6bcc45e](https://github.com/jorenn92/Maintainerr/commit/6bcc45ed9df47956eda3f692c6486f33e742c137))
+
 # [2.4.0](https://github.com/jorenn92/Maintainerr/compare/v2.3.1...v2.4.0) (2024-12-20)
 
 
