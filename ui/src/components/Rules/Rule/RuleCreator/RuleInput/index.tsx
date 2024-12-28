@@ -225,7 +225,8 @@ const RuleInput = (props: IRuleInput) => {
     )
     if (firstval) {
       const val = JSON.parse(firstval)
-      if (apps && !apps[val[0]].props.find((el) => el.id == val[1])) {
+      const appId = val[0]
+      if (!apps?.[appId]?.props.find((el) => el.id == val[1])) {
         setFirstVal(undefined)
       }
     }
