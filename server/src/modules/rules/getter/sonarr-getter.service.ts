@@ -47,15 +47,15 @@ export class SonarrGetterService {
 
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
-      let origLibItem = undefined;
-      let season = undefined;
-      let episode = undefined;
+      let origLibItem: PlexLibraryItem = undefined;
+      let seasonRatingKey: number | undefined = undefined;
+
       if (
         dataType === EPlexDataType.SEASONS ||
         dataType === EPlexDataType.EPISODES
       ) {
         origLibItem = _.cloneDeep(libItem);
-        season = libItem.grandparentRatingKey
+        seasonRatingKey = libItem.grandparentRatingKey
           ? libItem.parentIndex
           : libItem.index;
 
@@ -83,12 +83,14 @@ export class SonarrGetterService {
 
         const showResponse = await sonarrApiClient.getSeriesByTvdbId(tvdbId);
 
-        season = season
-          ? showResponse.seasons.find((el) => el.seasonNumber === season)
-          : season;
+        const season = seasonRatingKey
+          ? showResponse.seasons.find(
+              (el) => el.seasonNumber === seasonRatingKey,
+            )
+          : undefined;
 
         // fetch episode or first episode of the season
-        episode =
+        const episode =
           [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType) &&
           showResponse.added !== '0001-01-01T00:00:00Z'
             ? (showResponse.id
@@ -213,7 +215,7 @@ export class SonarrGetterService {
             }
             case 'unaired_episodes': {
               // returns true if a season with unaired episodes is found in monitored seasons
-              const data = [];
+              const data: SonarrSeason[] = [];
               if (dataType === EPlexDataType.SEASONS) {
                 data.push(season);
               } else {
@@ -267,6 +269,30 @@ export class SonarrGetterService {
               return showResponse.originalLanguage?.name
                 ? showResponse.originalLanguage.name
                 : null;
+            }
+            case 'seasonFinale': {
+              const episodes = await sonarrApiClient.getEpisodes(
+                showResponse.id,
+                origLibItem.index,
+              );
+
+              if (!episodes) {
+                return null;
+              }
+
+              return episodes.some((el) => el.finaleType === 'season');
+            }
+            case 'seriesFinale': {
+              const episodes = await sonarrApiClient.getEpisodes(
+                showResponse.id,
+                origLibItem.index,
+              );
+
+              if (!episodes) {
+                return null;
+              }
+
+              return episodes.some((el) => el.finaleType === 'series');
             }
           }
         } else return null;

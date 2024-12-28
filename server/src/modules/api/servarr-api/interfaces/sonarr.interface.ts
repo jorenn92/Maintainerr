@@ -77,6 +77,7 @@ export interface SonarrEpisode {
   };
   qualityCutoffNotMet: boolean;
   languageCutoffNotMet: boolean;
+  finaleType?: 'series' | 'season' | 'midseason';
   id: number;
 }
 

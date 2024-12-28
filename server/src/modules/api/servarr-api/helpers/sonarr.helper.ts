@@ -49,7 +49,9 @@ export class SonarrApi extends ServarrApi<{
         }${episodeIds ? `&episodeIds=${episodeIds}` : ''}`,
       );
 
-      return response.filter((el) => episodeIds.includes(el.episodeNumber));
+      return episodeIds
+        ? response.filter((el) => episodeIds.includes(el.episodeNumber))
+        : response;
     } catch (e) {
       this.logger.warn(
         `[Sonarr] Failed to retrieve show ${seriesID}'s episodes ${episodeIds}: ${e.message}`,
