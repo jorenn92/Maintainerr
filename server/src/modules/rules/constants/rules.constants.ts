@@ -100,15 +100,14 @@ export interface Property {
   mediaType: MediaType;
   humanName: string;
   cacheReset?: boolean; // for properties that require a cache reset between group executions
+  showType?: EPlexDataType[]; // if not configured = available for all types
 }
 
 export interface ApplicationProperties {
   id: number;
   name: string;
-  description?: string;
   mediaType: MediaType;
   props: Property[];
-  showType?: EPlexDataType[]; // if not configured = available for all types
 }
 export class RuleConstants {
   applications: ApplicationProperties[] = [
@@ -123,42 +122,42 @@ export class RuleConstants {
           humanName: 'Date added',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 1,
           name: 'seenBy',
           humanName: '[list] Viewed by (username)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT, // returns usernames []
-        } as Property,
+        },
         {
           id: 2,
           name: 'releaseDate',
           humanName: 'Release date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 3,
           name: 'rating_user',
           humanName: 'User rating (scale 1-10)',
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 4,
           name: 'people',
           humanName: '[list] People involved',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT, // return text[]
-        } as Property,
+        },
         {
           id: 5,
           name: 'viewCount',
           humanName: 'Times viewed',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 6,
           name: 'collections',
@@ -166,42 +165,42 @@ export class RuleConstants {
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
           cacheReset: true,
-        } as Property,
+        },
         {
           id: 7,
           name: 'lastViewedAt',
           humanName: 'Last view date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 8,
           name: 'fileVideoResolution',
           humanName: '[list] Media file resolution (4k, 1080,..)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
-        } as Property,
+        },
         {
           id: 9,
           name: 'fileBitrate',
           humanName: 'Media file bitrate',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 10,
           name: 'fileVideoCodec',
           humanName: 'Media file codec',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
-        } as Property,
+        },
         {
           id: 11,
           name: 'genre',
           humanName: '[list] List of genres (Action, Adventure,..)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT, // return text[]
-        } as Property,
+        },
         {
           id: 12,
           name: 'sw_allEpisodesSeenBy',
@@ -209,7 +208,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT, // return usernames []
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 13,
           name: 'sw_lastWatched',
@@ -217,7 +216,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 14,
           name: 'sw_episodes',
@@ -225,7 +224,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 15,
           name: 'sw_viewedEpisodes',
@@ -233,7 +232,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 16,
           name: 'sw_lastEpisodeAddedAt',
@@ -241,14 +240,14 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 17,
           name: 'sw_amountOfViews',
           humanName: 'Total views',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 18,
           name: 'sw_watchers',
@@ -260,7 +259,7 @@ export class RuleConstants {
             EPlexDataType.SEASONS,
             EPlexDataType.EPISODES,
           ],
-        } as Property,
+        },
         {
           id: 19,
           name: 'collection_names',
@@ -268,42 +267,42 @@ export class RuleConstants {
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
           cacheReset: true,
-        } as Property,
+        },
         {
           id: 20,
           name: 'playlists',
           humanName: 'Present in amount of playlists',
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 21,
           name: 'playlist_names',
           humanName: '[list] Playlists media is present in (titles)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
-        } as Property,
+        },
         {
           id: 22,
           name: 'rating_critics',
           humanName: 'Critics rating (scale 1-10)',
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 23,
           name: 'rating_audience',
           humanName: 'Audience rating (scale 1-10)',
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 24,
           name: 'labels',
           humanName: '[list] Labels',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
-        } as Property,
+        },
         {
           id: 25,
           name: 'sw_collections_including_parent',
@@ -312,7 +311,7 @@ export class RuleConstants {
           type: RuleType.NUMBER,
           showType: [EPlexDataType.SEASONS, EPlexDataType.EPISODES],
           cacheReset: true,
-        } as Property,
+        },
         {
           id: 26,
           name: 'sw_collection_names_including_parent',
@@ -322,7 +321,7 @@ export class RuleConstants {
           showType: [EPlexDataType.SEASONS, EPlexDataType.EPISODES],
           cacheReset: true,
           type: RuleType.TEXT,
-        } as Property,
+        },
         {
           id: 27,
           name: 'sw_lastEpisodeAiredAt',
@@ -330,14 +329,14 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 28,
           name: 'watchlist_isListedByUsers',
           humanName: '[list] Watchlisted by (username) [experimental]',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
-        } as Property,
+        },
       ],
     },
     {
@@ -351,7 +350,7 @@ export class RuleConstants {
           humanName: 'Date added',
           mediaType: MediaType.MOVIE,
           type: RuleType.DATE,
-        } as Property,
+        },
         // Don't use ID 1, It was once used for an old rule value. Changing the id's messes up existing rules.
         {
           id: 2,
@@ -359,84 +358,84 @@ export class RuleConstants {
           humanName: '[list] Tags (Text if 1, otherwise list)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT, // return text[]
-        } as Property,
+        },
         {
           id: 3,
           name: 'profile',
           humanName: 'Quality profile',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
-        } as Property, // TODO
+        }, // TODO
         {
           id: 4,
           name: 'releaseDate',
           humanName: 'Release date',
           mediaType: MediaType.MOVIE,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 5,
           name: 'monitored',
           humanName: 'is monitored',
           mediaType: MediaType.MOVIE,
           type: RuleType.BOOL,
-        } as Property,
+        },
         {
           id: 6,
           name: 'inCinemas',
           humanName: 'In cinemas date',
           mediaType: MediaType.MOVIE,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 7,
           name: 'fileSize',
           humanName: 'File - size in MB',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 8,
           name: 'fileAudioChannels',
           humanName: '[list] File - audio channels',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 9,
           name: 'fileQuality',
           humanName: '[list] File - quality (2160, 1080,..)',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 10,
           name: 'fileDate',
           humanName: 'File - download date',
           mediaType: MediaType.MOVIE,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 11,
           name: 'runTime',
           humanName: 'File - runtime in minutes',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 12,
           name: 'filePath',
           humanName: 'File - file path',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
-        } as Property,
+        },
         {
           id: 13,
           name: 'originalLanguage',
           humanName: 'Original language',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
-        } as Property,
+        },
       ],
     },
     {
@@ -451,7 +450,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
           showType: [EPlexDataType.SHOWS],
-        } as Property,
+        },
         {
           id: 1,
           name: 'diskSizeEntireShow',
@@ -463,28 +462,28 @@ export class RuleConstants {
             EPlexDataType.SEASONS,
             EPlexDataType.EPISODES,
           ],
-        } as Property,
+        },
         {
           id: 2,
           name: 'tags',
           humanName: '[list] Tags (show)',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT, // return text[]
-        } as Property,
+        },
         {
           id: 3,
           name: 'qualityProfileId',
           humanName: 'Quality profile ID',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 4,
           name: 'firstAirDate',
           humanName: 'First air date',
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 5,
           name: 'seasons',
@@ -492,7 +491,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 6,
           name: 'status',
@@ -500,7 +499,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT,
           showType: [EPlexDataType.SHOWS],
-        } as Property,
+        },
         {
           id: 7,
           name: 'ended',
@@ -508,21 +507,21 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.BOOL,
           showType: [EPlexDataType.SHOWS],
-        } as Property,
+        },
         {
           id: 8,
           name: 'monitored',
           humanName: 'Is monitored (deprecated)',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 9,
           name: 'monitored',
           humanName: 'Is monitored',
           mediaType: MediaType.SHOW,
           type: RuleType.BOOL,
-        } as Property,
+        },
         {
           id: 10,
           name: 'unaired_episodes',
@@ -530,7 +529,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.BOOL,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 11,
           name: 'seasons_monitored',
@@ -538,7 +537,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 12,
           name: 'unaired_episodes_season',
@@ -546,7 +545,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.BOOL,
           showType: [EPlexDataType.EPISODES],
-        } as Property,
+        },
         {
           id: 13,
           name: 'part_of_latest_season',
@@ -554,21 +553,37 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.BOOL,
           showType: [EPlexDataType.EPISODES, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 14,
           name: 'filePath',
           humanName: 'Base file path',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT,
-        } as Property,
+        },
         {
           id: 15,
           name: 'originalLanguage',
           humanName: 'Original language',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT,
-        } as Property,
+        },
+        {
+          id: 16,
+          name: 'seasonFinale',
+          humanName: 'Has season finale episode',
+          mediaType: MediaType.SHOW,
+          type: RuleType.BOOL,
+          showType: [EPlexDataType.SEASONS],
+        },
+        {
+          id: 17,
+          name: 'seriesFinale',
+          humanName: 'Has series finale episode',
+          mediaType: MediaType.SHOW,
+          type: RuleType.BOOL,
+          showType: [EPlexDataType.SEASONS],
+        },
       ],
     },
     {
@@ -582,49 +597,49 @@ export class RuleConstants {
           humanName: 'Requested by user (Plex or local username)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
-        } as Property, //  returns username[]
+        }, //  returns username[]
         {
           id: 1,
           name: 'requestDate',
           humanName: 'Request date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 2,
           name: 'releaseDate',
           humanName: 'Release/air date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 3,
           name: 'approvalDate',
           humanName: 'Approval date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 4,
           name: 'mediaAddedAt',
           humanName: 'Media downloaded date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 5,
           name: 'amountRequested',
           humanName: 'Amount of requests',
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 6,
           name: 'isRequested',
           humanName: 'Requested in Overseerr',
           mediaType: MediaType.BOTH,
           type: RuleType.BOOL,
-        } as Property,
+        },
       ],
     },
     {
@@ -638,7 +653,7 @@ export class RuleConstants {
           humanName: '[list] Viewed by (username)',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT, // returns usernames []
-        } as Property,
+        },
         {
           id: 1,
           name: 'sw_allEpisodesSeenBy',
@@ -646,35 +661,35 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT, // return usernames []
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 2,
           name: 'addDate',
           humanName: 'Date added',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 3,
           name: 'viewCount',
           humanName: 'Times viewed',
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 4,
           name: 'lastViewedAt',
           humanName: 'Last view date',
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
-        } as Property,
+        },
         {
           id: 5,
           name: 'sw_amountOfViews',
           humanName: 'Total views',
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
-        } as Property,
+        },
         {
           id: 6,
           name: 'sw_viewedEpisodes',
@@ -682,7 +697,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 7,
           name: 'sw_lastWatched',
@@ -690,7 +705,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
-        } as Property,
+        },
         {
           id: 8,
           name: 'sw_watchers',
@@ -702,7 +717,7 @@ export class RuleConstants {
             EPlexDataType.SEASONS,
             EPlexDataType.EPISODES,
           ],
-        } as Property,
+        },
       ],
     },
   ];
