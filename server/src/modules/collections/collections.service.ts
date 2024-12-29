@@ -941,6 +941,8 @@ export class CollectionsService {
                   collection.manualCollectionName !== undefined
                     ? collection.manualCollectionName
                     : '',
+                sonarrSettingsId: collection.sonarrSettingsId,
+                radarrSettingsId: collection.radarrSettingsId,
               },
             ])
             .execute()
