@@ -1001,8 +1001,14 @@ export class RulesService {
         [mediaResp as unknown as PlexLibraryItem],
         true,
       );
-      return { code: 1, result: result.stats };
+
+      if (result) {
+        return { code: 1, result: result.stats };
+      } else {
+        return { code: 0, result: 'An error occurred executing rules' };
+      }
     }
+
     return { code: 0, result: 'Invalid input' };
   }
 

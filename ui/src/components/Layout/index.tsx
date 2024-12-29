@@ -17,6 +17,7 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
   const [navBarOpen, setNavBarOpen] = useState(false)
   const SearchCtx = useContext(SearchContext)
   const SettingsCtx = useContext(SettingsContext)
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
   const handleNavbar = () => {
     setNavBarOpen(!navBarOpen)
@@ -34,6 +35,7 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
     <section>
       <Head>
         <title>Maintainerr</title>
+        <link rel="icon" href={`${basePath}/favicon.ico`} />
       </Head>
       <div className="flex h-full min-h-full min-w-0 bg-zinc-900">
         <div className="pwa-only fixed inset-0 z-20 h-1 w-full border-zinc-700 md:border-t" />

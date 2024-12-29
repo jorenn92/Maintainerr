@@ -378,9 +378,11 @@ const AddModal = (props: AddModal) => {
   }
 
   if (isLoading) {
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
     return (
       <span>
-        <CachedImage fill src="/spinner.svg" alt="Loading..." />
+        <CachedImage fill src={`${basePath}/spinner.svg`} alt="Loading..." />
       </span>
     )
   }

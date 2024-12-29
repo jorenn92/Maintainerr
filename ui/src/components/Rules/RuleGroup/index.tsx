@@ -57,7 +57,7 @@ const RuleGroup = (props: {
           </div>
 
           <div className="my-0.5 flex text-sm sm:my-1">
-            <span className="mr-2 w-full overflow-hidden overflow-ellipsis font-bold">
+            <span className="mr-2 w-full max-w-prose overflow-hidden overflow-ellipsis font-semibold">
               {props.group.description}
             </span>
           </div>
@@ -74,7 +74,7 @@ const RuleGroup = (props: {
             {`Library ${
               LibrariesCtx.libraries.find(
                 (el) => +el.key === +props.group.libraryId,
-              )?.title
+              )?.title ?? ''
             }`}
           </div>
           {props.group.rules.length > 0 ? (
