@@ -294,6 +294,9 @@ export class SonarrGetterService {
 
               return episodes.some((el) => el.finaleType === 'series');
             }
+            case 'seasonNumber': {
+              return season.seasonNumber;
+            }
           }
         } else return null;
       } else {

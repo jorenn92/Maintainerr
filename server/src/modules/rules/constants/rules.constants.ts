@@ -584,6 +584,14 @@ export class RuleConstants {
           type: RuleType.BOOL,
           showType: [EPlexDataType.SEASONS],
         },
+        {
+          id: 18,
+          name: 'seasonNumber',
+          humanName: 'Season number',
+          mediaType: MediaType.SHOW,
+          type: RuleType.NUMBER,
+          showType: [EPlexDataType.EPISODES, EPlexDataType.SEASONS],
+        },
       ],
     },
     {
