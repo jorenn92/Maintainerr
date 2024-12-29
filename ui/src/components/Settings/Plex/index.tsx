@@ -319,7 +319,7 @@ const PlexSettings = () => {
         ) : (
           <Alert
             type="error"
-            title="Connection failed! Please check and save your settings"
+            title="Connection failed! Double check your entries and make sure to Save Changes before you Test."
           />
         )
       ) : undefined}
