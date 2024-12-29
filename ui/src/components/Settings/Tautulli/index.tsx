@@ -47,8 +47,8 @@ const TautulliSettings = () => {
       const derivedPort = hostname.includes('http://')
         ? 80
         : hostname.includes('https://')
-          ? 443
-          : 80
+        ? 443
+        : 80
 
       if (derivedPort) {
         portToUse = derivedPort.toString()
@@ -60,10 +60,10 @@ const TautulliSettings = () => {
       const hostnameVal = hostname.includes('http://')
         ? hostname
         : hostname.includes('https://')
-          ? hostname
-          : portToUse == '443'
-            ? 'https://' + hostname
-            : 'http://' + hostname
+        ? hostname
+        : portToUse == '443'
+        ? 'https://' + hostname
+        : 'http://' + hostname
 
       let tautulli_url = `${addPortToUrl(hostnameVal, +portToUse)}`
       tautulli_url = tautulli_url.endsWith('/')
@@ -80,7 +80,7 @@ const TautulliSettings = () => {
         {
           ...settingsCtx.settings,
           ...payload,
-        },
+        }
       )
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
@@ -120,7 +120,7 @@ const TautulliSettings = () => {
         ) : (
           <Alert
             type="error"
-            title="Connection failed! Please check and save your settings"
+            title="Connection failed! Double check your entries and make sure to Save Changes before you Test."
           />
         )
       ) : undefined}

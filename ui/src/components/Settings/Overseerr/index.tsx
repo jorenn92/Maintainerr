@@ -55,8 +55,8 @@ const OverseerrSettings = () => {
       const derivedPort = hostnameRef.current.value.includes('http://')
         ? 80
         : hostnameRef.current.value.includes('https://')
-          ? 443
-          : 80
+        ? 443
+        : 80
 
       if (derivedPort) {
         setPort(derivedPort.toString())
@@ -73,10 +73,10 @@ const OverseerrSettings = () => {
       const hostnameVal = hostnameRef.current.value.includes('http://')
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https://')
-          ? hostnameRef.current.value
-          : portRef.current.value == '443'
-            ? 'https://' + hostnameRef.current.value
-            : 'http://' + hostnameRef.current.value
+        ? hostnameRef.current.value
+        : portRef.current.value == '443'
+        ? 'https://' + hostnameRef.current.value
+        : 'http://' + hostnameRef.current.value
 
       const payload = {
         overseerr_url: addPortToUrl(hostnameVal, +portRef.current.value),
@@ -87,7 +87,7 @@ const OverseerrSettings = () => {
         {
           ...settingsCtx.settings,
           ...payload,
-        },
+        }
       )
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
@@ -127,7 +127,7 @@ const OverseerrSettings = () => {
         ) : (
           <Alert
             type="error"
-            title="Connection failed! Please check and save your settings"
+            title="Connection failed! Double check your entries and make sure to Save Changes before you Test."
           />
         )
       ) : undefined}
