@@ -1,3 +1,18 @@
+# [2.5.0](https://github.com/jorenn92/Maintainerr/compare/v2.4.1...v2.5.0) (2024-12-30)
+
+
+### Bug Fixes
+
+* *arr server not persisting on initial save ([#1475](https://github.com/jorenn92/Maintainerr/issues/1475)) ([8ace636](https://github.com/jorenn92/Maintainerr/commit/8ace63659ded1d44eb99fc6c81f00121c91a4b76))
+* Client side error when changing rule data/media type ([2e086b2](https://github.com/jorenn92/Maintainerr/commit/2e086b2d76ac6893b56962e7c0d5960c9d1852c9))
+* Resolve various UI & UX issues ([#1452](https://github.com/jorenn92/Maintainerr/issues/1452)) ([354b903](https://github.com/jorenn92/Maintainerr/commit/354b903bf4ff1dee216792a15de9d85304994e35))
+
+
+### Features
+
+* Add season has season/series finale episode ([f53d094](https://github.com/jorenn92/Maintainerr/commit/f53d0949e2291319891ce27424c47e827fcdb615))
+* Add season number filter ([f0fd71e](https://github.com/jorenn92/Maintainerr/commit/f0fd71e7062e83553b8bee951adf20a474e7cf2b))
+
 ## [2.4.1](https://github.com/jorenn92/Maintainerr/compare/v2.4.0...v2.4.1) (2024-12-25)
 
 
