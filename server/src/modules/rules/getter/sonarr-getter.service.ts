@@ -297,6 +297,9 @@ export class SonarrGetterService {
             case 'seasonNumber': {
               return season.seasonNumber;
             }
+            case 'rating': {
+              return showResponse.ratings?.value ?? null;
+            }
           }
         } else return null;
       } else {

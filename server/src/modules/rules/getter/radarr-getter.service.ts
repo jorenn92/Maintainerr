@@ -132,6 +132,15 @@ export class RadarrGetterService {
               ? movieResponse.originalLanguage.name
               : null;
           }
+          case 'rottenTomatoesRating': {
+            return movieResponse.ratings.rottenTomatoes?.value ?? null;
+          }
+          case 'traktRating': {
+            return movieResponse.ratings.trakt?.value ?? null;
+          }
+          case 'imdbRating': {
+            return movieResponse.ratings.imdb?.value ?? null;
+          }
         }
       } else {
         this.logger.debug(
