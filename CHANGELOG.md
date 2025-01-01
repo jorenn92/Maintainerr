@@ -1,3 +1,15 @@
+# [2.6.0](https://github.com/jorenn92/Maintainerr/compare/v2.5.0...v2.6.0) (2025-01-01)
+
+
+### Bug Fixes
+
+* Docs links ([#1487](https://github.com/jorenn92/Maintainerr/issues/1487)) ([d8bf2d1](https://github.com/jorenn92/Maintainerr/commit/d8bf2d140fccb7d45a3e33a2f4d6426b33684dc8))
+
+
+### Features
+
+* Add rating filters (RT, IMDb, Trakt) ([4b79f56](https://github.com/jorenn92/Maintainerr/commit/4b79f56aa63ae31388874a1400f873b97dede2b9))
+
 # [2.5.0](https://github.com/jorenn92/Maintainerr/compare/v2.4.1...v2.5.0) (2024-12-30)
 
 
