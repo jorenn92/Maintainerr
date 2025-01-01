@@ -33,11 +33,26 @@ export interface RadarrMovie {
   digitalRelease: string;
   inCinemas: string;
   tags: number[];
+  ratings: RadarrRatings;
 }
 
 export interface RadarrLanguage {
   id: number;
   name: string | null;
+}
+
+interface RadarrRatings {
+  imdb?: RatingChild;
+  tmdb?: RatingChild;
+  metacritic?: RatingChild;
+  rottenTomatoes?: RatingChild;
+  trakt?: RatingChild;
+}
+
+interface RatingChild {
+  votes: number;
+  value: number;
+  type: 'user' | 'critic';
 }
 
 export interface RadarrInfo {
