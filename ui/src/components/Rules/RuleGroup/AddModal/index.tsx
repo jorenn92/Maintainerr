@@ -63,10 +63,10 @@ interface ICreateApiObject {
 
 const AddModal = (props: AddModal) => {
   const [selectedLibraryId, setSelectedLibraryId] = useState<string>(
-    props.editData ? props.editData.libraryId.toString() : ''
+    props.editData ? props.editData.libraryId.toString() : '',
   )
   const [selectedType, setSelectedType] = useState<string>(
-    props.editData?.type ? props.editData.type.toString() : ''
+    props.editData?.type ? props.editData.type.toString() : '',
   )
   const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
   const [collection, setCollection] = useState<ICollection>()
@@ -93,7 +93,7 @@ const AddModal = (props: AddModal) => {
   const { addToast } = useToasts()
 
   const [useRules, setUseRules] = useState<boolean>(
-    props.editData ? props.editData.useRules : true
+    props.editData ? props.editData.useRules : true,
   )
   const [arrOption, setArrOption] = useState<number>()
   const [radarrSettingsId, setRadarrSettingsId] = useState<
@@ -103,12 +103,12 @@ const AddModal = (props: AddModal) => {
     number | null | undefined
   >(props.editData ? null : undefined)
   const [active, setActive] = useState<boolean>(
-    props.editData ? props.editData.isActive : true
+    props.editData ? props.editData.isActive : true,
   )
   const [rules, setRules] = useState<IRule[]>(
     props.editData
       ? props.editData.rules.map((r) => JSON.parse(r.ruleJson) as IRule)
-      : []
+      : [],
   )
   const [error, setError] = useState<boolean>(false)
   const [formIncomplete, setFormIncomplete] = useState<boolean>(false)
@@ -116,16 +116,16 @@ const AddModal = (props: AddModal) => {
   const LibrariesCtx = useContext(LibrariesContext)
   const tautulliEnabled =
     ConstantsCtx.constants.applications?.some(
-      (x) => x.id == Application.TAUTULLI
+      (x) => x.id == Application.TAUTULLI,
     ) ?? false
   const overseerrEnabled =
     ConstantsCtx.constants.applications?.some(
-      (x) => x.id == Application.OVERSEERR
+      (x) => x.id == Application.OVERSEERR,
     ) ?? false
 
   function updateLibraryId(value: string) {
     const lib = LibrariesCtx.libraries.find(
-      (el: ILibrary) => +el.key === +value
+      (el: ILibrary) => +el.key === +value,
     )
 
     if (lib) {
@@ -134,7 +134,7 @@ const AddModal = (props: AddModal) => {
       setSelectedType(
         lib.type === 'movie'
           ? EPlexDataType.MOVIES.toString()
-          : EPlexDataType.SHOWS.toString()
+          : EPlexDataType.SHOWS.toString(),
       )
     }
 
@@ -145,7 +145,7 @@ const AddModal = (props: AddModal) => {
 
   function setLibraryId(value: string) {
     const lib = LibrariesCtx.libraries.find(
-      (el: ILibrary) => +el.key === +value
+      (el: ILibrary) => +el.key === +value,
     )
 
     if (lib) {
@@ -162,7 +162,7 @@ const AddModal = (props: AddModal) => {
   const handleUpdateArrAction = (
     type: 'Radarr' | 'Sonarr',
     arrAction: number,
-    settingId?: number | null
+    settingId?: number | null,
   ) => {
     setArrOption(arrAction)
 
@@ -225,7 +225,7 @@ const AddModal = (props: AddModal) => {
 
     if (response && response.code === 1) {
       const result: { mediaType: string; rules: IRule[] } = JSON.parse(
-        response.result
+        response.result,
       )
       handleLoadRules(result.rules)
       addToast('Successfully imported rules from Yaml.', {
@@ -261,7 +261,7 @@ const AddModal = (props: AddModal) => {
           : Promise.resolve(null)
       const collectionPromise: Promise<ICollection | null> = props.editData
         ? GetApiHandler(
-            `/collections/collection/${props.editData.collectionId}`
+            `/collections/collection/${props.editData.collectionId}`,
           )
         : Promise.resolve(null)
 
@@ -586,31 +586,31 @@ const AddModal = (props: AddModal) => {
                           },
                         ]
                       : +selectedType === EPlexDataType.SEASONS
-                      ? [
-                          {
-                            id: 0,
-                            name: 'Unmonitor and delete season',
-                          },
-                          {
-                            id: 2,
-                            name: 'Unmonitor and delete existing episodes',
-                          },
-                          {
-                            id: 3,
-                            name: 'Unmonitor season and keep files',
-                          },
-                        ]
-                      : // episodes
-                        [
-                          {
-                            id: 0,
-                            name: 'Unmonitor and delete episode',
-                          },
-                          {
-                            id: 3,
-                            name: 'Unmonitor and keep file',
-                          },
-                        ]
+                        ? [
+                            {
+                              id: 0,
+                              name: 'Unmonitor and delete season',
+                            },
+                            {
+                              id: 2,
+                              name: 'Unmonitor and delete existing episodes',
+                            },
+                            {
+                              id: 3,
+                              name: 'Unmonitor season and keep files',
+                            },
+                          ]
+                        : // episodes
+                          [
+                            {
+                              id: 0,
+                              name: 'Unmonitor and delete episode',
+                            },
+                            {
+                              id: 3,
+                              name: 'Unmonitor and keep file',
+                            },
+                          ]
                   }
                 />
               </>
