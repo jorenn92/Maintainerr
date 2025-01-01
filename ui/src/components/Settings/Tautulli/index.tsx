@@ -47,8 +47,8 @@ const TautulliSettings = () => {
       const derivedPort = hostname.includes('http://')
         ? 80
         : hostname.includes('https://')
-          ? 443
-          : 80
+        ? 443
+        : 80
 
       if (derivedPort) {
         portToUse = derivedPort.toString()
@@ -60,10 +60,10 @@ const TautulliSettings = () => {
       const hostnameVal = hostname.includes('http://')
         ? hostname
         : hostname.includes('https://')
-          ? hostname
-          : portToUse == '443'
-            ? 'https://' + hostname
-            : 'http://' + hostname
+        ? hostname
+        : portToUse == '443'
+        ? 'https://' + hostname
+        : 'http://' + hostname
 
       let tautulli_url = `${addPortToUrl(hostnameVal, +portToUse)}`
       tautulli_url = tautulli_url.endsWith('/')
@@ -80,7 +80,7 @@ const TautulliSettings = () => {
         {
           ...settingsCtx.settings,
           ...payload,
-        },
+        }
       )
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
@@ -199,7 +199,7 @@ const TautulliSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
               <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
-                <DocsButton page="Configuration.html#tautulli" />
+                <DocsButton page="Configuration/#tautulli" />
               </span>
               <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
                 <TestButton

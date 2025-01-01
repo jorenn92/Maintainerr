@@ -55,13 +55,13 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
   }
 
   const initialHostname = props.settings?.url
-    ? (getHostname(props.settings.url) ?? '')
+    ? getHostname(props.settings.url) ?? ''
     : ''
   const initialBaseUrl = props.settings?.url
-    ? (getBaseUrl(props.settings.url) ?? '')
+    ? getBaseUrl(props.settings.url) ?? ''
     : ''
   const initialPort = props.settings?.url
-    ? (getPortFromUrl(props.settings.url) ?? '')
+    ? getPortFromUrl(props.settings.url) ?? ''
     : ''
   const initialApiKey = props.settings?.apiKey ?? ''
   const initialServerName = props.settings?.serverName ?? ''
@@ -81,7 +81,7 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
           port,
           apiKey,
         }
-      : undefined,
+      : undefined
   )
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<TestStatus>()
@@ -97,10 +97,10 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
     const hostnameVal = hostname.includes('http://')
       ? hostname
       : hostname.includes('https://')
-        ? hostname
-        : port == '443'
-          ? 'https://' + hostname
-          : 'http://' + hostname
+      ? hostname
+      : port == '443'
+      ? 'https://' + hostname
+      : 'http://' + hostname
 
     let radarrUrl = `${addPortToUrl(hostnameVal, +port)}`
     radarrUrl = radarrUrl.endsWith('/') ? radarrUrl.slice(0, -1) : radarrUrl
@@ -114,8 +114,8 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
       const derivedPort = hostname.includes('http://')
         ? '80'
         : hostname.includes('https://')
-          ? '443'
-          : '80'
+        ? '443'
+        : '80'
 
       if (derivedPort) {
         setPort(derivedPort.toString())
@@ -315,7 +315,7 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
       <div className="actions mt-5 w-full">
         <div className="flex w-full flex-wrap sm:flex-nowrap">
           <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
-            <DocsButton page="Configuration.html#radarr" />
+            <DocsButton page="Configuration/#radarr" />
           </span>
         </div>
       </div>

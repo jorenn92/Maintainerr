@@ -17,7 +17,7 @@ const nextConfig = {
     return [
       {
         source: '/docs',
-        destination: 'https://docs.maintainerr.info/Introduction.html',
+        destination: 'https://docs.maintainerr.info/Introduction',
         permanent: true,
       },
     ]

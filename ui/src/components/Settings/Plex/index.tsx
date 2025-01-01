@@ -90,7 +90,7 @@ const PlexSettings = () => {
 
   const submit = async (
     e: React.FormEvent<HTMLFormElement> | undefined,
-    plex_token?: { plex_auth_token: string } | undefined,
+    plex_token?: { plex_auth_token: string } | undefined
   ) => {
     e?.preventDefault()
     if (
@@ -130,7 +130,7 @@ const PlexSettings = () => {
         {
           ...settingsCtx.settings,
           ...payload,
-        },
+        }
       )
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
@@ -146,14 +146,14 @@ const PlexSettings = () => {
   }
 
   const submitPlexToken = async (
-    plex_token?: { plex_auth_token: string } | undefined,
+    plex_token?: { plex_auth_token: string } | undefined
   ) => {
     if (plex_token) {
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
         '/settings/plex/token',
         {
           plex_auth_token: plex_token.plex_auth_token,
-        },
+        }
       )
       if (resp.code === 1) {
         settingsCtx.settings.plex_auth_token = plex_token.plex_auth_token
@@ -174,7 +174,7 @@ const PlexSettings = () => {
           local: conn.local,
           status: conn.status === 200,
           message: conn.message,
-        }),
+        })
       )
     })
     return orderBy(finalPresets, ['status', 'ssl'], ['desc', 'desc'])
@@ -237,7 +237,7 @@ const PlexSettings = () => {
 
   function setFieldValue(
     ref: React.MutableRefObject<HTMLInputElement | null>,
-    value: string,
+    value: string
   ) {
     if (ref.current) {
       if (ref.current.type === 'checkbox') {
@@ -260,10 +260,10 @@ const PlexSettings = () => {
         },
         (id) => {
           toastId = id
-        },
+        }
       )
       const response: PlexDevice[] = await GetApiHandler(
-        '/settings/plex/devices/servers',
+        '/settings/plex/devices/servers'
       )
       if (response) {
         setAvailableServers(response)
@@ -358,16 +358,16 @@ const PlexSettings = () => {
                         ? 'Retrieving servers...'
                         : 'Manual configuration'
                       : tokenValid === true
-                        ? 'Press the button to load available servers'
-                        : 'Authenticate to load servers'}
+                      ? 'Press the button to load available servers'
+                      : 'Authenticate to load servers'}
                   </option>
                   {availablePresets.map((server, index) => (
                     <option key={`preset-server-${index}`} value={index}>
                       {`
                             ${server.name} (${server.address})
                             [${server.local ? 'local' : 'remote'}]${
-                              server.ssl ? ` [secure]` : ''
-                            }
+                        server.ssl ? ` [secure]` : ''
+                      }
                           `}
                     </option>
                   ))}
@@ -504,7 +504,7 @@ const PlexSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
               <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
-                <DocsButton page="Configuration.html#plex" />
+                <DocsButton page="Configuration/#plex" />
               </span>
               <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
                 <TestButton onClick={appTest} testUrl="/settings/test/plex" />

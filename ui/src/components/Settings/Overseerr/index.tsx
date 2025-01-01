@@ -55,8 +55,8 @@ const OverseerrSettings = () => {
       const derivedPort = hostnameRef.current.value.includes('http://')
         ? 80
         : hostnameRef.current.value.includes('https://')
-          ? 443
-          : 80
+        ? 443
+        : 80
 
       if (derivedPort) {
         setPort(derivedPort.toString())
@@ -73,10 +73,10 @@ const OverseerrSettings = () => {
       const hostnameVal = hostnameRef.current.value.includes('http://')
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https://')
-          ? hostnameRef.current.value
-          : portRef.current.value == '443'
-            ? 'https://' + hostnameRef.current.value
-            : 'http://' + hostnameRef.current.value
+        ? hostnameRef.current.value
+        : portRef.current.value == '443'
+        ? 'https://' + hostnameRef.current.value
+        : 'http://' + hostnameRef.current.value
 
       const payload = {
         overseerr_url: addPortToUrl(hostnameVal, +portRef.current.value),
@@ -87,7 +87,7 @@ const OverseerrSettings = () => {
         {
           ...settingsCtx.settings,
           ...payload,
-        },
+        }
       )
       if (Boolean(resp.code)) {
         settingsCtx.addSettings({
@@ -196,7 +196,7 @@ const OverseerrSettings = () => {
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
               <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
-                <DocsButton page="Configuration.html#overseerr" />
+                <DocsButton page="Configuration/#overseerr" />
               </span>
               <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
                 <TestButton
