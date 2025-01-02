@@ -300,6 +300,9 @@ export class SonarrGetterService {
             case 'rating': {
               return showResponse.ratings?.value ?? null;
             }
+            case 'ratingVotes': {
+              return showResponse.ratings?.votes ?? null;
+            }
           }
         } else return null;
       } else {

@@ -135,11 +135,20 @@ export class RadarrGetterService {
           case 'rottenTomatoesRating': {
             return movieResponse.ratings.rottenTomatoes?.value ?? null;
           }
+          case 'rottenTomatoesRatingVotes': {
+            return movieResponse.ratings.rottenTomatoes?.votes ?? null;
+          }
           case 'traktRating': {
             return movieResponse.ratings.trakt?.value ?? null;
           }
+          case 'traktRatingVotes': {
+            return movieResponse.ratings.trakt?.votes ?? null;
+          }
           case 'imdbRating': {
             return movieResponse.ratings.imdb?.value ?? null;
+          }
+          case 'imdbRatingVotes': {
+            return movieResponse.ratings.imdb?.votes ?? null;
           }
         }
       } else {
