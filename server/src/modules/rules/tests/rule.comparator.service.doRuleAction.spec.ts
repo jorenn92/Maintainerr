@@ -17,413 +17,130 @@ describe('RuleComparatorService', () => {
   });
 
   describe('doRuleAction', () => {
-    it('should return true when comparing two strings with action EQUALS', () => {
-      const val1 = 'abc';
-      const val2 = 'abc';
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
+    const equalsData = [
+      [true, 'abc', 'abc'],
+      [true, 'abc', 'ABC'],
+      [true, ['abc', 'def'], ['abc', 'def']],
+      [true, ['abc', 'def'], ['ABC', 'DEF']],
+      [true, ['abc'], 'abc'],
+      [true, ['abc'], 'ABC'],
+      [true, new Date('2022-01-01'), new Date('2022-01-01')],
+      [true, 5, 5],
+      [false, 'abc', ''],
+      [false, 'abc', undefined],
+      [false, 'abc', 'abd'],
+      [false, ['abc'], ['abc', 'def']],
+      [false, ['abc', 'def'], ['abc']],
+      [false, ['abc', 'def'], ['abc', 'cde']],
+      [false, new Date('2022-01-01'), new Date('2022-01-02')],
+      [false, 5, 4],
+    ] as [boolean, any, any][];
 
-    it('should return false when comparing strings with action EQUALS and value is an empty string', () => {
-      const val1 = 'abc';
-      const val2 = '';
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
+    it.each(equalsData)(
+      'should return %s when val1 is %o and val2 is %o with action EQUALS',
+      (expected, val1, val2) => {
+        const action = RulePossibility.EQUALS;
+        const result = ruleComparatorService['doRuleAction'](
+          val1,
+          val2,
+          action,
+        );
+        expect(result).toBe(expected);
+      },
+    );
 
-    it('should return false when comparing two strings with action EQUALS and value is undefined', () => {
-      const val1 = 'abc';
-      const val2 = undefined;
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
+    it.each(equalsData)(
+      'should return %s when val1 is %o and val2 is %o with action NOT_EQUALS',
+      (expected, val1, val2) => {
+        const action = RulePossibility.NOT_EQUALS;
+        const result = ruleComparatorService['doRuleAction'](
+          val1,
+          val2,
+          action,
+        );
+        expect(result).toBe(!expected);
+      },
+    );
 
-    it('should return false when comparing two strings with action EQUALS', () => {
-      const val1 = 'abc';
-      const val2 = 'abd';
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
+    const containsData = [
+      [true, 'abc', 'ab'],
+      [true, ['abc', 'def'], ['ral', undefined, 'abc']],
+      [true, [1, 2, 3, 4], [3]],
+      [true, [1, 2, 3, 4], [3, 1]],
+      [true, ['abc', 'def'], ['abc']],
+      [false, 'abc', 'de'],
+      [false, ['abc', 'def'], ['ral', undefined, 'rel']],
+      [false, ['abc', 'def'], ['ghi']],
+      [false, [1, 2, 3, 4], [6]],
+      [false, [1, 2, 3, 4], [6, 5]],
+      [false, ['ImDb top 250', 'My birthday', 'jef'], ['imdb']],
+      [false, ['abc', 'def'], ['']],
+    ] as [boolean, any, any][];
 
-    it('should return false when comparing two strings with action NOT_EQUALS', () => {
-      const val1 = 'abc';
-      const val2 = 'abc';
-      const action = RulePossibility.NOT_EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
+    it.each(containsData)(
+      'should return %s when val1 is %o and val2 is %o with action CONTAINS',
+      (expected, val1, val2) => {
+        const action = RulePossibility.CONTAINS;
+        const result = ruleComparatorService['doRuleAction'](
+          val1,
+          val2,
+          action,
+        );
+        expect(result).toBe(expected);
+      },
+    );
 
-    it('should return true when comparing two strings with action NOT_EQUALS', () => {
-      const val1 = 'abc';
-      const val2 = 'abd';
-      const action = RulePossibility.NOT_EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
+    it.each(containsData)(
+      'should return %s when val1 is %o and val2 is %o with action NOT_CONTAINS',
+      (expected, val1, val2) => {
+        const action = RulePossibility.NOT_CONTAINS;
+        const result = ruleComparatorService['doRuleAction'](
+          val1,
+          val2,
+          action,
+        );
+        expect(result).toBe(!expected);
+      },
+    );
 
-    it('should return true when comparing an array of strings with action EQUALS', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['abc', 'def'];
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
+    const containsPartialData = [
+      [true, 'abc', 'ab'],
+      [true, ['abc', 'def'], ['abc']],
+      [true, ['ImDb top 250', 'My birthday', 'jef'], ['imdb']],
+      [true, ['abc', 'def'], ['ral', undefined, 'abc']],
+      [true, ['abc', 'def'], ['ral', undefined, 'ab']],
+      [false, 'abc', 'de'],
+      [false, ['ImDb top 250', 'My birthday', 'jef'], ['jos']],
+      [false, ['abc', 'def'], ['']],
+      [false, ['abc', 'def'], ['ral', undefined, 'rel']],
+      [false, [1, 2, 3, 4], [6]],
+    ] as [boolean, any, any][];
 
-    it('should return false when comparing a faulty array of strings with action EQUALS', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['abc', 'cde'];
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
+    it.each(containsPartialData)(
+      'should return %s when val1 is %o and val2 is %o with action CONTAINS_PARTIAL',
+      (expected, val1, val2) => {
+        const action = RulePossibility.CONTAINS_PARTIAL;
+        const result = ruleComparatorService['doRuleAction'](
+          val1,
+          val2,
+          action,
+        );
+        expect(result).toBe(expected);
+      },
+    );
 
-    it('should return false when comparing an array of strings with action NOT_EQUALS', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['abc', 'def'];
-      const action = RulePossibility.NOT_EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing a faulty array of strings with action NOT_EQUALS', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['abc', 'cde'];
-      const action = RulePossibility.NOT_EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing two dates with action EQUALS', () => {
-      const val1 = new Date('2022-01-01');
-      const val2 = new Date('2022-01-01');
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing two dates with action EQUALS', () => {
-      const val1 = new Date('2022-01-01');
-      const val2 = new Date('2022-01-02');
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing two dates with action NOT_EQUALS', () => {
-      const val1 = new Date('2022-01-01');
-      const val2 = new Date('2022-01-01');
-      const action = RulePossibility.NOT_EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing two dates with action NOT_EQUALS', () => {
-      const val1 = new Date('2022-01-01');
-      const val2 = new Date('2022-01-02');
-      const action = RulePossibility.NOT_EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing two numbers with action EQUALS', () => {
-      const val1 = 5;
-      const val2 = 5;
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing two numbers with action EQUALS', () => {
-      const val1 = 5;
-      const val2 = 4;
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing two numbers with action NOT_EQUALS', () => {
-      const val1 = 5;
-      const val2 = 5;
-      const action = RulePossibility.NOT_EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing two numbers with action NOT_EQUALS', () => {
-      const val1 = 5;
-      const val2 = 4;
-      const action = RulePossibility.NOT_EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing a string with action CONTAINS', () => {
-      const val1 = 'abc';
-      const val2 = 'ab';
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing a string with action CONTAINS', () => {
-      const val1 = 'abc';
-      const val2 = 'de';
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing a string with action CONTAINS_PARTIAL', () => {
-      const val1 = 'abc';
-      const val2 = 'de';
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing a string with action CONTAINS_PARTIAL', () => {
-      const val1 = 'abc';
-      const val2 = 'ab';
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing an array of strings with an exact match with action CONTAINS', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['abc'];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing an array of strings with an exact match with action CONTAINS_PARTIAL', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['abc'];
-      const action = RulePossibility.CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing an array of multiple word strings with action CONTAINS_PARTIAL', () => {
-      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
-      const val2 = ['imdb'];
-      const action = RulePossibility.CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing an array of multiple word strings with action CONTAINS', () => {
-      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
-      const val2 = ['imdb'];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing an array of multiple word strings with action CONTAINS_PARTIAL', () => {
-      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
-      const val2 = ['jos'];
-      const action = RulePossibility.CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing an array of strings with action CONTAINS and value is an empty string', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = [''];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing an array of strings with action CONTAINS_PARTIAL and value is an empty string', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = [''];
-      const action = RulePossibility.CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing an array of strings with action CONTAINS and value contains undefined', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['ral', undefined, 'rel'];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing an array of strings with action CONTAINS_PARTIAL and value contains undefined', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['ral', undefined, 'rel'];
-      const action = RulePossibility.CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing an array of strings with action CONTAINS and value contains undefined', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['ral', undefined, 'abc'];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing an array of strings with action CONTAINS_PARTIAL and value contains undefined and an exact match', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['ral', undefined, 'abc'];
-      const action = RulePossibility.CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing an array of strings with action CONTAINS_PARTIAL and value contains undefined and a partial match', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['ral', undefined, 'ab'];
-      const action = RulePossibility.CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing an array of strings with action CONTAINS', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['ghi'];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing an array of strings with action NOT_CONTAINS', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['ghi'];
-      const action = RulePossibility.NOT_CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing an array of multiple word strings with action NOT_CONTAINS', () => {
-      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
-      const val2 = ['ImDb'];
-      const action = RulePossibility.NOT_CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing an array of multiple word strings with action NOT_CONTAINS_PARTIAL', () => {
-      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
-      const val2 = ['ImDb'];
-      const action = RulePossibility.NOT_CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing an array of multiple word strings with action NOT_CONTAINS', () => {
-      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
-      const val2 = ['Jos'];
-      const action = RulePossibility.NOT_CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing an array of multiple word strings with action NOT_CONTAINS_PARTIAL', () => {
-      const val1 = ['ImDb top 250', 'My birthday', 'jef'];
-      const val2 = ['Jos'];
-      const action = RulePossibility.NOT_CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing an array of strings with action NOT_CONTAINS', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['abc'];
-      const action = RulePossibility.NOT_CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing an array of strings with action NOT_CONTAINS_PARTIAL', () => {
-      const val1 = ['abc', 'def'];
-      const val2 = ['abc'];
-      const action = RulePossibility.NOT_CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing an array of numbers against 1 value with action CONTAINS', () => {
-      const val1 = [1, 2, 3, 4];
-      const val2 = [6];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing an array of numbers against 1 value with action CONTAINS_PARTIAL', () => {
-      const val1 = [1, 2, 3, 4];
-      const val2 = [6];
-      const action = RulePossibility.CONTAINS_PARTIAL;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing an array of numbers against 1 value with action NOT_CONTAINS', () => {
-      const val1 = [1, 2, 3, 4];
-      const val2 = [6];
-      const action = RulePossibility.NOT_CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing an array of numbers against 1 value with action NOT_CONTAINS and value contains undefined', () => {
-      const val1 = [1, 2, 3, 4];
-      const val2 = [5, undefined, 6];
-      const action = RulePossibility.NOT_CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return true when comparing an array of numbers against 1 value with action CONTAINS', () => {
-      const val1 = [1, 2, 3, 4];
-      const val2 = [3];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing an array of numbers against 1 value with action NOT_CONTAINS', () => {
-      const val1 = [1, 2, 3, 4];
-      const val2 = [3];
-      const action = RulePossibility.NOT_CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when comparing 2 arrays of multiple numbers with action CONTAINS', () => {
-      const val1 = [1, 2, 3, 4];
-      const val2 = [6, 5];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing an array of multiple numbers with action CONTAINS', () => {
-      const val1 = [1, 2, 3, 4];
-      const val2 = [3, 1];
-      const action = RulePossibility.CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing an array of multiple numbers with action NOT_CONTAINS', () => {
-      const val1 = [1, 2, 3, 4];
-      const val2 = [3, 5];
-      const action = RulePossibility.NOT_CONTAINS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
+    it.each(containsPartialData)(
+      'should return %s when val1 is %o and val2 is %o with action NOT_CONTAINS_PARTIAL',
+      (expected, val1, val2) => {
+        const action = RulePossibility.NOT_CONTAINS_PARTIAL;
+        const result = ruleComparatorService['doRuleAction'](
+          val1,
+          val2,
+          action,
+        );
+        expect(result).toBe(!expected);
+      },
+    );
 
     it('should return true when comparing two numbers with action BIGGER', () => {
       const val1 = 5;
@@ -445,22 +162,6 @@ describe('RuleComparatorService', () => {
       const val1 = 5;
       const val2 = undefined;
       const action = RulePossibility.SMALLER;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(false);
-    });
-
-    it('should return true when comparing two numbers with action EQUALS', () => {
-      const val1 = 5;
-      const val2 = 5;
-      const action = RulePossibility.EQUALS;
-      const result = ruleComparatorService['doRuleAction'](val1, val2, action);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when comparing two numbers with action NOT_EQUALS', () => {
-      const val1 = 5;
-      const val2 = 5;
-      const action = RulePossibility.NOT_EQUALS;
       const result = ruleComparatorService['doRuleAction'](val1, val2, action);
       expect(result).toBe(false);
     });

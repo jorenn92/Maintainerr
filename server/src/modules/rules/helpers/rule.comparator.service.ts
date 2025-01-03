@@ -374,68 +374,72 @@ export class RuleComparatorService {
   }
 
   private doRuleAction<T>(val1: T, val2: T, action: RulePossibility): boolean {
-    if (
-      typeof val1 === 'string' ||
-      (Array.isArray(val1) ? typeof val1[0] === 'string' : false)
-    ) {
-      val1 = Array.isArray(val1)
-        ? (val1.map((el) => el?.toLowerCase()) as unknown as T)
-        : ((val1 as string)?.toLowerCase() as unknown as T);
+    if (typeof val1 === 'string') {
+      val1 = val1.toLowerCase() as T;
     }
-    if (
-      typeof val2 === 'string' ||
-      (Array.isArray(val2) ? typeof val2[0] === 'string' : false)
-    ) {
-      val2 = Array.isArray(val2)
-        ? (val2.map((el) => el?.toLowerCase()) as unknown as T)
-        : ((val2 as string)?.toLowerCase() as unknown as T);
+
+    if (typeof val2 === 'string') {
+      val2 = val2.toLowerCase() as T;
     }
+
+    if (Array.isArray(val1)) {
+      val1 = val1.map((el) =>
+        typeof el == 'string' ? el.toLowerCase() : el,
+      ) as T;
+    }
+
+    if (Array.isArray(val2)) {
+      val2 = val2.map((el) =>
+        typeof el == 'string' ? el.toLowerCase() : el,
+      ) as T;
+    }
+
     if (action === RulePossibility.BIGGER) {
       return val1 > val2;
     }
+
     if (action === RulePossibility.SMALLER) {
       return val1 < val2;
     }
+
     if (action === RulePossibility.EQUALS) {
       if (!Array.isArray(val1)) {
         if (val1 instanceof Date && val2 instanceof Date) {
           return (
-            new Date(val1?.toDateString()).valueOf() ===
-            new Date(val2?.toDateString()).valueOf()
+            new Date(val1.toDateString()).valueOf() ===
+            new Date(val2.toDateString()).valueOf()
           );
         }
+
         if (typeof val1 === 'boolean') {
           return val1 == val2;
         }
+
         return val1 === val2;
       } else {
-        if (val1.length > 0) {
-          return val1?.every((e) => {
-            e =
-              typeof e === 'string'
-                ? (e as unknown as string)?.toLowerCase()
-                : e;
-            if (Array.isArray(val2)) {
-              return (val2 as unknown as T[])?.includes(e);
-            } else {
-              return e === val2;
-            }
-          });
+        const val2Array = Array.isArray(val2) ? val2 : [val2];
+
+        if (val1.length === val2Array.length) {
+          const set1 = new Set(val1);
+          const set2 = new Set(val2Array);
+          return [...set1].every((value) => set2.has(value));
         } else {
           return false;
         }
       }
     }
+
     if (action === RulePossibility.NOT_EQUALS) {
       return !this.doRuleAction(val1, val2, RulePossibility.EQUALS);
     }
+
     if (action === RulePossibility.CONTAINS) {
       try {
         if (!Array.isArray(val2)) {
           return (val1 as unknown as T[])?.includes(val2);
         } else {
           if (val2.length > 0) {
-            return val2?.some((el) => {
+            return val2.some((el) => {
               return (val1 as unknown as T[])?.includes(el);
             });
           } else {
@@ -446,12 +450,12 @@ export class RuleComparatorService {
         return null;
       }
     }
+
     if (action === RulePossibility.CONTAINS_PARTIAL) {
       try {
         if (!Array.isArray(val2)) {
-          // return (val1 as unknown as T[])?.includes(val2);
           return (
-            (Array.isArray(val1) ? (val1 as unknown as T[]) : [val1])?.some(
+            (Array.isArray(val1) ? (val1 as unknown as T[]) : [val1]).some(
               (line) => {
                 return typeof line === 'string' &&
                   val2 != undefined &&
@@ -465,10 +469,9 @@ export class RuleComparatorService {
           );
         } else {
           if (val2.length > 0) {
-            return val2?.some((el) => {
-              // return (val1 as unknown as T[])?.includes(el);
+            return val2.some((el) => {
               return (
-                (val1 as unknown as T[])?.some((line) => {
+                (val1 as unknown as T[]).some((line) => {
                   return typeof line === 'string' &&
                     el != undefined &&
                     el.length > 0
@@ -487,24 +490,30 @@ export class RuleComparatorService {
         return null;
       }
     }
+
     if (action === RulePossibility.NOT_CONTAINS) {
       return !this.doRuleAction(val1, val2, RulePossibility.CONTAINS);
     }
+
     if (action === RulePossibility.NOT_CONTAINS_PARTIAL) {
       return !this.doRuleAction(val1, val2, RulePossibility.CONTAINS_PARTIAL);
     }
+
     if (action === RulePossibility.BEFORE) {
       return val1 && val2 ? val1 <= val2 : false;
     }
+
     if (action === RulePossibility.AFTER) {
       return val1 && val2 ? val1 >= val2 : false;
     }
+
     if (action === RulePossibility.IN_LAST) {
       return (
         val1 >= val2 && // time in s
         (val1 as unknown as Date) <= new Date()
       );
     }
+
     if (action === RulePossibility.IN_NEXT) {
       return (
         val1 <= val2 && //  time in s
