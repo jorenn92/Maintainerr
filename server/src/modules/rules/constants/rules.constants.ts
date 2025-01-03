@@ -337,6 +337,14 @@ export class RuleConstants {
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
         },
+        {
+          id: 29,
+          name: 'sw_seasonLastEpisodeAiredAt',
+          humanName: 'Last episode aired at (season)',
+          mediaType: MediaType.SHOW,
+          type: RuleType.DATE,
+          showType: [EPlexDataType.EPISODES],
+        },
       ],
     },
     {

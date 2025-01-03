@@ -1047,7 +1047,7 @@ export class CollectionsService {
     try {
       const result = await this.plexApi.getCollection(id);
 
-      if (result.smart) {
+      if (result?.smart) {
         this.logger.warn(
           `Plex collection ${id} is a smart collection which is not supported.`,
         );
