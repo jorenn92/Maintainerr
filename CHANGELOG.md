@@ -1,3 +1,15 @@
+# [2.7.0](https://github.com/jorenn92/Maintainerr/compare/v2.6.0...v2.7.0) (2025-01-05)
+
+
+### Bug Fixes
+
+* Equals with lists now only returns true if they are identical ([e900dac](https://github.com/jorenn92/Maintainerr/commit/e900dac47a26cd2f8422584d3eaa9c0a94f7073a))
+
+
+### Features
+
+* Add rating vote count filters ([05617e1](https://github.com/jorenn92/Maintainerr/commit/05617e12f6f9d8e8a95c39a86f87a02aca8d26ec))
+
 # [2.6.0](https://github.com/jorenn92/Maintainerr/compare/v2.5.0...v2.6.0) (2025-01-01)
 
 
