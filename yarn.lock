@@ -1514,7 +1514,7 @@ __metadata:
     winston: "npm:^3.17.0"
     winston-daily-rotate-file: "npm:^5.0.0"
     xml2js: "npm:^0.6.2"
-    yaml: "npm:^2.6.1"
+    yaml: "npm:^2.7.0"
   languageName: unknown
   linkType: soft
 
@@ -1558,7 +1558,7 @@ __metadata:
     react-transition-group: "npm:^4.4.5"
     tailwindcss: "npm:^3.4.17"
     typescript: "npm:^5.7.2"
-    yaml: "npm:^2.6.1"
+    yaml: "npm:^2.7.0"
   languageName: unknown
   linkType: soft
 
@@ -16076,12 +16076,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:^2.6.1":
-  version: 2.6.1
-  resolution: "yaml@npm:2.6.1"
+"yaml@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "yaml@npm:2.7.0"
   bin:
     yaml: bin.mjs
-  checksum: 10c0/aebf07f61c72b38c74d2b60c3a3ccf89ee4da45bcd94b2bfb7899ba07a5257625a7c9f717c65a6fc511563d48001e01deb1d9e55f0133f3e2edf86039c8c1be7
+  checksum: 10c0/886a7d2abbd70704b79f1d2d05fe9fb0aa63aefb86e1cb9991837dced65193d300f5554747a872b4b10ae9a12bc5d5327e4d04205f70336e863e35e89d8f4ea9
   languageName: node
   linkType: hard
 
