@@ -28,7 +28,7 @@
     "react-select": "^5.9.0",
     "react-toast-notifications": "^2.5.1",
     "react-transition-group": "^4.4.5",
-    "yaml": "^2.6.1"
+    "yaml": "^2.7.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
