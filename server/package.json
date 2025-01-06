@@ -58,7 +58,7 @@
     "@nestjs/schematics": "^10.2.3",
     "@nestjs/testing": "^10.4.15",
     "@types/jest": "^29.5.14",
-    "@types/lodash": "^4.17.13",
+    "@types/lodash": "^4.17.14",
     "@types/node": "^22",
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^8.19.0",
