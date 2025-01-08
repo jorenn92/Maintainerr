@@ -121,12 +121,15 @@ const Rules: React.FC = () => {
           {'Rules Listing'}
         </h1>
         <ul className="max-w-8xl grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-          <li className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-gray-400 bg-zinc-800 p-4 text-zinc-400">
-            <AddButton
-              onClick={showAddModal}
-              text="New Rule"
-              key="add-button"
-            />
+          <li className="xl:border-1 relative flex items-center justify-center rounded-xl border-2 border-dashed border-gray-400 p-4 text-zinc-400 xl:border-solid xl:border-zinc-700">
+            <div className="xl:bg-rule absolute inset-0 rounded-xl bg-zinc-800 xl:bg-center xl:bg-no-repeat xl:blur-lg"></div>
+            <div className="relative">
+              <AddButton
+                onClick={showAddModal}
+                text="New Rule"
+                key="add-button"
+              />
+            </div>
           </li>
           {(data as IRuleGroup[]).map((el) => (
             <li
