@@ -106,11 +106,8 @@ const Rules: React.FC = () => {
       <div className="w-full">
         <LibrarySwitcher onSwitch={onSwitchLibrary} />
 
-        <div className="m-auto mb-5 flex">
-          <div className="ml-auto sm:ml-0">
-            <AddButton onClick={showAddModal} text="New Rule" />
-          </div>
-          <div className="ml-2 mr-auto sm:mr-0">
+        <div className="m-auto mb-3 flex">
+          <div className="mr-auto sm:mr-0">
             <ExecuteButton
               onClick={debounce(sync, 5000, {
                 leading: true,
@@ -120,17 +117,30 @@ const Rules: React.FC = () => {
             />
           </div>
         </div>
-
-        <div>
-          {(data as IRuleGroup[]).map((el) => (
-            <RuleGroup
-              onDelete={refreshData}
-              onEdit={editHandler}
-              key={el.id}
-              group={el as IRuleGroup}
+        <h1 className="mb-4 text-lg font-bold text-zinc-200">
+          {'Rules Listing'}
+        </h1>
+        <ul className="max-w-8xl grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+          <li className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-gray-400 bg-zinc-800 p-4 text-zinc-400">
+            <AddButton
+              onClick={showAddModal}
+              text="New Rule"
+              key="add-button"
             />
+          </li>
+          {(data as IRuleGroup[]).map((el) => (
+            <li
+              key={el.id}
+              className="flex h-full rounded-xl bg-zinc-800 p-4 text-zinc-400 shadow ring-1 ring-zinc-700"
+            >
+              <RuleGroup
+                onDelete={refreshData}
+                onEdit={editHandler}
+                group={el as IRuleGroup}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </>
   )

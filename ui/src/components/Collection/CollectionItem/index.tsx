@@ -14,7 +14,7 @@ const CollectionItem = (props: ICollectionItem) => {
   return (
     <>
       <a
-        className="hover:none hover:cursor-pointer"
+        className="hover:cursor-pointer"
         {...(props.onClick
           ? { onClick: () => props.onClick!(props.collection) }
           : {})}
@@ -40,16 +40,11 @@ const CollectionItem = (props: ICollectionItem) => {
         ) : undefined}
         <div className="inset-0 z-0 h-fit p-3">
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-base font-bold text-white sm:text-lg">
-            <a
-              className="hover:cursor-pointer hover:underline"
-              {...(props.onClick
-                ? { onClick: () => props.onClick!(props.collection) }
-                : {})}
-            >
+            <div>
               {props.collection.manualCollection
                 ? `${props.collection.manualCollectionName} (manual)`
                 : props.collection.title}
-            </a>
+            </div>
           </div>
           <div className="h-12 max-h-12 overflow-y-hidden whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll">
             {props.collection.manualCollection
@@ -62,7 +57,7 @@ const CollectionItem = (props: ICollectionItem) => {
           <div className="mr-5 flex flex-row sm:mr-0 sm:mt-auto sm:flex-col">
             <div className="mb-5 mr-5 sm:mr-0">
               <p className="font-bold">Library</p>
-              <p>
+              <p className="text-amber-500">
                 {LibrariesCtx.libraries.find(
                   (el) => +el.key === +props.collection.libraryId,
                 )?.title ?? <>&nbsp;</>}
@@ -71,7 +66,7 @@ const CollectionItem = (props: ICollectionItem) => {
 
             <div className="mr-5 sm:mr-0">
               <p className="font-bold">Items</p>
-              <p>
+              <p className="text-amber-500">
                 {' '}
                 {`${
                   props.collection.media ? props.collection.media.length : 0
@@ -85,16 +80,16 @@ const CollectionItem = (props: ICollectionItem) => {
               <p className="font-bold">Status</p>
               <p>
                 {props.collection.isActive ? (
-                  <span className="text-green-900">Active</span>
+                  <span className="text-green-500">Active</span>
                 ) : (
-                  <span className="text-red-700">Inactive</span>
+                  <span className="text-red-500">Inactive</span>
                 )}
               </p>
             </div>
 
             <div className="mr-0 sm:mr-0">
               <p className="font-bold">Delete</p>
-              <p>{` After ${props.collection.deleteAfterDays} days`}</p>
+              <p className="text-amber-500">{` After ${props.collection.deleteAfterDays} days`}</p>
             </div>
           </div>
         </div>
