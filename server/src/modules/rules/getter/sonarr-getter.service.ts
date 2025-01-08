@@ -280,7 +280,9 @@ export class SonarrGetterService {
                 return null;
               }
 
-              return episodes.some((el) => el.finaleType === 'season');
+              return episodes.some(
+                (el) => el.finaleType === 'season' && el.hasFile,
+              );
             }
             case 'seriesFinale': {
               const episodes = await sonarrApiClient.getEpisodes(
@@ -292,7 +294,9 @@ export class SonarrGetterService {
                 return null;
               }
 
-              return episodes.some((el) => el.finaleType === 'series');
+              return episodes.some(
+                (el) => el.finaleType === 'series' && el.hasFile,
+              );
             }
             case 'seasonNumber': {
               return season.seasonNumber;
