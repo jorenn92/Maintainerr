@@ -16,6 +16,9 @@ module.exports = {
       screens: {
         xs: '440px',
       },
+      backgroundImage: {
+        rule: "url('/rule-bg.png')",
+      },
       typography: (theme) => ({
         DEFAULT: {
           css: {
@@ -65,5 +68,6 @@ module.exports = {
     require('@tailwindcss/forms'),
     require('@tailwindcss/typography'),
     require('@tailwindcss/aspect-ratio'),
+    require('tailwind-filter-utilities'),
   ],
 }
