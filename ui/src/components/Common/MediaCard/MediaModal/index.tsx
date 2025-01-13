@@ -133,18 +133,20 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
               )}
             </div>
             <div className="absolute right-4 top-4 z-10 flex-col">
-              <div className="">
-                <a
-                  href={`https://themoviedb.org/${mediaTypeOf}/${tmdbid}`}
-                  target="_blank"
-                >
-                  <img
-                    src={`/icons_logos/tmdb_logo.svg`}
-                    alt="TMDB Logo"
-                    className="h-8 w-32 rounded-lg bg-black bg-opacity-70 p-2 shadow-lg"
-                  />
-                </a>
-              </div>
+              {tmdbid && (
+                <div>
+                  <a
+                    href={`https://themoviedb.org/${mediaTypeOf}/${tmdbid}`}
+                    target="_blank"
+                  >
+                    <img
+                      src={`/icons_logos/tmdb_logo.svg`}
+                      alt="TMDB Logo"
+                      className="h-8 w-32 rounded-lg bg-black bg-opacity-70 p-2 shadow-lg"
+                    />
+                  </a>
+                </div>
+              )}
               <div>
                 <a
                   href={`https://app.plex.tv/desktop#!/server/${machineId}/details?key=%2Flibrary%2Fmetadata%2F${id}`}
