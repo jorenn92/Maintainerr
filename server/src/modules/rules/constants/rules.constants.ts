@@ -338,6 +338,13 @@ export class RuleConstants {
           type: RuleType.TEXT,
         },
         {
+          id: 30,
+          name: 'watchlist_isWatchlisted',
+          humanName: 'Is Watchlisted',
+          mediaType: MediaType.BOTH,
+          type: RuleType.BOOL,
+        },
+        {
           id: 29,
           name: 'sw_seasonLastEpisodeAiredAt',
           humanName: 'Last episode aired at (season)',
