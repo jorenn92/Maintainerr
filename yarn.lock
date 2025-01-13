@@ -1542,7 +1542,7 @@ __metadata:
     bowser: "npm:^2.11.0"
     cron-validator: "npm:^1.3.1"
     eslint: "npm:^9.17.0"
-    eslint-config-next: "npm:15.1.3"
+    eslint-config-next: "npm:15.1.4"
     eslint-config-prettier: "npm:^10.0.1"
     lodash: "npm:^4.17.21"
     monaco-editor: "npm:0.52.2"
@@ -1757,12 +1757,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/eslint-plugin-next@npm:15.1.3":
-  version: 15.1.3
-  resolution: "@next/eslint-plugin-next@npm:15.1.3"
+"@next/eslint-plugin-next@npm:15.1.4":
+  version: 15.1.4
+  resolution: "@next/eslint-plugin-next@npm:15.1.4"
   dependencies:
     fast-glob: "npm:3.3.1"
-  checksum: 10c0/60e85ad10d0d3afafe6d6e02a70636681b78aacff8bcef2bbe18d77b3192f91ea999bc471d19d22b37abaa3fee72d35299c040b9cce0bc6fd7848d031590abde
+  checksum: 10c0/6b5356275027e7b597914aa410805dab6b988c81c7ec0855e829e967d0064b9512828efc5d3b8826b798b30f1494618c82c5067c36d6d7837071ed670d690eab
   languageName: node
   linkType: hard
 
@@ -6246,11 +6246,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-next@npm:15.1.3":
-  version: 15.1.3
-  resolution: "eslint-config-next@npm:15.1.3"
+"eslint-config-next@npm:15.1.4":
+  version: 15.1.4
+  resolution: "eslint-config-next@npm:15.1.4"
   dependencies:
-    "@next/eslint-plugin-next": "npm:15.1.3"
+    "@next/eslint-plugin-next": "npm:15.1.4"
     "@rushstack/eslint-patch": "npm:^1.10.3"
     "@typescript-eslint/eslint-plugin": "npm:^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0"
     "@typescript-eslint/parser": "npm:^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0"
@@ -6266,7 +6266,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/e9e27f7b4426f57d55ceb107505354ef639afae8b8ec78ead62c7400ef51fe8e572619a61d3da38f0019c5387f7cc184a0ffc7a4c7c499f8020d198403153fa9
+  checksum: 10c0/9c52e8e2c6f71e94eec0a2d2a2ee0a32d6ac3cb6b354e8364ddb8b9942b2b1ea2207c3be1532dfb296a697df27f89f6f3eb86190ecf9ffaf5528d7a3749fb012
   languageName: node
   linkType: hard
 
