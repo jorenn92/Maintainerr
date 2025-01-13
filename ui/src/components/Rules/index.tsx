@@ -106,7 +106,7 @@ const Rules: React.FC = () => {
       <div className="w-full">
         <LibrarySwitcher onSwitch={onSwitchLibrary} />
 
-        <div className="m-auto mb-5 flex">
+        <div className="m-auto mb-3 flex">
           <div className="ml-auto sm:ml-0">
             <AddButton onClick={showAddModal} text="New Rule" />
           </div>
@@ -120,14 +120,14 @@ const Rules: React.FC = () => {
             />
           </div>
         </div>
-        <h1 className="mb-4 text-lg font-bold text-zinc-200">
+        <h1 className="mb-3 text-lg font-bold text-zinc-200">
           {'Rules Listing'}
         </h1>
-        <ul className="max-w-8xl grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+        <ul className="xs:collection-cards-vertical">
           {(data as IRuleGroup[]).map((el) => (
             <li
               key={el.id}
-              className="flex h-full rounded-xl bg-zinc-800 p-4 text-zinc-400 shadow ring-1 ring-zinc-700"
+              className="collection relative mb-5 flex h-fit transform-gpu flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 xs:w-full sm:mb-0 sm:mr-5"
             >
               <RuleGroup
                 onDelete={refreshData}

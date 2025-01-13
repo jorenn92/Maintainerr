@@ -46,15 +46,16 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
   }) => {
     useEffect(() => {
       if (show) {
-        // Disable background scroll while modal is open
-        document.body.classList.add('overflow-hidden')
+        // Prevent background scrolling when modal is open
+        document.body.classList.add('fixed', 'overflow-hidden', 'w-full')
       } else {
-        document.body.classList.remove('overflow-hidden')
+        document.body.classList.remove('fixed', 'overflow-hidden', 'w-full')
       }
       return () => {
-        document.body.classList.remove('overflow-hidden')
+        document.body.classList.remove('fixed', 'overflow-hidden', 'w-full')
       }
     }, [show])
+
     if (!show) return null
 
     const [loading, setLoading] = useState<boolean>(true)
@@ -85,15 +86,15 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
 
     return (
       <div
-        className="fixed inset-0 z-50 flex items-start items-center justify-center bg-black bg-opacity-70 md:justify-end xl:items-center xl:justify-center"
+        className="fixed inset-0 z-50 flex items-start items-center justify-center bg-black bg-opacity-70 px-3"
         onClick={onClose} // Close modal when clicking outside
       >
         <div
-          className="relative mt-4 w-full max-w-4xl overflow-hidden overflow-y-auto rounded-xl bg-zinc-800 sm:w-3/4"
+          className="relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-xl bg-zinc-800 shadow-lg sm:w-3/4"
           onClick={(e) => e.stopPropagation()} // Prevent modal close on content click
         >
           {/* Top Half with Background Image */}
-          <div className="relative h-0 w-full overflow-hidden p-2 md:h-60 xl:h-96">
+          <div className="relative h-0 w-full overflow-hidden p-2 md:h-60 lg:h-60 xl:h-96">
             <div
               className="h-full w-full rounded-xl bg-cover bg-center bg-no-repeat"
               style={{
@@ -126,7 +127,7 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
               </div>
               {metadata?.contentRating && (
                 <div className="pointer-events-none mt-1 flex h-5 items-center justify-center rounded-lg bg-black bg-opacity-70 p-2 text-xs font-medium uppercase text-zinc-200 xl:h-5">
-                  {'Rated '}
+                  {'Rated: '}
                   {metadata.contentRating || ''}
                 </div>
               )}
@@ -140,7 +141,7 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                   <img
                     src={`/icons_logos/tmdb_logo.svg`}
                     alt="TMDB Logo"
-                    className="h-8 w-32 rounded-lg bg-black bg-opacity-70 p-2 shadow-lg" // Optional: Customize the size using Tailwind classes
+                    className="h-8 w-32 rounded-lg bg-black bg-opacity-70 p-2 shadow-lg"
                   />
                 </a>
               </div>
@@ -174,7 +175,7 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
             {metadata && (
               <>
                 {metadata.Rating && metadata.Rating.length > 0 ? (
-                  <div className="pointer-events-none absolute bottom-4 left-4 z-10 flex flex-col">
+                  <div className="pointer-default absolute bottom-4 left-4 z-10 flex flex-col">
                     {metadata.Rating.map((rating, index) => {
                       const prefix = rating.image.split('://')[0]
                       const type = rating.type
@@ -196,14 +197,15 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                       return (
                         <div
                           key={index}
-                          className="mb-1 flex items-center space-x-1 rounded-lg bg-black bg-opacity-70 px-3 py-1 text-white shadow-lg"
+                          className="mb-1 flex items-center justify-between space-x-1 rounded-lg bg-black bg-opacity-70 px-3 py-1 text-white shadow-lg"
                         >
                           <img
                             src={icon}
                             alt={`${prefix} ${type} Icon`}
                             className="h-6 w-6"
+                            title={`${prefix}-${type}`}
                           />
-                          <span className="text-sm font-medium">
+                          <span className="flex cursor-default items-center justify-end text-sm font-medium">
                             {rating.value}
                           </span>
                         </div>
@@ -244,20 +246,20 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
               <p>{summary || 'No summary available.'}</p>
             </div>
 
-            <div className="mr-0.5 mt-6 flex flex-row justify-between">
+            <div className="mr-0.5 mt-6 flex flex-row items-center justify-between">
               {metadata?.Guid &&
                 ['movie', 'show'].includes(mediaType) &&
                 metadata.Guid.length > 0 && (
-                  <div className="flex items-center text-xs text-zinc-400">
+                  <div className="flex flex-wrap items-center text-xs text-zinc-400">
                     {metadata.Guid.map((guid, index) => (
                       <span
                         key={index}
-                        className="mr-0.5 flex h-8 items-center justify-center rounded-lg bg-zinc-700 bg-opacity-70 px-2 text-xs text-white shadow-lg"
+                        className="mb-0.5 mr-0.5 flex h-8 items-center justify-center rounded-lg bg-zinc-700 bg-opacity-70 px-2 text-xs text-white shadow-lg"
                       >
                         {guid.id}
                       </span>
                     ))}
-                    &larr; (Reported by Plex metadata)
+                    (Plex metadata IDs)
                   </div>
                 )}
               <div className="ml-auto flex space-x-3">
