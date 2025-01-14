@@ -496,7 +496,7 @@ export class PlexGetterService {
           const filterResults = await Promise.all(userFilterPromises);
           const result = plexUsers.filter((_, index) => filterResults[index]);
 
-          return result.length > 0 ? 1 : 0;
+          return result.length > 0;
         }
         case 'sw_seasonLastEpisodeAiredAt': {
           const lastEpDate = await this.plexApi
