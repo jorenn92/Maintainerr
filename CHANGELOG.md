@@ -1,3 +1,15 @@
+# [2.8.0](https://github.com/jorenn92/Maintainerr/compare/v2.7.0...v2.8.0) (2025-01-14)
+
+
+### Bug Fixes
+
+* Has series/season finale should only pass when file exists ([#1502](https://github.com/jorenn92/Maintainerr/issues/1502)) ([00e0255](https://github.com/jorenn92/Maintainerr/commit/00e02557380d0bc9d8c10f8d82e19d59d9184d4e))
+
+
+### Features
+
+* Add "Last episode aired at (season)" for episodes ([#1491](https://github.com/jorenn92/Maintainerr/issues/1491)) ([fecf360](https://github.com/jorenn92/Maintainerr/commit/fecf360ecae0d1add7ba4d6121704debd708725e))
+
 # [2.7.0](https://github.com/jorenn92/Maintainerr/compare/v2.6.0...v2.7.0) (2025-01-05)
 
 
