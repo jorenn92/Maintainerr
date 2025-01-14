@@ -4,6 +4,7 @@ import {
   AddSeriesOptions,
   LanguageProfile,
   SonarrEpisode,
+  SonarrEpisodeFile,
   SonarrInfo,
   SonarrSeason,
   SonarrSeries,
@@ -59,9 +60,11 @@ export class SonarrApi extends ServarrApi<{
       this.logger.debug(e);
     }
   }
-  public async getEpisodeFile(episodeFileId: number): Promise<SonarrEpisode> {
+  public async getEpisodeFile(
+    episodeFileId: number,
+  ): Promise<SonarrEpisodeFile> {
     try {
-      const response = await this.get<SonarrEpisode>(
+      const response = await this.get<SonarrEpisodeFile>(
         `/episodefile/${episodeFileId}`,
       );
 
