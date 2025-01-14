@@ -469,6 +469,35 @@ export class PlexGetterService {
           const result = plexUsers.filter((_, index) => filterResults[index]);
           return result.map((u) => u.username);
         }
+        case 'watchlist_isWatchlisted': {
+          const guid = grandparent
+            ? grandparent.guid
+            : parent
+              ? parent.guid
+              : metadata.guid;
+          const media_uuid = guid.match(/plex:\/\/[a-z]+\/([a-z0-9]+)$/);
+
+          const plexUsers: SimplePlexUser[] =
+            await this.plexApi.getCorrectedUsers();
+
+          const userFilterPromises = plexUsers.map(async (u) => {
+            if (u.uuid === undefined || media_uuid === undefined) return false; // break if UUIDs are unavailable
+            try {
+              const watchlist = await this.plexApi.getWatchlistIdsForUser(
+                u.uuid,
+              );
+              return (
+                watchlist.find((i) => i.id === media_uuid[1]) !== undefined
+              );
+            } catch (e) {
+              return false;
+            }
+          });
+          const filterResults = await Promise.all(userFilterPromises);
+          const result = plexUsers.filter((_, index) => filterResults[index]);
+
+          return result.length > 0;
+        }
         case 'sw_seasonLastEpisodeAiredAt': {
           const lastEpDate = await this.plexApi
             .getChildrenMetadata(parent.ratingKey)
