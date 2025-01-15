@@ -13,7 +13,6 @@ import RemoveFromCollectionBtn from '../../Collection/CollectionDetail/RemoveFro
 interface IMediaCard {
   id: number
   image?: string
-  backdrop?: string
   summary?: string
   year?: string
   mediaType: 'movie' | 'show' | 'season' | 'episode'
@@ -56,26 +55,21 @@ const MediaCard: React.FC<IMediaCard> = ({
   const [isUpdating, setIsUpdating] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
   const [image, setImage] = useState<string | null>(null)
-  const [backdrop, setBackdrop] = useState<string | null>(null)
   const [excludeModal, setExcludeModal] = useState(false)
   const [addModal, setAddModal] = useState(false)
   const [hasExclusion, setHasExclusion] = useState(false)
   const [showMediaModal, setShowMediaModal] = useState(false)
 
   const openMediaModal = () => {
-    if (window.innerWidth >= 640) {
-      setShowMediaModal(true)
-    }
+    setShowMediaModal(true)
   }
+
   const closeMediaModal = () => setShowMediaModal(false)
 
   useEffect(() => {
     if (tmdbid) {
       GetApiHandler(`/moviedb/image/${mediaType}/${tmdbid}`).then((resp) =>
         setImage(resp),
-      )
-      GetApiHandler(`/moviedb/backdrop/${mediaType}/${tmdbid}`).then((resp) =>
-        setBackdrop(resp),
       )
     }
     getExclusions()
@@ -368,7 +362,6 @@ const MediaCard: React.FC<IMediaCard> = ({
           mediaType={mediaType}
           tmdbid={tmdbid}
           year={year}
-          backdrop={`https://image.tmdb.org/t/p/w1280${backdrop}`}
           userScore={userScore}
         />
       )}
