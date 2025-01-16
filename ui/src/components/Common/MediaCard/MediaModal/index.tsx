@@ -132,6 +132,21 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                       const prefix = rating.image.split('://')[0]
                       const type = rating.type
                       const icon = iconMap[prefix]?.[type]
+                      let percentageValue = rating.value
+                      if (
+                        ['themoviedb', 'rottentomatoes'].includes(prefix) &&
+                        typeof rating.value === 'number'
+                      ) {
+                        percentageValue = rating.value * 10
+                      } else if (prefix === 'imdb') {
+                        percentageValue = rating.value
+                      }
+                      const displayValue = [
+                        'themoviedb',
+                        'rottentomatoes',
+                      ].includes(prefix)
+                        ? `${percentageValue}%`
+                        : `${percentageValue}/10`
                       return (
                         <div
                           key={index}
@@ -143,8 +158,8 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                             className="h-6 w-6"
                             title={`${prefix}-${type}`}
                           />
-                          <span className="flex cursor-default items-center justify-end text-sm font-medium">
-                            {rating.value}
+                          <span className="flex cursor-default pl-0.5 text-sm font-medium">
+                            {displayValue}
                           </span>
                         </div>
                       )
