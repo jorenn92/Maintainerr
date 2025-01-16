@@ -84,7 +84,7 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
         </div>
 
         <main
-          className="relative top-16 z-0 mt-2 w-full focus:outline-none"
+          className="relative top-16 z-0 mt-2 w-full focus:outline-none lg:z-40 xl:z-40"
           tabIndex={0}
         >
           <div className="mb-6">

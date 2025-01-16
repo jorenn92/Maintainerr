@@ -16,6 +16,13 @@ export class TmdbApiController {
       type: 'imdb',
     });
   }
+  @Get('/backdrop/:type/:tmdbId')
+  getBackdropImage(
+    @Param('tmdbId', new ParseIntPipe()) tmdbId: number,
+    @Param('type') type: 'movie' | 'show',
+  ) {
+    return this.movieDbApi.getBackdropImagePath({ tmdbId: tmdbId, type: type });
+  }
   @Get('/image/:type/:tmdbId')
   getImage(
     @Param('tmdbId', new ParseIntPipe()) tmdbId: number,
