@@ -85,7 +85,7 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
         onClick={onClose} // Close modal when clicking outside
       >
         <div
-          className="relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-xl bg-zinc-800 shadow-lg sm:w-3/4"
+          className="relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-xl bg-zinc-800 shadow-lg"
           onClick={(e) => e.stopPropagation()} // Prevent modal close on content click
         >
           {/* Top Half with Background Image */}
@@ -146,11 +146,11 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                         'rottentomatoes',
                       ].includes(prefix)
                         ? `${percentageValue}%`
-                        : `${percentageValue}/10`
+                        : `${percentageValue}`
                       return (
                         <div
                           key={index}
-                          className="mb-1 flex items-center space-x-1 rounded-lg bg-black bg-opacity-70 px-3 py-1 text-white shadow-lg"
+                          className="mb-1 flex items-center justify-center space-x-1.5 rounded-lg bg-black bg-opacity-70 px-3 py-1 text-white shadow-lg"
                         >
                           <img
                             src={icon}
@@ -158,7 +158,7 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                             className="h-6 w-6"
                             title={`${prefix}-${type}`}
                           />
-                          <span className="flex cursor-default pl-0.5 text-sm font-medium">
+                          <span className="cursor-default text-sm font-medium">
                             {displayValue}
                           </span>
                         </div>
