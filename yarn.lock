@@ -1482,7 +1482,7 @@ __metadata:
     "@nestjs/common": "npm:^10.4.15"
     "@nestjs/core": "npm:^10.4.15"
     "@nestjs/platform-express": "npm:^11.0.3"
-    "@nestjs/schedule": "npm:^4.1.2"
+    "@nestjs/schedule": "npm:^5.0.0"
     "@nestjs/schematics": "npm:^10.2.3"
     "@nestjs/testing": "npm:^10.4.15"
     "@nestjs/typeorm": "npm:^10.0.2"
@@ -1688,16 +1688,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/schedule@npm:^4.1.2":
-  version: 4.1.2
-  resolution: "@nestjs/schedule@npm:4.1.2"
+"@nestjs/schedule@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@nestjs/schedule@npm:5.0.0"
   dependencies:
-    cron: "npm:3.2.1"
-    uuid: "npm:11.0.3"
+    cron: "npm:3.5.0"
   peerDependencies:
-    "@nestjs/common": ^8.0.0 || ^9.0.0 || ^10.0.0
-    "@nestjs/core": ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10c0/90124e454fb4d170eb806c2afea67a2f4466d2e9b01b8c5516f4d8bd0592fc949f53263e3441a3c494cf624d3f4aa233d798964e0e2f580b9347d5ec81d49b53
+    "@nestjs/common": ^10.0.0 || ^11.0.0
+    "@nestjs/core": ^10.0.0 || ^11.0.0
+  checksum: 10c0/5bb23ee362c20726515034c6ce231c551059805c4b7f84607ca155463985bd59b275c6b85fffaa8131407c3edb8e62c48cb6a690fc2fa8ce9f20d2305ad8fb6b
   languageName: node
   linkType: hard
 
@@ -5292,13 +5291,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron@npm:3.2.1":
-  version: 3.2.1
-  resolution: "cron@npm:3.2.1"
+"cron@npm:3.5.0":
+  version: 3.5.0
+  resolution: "cron@npm:3.5.0"
   dependencies:
     "@types/luxon": "npm:~3.4.0"
     luxon: "npm:~3.5.0"
-  checksum: 10c0/26e2ea54c4e15abbc70d391b6366b7e9c72281637cdf0c077726b03a65901c013b2817854ef942f02c452b40b6d482f879d0eeb2a8f7b0c6cc53694e740bf1fa
+  checksum: 10c0/ca5fbfb0d54a77ff4a293ad7bd0e67872915985d739fa4b72ecfaae72db1918f542469a1a6638af4c5a280753443ba308dd04382fe8dcc07d29bd7922856ea94
   languageName: node
   linkType: hard
 
@@ -15718,15 +15717,6 @@ __metadata:
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
   checksum: 10c0/02ba649de1b7ca8854bfe20a82f1dfbdda3fb57a22ab4a8972a63a34553cf7aa51bc9081cf7e001b035b88186d23689d69e71b510e610a09a4c66f68aa95b672
-  languageName: node
-  linkType: hard
-
-"uuid@npm:11.0.3":
-  version: 11.0.3
-  resolution: "uuid@npm:11.0.3"
-  bin:
-    uuid: dist/esm/bin/uuid
-  checksum: 10c0/cee762fc76d949a2ff9205770334699e0043d52bb766472593a25f150077c9deed821230251ea3d6ab3943a5ea137d2826678797f1d5f6754c7ce5ce27e9f7a6
   languageName: node
   linkType: hard
 
