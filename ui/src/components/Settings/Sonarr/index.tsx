@@ -32,7 +32,6 @@ export interface ISonarrSetting {
   serverName: string
   url: string
   apiKey: string
-  isDefault: boolean
 }
 
 const SonarrSettings = () => {
@@ -52,14 +51,6 @@ const SonarrSettings = () => {
       newSettings[index] = setting
     } else {
       newSettings.push(setting)
-    }
-
-    if (setting.isDefault) {
-      newSettings.forEach((s) => {
-        if (s.id !== setting.id) {
-          s.isDefault = false
-        }
-      })
     }
 
     setSettings(newSettings)
@@ -119,20 +110,12 @@ const SonarrSettings = () => {
           {settings.map((setting) => (
             <li
               key={setting.id}
-              className="rounded-xl bg-zinc-800 p-4 text-zinc-400 shadow ring-1 ring-zinc-700 h-full"
+              className="h-full rounded-xl bg-zinc-800 p-4 text-zinc-400 shadow ring-1 ring-zinc-700"
             >
-              <div className="flex gap-x-3 mb-2 items-center">
-                <div className="text-base font-medium text-white sm:text-lg">
-                  {setting.serverName}
-                </div>
-                {setting.isDefault && (
-                  <div className="bg-amber-600 px-2 py-0.5 rounded text-zinc-200 shadow-md text-xs">
-                    Default
-                  </div>
-                )}
+              <div className="mb-2 flex items-center gap-x-3 text-base font-medium text-white sm:text-lg">
+                {setting.serverName}
               </div>
-
-              <p className="text-gray-300 space-x-2 mb-4  truncate">
+              <p className="mb-4 space-x-2 truncate text-gray-300">
                 <span className="font-semibold">Address</span>
                 <a href={setting.url} className="hover:underline">
                   {setting.url}
@@ -148,7 +131,7 @@ const SonarrSettings = () => {
                   }}
                 >
                   {<DocumentAddIcon className="m-auto" />}{' '}
-                  <p className="font-semibold m-auto">Edit</p>
+                  <p className="m-auto font-semibold">Edit</p>
                 </Button>
                 <DeleteButton
                   onDeleteRequested={() => confirmedDelete(setting.id)}
@@ -157,14 +140,14 @@ const SonarrSettings = () => {
             </li>
           ))}
 
-          <li className="rounded-xl bg-zinc-800 p-4 text-zinc-400 shadow border-2 border-dashed border-gray-400 flex items-center justify-center h-full">
+          <li className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-gray-400 bg-zinc-800 p-4 text-zinc-400 shadow">
             <button
               type="button"
-              className="add-button bg-amber-600 hover:bg-amber-500 flex m-auto h-9 rounded text-zinc-200 shadow-md px-4"
+              className="add-button m-auto flex h-9 rounded bg-amber-600 px-4 text-zinc-200 shadow-md hover:bg-amber-500"
               onClick={showAddModal}
             >
               {<PlusCircleIcon className="m-auto h-5" />}
-              <p className="m-auto font-semibold ml-1">Add server</p>
+              <p className="m-auto ml-1 font-semibold">Add server</p>
             </button>
           </li>
         </ul>
@@ -190,7 +173,7 @@ const SonarrSettings = () => {
         >
           <p className="mb-4">
             This server is currently being used by the following rules:
-            <ul className="list-disc list-inside">
+            <ul className="list-inside list-disc">
               {collectionsInUseWarning.map((x) => (
                 <li key={x.id}>{x.title}</li>
               ))}
@@ -228,7 +211,7 @@ const DeleteButton = ({
       }}
     >
       {<TrashIcon className="m-auto" />}{' '}
-      <p className="font-semibold m-auto">
+      <p className="m-auto font-semibold">
         {showSureDelete ? <>Are you sure?</> : <>Delete</>}
       </p>
     </Button>

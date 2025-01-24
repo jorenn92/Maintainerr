@@ -29,7 +29,7 @@ const TestMediaItem = (props: ITestMediaItem) => {
   const [loading, setLoading] = useState(true)
   const [ruleGroup, setRuleGroup] = useState<{
     dataType: EPlexDataType
-    id: String
+    id: string
   }>()
   const [selectedSeasons, setSelectedSeasons] = useState<number>(-1)
   const [selectedEpisodes, setSelectedEpisodes] = useState<number>(-1)
@@ -135,6 +135,8 @@ const TestMediaItem = (props: ITestMediaItem) => {
   }, [selectedSeasons])
 
   const onSubmit = async () => {
+    setComparisonResult(undefined)
+
     if (ruleGroup) {
       const result = await PostApiHandler(`/rules/test`, {
         rulegroupId: ruleGroup.id,
@@ -146,7 +148,8 @@ const TestMediaItem = (props: ITestMediaItem) => {
 
   useEffect(() => {
     GetApiHandler(`/rules/collection/${props.collectionId}`).then((resp) => {
-      setRuleGroup(resp), setLoading(false)
+      setRuleGroup(resp)
+      setLoading(false)
     })
   }, [])
 
@@ -168,7 +171,7 @@ const TestMediaItem = (props: ITestMediaItem) => {
   }, [selectedMediaId])
 
   return !loading && ruleGroup ? (
-    <div className={'w-full h-full'}>
+    <div className={'h-full w-full'}>
       <Modal
         loading={false}
         backgroundClickable={false}
@@ -267,9 +270,9 @@ const TestMediaItem = (props: ITestMediaItem) => {
               options={{ readOnly: true, minimap: { enabled: false } }}
               defaultLanguage="yaml"
               theme="vs-dark"
-              {...(comparisonResult
-                ? { value: YAML.stringify(comparisonResult.result) }
-                : undefined)}
+              value={
+                comparisonResult ? YAML.stringify(comparisonResult.result) : ''
+              }
               onMount={handleEditorDidMount}
             />
           </div>

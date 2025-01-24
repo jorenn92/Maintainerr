@@ -31,7 +31,7 @@ class PlexOAuth {
   public initializeHeaders(): void {
     if (!window) {
       throw new Error(
-        'Window is not defined. Are you calling this in the browser?'
+        'Window is not defined. Are you calling this in the browser?',
       )
     }
     const browser = getParser(window.navigator.userAgent)
@@ -54,13 +54,13 @@ class PlexOAuth {
   public async getPin(): Promise<PlexPin> {
     if (!this.plexHeaders) {
       throw new Error(
-        'You must initialize the plex headers clientside to login'
+        'You must initialize the plex headers clientside to login',
       )
     }
     const response = await axios.post(
       'https://plex.tv/api/v2/pins?strong=true',
       undefined,
-      { headers: this.plexHeaders }
+      { headers: this.plexHeaders },
     )
 
     this.pin = { id: response.data.id, code: response.data.code }
@@ -98,7 +98,7 @@ class PlexOAuth {
 
     if (this.popup) {
       this.popup.location.href = `https://app.plex.tv/auth/#!?${this.encodeData(
-        params
+        params,
       )}`
     }
 
@@ -108,7 +108,7 @@ class PlexOAuth {
   private async pinPoll(): Promise<string> {
     const executePoll = async (
       resolve: (authToken: string) => void,
-      reject: (e: Error) => void
+      reject: (e: Error) => void,
     ) => {
       try {
         if (!this.pin) {
@@ -117,7 +117,7 @@ class PlexOAuth {
 
         const response = await axios.get(
           `https://plex.tv/api/v2/pins/${this.pin.id}`,
-          { headers: this.plexHeaders }
+          { headers: this.plexHeaders },
         )
 
         if (response.data?.authToken) {
@@ -154,7 +154,7 @@ class PlexOAuth {
   }): Window | void {
     if (!window) {
       throw new Error(
-        'Window is undefined. Are you running this in the browser?'
+        'Window is undefined. Are you running this in the browser?',
       )
     }
     // Fixes dual-screen position                         Most browsers      Firefox
@@ -165,13 +165,13 @@ class PlexOAuth {
     const width = window.innerWidth
       ? window.innerWidth
       : document.documentElement.clientWidth
-      ? document.documentElement.clientWidth
-      : screen.width
+        ? document.documentElement.clientWidth
+        : screen.width
     const height = window.innerHeight
       ? window.innerHeight
       : document.documentElement.clientHeight
-      ? document.documentElement.clientHeight
-      : screen.height
+        ? document.documentElement.clientHeight
+        : screen.height
     const left = width / 2 - w / 2 + dualScreenLeft
     const top = height / 2 - h / 2 + dualScreenTop
 
@@ -186,7 +186,7 @@ class PlexOAuth {
         ', top=' +
         top +
         ', left=' +
-        left
+        left,
     )
     if (newWindow) {
       newWindow.focus()

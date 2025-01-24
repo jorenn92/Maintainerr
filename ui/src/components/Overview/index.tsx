@@ -11,7 +11,7 @@ const Overview = () => {
   // const [isLoading, setIsLoading] = useState<Boolean>(false)
   const loadingRef = useRef<boolean>(false)
 
-  const [loadingExtra, setLoadingExtra] = useState<Boolean>(false)
+  const [loadingExtra, setLoadingExtra] = useState<boolean>(false)
 
   const [data, setData] = useState<IPlexMetadata[]>([])
   const dataRef = useRef<IPlexMetadata[]>([])
@@ -21,7 +21,7 @@ const Overview = () => {
 
   const [selectedLibrary, setSelectedLibrary] = useState<number>()
   const selectedLibraryRef = useRef<number>()
-  const [searchUsed, setsearchUsed] = useState<Boolean>(false)
+  const [searchUsed, setsearchUsed] = useState<boolean>(false)
 
   const pageData = useRef<number>(0)
   const SearchCtx = useContext(SearchContext)
@@ -43,7 +43,7 @@ const Overview = () => {
         LibrariesCtx.libraries.length > 0
       ) {
         switchLib(
-          selectedLibrary ? selectedLibrary : +LibrariesCtx.libraries[0].key
+          selectedLibrary ? selectedLibrary : +LibrariesCtx.libraries[0].key,
         )
       }
     }, 300)
@@ -58,7 +58,7 @@ const Overview = () => {
           pageData.current = resp.length * 50
           setData(resp ? resp : [])
           setIsLoading(false)
-        }
+        },
       )
       setSelectedLibrary(+LibrariesCtx.libraries[0]?.key)
     } else {
@@ -108,7 +108,7 @@ const Overview = () => {
         await GetApiHandler(
           `/plex/library/${selectedLibraryRef.current}/content/${
             pageData.current + 1
-          }?amount=${fetchAmount}`
+          }?amount=${fetchAmount}`,
         )
 
       if (askedLib === selectedLibraryRef.current) {

@@ -7,6 +7,11 @@ import chalk from 'chalk';
 import path from 'path';
 import * as fs from 'fs';
 
+const dataDir =
+  process.env.NODE_ENV === 'production'
+    ? '/opt/data'
+    : path.join(__dirname, '../../data');
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     // Winston logger config
@@ -49,10 +54,7 @@ async function bootstrap() {
       transports: [
         new winston.transports.Console(),
         new DailyRotateFile({
-          filename: path.join(
-            __dirname,
-            `../../data/logs/maintainerr-%DATE%.log`,
-          ),
+          filename: path.join(dataDir, 'logs/maintainerr-%DATE%.log'),
           datePattern: 'YYYY-MM-DD',
           zippedArchive: true,
           maxSize: '20m',
@@ -78,13 +80,10 @@ async function bootstrap() {
 function createDataDirectoryStructure() {
   try {
     // Check if data directory has read and write permissions
-    fs.accessSync(
-      path.join(__dirname, `../../data`),
-      fs.constants.R_OK | fs.constants.W_OK,
-    );
+    fs.accessSync(dataDir, fs.constants.R_OK | fs.constants.W_OK);
 
     // create logs dir
-    const dir = path.join(__dirname, `../../data/logs`);
+    const dir = path.join(dataDir, 'logs');
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, {
         recursive: true,
@@ -93,7 +92,7 @@ function createDataDirectoryStructure() {
     }
 
     // if db already exists, check r/w permissions
-    const db = path.join(__dirname, `../../data/maintainerr.sqlite`);
+    const db = path.join(dataDir, 'maintainerr.sqlite');
     if (fs.existsSync(db)) {
       fs.accessSync(db, fs.constants.R_OK | fs.constants.W_OK);
     }

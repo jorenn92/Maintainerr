@@ -157,6 +157,10 @@ export class RulesService {
     }
   }
 
+  async getRuleGroupCount(): Promise<number> {
+    return this.ruleGroupRepository.count();
+  }
+
   async getRuleGroupById(ruleGroupId: number): Promise<RuleGroup> {
     try {
       return await this.ruleGroupRepository.findOne({
@@ -241,6 +245,9 @@ export class RulesService {
           forceOverseerr: params.forceOverseerr ? params.forceOverseerr : false,
           tautulliWatchedPercentOverride:
             params.tautulliWatchedPercentOverride ?? null,
+          radarrSettingsId: params.radarrSettingsId ?? null,
+          sonarrSettingsId: params.sonarrSettingsId ?? null,
+          visibleOnRecommended: params.collection?.visibleOnRecommended,
           visibleOnHome: params.collection?.visibleOnHome,
           deleteAfterDays: +params.collection?.deleteAfterDays,
           manualCollection: params.collection?.manualCollection,
@@ -315,16 +322,14 @@ export class RulesService {
           group.collectionId,
         );
 
-        // if datatype, manual collection settings or *arr server changed then remove the collection media and specific exclusions. The Plex collection will be removed later by updateCollection()
+        // if datatype or manual collection settings changed then remove the collection media and specific exclusions. The Plex collection will be removed later by updateCollection()
         if (
           group.dataType !== params.dataType ||
           params.collection.manualCollection !==
             dbCollection.manualCollection ||
           params.collection.manualCollectionName !==
             dbCollection.manualCollectionName ||
-          params.libraryId !== dbCollection.libraryId ||
-          params.radarrSettingsId !== dbCollection.radarrSettingsId ||
-          params.sonarrSettingsId !== dbCollection.sonarrSettingsId
+          params.libraryId !== dbCollection.libraryId
         ) {
           this.logger.log(
             `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media & specific exclusions`,
@@ -371,6 +376,7 @@ export class RulesService {
               params.tautulliWatchedPercentOverride ?? null,
             radarrSettingsId: params.radarrSettingsId ?? null,
             sonarrSettingsId: params.sonarrSettingsId ?? null,
+            visibleOnRecommended: params.collection.visibleOnRecommended,
             visibleOnHome: params.collection.visibleOnHome,
             deleteAfterDays: +params.collection.deleteAfterDays,
             manualCollection: params.collection.manualCollection,
@@ -841,6 +847,16 @@ export class RulesService {
       });
   }
 
+  public async getCommunityRuleCount(): Promise<number> {
+    const response = await axios.get<CommunityRule[]>(this.communityUrl, {
+      headers: {
+        Authorization: 'token ' + this.key,
+      },
+    });
+
+    return response.data.length;
+  }
+
   public async addToCommunityRules(rule: CommunityRule): Promise<ReturnStatus> {
     const rules = await this.getCommunityRules();
     const appVersion = process.env.npm_package_version
@@ -1013,8 +1029,14 @@ export class RulesService {
         [mediaResp as unknown as PlexLibraryItem],
         true,
       );
-      return { code: 1, result: result.stats };
+
+      if (result) {
+        return { code: 1, result: result.stats };
+      } else {
+        return { code: 0, result: 'An error occurred executing rules' };
+      }
     }
+
     return { code: 0, result: 'Invalid input' };
   }
 
@@ -1040,7 +1062,9 @@ export class RulesService {
         );
 
         //test first value
-        const first = firstValApplication.props[parsedRule.firstVal[1]];
+        const first = firstValApplication.props.find(
+          (x) => x.id == parsedRule.firstVal[1],
+        );
 
         result = first.cacheReset ? true : result;
 
@@ -1049,7 +1073,9 @@ export class RulesService {
           : undefined;
 
         // test second value
-        const second = secondValApplication?.props[parsedRule.lastVal[1]];
+        const second = secondValApplication?.props.find(
+          (x) => x.id == parsedRule.lastVal[1],
+        );
 
         result = second?.cacheReset ? true : result;
       }

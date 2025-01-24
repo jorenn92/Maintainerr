@@ -30,6 +30,7 @@ import { NotificationService } from '../notifications/notifications.service';
 interface addCollectionDbResponse {
   id: number;
   isActive: boolean;
+  visibleOnRecommended: boolean;
   visibleOnHome: boolean;
   deleteAfterDays: number;
   manualCollection: boolean;
@@ -83,6 +84,12 @@ export class CollectionsService {
       );
       return undefined;
     }
+  }
+
+  public async getCollectionMediaCount(id?: number) {
+    return await this.CollectionMediaRepo.count({
+      where: { collectionId: id },
+    });
   }
 
   public async getCollectionMediaWitPlexDataAndhPaging(
@@ -254,7 +261,7 @@ export class CollectionsService {
         await this.plexApi.UpdateCollectionSettings({
           libraryId: collectionObj.libraryId,
           collectionId: plexCollection.ratingKey,
-          recommended: false,
+          recommended: collection.visibleOnRecommended,
           ownHome: collection.visibleOnHome,
           sharedHome: collection.visibleOnHome,
         });
@@ -269,7 +276,7 @@ export class CollectionsService {
           await this.plexApi.UpdateCollectionSettings({
             libraryId: collection.libraryId,
             collectionId: plexCollection.ratingKey,
-            recommended: false,
+            recommended: collection.visibleOnRecommended,
             ownHome: collection.visibleOnHome,
             sharedHome: collection.visibleOnHome,
           });
@@ -362,7 +369,7 @@ export class CollectionsService {
           await this.plexApi.UpdateCollectionSettings({
             libraryId: dbCollection.libraryId,
             collectionId: dbCollection.plexId,
-            recommended: false,
+            recommended: collection.visibleOnRecommended,
             ownHome: collection.visibleOnHome,
             sharedHome: collection.visibleOnHome,
           });
@@ -561,7 +568,7 @@ export class CollectionsService {
               await this.plexApi.UpdateCollectionSettings({
                 libraryId: collection.libraryId,
                 collectionId: collection.plexId,
-                recommended: false,
+                recommended: collection.visibleOnRecommended,
                 ownHome: collection.visibleOnHome,
                 sharedHome: collection.visibleOnHome,
               });
@@ -920,6 +927,7 @@ export class CollectionsService {
                 libraryId: collection.libraryId,
                 arrAction: collection.arrAction ? collection.arrAction : 0,
                 isActive: collection.isActive,
+                visibleOnRecommended: collection.visibleOnRecommended,
                 visibleOnHome: collection.visibleOnHome,
                 deleteAfterDays: collection.deleteAfterDays,
                 listExclusions: collection.listExclusions,
@@ -935,6 +943,8 @@ export class CollectionsService {
                   collection.manualCollectionName !== undefined
                     ? collection.manualCollectionName
                     : '',
+                sonarrSettingsId: collection.sonarrSettingsId,
+                radarrSettingsId: collection.radarrSettingsId,
               },
             ])
             .execute()
@@ -1039,7 +1049,7 @@ export class CollectionsService {
     try {
       const result = await this.plexApi.getCollection(id);
 
-      if (result.smart) {
+      if (result?.smart) {
         this.logger.warn(
           `Plex collection ${id} is a smart collection which is not supported.`,
         );

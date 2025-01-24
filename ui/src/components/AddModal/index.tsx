@@ -174,44 +174,44 @@ const AddModal = (props: IAddModal) => {
   useEffect(() => {
     setLoading(true)
 
-    props.type === 2
-      ? selectedEpisodes !== -1
-        ? GetApiHandler(`/collections?typeId=4`).then((resp) => {
-            // get collections for episodes
-            setCollectionOptions([...origCollectionOptions, ...resp])
-            setLoading(false)
-          })
-        : selectedSeasons !== -1
-          ? GetApiHandler(`/collections?typeId=3`).then((resp) => {
-              // get collections for episodes and seasons
-              GetApiHandler(`/collections?typeId=4`).then((resp2) => {
-                setCollectionOptions([
-                  ...origCollectionOptions,
-                  ...resp,
-                  ...resp2,
-                ])
-                setLoading(false)
-              })
-            })
-          : GetApiHandler(`/collections?typeId=2`).then((resp) => {
-              // get collections for episodes, seasons and shows
-              GetApiHandler(`/collections?typeId=3`).then((resp2) => {
-                GetApiHandler(`/collections?typeId=4`).then((resp3) => {
-                  setCollectionOptions([
-                    ...origCollectionOptions,
-                    ...resp,
-                    ...resp2,
-                    ...resp3,
-                  ])
-                  setLoading(false)
-                })
-              })
-            })
-      : GetApiHandler(`/collections?typeId=1`).then((resp) => {
-          // get collections for movies
+    if (props.type === 2) {
+      if (selectedEpisodes !== -1) {
+        GetApiHandler(`/collections?typeId=4`).then((resp) => {
+          // get collections for episodes
           setCollectionOptions([...origCollectionOptions, ...resp])
           setLoading(false)
         })
+      } else if (selectedSeasons !== -1) {
+        GetApiHandler(`/collections?typeId=3`).then((resp) => {
+          // get collections for episodes and seasons
+          GetApiHandler(`/collections?typeId=4`).then((resp2) => {
+            setCollectionOptions([...origCollectionOptions, ...resp, ...resp2])
+            setLoading(false)
+          })
+        })
+      } else {
+        GetApiHandler(`/collections?typeId=2`).then((resp) => {
+          // get collections for episodes, seasons and shows
+          GetApiHandler(`/collections?typeId=3`).then((resp2) => {
+            GetApiHandler(`/collections?typeId=4`).then((resp3) => {
+              setCollectionOptions([
+                ...origCollectionOptions,
+                ...resp,
+                ...resp2,
+                ...resp3,
+              ])
+              setLoading(false)
+            })
+          })
+        })
+      }
+    } else {
+      GetApiHandler(`/collections?typeId=1`).then((resp) => {
+        // get collections for movies
+        setCollectionOptions([...origCollectionOptions, ...resp])
+        setLoading(false)
+      })
+    }
   }, [selectedSeasons, selectedEpisodes])
 
   return (

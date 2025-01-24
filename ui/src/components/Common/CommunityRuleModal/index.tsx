@@ -219,7 +219,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         <SearchBar onSearch={handleSearch} />
         {originalRules.length > 0 ? (
           <div className="flex flex-col">
-            <div className="my-2 -mx-4 overflow-x-auto md:mx-0 lg:mx-0">
+            <div className="-mx-4 my-2 overflow-x-auto md:mx-0 lg:mx-0">
               <div className="inline-block min-w-full py-2 align-middle">
                 <div className="overflow-hidden rounded-lg shadow md:mx-0 lg:mx-0">
                   <table className="ml-2 mr-2 min-w-full table-fixed">
@@ -298,7 +298,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
             title={'Community Rule Description'}
             iconSvg={''}
           >
-            <div className="block max-h-full w-full max-w-full overflow-auto  bg-zinc-600 p-3 text-zinc-200">
+            <div className="block max-h-full w-full max-w-full overflow-auto bg-zinc-600 p-3 text-zinc-200">
               {originalRules.find((r) => r.id === clickedRule)?.description}
             </div>
           </Modal>

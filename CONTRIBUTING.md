@@ -7,7 +7,7 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
 ### Tools Required
 
 - HTML/Typescript/Javascript editor
-  - [VSCode](https://code.visualstudio.com/) is recommended. Upon opening the project, a few extensions will be automatically recommended for install.
+- [VSCode](https://code.visualstudio.com/) is recommended. Upon opening the project, a few extensions will be automatically recommended for install.
 - [NodeJS](https://nodejs.org/en/download/) (Node 20.x or higher)
 - [Git](https://git-scm.com/downloads)
 
@@ -43,35 +43,34 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
        - `docs`
        - `feature`
        - `fix`
-       - `patch`  
+       - `patch`
 
-4. Activate the correct Yarn version. (*Note: In order to run `corepack enable`, you will need to be running cmd or Powershell as an Administrator.*)
+4. Activate the correct Yarn version. (_Note: In order to run `corepack enable`, you will need to be running cmd or PowerShell as an Administrator._)
 
-    ```bash
+   ```bash
    corepack install
    corepack enable
    ```
 
 5. Install dependencies
 
-    ```bash
-    yarn
+   ```bash
+   yarn
    ```
 
 6. As of Maintainerr v2.0, the project looks to ensure you have read/write permissions on the `data` directory. This `data` directory does not exist when you first clone your fork. Before running the below commands, create a folder inside of your main Maintainerr directory named `data`, and ensure it has full permissions to the `Everyone` user.
 
-    ```bash
-    example ->  C:\Users\You\Documents\GitRepos\Maintainerr\data
-    ```
-
-7. Run the development commands (you will need two different cmd/Powershell terminals. One for each command.)
-
    ```bash
-   yarn dev:server
-   yarn dev:ui
+   example ->  C:\Users\You\Documents\GitRepos\Maintainerr\data
    ```
 
-   - If the build fails with Powershell, try to use cmd instead.
+7. Run the development command
+
+   ```bash
+   yarn dev
+   ```
+
+   - If the build fails with PowerShell, try to use cmd instead.
 
 8. Make your code changes/improvements and test that they work as intended.
 
@@ -94,8 +93,8 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
 - Always rebase your commit to the latest `main` branch. Do **not** merge `main` into your branch.
 - It is your responsibility to keep your branch up-to-date. Your work will **not** be merged unless it is rebased off the latest `main` branch.
 - You can create a "draft" pull request early to get feedback on your work.
-- Your code **must** be formatted correctly, or the tests will fail.
-  - We use Prettier to format our code base. It should automatically run with a Git hook, but it is recommended to have the Prettier extension installed in your editor and format on save.
+- Your code **must** be formatted correctly.
+  - We use Prettier to format our code base. It is recommended to have the Prettier extension installed in your editor and format on save.
 - If you have questions or need help, you can reach out via [Discussions](https://github.com/jorenn92/Maintainerr/discussions) or our [Discord server](https://discord.gg/WP4ZW2QYwk).
 
 ### UI Text Style

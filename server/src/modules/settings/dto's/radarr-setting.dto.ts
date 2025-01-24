@@ -8,8 +8,6 @@ export type RadarrSettingDto = {
   url: string;
 
   apiKey: string;
-
-  isDefault: boolean;
 };
 
 export type RadarrSettingRawDto = Omit<RadarrSettingDto, 'id'>;

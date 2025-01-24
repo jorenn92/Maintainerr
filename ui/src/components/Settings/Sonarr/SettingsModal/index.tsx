@@ -47,7 +47,6 @@ interface SonarrSettingSaveRequest {
   url: string
   apiKey: string
   serverName: string
-  isDefault: boolean
 }
 
 const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
@@ -66,14 +65,12 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
     : ''
   const initialApiKey = props.settings?.apiKey ?? ''
   const initialServerName = props.settings?.serverName ?? ''
-  const initialIsDefault = props.settings?.isDefault ?? false
 
   const [hostname, setHostname] = useState<string>(initialHostname)
   const [baseUrl, setBaseUrl] = useState<string>(initialBaseUrl)
   const [port, setPort] = useState<string>(initialPort)
   const [apiKey, setApiKey] = useState<string>(initialApiKey)
   const [serverName, setServerName] = useState<string>(initialServerName)
-  const [isDefault, setIsDefault] = useState<boolean>(initialIsDefault)
 
   const [error, setError] = useState<boolean>()
   const [testedSettings, setTestedSettings] = useState(
@@ -134,11 +131,10 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
     const sonarrUrl = constructUrl(port)
 
     if (hostname && port && apiKey && serverName) {
-      let payload: SonarrSettingSaveRequest = {
+      const payload: SonarrSettingSaveRequest = {
         url: `${sonarrUrl}${baseUrl ? `/${baseUrl}` : ''}`,
         apiKey: apiKey,
         serverName: serverName,
-        isDefault: isDefault,
         ...(props.settings?.id && { id: props.settings?.id }),
       }
 
@@ -231,23 +227,6 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
       ) : undefined}
 
       <div className="form-row">
-        <label htmlFor="isDefault" className="text-label">
-          Default Server
-        </label>
-        <div className="form-input">
-          <div className="form-input-field">
-            <input
-              type="checkbox"
-              name="isDefault"
-              id="isDefault"
-              checked={isDefault}
-              onChange={(e) => setIsDefault(e.target.checked)}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="form-row">
         <label htmlFor="serverName" className="text-label">
           Server Name
         </label>
@@ -301,6 +280,7 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
       <div className="form-row">
         <label htmlFor="baseUrl" className="text-label">
           Base URL
+          <span className="label-tip">{`No Leading Slash`}</span>
         </label>
         <div className="form-input">
           <div className="form-input-field">
@@ -334,8 +314,8 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
 
       <div className="actions mt-5 w-full">
         <div className="flex w-full flex-wrap sm:flex-nowrap">
-          <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
-            <DocsButton page="Configuration" />
+          <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
+            <DocsButton page="Configuration/#sonarr" />
           </span>
         </div>
       </div>

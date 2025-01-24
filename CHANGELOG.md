@@ -1,3 +1,109 @@
+# [2.8.0](https://github.com/jorenn92/Maintainerr/compare/v2.7.0...v2.8.0) (2025-01-14)
+
+
+### Bug Fixes
+
+* Has series/season finale should only pass when file exists ([#1502](https://github.com/jorenn92/Maintainerr/issues/1502)) ([00e0255](https://github.com/jorenn92/Maintainerr/commit/00e02557380d0bc9d8c10f8d82e19d59d9184d4e))
+
+
+### Features
+
+* Add "Last episode aired at (season)" for episodes ([#1491](https://github.com/jorenn92/Maintainerr/issues/1491)) ([fecf360](https://github.com/jorenn92/Maintainerr/commit/fecf360ecae0d1add7ba4d6121704debd708725e))
+
+# [2.7.0](https://github.com/jorenn92/Maintainerr/compare/v2.6.0...v2.7.0) (2025-01-05)
+
+
+### Bug Fixes
+
+* Equals with lists now only returns true if they are identical ([e900dac](https://github.com/jorenn92/Maintainerr/commit/e900dac47a26cd2f8422584d3eaa9c0a94f7073a))
+
+
+### Features
+
+* Add rating vote count filters ([05617e1](https://github.com/jorenn92/Maintainerr/commit/05617e12f6f9d8e8a95c39a86f87a02aca8d26ec))
+
+# [2.6.0](https://github.com/jorenn92/Maintainerr/compare/v2.5.0...v2.6.0) (2025-01-01)
+
+
+### Bug Fixes
+
+* Docs links ([#1487](https://github.com/jorenn92/Maintainerr/issues/1487)) ([d8bf2d1](https://github.com/jorenn92/Maintainerr/commit/d8bf2d140fccb7d45a3e33a2f4d6426b33684dc8))
+
+
+### Features
+
+* Add rating filters (RT, IMDb, Trakt) ([4b79f56](https://github.com/jorenn92/Maintainerr/commit/4b79f56aa63ae31388874a1400f873b97dede2b9))
+
+# [2.5.0](https://github.com/jorenn92/Maintainerr/compare/v2.4.1...v2.5.0) (2024-12-30)
+
+
+### Bug Fixes
+
+* *arr server not persisting on initial save ([#1475](https://github.com/jorenn92/Maintainerr/issues/1475)) ([8ace636](https://github.com/jorenn92/Maintainerr/commit/8ace63659ded1d44eb99fc6c81f00121c91a4b76))
+* Client side error when changing rule data/media type ([2e086b2](https://github.com/jorenn92/Maintainerr/commit/2e086b2d76ac6893b56962e7c0d5960c9d1852c9))
+* Resolve various UI & UX issues ([#1452](https://github.com/jorenn92/Maintainerr/issues/1452)) ([354b903](https://github.com/jorenn92/Maintainerr/commit/354b903bf4ff1dee216792a15de9d85304994e35))
+
+
+### Features
+
+* Add season has season/series finale episode ([f53d094](https://github.com/jorenn92/Maintainerr/commit/f53d0949e2291319891ce27424c47e827fcdb615))
+* Add season number filter ([f0fd71e](https://github.com/jorenn92/Maintainerr/commit/f0fd71e7062e83553b8bee951adf20a474e7cf2b))
+
+## [2.4.1](https://github.com/jorenn92/Maintainerr/compare/v2.4.0...v2.4.1) (2024-12-25)
+
+
+### Bug Fixes
+
+* Do not reset collection on *arr server change ([#1467](https://github.com/jorenn92/Maintainerr/issues/1467)) ([6bcc45e](https://github.com/jorenn92/Maintainerr/commit/6bcc45ed9df47956eda3f692c6486f33e742c137))
+
+# [2.4.0](https://github.com/jorenn92/Maintainerr/compare/v2.3.1...v2.4.0) (2024-12-20)
+
+
+### Bug Fixes
+
+* Community rules & incorrect out of date ([#1448](https://github.com/jorenn92/Maintainerr/issues/1448)) ([1797104](https://github.com/jorenn92/Maintainerr/commit/17971044d88e84bb66fd80a772206ed7dda4d030))
+* Media type selection not reflecting what is saved ([#1444](https://github.com/jorenn92/Maintainerr/issues/1444)) ([47a9651](https://github.com/jorenn92/Maintainerr/commit/47a9651fa579c38e23012a2b6d4878b88ceaf0dc))
+
+
+### Features
+
+* add about page ([#1408](https://github.com/jorenn92/Maintainerr/issues/1408)) ([56fda5c](https://github.com/jorenn92/Maintainerr/commit/56fda5c129183feafd867839b92fc94e6ed52b9e))
+
+## [2.3.1](https://github.com/jorenn92/Maintainerr/compare/v2.3.0...v2.3.1) (2024-12-17)
+
+
+### Bug Fixes
+
+* Container startup failing for some ([3a18d2e](https://github.com/jorenn92/Maintainerr/commit/3a18d2e8c2a1f3144f2b5831b11b3723b0f0c64f))
+
+# [2.3.0](https://github.com/jorenn92/Maintainerr/compare/v2.2.1...v2.3.0) (2024-12-17)
+
+
+### Bug Fixes
+
+* __PATH_PREFIX__ not replaced when using user directive ([#1394](https://github.com/jorenn92/Maintainerr/issues/1394)) ([9b237ea](https://github.com/jorenn92/Maintainerr/commit/9b237ea403224f9742bcb2cde7ba586a8a5fdcd1))
+* changed all docs URLs to match new docs URL generations. ([c8161a3](https://github.com/jorenn92/Maintainerr/commit/c8161a3a1fd62c5765681e4eb843f16f9f0bd278))
+* Docker startup ([ce4e7ad](https://github.com/jorenn92/Maintainerr/commit/ce4e7ad06ecca1d3fcb2112e85ca8a4641098041))
+* error when overseerr URL is null ([a2aeb99](https://github.com/jorenn92/Maintainerr/commit/a2aeb994757acdaacd0de694e253a327f1fdaeea))
+* Handling collections failure after multi arr ([e299c15](https://github.com/jorenn92/Maintainerr/commit/e299c1508ecf0718f8acf6f4cfdbbc24777fe3be))
+* Ignore Plex smart collections due to library corruption ([#1355](https://github.com/jorenn92/Maintainerr/issues/1355)) ([7cf6780](https://github.com/jorenn92/Maintainerr/commit/7cf6780e62ef7a4332a5e089da5823be4bf93226))
+* lint issues ([149dc78](https://github.com/jorenn92/Maintainerr/commit/149dc78d08beed8df967e8da576307b8cf02f1ce))
+* Only allow saving successfully tested settings ([bd88567](https://github.com/jorenn92/Maintainerr/commit/bd88567f60a6371d3804b5b898fa19037714caa4))
+* **package.json:** lint:server script ([575a6c5](https://github.com/jorenn92/Maintainerr/commit/575a6c58ea678ef87e4ae2ab1e9200462ef257b7))
+* Remove cached arr API client on setting changes ([3081105](https://github.com/jorenn92/Maintainerr/commit/308110509a83f526162d0c2cd245081c2c6eb4a6))
+* Revert defaulting to ipv6 ([8ee4888](https://github.com/jorenn92/Maintainerr/commit/8ee4888d44ffafa99ced262f9316d626884fb9ed))
+* Sonarr media existence check in collection handling ([8cd0030](https://github.com/jorenn92/Maintainerr/commit/8cd00301410c7eef1c2ac973834bafd6416e73d0))
+* Trim trailing slash in Overseerr URL ([d3dab2d](https://github.com/jorenn92/Maintainerr/commit/d3dab2d964200d9df70957288237bd4892f10960))
+
+
+### Features
+
+* Add "Original Language" rule to Sonarr & Radarr ([#1407](https://github.com/jorenn92/Maintainerr/issues/1407)) ([bf6bf49](https://github.com/jorenn92/Maintainerr/commit/bf6bf4918bab5116044a002d904b839618169d42))
+* Add "Show on library recommended" option ([ccc13ba](https://github.com/jorenn92/Maintainerr/commit/ccc13ba526117691670b1eb741a14e4b36416dd4))
+* Add base path support ([#1373](https://github.com/jorenn92/Maintainerr/issues/1373)) ([9597bfa](https://github.com/jorenn92/Maintainerr/commit/9597bfa69f29e508e8762ddfad1d2c3cccd39528))
+* Add envars to control service ports ([#1333](https://github.com/jorenn92/Maintainerr/issues/1333)) ([b418975](https://github.com/jorenn92/Maintainerr/commit/b4189752ce265b16e2b28a7c4eecc0385903fe07))
+* Support mutiple *arr servers ([156aca1](https://github.com/jorenn92/Maintainerr/commit/156aca12fd599e490dd68a60100c9f2a210a859a))
+
 ## [2.2.1](https://github.com/jorenn92/Maintainerr/compare/v2.2.0...v2.2.1) (2024-11-06)
 
 

@@ -15,6 +15,7 @@ export interface ICollection {
   title: string
   description?: string
   isActive: boolean
+  visibleOnRecommended?: boolean
   visibleOnHome?: boolean
   deleteAfterDays?: number
   listExclusions?: boolean
@@ -66,7 +67,7 @@ const Collection = () => {
       id != 9999
         ? LibrariesCtx.libraries.find((el) => +el.key === id)
         : undefined
-    lib ? setLibrary(lib) : setLibrary(undefined)
+    setLibrary(lib)
   }
 
   useEffect(() => {

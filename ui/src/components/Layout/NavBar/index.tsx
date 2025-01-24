@@ -59,6 +59,7 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
   const navRef = useRef<HTMLDivElement>(null)
   const SearchCtx = useContext(SearchContext)
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
   useEffect(() => {
     setTimeout(() => {
@@ -112,7 +113,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
             >
               <>
                 <div className="sidebar relative flex w-full max-w-xs flex-1 flex-col bg-zinc-800">
-                  <div className="sidebar-close-button absolute top-0 right-0 -mr-14 p-1">
+                  <div className="sidebar-close-button absolute right-0 top-0 -mr-14 p-1">
                     <button
                       className="flex h-12 w-12 items-center justify-center rounded-full text-white focus:bg-zinc-600 focus:outline-none"
                       aria-label="Close sidebar"
@@ -123,7 +124,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                   </div>
                   <div
                     ref={navRef}
-                    className="flex h-0 flex-1 flex-col overflow-y-auto pt-4 pb-8 sm:pb-4"
+                    className="flex h-0 flex-1 flex-col overflow-y-auto pb-8 pt-4 sm:pb-4"
                   >
                     <div className="flex flex-shrink-0 items-center px-2">
                       <span className="px-4 text-xl text-zinc-50">
@@ -132,7 +133,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                             width={0}
                             height={0}
                             style={{ width: '100%', height: 'auto' }}
-                            src="/logo.svg"
+                            src={`${basePath}/logo.svg`}
                             alt="Logo"
                             priority
                           />
@@ -157,8 +158,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                               }}
                               role="button"
                               tabIndex={0}
-                              className={`flex items-center rounded-md px-2 py-2 text-base font-medium leading-6 text-white transition duration-150 ease-in-out focus:outline-none
-                              ${
+                              className={`flex items-center rounded-md px-2 py-2 text-base font-medium leading-6 text-white transition duration-150 ease-in-out focus:outline-none ${
                                 link.selected
                                   ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'
                                   : 'hover:bg-zinc-700'
@@ -185,10 +185,10 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
         </Transition>
       </div>
 
-      <div className="fixed top-0 bottom-0 left-0 z-30 hidden lg:flex lg:flex-shrink-0">
+      <div className="fixed bottom-0 left-0 top-0 z-30 hidden lg:flex lg:flex-shrink-0">
         <div className="sidebar flex w-64 flex-col">
           <div className="flex h-0 flex-1 flex-col">
-            <div className="flex flex-1 flex-col overflow-y-auto pt-4 pb-4">
+            <div className="flex flex-1 flex-col overflow-y-auto pb-4 pt-4">
               <div className="flex flex-shrink-0 items-center">
                 <span className="px-4 text-2xl text-zinc-50">
                   <Link href="/">
@@ -196,7 +196,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                       width={0}
                       height={0}
                       style={{ width: '100%', height: 'auto' }}
-                      src="/logo.svg"
+                      src={`${basePath}/logo.svg`}
                       alt="Logo"
                       priority
                     />
@@ -223,9 +223,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                           navBarLink.selected
                             ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'
                             : 'hover:bg-zinc-700'
-                        }
-                        focus:bg-amber-800 focus:outline-none
-                      `}
+                        } focus:bg-amber-800 focus:outline-none`}
                       >
                         {navBarLink.svgIcon}
                         {navBarLink.name}

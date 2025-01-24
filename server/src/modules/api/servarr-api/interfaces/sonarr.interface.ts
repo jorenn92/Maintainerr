@@ -31,22 +31,27 @@ export interface SonarrInfo {
 }
 
 export interface SonarrEpisode {
+  id: number;
   airDate: string;
   seriesId: number;
   seasonNumber: number;
   episodeNumber: number;
   episodeFileId: number;
+  hasFile: boolean;
+  monitored: boolean;
+  finaleType?: 'series' | 'season' | 'midseason';
+}
+
+export interface SonarrEpisodeFile {
+  id: number;
+  seriesId: number;
+  seasonNumber: number;
   relativePath: string;
   path: string;
   size: number;
-  monitored: boolean;
   dateAdded: Date;
   sceneName?: string;
   releaseGroup?: string;
-  language?: {
-    id: number;
-    name: string;
-  };
   quality?: {
     quality: {
       id: number;
@@ -76,13 +81,12 @@ export interface SonarrEpisode {
     subtitles: string;
   };
   qualityCutoffNotMet: boolean;
-  languageCutoffNotMet: boolean;
-  id: number;
 }
 
 export interface SonarrSeries {
   title: string;
   sortTitle: string;
+  originalLanguage: SonarrLanguage;
   seasonCount: number;
   status: string;
   overview: string;
@@ -129,6 +133,11 @@ export interface SonarrSeries {
   };
   statistics?: SonarrStatistics;
   ended?: boolean;
+}
+
+export interface SonarrLanguage {
+  id: number;
+  name: string | null;
 }
 
 export interface AddSeriesOptions {

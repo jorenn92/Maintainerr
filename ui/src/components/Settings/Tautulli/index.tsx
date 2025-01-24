@@ -22,7 +22,7 @@ const TautulliSettings = () => {
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
   const [testBanner, setTestbanner] = useState<{
-    status: Boolean
+    status: boolean
     version: string
   }>({ status: false, version: '0' })
 
@@ -120,7 +120,7 @@ const TautulliSettings = () => {
         ) : (
           <Alert
             type="error"
-            title="Connection failed! Please check and save your settings"
+            title="Connection failed! Double check your entries and make sure to Save Changes before you Test."
           />
         )
       ) : undefined}
@@ -164,6 +164,7 @@ const TautulliSettings = () => {
           <div className="form-row">
             <label htmlFor="baseUrl" className="text-label">
               Base URL
+              <span className="label-tip">{`No Leading Slash`}</span>
             </label>
             <div className="form-input">
               <div className="form-input-field">
@@ -197,10 +198,10 @@ const TautulliSettings = () => {
 
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
-              <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
-                <DocsButton page="Configuration" />
+              <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
+                <DocsButton page="Configuration/#tautulli" />
               </span>
-              <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
+              <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
                 <TestButton
                   onClick={appTest}
                   testUrl="/settings/test/tautulli"

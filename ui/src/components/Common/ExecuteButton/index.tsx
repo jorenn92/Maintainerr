@@ -22,16 +22,16 @@ const ExecuteButton = (props: IExecuteButton) => {
 
   return (
     <button
-      className="edit-button flex m-auto rounded h-9 text-zinc-200 shadow-md"
+      className="edit-button m-auto flex h-9 rounded text-zinc-200 shadow-md"
       disabled={clicked}
       onClick={onClick}
     >
       {clicked ? (
-        <SmallLoadingSpinner className="h-5 m-auto ml-2" />
+        <SmallLoadingSpinner className="m-auto ml-2 h-5" />
       ) : (
-        <PlayIcon className="m-auto h-5 ml-4" />
+        <PlayIcon className="m-auto ml-4 h-5" />
       )}{' '}
-      <p className="m-auto rules-button-text ml-1 mr-4">{props.text}</p>
+      <p className="rules-button-text m-auto ml-1 mr-4">{props.text}</p>
     </button>
   )
 }

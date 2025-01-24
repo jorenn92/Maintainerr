@@ -73,10 +73,10 @@ const PlexSettings = () => {
   const serverPresetRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
-  const [tokenValid, setTokenValid] = useState<Boolean>(false)
-  const [clearTokenClicked, setClearTokenClicked] = useState<Boolean>(false)
+  const [tokenValid, setTokenValid] = useState<boolean>(false)
+  const [clearTokenClicked, setClearTokenClicked] = useState<boolean>(false)
   const [testBanner, setTestbanner] = useState<{
-    status: Boolean
+    status: boolean
     version: string
   }>({ status: false, version: '0' })
   const [availableServers, setAvailableServers] = useState<PlexDevice[]>()
@@ -92,7 +92,7 @@ const PlexSettings = () => {
     e: React.FormEvent<HTMLFormElement> | undefined,
     plex_token?: { plex_auth_token: string } | undefined,
   ) => {
-    e ? e.preventDefault() : undefined
+    e?.preventDefault()
     if (
       hostnameRef.current?.value &&
       nameRef.current?.value &&
@@ -107,7 +107,9 @@ const PlexSettings = () => {
         plex_auth_token?: string
       } = {
         plex_hostname: sslRef.current?.checked
-          ? `https://${hostnameRef.current.value.replace('http://', '').replace('https://', '')}`
+          ? `https://${hostnameRef.current.value
+              .replace('http://', '')
+              .replace('https://', '')}`
           : hostnameRef.current.value
               .replace('http://', '')
               .replace('https://', ''),
@@ -317,7 +319,7 @@ const PlexSettings = () => {
         ) : (
           <Alert
             type="error"
-            title="Connection failed! Please check and save your settings"
+            title="Connection failed! Double check your entries and make sure to Save Changes before you Test."
           />
         )
       ) : undefined}
@@ -500,11 +502,11 @@ const PlexSettings = () => {
           </div>
 
           <div className="actions mt-5 w-full">
-            <div className="flex flex-wrap sm:flex-nowrap w-full">
-              <span className="m-auto sm:mr-auto sm:ml-3 rounded-md shadow-sm">
-                <DocsButton page="Configuration" />
+            <div className="flex w-full flex-wrap sm:flex-nowrap">
+              <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
+                <DocsButton page="Configuration/#plex" />
               </span>
-              <div className="flex sm:justify-end m-auto sm:m-0 mt-3 xs:mt-0">
+              <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
                 <TestButton onClick={appTest} testUrl="/settings/test/plex" />
 
                 <span className="ml-3 inline-flex rounded-md shadow-sm">

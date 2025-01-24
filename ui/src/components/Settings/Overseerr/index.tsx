@@ -1,10 +1,5 @@
 import { SaveIcon } from '@heroicons/react/solid'
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
@@ -28,7 +23,7 @@ const OverseerrSettings = () => {
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
   const [testBanner, setTestbanner] = useState<{
-    status: Boolean
+    status: boolean
     version: string
   }>({ status: false, version: '0' })
 
@@ -79,9 +74,9 @@ const OverseerrSettings = () => {
         ? hostnameRef.current.value
         : hostnameRef.current.value.includes('https://')
           ? hostnameRef.current.value
-        : portRef.current.value == '443'
-        ? 'https://' + hostnameRef.current.value
-        : 'http://' + hostnameRef.current.value
+          : portRef.current.value == '443'
+            ? 'https://' + hostnameRef.current.value
+            : 'http://' + hostnameRef.current.value
 
       const payload = {
         overseerr_url: addPortToUrl(hostnameVal, +portRef.current.value),
@@ -132,7 +127,7 @@ const OverseerrSettings = () => {
         ) : (
           <Alert
             type="error"
-            title="Connection failed! Please check and save your settings"
+            title="Connection failed! Double check your entries and make sure to Save Changes before you Test."
           />
         )
       ) : undefined}
@@ -173,7 +168,9 @@ const OverseerrSettings = () => {
                   ref={portRef}
                   value={portRef.current?.value}
                   defaultValue={port}
-                  onChange={(e) => handleSettingsInputChange(e, portRef, setPort)}
+                  onChange={(e) =>
+                    handleSettingsInputChange(e, portRef, setPort)
+                  }
                 ></input>
               </div>
             </div>
@@ -198,10 +195,10 @@ const OverseerrSettings = () => {
 
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
-              <span className="m-auto rounded-md shadow-sm sm:mr-auto sm:ml-3">
-                <DocsButton page="Configuration" />
+              <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
+                <DocsButton page="Configuration/#overseerr" />
               </span>
-              <div className="m-auto flex sm:m-0 sm:justify-end mt-3 xs:mt-0">
+              <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
                 <TestButton
                   onClick={appTest}
                   testUrl="/settings/test/overseerr"

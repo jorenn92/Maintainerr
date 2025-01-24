@@ -22,10 +22,7 @@ export interface ISettingsLink {
 const SettingsLink: React.FC<ISettingsLink> = (props: ISettingsLink) => {
   if (props.isMobile) {
     return (
-      <option
-        disabled={props.disabled}
-        value={props.route}
-      >
+      <option disabled={props.disabled} value={props.route}>
         {props.children}
       </option>
     )

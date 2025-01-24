@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { isValidCron } from 'cron-validator';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
@@ -11,7 +11,6 @@ import { SettingDto } from "./dto's/setting.dto";
 import { Settings } from './entities/settings.entities';
 import { InternalApiService } from '../api/internal-api/internal-api.service';
 import { TautulliApiService } from '../api/tautulli-api/tautulli-api.service';
-import { NotificationSettings } from './interfaces/notifications-settings.interface';
 import { RadarrSettings } from './entities/radarr_settings.entities';
 import {
   DeleteRadarrSettingResponseDto,
@@ -159,25 +158,15 @@ export class SettingsService implements SettingDto {
     try {
       settings.url = settings.url.toLowerCase();
 
-      return this.radarrSettingsRepo.manager.transaction(async (manager) => {
-        if (settings.isDefault) {
-          await manager
-            .withRepository(this.radarrSettingsRepo)
-            .update({ isDefault: true }, { isDefault: false });
-        }
+      const savedSetting = await this.radarrSettingsRepo.save(settings);
 
-        const savedSetting = await manager
-          .withRepository(this.radarrSettingsRepo)
-          .save(settings);
-
-        this.logger.log('Radarr setting added');
-        return {
-          data: savedSetting,
-          status: 'OK',
-          code: 1,
-          message: 'Success',
-        };
-      });
+      this.logger.log('Radarr setting added');
+      return {
+        data: savedSetting,
+        status: 'OK',
+        code: 1,
+        message: 'Success',
+      };
     } catch (e) {
       this.logger.error('Error while adding Radarr setting: ', e);
       return { status: 'NOK', code: 0, message: 'Failure' };
@@ -190,33 +179,16 @@ export class SettingsService implements SettingDto {
     try {
       settings.url = settings.url.toLowerCase();
 
-      const data = await this.radarrSettingsRepo.manager.transaction(
-        async (manager) => {
-          const settingsDb = await manager
-            .withRepository(this.radarrSettingsRepo)
-            .findOne({
-              where: { id: settings.id },
-            });
+      const settingsDb = await this.radarrSettingsRepo.findOne({
+        where: { id: settings.id },
+      });
 
-          const data = {
-            ...settingsDb,
-            ...settings,
-          };
+      const data = {
+        ...settingsDb,
+        ...settings,
+      };
 
-          await manager.withRepository(this.radarrSettingsRepo).save(data);
-
-          if (settings.isDefault) {
-            await manager
-              .withRepository(this.radarrSettingsRepo)
-              .update(
-                { isDefault: true, id: Not(settings.id) },
-                { isDefault: false },
-              );
-          }
-
-          return data;
-        },
-      );
+      await this.radarrSettingsRepo.save(data);
 
       this.servarr.deleteCachedRadarrApiClient(settings.id);
       this.logger.log('Radarr settings updated');
@@ -289,25 +261,15 @@ export class SettingsService implements SettingDto {
     try {
       settings.url = settings.url.toLowerCase();
 
-      return this.sonarrSettingsRepo.manager.transaction(async (manager) => {
-        if (settings.isDefault) {
-          await manager
-            .withRepository(this.sonarrSettingsRepo)
-            .update({ isDefault: true }, { isDefault: false });
-        }
+      const savedSetting = await this.sonarrSettingsRepo.save(settings);
 
-        const savedSetting = await manager
-          .withRepository(this.sonarrSettingsRepo)
-          .save(settings);
-
-        this.logger.log('Sonarr setting added');
-        return {
-          data: savedSetting,
-          status: 'OK',
-          code: 1,
-          message: 'Success',
-        };
-      });
+      this.logger.log('Sonarr setting added');
+      return {
+        data: savedSetting,
+        status: 'OK',
+        code: 1,
+        message: 'Success',
+      };
     } catch (e) {
       this.logger.error('Error while adding Sonarr setting: ', e);
       return { status: 'NOK', code: 0, message: 'Failure' };
@@ -320,33 +282,16 @@ export class SettingsService implements SettingDto {
     try {
       settings.url = settings.url.toLowerCase();
 
-      const data = await this.sonarrSettingsRepo.manager.transaction(
-        async (manager) => {
-          const settingsDb = await manager
-            .withRepository(this.sonarrSettingsRepo)
-            .findOne({
-              where: { id: settings.id },
-            });
+      const settingsDb = await this.sonarrSettingsRepo.findOne({
+        where: { id: settings.id },
+      });
 
-          const data = {
-            ...settingsDb,
-            ...settings,
-          };
+      const data = {
+        ...settingsDb,
+        ...settings,
+      };
 
-          await manager.withRepository(this.sonarrSettingsRepo).save(data);
-
-          if (settings.isDefault) {
-            await manager
-              .withRepository(this.sonarrSettingsRepo)
-              .update(
-                { isDefault: true, id: Not(settings.id) },
-                { isDefault: false },
-              );
-          }
-
-          return data;
-        },
-      );
+      await this.sonarrSettingsRepo.save(data);
 
       this.servarr.deleteCachedSonarrApiClient(settings.id);
 

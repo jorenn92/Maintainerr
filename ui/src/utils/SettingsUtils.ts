@@ -44,7 +44,7 @@ export function getPortFromUrl(url: string): string | undefined {
 export function getHostname(url: string): string | undefined {
   try {
     const urlObject = new URL(url)
-    let baseUrl = urlObject.protocol + '//' + urlObject.hostname
+    const baseUrl = urlObject.protocol + '//' + urlObject.hostname
     return baseUrl
   } catch (error) {
     console.error('Invalid URL:', error.message)

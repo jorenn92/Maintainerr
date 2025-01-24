@@ -10,6 +10,7 @@ export interface ICollection {
   description?: string;
   isActive: boolean;
   arrAction: number;
+  visibleOnRecommended?: boolean;
   visibleOnHome?: boolean;
   listExclusions?: boolean;
   forceOverseerr?: boolean;

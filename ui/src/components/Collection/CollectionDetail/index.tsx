@@ -155,14 +155,14 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
   return (
     <div className="w-full">
       <div className="m-auto mb-3 flex w-full">
-        <h1 className="w-full whitespace-nowrap overflow-hidden overflow-ellipsis flex text-lg font-bold text-zinc-200 sm:m-0 xl:m-0 justify-center sm:justify-start">
+        <h1 className="flex w-full justify-center overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-bold text-zinc-200 sm:m-0 sm:justify-start xl:m-0">
           {`${props.title}`}
         </h1>
       </div>
 
       <div>
-        <div className="flex justify-center items-center h-full">
-          <div className="mt-0 mb-4 w-fit sm:w-full">
+        <div className="flex h-full items-center justify-center">
+          <div className="mb-4 mt-0 w-fit sm:w-full">
             <TabbedLinks
               onChange={(t) => setSelectedTab(t)}
               routes={tabbedRoutes}
@@ -173,11 +173,11 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
         </div>
         <div className="flex justify-center sm:justify-start">
           <button
-            className="edit-button mb-4 flex  rounded h-9 text-zinc-200 shadow-md"
+            className="edit-button mb-4 flex h-9 rounded text-zinc-200 shadow-md"
             onClick={() => setMediaTestModalOpen(true)}
           >
-            {<PlayIcon className="m-auto h-5 ml-5" />}{' '}
-            <p className="m-auto rules-button-text ml-1 mr-5">Test Media</p>
+            {<PlayIcon className="m-auto ml-5 h-5" />}{' '}
+            <p className="rules-button-text m-auto ml-1 mr-5">Test Media</p>
           </button>
         </div>
 
