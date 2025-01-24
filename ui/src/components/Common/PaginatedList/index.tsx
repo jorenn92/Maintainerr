@@ -16,7 +16,7 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
   items,
   onEdit,
   onAdd,
-  addName
+  addName,
 }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
@@ -37,18 +37,18 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
   }
 
   return (
-    <div className="max-w-full mx-auto mt-8 p-6 bg-zinc-800 text-zinc-400 rounded-lg shadow-lg">
+    <div className="mx-auto mt-8 max-w-full rounded-lg bg-zinc-800 p-6 text-zinc-400 shadow-lg">
       <ul className="space-y-3">
         {currentItems.map((item) => (
           <li
             key={item.id}
-            className="flex justify-between items-center bg-zinc-700 p-4 rounded-md hover:bg-zinc-600 transition-all"
+            className="flex items-center justify-between rounded-md bg-zinc-700 p-4 transition-all hover:bg-zinc-600"
           >
             <div className="flex flex-col space-y-2">
               <span className="text-lg font-medium">{item.title}</span>
               <button
                 onClick={() => onEdit(item.id)}
-                className="self-start text-zinc-400 font-bold underline hover:text-amber-600 transition-all"
+                className="self-start font-bold text-zinc-400 underline transition-all hover:text-amber-600"
               >
                 Edit
               </button>
@@ -57,11 +57,11 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
         ))}
       </ul>
 
-      <div className="mt-6 flex justify-between items-center text-white">
+      <div className="mt-6 flex items-center justify-between text-white">
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
-          className={`px-4 py-2 rounded-md ${currentPage === 1 ? 'opacity-50 cursor-not-allowed bg-zinc-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+          className={`rounded-md px-4 py-2 ${currentPage === 1 ? 'cursor-not-allowed bg-zinc-600 opacity-50' : 'bg-zinc-700 hover:bg-zinc-600'}`}
         >
           Previous
         </button>
@@ -73,7 +73,7 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className={`px-4 py-2 rounded-md ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed bg-zinc-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+          className={`rounded-md px-4 py-2 ${currentPage === totalPages ? 'cursor-not-allowed bg-zinc-600 opacity-50' : 'bg-zinc-700 hover:bg-zinc-600'}`}
         >
           Next
         </button>
@@ -82,7 +82,7 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
       <div className="mt-6 flex justify-center">
         <button
           onClick={onAdd}
-          className="inline-flex items-center justify-center border border-transparent leading-5 font-medium focus:outline-none transition ease-in-out duration-150 cursor-pointer disabled:opacity-50 whitespace-nowrap text-white bg-amber-600 border-amber-600 hover:bg-amber-500 hover:border-amber-500 rounded-md focus:border-amber-700 focus:ring-amber active:bg-amber-700 active:border-amber-700 px-4 py-2 text-sm button-md "
+          className="focus:ring-amber button-md inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md border border-amber-600 border-transparent bg-amber-600 px-4 py-2 text-sm font-medium leading-5 text-white transition duration-150 ease-in-out hover:border-amber-500 hover:bg-amber-500 focus:border-amber-700 focus:outline-none active:border-amber-700 active:bg-amber-700 disabled:opacity-50"
         >
           {addName ? addName : 'Add'}
         </button>

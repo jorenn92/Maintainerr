@@ -26,7 +26,7 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
   }
 
   return (
-    <div className="flex justify-between items-center py-2 border-b border-gray-700">
+    <div className="flex items-center justify-between border-b border-gray-700 py-2">
       <div className="flex items-center">
         <input
           type="checkbox"
@@ -34,8 +34,8 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
           checked={isToggled}
           onChange={handleToggle}
         />
-        <span className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-400 cursor-pointer"></span>
-        <span className="text-white ml-3">{label}</span>
+        <span className="toggle-label block h-6 cursor-pointer overflow-hidden rounded-full bg-gray-400"></span>
+        <span className="ml-3 text-white">{label}</span>
       </div>
       {/* <a href="#" className="text-blue-400 hover:underline">Edit</a> */}
     </div>

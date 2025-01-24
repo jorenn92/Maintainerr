@@ -338,7 +338,7 @@
   }
 
   .section-settings {
-    @apply mt-6 mb-5 text-white;
+    @apply mb-5 mt-6 text-white;
   }
   .form-row {
     @apply mt-6 max-w-6xl sm:mt-5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4;
