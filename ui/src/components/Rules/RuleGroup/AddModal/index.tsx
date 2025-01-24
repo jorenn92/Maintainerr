@@ -413,7 +413,7 @@ const AddModal = (props: AddModal) => {
           <div className="ml-auto">
             <Link
               legacyBehavior
-              href={`https://docs.maintainerr.info/Rules`}
+              href={`https://docs.maintainerr.info/latest/Rules`}
               passHref={true}
             >
               <a target="_blank" rel="noopener noreferrer">
