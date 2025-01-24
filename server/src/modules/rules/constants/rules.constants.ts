@@ -170,7 +170,7 @@ export class RuleConstants {
           name: 'seenBy',
           humanName: '[list] Viewed by (username)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.TEXT, // returns usernames []
+          type: RuleType.TEXT_LIST, // returns usernames []
         },
         {
           id: 2,
@@ -191,7 +191,7 @@ export class RuleConstants {
           name: 'people',
           humanName: '[list] People involved',
           mediaType: MediaType.BOTH,
-          type: RuleType.TEXT, // return text[]
+          type: RuleType.TEXT_LIST, // return text[]
         },
         {
           id: 5,
@@ -220,7 +220,7 @@ export class RuleConstants {
           name: 'fileVideoResolution',
           humanName: '[list] Media file resolution (4k, 1080,..)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.TEXT,
+          type: RuleType.TEXT_LIST,
         },
         {
           id: 9,
@@ -241,14 +241,14 @@ export class RuleConstants {
           name: 'genre',
           humanName: '[list] List of genres (Action, Adventure,..)',
           mediaType: MediaType.BOTH,
-          type: RuleType.TEXT, // return text[]
+          type: RuleType.TEXT_LIST, // return text[]
         },
         {
           id: 12,
           name: 'sw_allEpisodesSeenBy',
           humanName: '[list] Users that saw all available episodes',
           mediaType: MediaType.SHOW,
-          type: RuleType.TEXT, // return usernames []
+          type: RuleType.TEXT_LIST, // return usernames []
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
         },
         {
@@ -295,7 +295,7 @@ export class RuleConstants {
           name: 'sw_watchers',
           humanName: '[list] Users that watch the show/season/episode',
           mediaType: MediaType.SHOW,
-          type: RuleType.TEXT, // return usernames []
+          type: RuleType.TEXT_LIST, // return usernames []
           showType: [
             EPlexDataType.SHOWS,
             EPlexDataType.SEASONS,
@@ -307,7 +307,7 @@ export class RuleConstants {
           name: 'collection_names',
           humanName: '[list] Collections media is present in (titles)',
           mediaType: MediaType.BOTH,
-          type: RuleType.TEXT,
+          type: RuleType.TEXT_LIST,
           cacheReset: true,
         },
         {
@@ -322,7 +322,7 @@ export class RuleConstants {
           name: 'playlist_names',
           humanName: '[list] Playlists media is present in (titles)',
           mediaType: MediaType.BOTH,
-          type: RuleType.TEXT,
+          type: RuleType.TEXT_LIST,
         },
         {
           id: 22,
@@ -343,7 +343,7 @@ export class RuleConstants {
           name: 'labels',
           humanName: '[list] Labels',
           mediaType: MediaType.BOTH,
-          type: RuleType.TEXT,
+          type: RuleType.TEXT_LIST,
         },
         {
           id: 25,
@@ -362,7 +362,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           showType: [EPlexDataType.SEASONS, EPlexDataType.EPISODES],
           cacheReset: true,
-          type: RuleType.TEXT,
+          type: RuleType.TEXT_LIST,
         },
         {
           id: 27,
@@ -377,7 +377,7 @@ export class RuleConstants {
           name: 'watchlist_isListedByUsers',
           humanName: '[list] Watchlisted by (username) [experimental]',
           mediaType: MediaType.BOTH,
-          type: RuleType.TEXT,
+          type: RuleType.TEXT_LIST,
         },
         {
           id: 30,
@@ -516,7 +516,7 @@ export class RuleConstants {
           name: 'tags',
           humanName: '[list] Tags (Text if 1, otherwise list)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.TEXT, // return text[]
+          type: RuleType.TEXT_LIST, // return text[]
         },
         {
           id: 3,
@@ -558,14 +558,14 @@ export class RuleConstants {
           name: 'fileAudioChannels',
           humanName: '[list] File - audio channels',
           mediaType: MediaType.MOVIE,
-          type: RuleType.NUMBER,
+          type: RuleType.NUMBER_LIST,
         },
         {
           id: 9,
           name: 'fileQuality',
           humanName: '[list] File - quality (2160, 1080,..)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.NUMBER,
+          type: RuleType.NUMBER_LIST,
         },
         {
           id: 10,
@@ -669,7 +669,7 @@ export class RuleConstants {
           name: 'tags',
           humanName: '[list] Tags (show)',
           mediaType: MediaType.SHOW,
-          type: RuleType.TEXT, // return text[]
+          type: RuleType.TEXT_LIST, // return text[]
         },
         {
           id: 3,
@@ -875,14 +875,14 @@ export class RuleConstants {
           name: 'seenBy',
           humanName: '[list] Viewed by (username)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.TEXT, // returns usernames []
+          type: RuleType.TEXT_LIST, // returns usernames []
         },
         {
           id: 1,
           name: 'sw_allEpisodesSeenBy',
           humanName: '[list] Users that saw all available episodes',
           mediaType: MediaType.SHOW,
-          type: RuleType.TEXT, // return usernames []
+          type: RuleType.TEXT_LIST, // return usernames []
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
         },
         {
@@ -934,7 +934,7 @@ export class RuleConstants {
           name: 'sw_watchers',
           humanName: '[list] Users that watch the show/season/episode',
           mediaType: MediaType.SHOW,
-          type: RuleType.TEXT, // return usernames []
+          type: RuleType.TEXT_LIST, // return usernames []
           showType: [
             EPlexDataType.SHOWS,
             EPlexDataType.SEASONS,
