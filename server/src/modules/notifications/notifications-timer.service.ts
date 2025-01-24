@@ -28,7 +28,7 @@ export class NotificationTimerService extends TaskBase {
   protected onBootstrapHook(): void {}
 
   public async execute() {
-    this.notificationService.registerConfiguredAgents(true); // re register notification agents
+    await this.notificationService.registerConfiguredAgents(true); // re register notification agents
 
     // helper submethod
     const getDayStart = (date) => new Date(date.setHours(0, 0, 0, 0));
@@ -86,7 +86,7 @@ export class NotificationTimerService extends TaskBase {
 
         // send the notification if required
         if (notification.rulegroups && transformedItems.length > 0) {
-          this.notificationService.handleNotification(
+          await this.notificationService.handleNotification(
             this.type,
             transformedItems,
             undefined,

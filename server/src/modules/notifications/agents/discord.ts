@@ -84,7 +84,7 @@ interface DiscordWebhookPayload {
 
 class DiscordAgent implements NotificationAgent {
   constructor(
-    private readonly settings: NotificationAgentConfig,
+    private readonly settings: NotificationAgentDiscord,
     readonly notification: Notification,
   ) {
     this.notification = notification;

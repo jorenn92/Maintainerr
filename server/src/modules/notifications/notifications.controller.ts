@@ -8,7 +8,7 @@ export class NotificationsController {
 
   @Post('/test')
   public async sendTestNotification() {
-    this.notificationService.handleNotification(
+    await this.notificationService.handleNotification(
       NotificationType.TEST_NOTIFICATION,
       null,
     );

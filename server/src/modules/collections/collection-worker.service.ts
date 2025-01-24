@@ -58,7 +58,7 @@ export class CollectionWorkerService extends TaskBase {
         return;
       }
 
-      this.notificationService.registerConfiguredAgents(true); // re-register notification agents, to avoid flukes
+      await this.notificationService.registerConfiguredAgents(true); // re-register notification agents, to avoid flukes
       await super.execute();
 
       // wait 5 seconds to make sure we're not executing together with the rule handler
@@ -102,7 +102,7 @@ export class CollectionWorkerService extends TaskBase {
 
           // handle notification
           if (handledMediaForNotification.length > 0) {
-            this.notificationService.handleNotification(
+            await this.notificationService.handleNotification(
               NotificationType.MEDIA_HANDLED,
               handledMediaForNotification,
               collection.title,
@@ -132,7 +132,7 @@ export class CollectionWorkerService extends TaskBase {
         );
 
         // notify
-        this.notificationService.handleNotification(
+        await this.notificationService.handleNotification(
           NotificationType.COLLECTION_HANDLING_FAILED,
           undefined,
         );
@@ -143,7 +143,7 @@ export class CollectionWorkerService extends TaskBase {
       this.logger.debug(e);
 
       // notify
-      this.notificationService.handleNotification(
+      await this.notificationService.handleNotification(
         NotificationType.COLLECTION_HANDLING_FAILED,
         undefined,
       );

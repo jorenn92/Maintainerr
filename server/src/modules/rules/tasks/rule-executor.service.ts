@@ -122,7 +122,7 @@ export class RuleExecutorService extends TaskBase {
       this.logger.log(
         'Not all applications are reachable.. Skipped rule execution.',
       );
-      this.notificationService.handleNotification(
+      await this.notificationService.handleNotification(
         NotificationType.RULE_HANDLING_FAILED,
         undefined,
       );
@@ -273,7 +273,7 @@ export class RuleExecutorService extends TaskBase {
             }'.`,
           );
 
-          this.notificationService.handleNotification(
+          await this.notificationService.handleNotification(
             NotificationType.MEDIA_REMOVED_FROM_COLLECTION,
             dataToRemove,
             collection.title,
@@ -289,7 +289,7 @@ export class RuleExecutorService extends TaskBase {
             }'.`,
           );
 
-          this.notificationService.handleNotification(
+          await this.notificationService.handleNotification(
             NotificationType.MEDIA_ADDED_TO_COLLECTION,
             dataToAdd,
             collection.title,
@@ -316,14 +316,14 @@ export class RuleExecutorService extends TaskBase {
         return collection;
       } else {
         this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
-        this.notificationService.handleNotification(
+        await this.notificationService.handleNotification(
           NotificationType.RULE_HANDLING_FAILED,
           undefined,
         );
       }
     } catch (err) {
       this.logger.error(`Execption occurred while handling rule: `, err);
-      this.notificationService.handleNotification(
+      await this.notificationService.handleNotification(
         NotificationType.RULE_HANDLING_FAILED,
         undefined,
       );
