@@ -13,6 +13,10 @@ export enum RulePossibility {
   NOT_CONTAINS,
   CONTAINS_PARTIAL,
   NOT_CONTAINS_PARTIAL,
+  COUNT_EQUALS,
+  COUNT_NOT_EQUALS,
+  COUNT_BIGGER,
+  COUNT_SMALLER,
 }
 
 export enum RuleOperators {
@@ -49,8 +53,6 @@ export class RuleType {
       RulePossibility.SMALLER,
       RulePossibility.EQUALS,
       RulePossibility.NOT_EQUALS,
-      RulePossibility.CONTAINS,
-      RulePossibility.NOT_CONTAINS,
     ],
     'number',
   );
@@ -73,8 +75,6 @@ export class RuleType {
       RulePossibility.NOT_EQUALS,
       RulePossibility.CONTAINS,
       RulePossibility.NOT_CONTAINS,
-      RulePossibility.CONTAINS_PARTIAL,
-      RulePossibility.NOT_CONTAINS_PARTIAL,
     ],
     'text',
   );
@@ -82,6 +82,38 @@ export class RuleType {
     '3',
     [RulePossibility.EQUALS, RulePossibility.NOT_EQUALS],
     'boolean',
+  );
+  static readonly NUMBER_LIST = new RuleType(
+    '4',
+    [
+      RulePossibility.EQUALS,
+      RulePossibility.NOT_EQUALS,
+      RulePossibility.CONTAINS,
+      RulePossibility.NOT_CONTAINS,
+      RulePossibility.CONTAINS_PARTIAL,
+      RulePossibility.NOT_CONTAINS_PARTIAL,
+      RulePossibility.COUNT_EQUALS,
+      RulePossibility.COUNT_NOT_EQUALS,
+      RulePossibility.COUNT_BIGGER,
+      RulePossibility.COUNT_SMALLER,
+    ],
+    'number list',
+  );
+  static readonly TEXT_LIST = new RuleType(
+    '4',
+    [
+      RulePossibility.EQUALS,
+      RulePossibility.NOT_EQUALS,
+      RulePossibility.CONTAINS,
+      RulePossibility.NOT_CONTAINS,
+      RulePossibility.CONTAINS_PARTIAL,
+      RulePossibility.NOT_CONTAINS_PARTIAL,
+      RulePossibility.COUNT_EQUALS,
+      RulePossibility.COUNT_NOT_EQUALS,
+      RulePossibility.COUNT_BIGGER,
+      RulePossibility.COUNT_SMALLER,
+    ],
+    'text list',
   );
   public constructor(
     private readonly key: string,
@@ -92,6 +124,15 @@ export class RuleType {
     return this.key;
   }
 }
+
+export type RuleValueType =
+  | number
+  | Date
+  | string
+  | boolean
+  | number[]
+  | string[]
+  | null;
 
 export interface Property {
   id: number;
