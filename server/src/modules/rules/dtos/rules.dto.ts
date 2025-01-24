@@ -23,5 +23,4 @@ export class RulesDto {
   notifications?: Notification[];
   radarrSettingsId?: number;
   sonarrSettingsId?: number;
-  notifications?: Notification[];
 }
