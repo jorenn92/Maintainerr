@@ -5,8 +5,8 @@ import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
 import {
-  NotificationAgentConfig,
   NotificationAgentKey,
+  NotificationAgentWebhook,
   NotificationType,
 } from '../notifications-interfaces';
 import { Notification } from '../entities/notification.entities';
@@ -27,7 +27,7 @@ const KeyMap: Record<string, string | KeyMapFunction> = {
 class WebhookAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
-    private readonly settings: NotificationAgentConfig,
+    private readonly settings: NotificationAgentWebhook,
     readonly notification: Notification,
   ) {
     this.notification = notification;
@@ -98,9 +98,7 @@ class WebhookAgent implements NotificationAgent {
   ): Promise<boolean> {
     const settings = this.getSettings();
 
-    if (
-      !hasNotificationType(type, settings.types ?? [0])
-    ) {
+    if (!hasNotificationType(type, settings.types ?? [0])) {
       return true;
     }
 

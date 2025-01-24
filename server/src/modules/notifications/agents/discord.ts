@@ -3,7 +3,7 @@ import { hasNotificationType } from '../notifications.service';
 import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
 import {
-  NotificationAgentConfig,
+  NotificationAgentDiscord,
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';

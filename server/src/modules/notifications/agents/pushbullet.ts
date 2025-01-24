@@ -4,8 +4,8 @@ import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
 import {
-  NotificationAgentConfig,
   NotificationAgentKey,
+  NotificationAgentPushbullet,
   NotificationType,
 } from '../notifications-interfaces';
 import { Notification } from '../entities/notification.entities';
@@ -20,7 +20,7 @@ interface PushbulletPayload {
 class PushbulletAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
-    private readonly settings: NotificationAgentConfig,
+    private readonly settings: NotificationAgentPushbullet,
     readonly notification: Notification,
   ) {
     this.notification = notification;

@@ -4,7 +4,7 @@ export interface NotificationAgentConfig {
   options: Record<string, unknown>;
 }
 export interface NotificationAgentDiscord extends NotificationAgentConfig {
-  options: {
+  options: NotificationAgentConfig['options'] & {
     botUsername?: string;
     botAvatarUrl?: string;
     webhookUrl: string;
@@ -12,13 +12,13 @@ export interface NotificationAgentDiscord extends NotificationAgentConfig {
 }
 
 export interface NotificationAgentSlack extends NotificationAgentConfig {
-  options: {
+  options: NotificationAgentConfig['options'] & {
     webhookUrl: string;
   };
 }
 
 export interface NotificationAgentEmail extends NotificationAgentConfig {
-  options: {
+  options: NotificationAgentConfig['options'] & {
     emailFrom: string;
     smtpHost: string;
     smtpPort: number;
@@ -35,14 +35,14 @@ export interface NotificationAgentEmail extends NotificationAgentConfig {
 }
 
 export interface NotificationAgentLunaSea extends NotificationAgentConfig {
-  options: {
+  options: NotificationAgentConfig['options'] & {
     webhookUrl: string;
     profileName?: string;
   };
 }
 
 export interface NotificationAgentTelegram extends NotificationAgentConfig {
-  options: {
+  options: NotificationAgentConfig['options'] & {
     botUsername?: string;
     botAPI: string;
     chatId: string;
@@ -51,14 +51,14 @@ export interface NotificationAgentTelegram extends NotificationAgentConfig {
 }
 
 export interface NotificationAgentPushbullet extends NotificationAgentConfig {
-  options: {
+  options: NotificationAgentConfig['options'] & {
     accessToken: string;
     channelTag?: string;
   };
 }
 
 export interface NotificationAgentPushover extends NotificationAgentConfig {
-  options: {
+  options: NotificationAgentConfig['options'] & {
     accessToken: string;
     userToken: string;
     sound: string;
@@ -66,7 +66,7 @@ export interface NotificationAgentPushover extends NotificationAgentConfig {
 }
 
 export interface NotificationAgentWebhook extends NotificationAgentConfig {
-  options: {
+  options: NotificationAgentConfig['options'] & {
     webhookUrl: string;
     jsonPayload: string;
     authHeader?: string;
@@ -74,7 +74,7 @@ export interface NotificationAgentWebhook extends NotificationAgentConfig {
 }
 
 export interface NotificationAgentGotify extends NotificationAgentConfig {
-  options: {
+  options: NotificationAgentConfig['options'] & {
     url: string;
     token: string;
   };

@@ -4,7 +4,6 @@ import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
 import PreparedEmail from '../email/preparedEmail';
 import {
-  NotificationAgentConfig,
   NotificationAgentEmail,
   NotificationAgentKey,
   NotificationType,
@@ -15,7 +14,7 @@ import { Notification } from '../entities/notification.entities';
 class EmailAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
-    private readonly settings: NotificationAgentConfig,
+    private readonly settings: NotificationAgentEmail,
     readonly notification: Notification,
   ) {
     this.notification = notification;

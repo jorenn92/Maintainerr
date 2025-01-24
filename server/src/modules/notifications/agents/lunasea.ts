@@ -4,8 +4,8 @@ import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
 import {
-  NotificationAgentConfig,
   NotificationAgentKey,
+  NotificationAgentLunaSea,
   NotificationType,
 } from '../notifications-interfaces';
 import { Notification } from '../entities/notification.entities';
@@ -13,7 +13,7 @@ import { Notification } from '../entities/notification.entities';
 class LunaSeaAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
-    private readonly settings: NotificationAgentConfig,
+    private readonly settings: NotificationAgentLunaSea,
     readonly notification: Notification,
   ) {
     this.notification = notification;

@@ -4,8 +4,8 @@ import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
 import {
-  NotificationAgentConfig,
   NotificationAgentKey,
+  NotificationAgentPushover,
   NotificationType,
 } from '../notifications-interfaces';
 import { Notification } from '../entities/notification.entities';
@@ -29,7 +29,7 @@ interface PushoverPayload extends PushoverImagePayload {
 class PushoverAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
-    private readonly settings: NotificationAgentConfig,
+    private readonly settings: NotificationAgentPushover,
     readonly notification: Notification,
   ) {
     this.notification = notification;

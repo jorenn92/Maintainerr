@@ -4,8 +4,8 @@ import type { NotificationAgent, NotificationPayload } from './agent';
 import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
 import {
-  NotificationAgentConfig,
   NotificationAgentKey,
+  NotificationAgentTelegram,
   NotificationType,
 } from '../notifications-interfaces';
 import { Notification } from '../entities/notification.entities';
@@ -30,7 +30,7 @@ class TelegramAgent implements NotificationAgent {
 
   public constructor(
     private readonly appSettings: SettingsService,
-    private readonly settings: NotificationAgentConfig,
+    private readonly settings: NotificationAgentTelegram,
     readonly notification: Notification,
   ) {
     this.notification = notification;

@@ -4,7 +4,7 @@ import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
 import {
-  NotificationAgentConfig,
+  NotificationAgentGotify,
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
@@ -20,7 +20,7 @@ interface GotifyPayload {
 class GotifyAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
-    private readonly settings: NotificationAgentConfig,
+    private readonly settings: NotificationAgentGotify,
     readonly notification: Notification,
   ) {
     this.notification = notification;
