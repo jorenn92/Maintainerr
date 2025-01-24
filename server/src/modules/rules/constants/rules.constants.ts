@@ -100,7 +100,7 @@ export class RuleType {
     'number list',
   );
   static readonly TEXT_LIST = new RuleType(
-    '4',
+    '5',
     [
       RulePossibility.EQUALS,
       RulePossibility.NOT_EQUALS,
