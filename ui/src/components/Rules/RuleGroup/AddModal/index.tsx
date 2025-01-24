@@ -32,6 +32,7 @@ import { CloudDownloadIcon } from '@heroicons/react/outline'
 import { useToasts } from 'react-toast-notifications'
 import ConfigureNotificationModal from './ConfigureNotificationModal'
 import { AgentConfiguration } from '../../../Settings/Notifications/CreateNotificationModal'
+import Modal from '../../../Common/Modal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -976,6 +977,7 @@ const AddModal = (props: AddModal) => {
                   }}
                 />
               ) : undefined}
+
               {configureNotificionModal ? (
                 <ConfigureNotificationModal
                   onSuccess={(selection) => {
@@ -988,6 +990,7 @@ const AddModal = (props: AddModal) => {
                   selectedAgents={configuredNotificationConfigurations}
                 />
               ) : undefined}
+
               <RuleCreator
                 key={ruleCreatorVersion.current}
                 mediaType={

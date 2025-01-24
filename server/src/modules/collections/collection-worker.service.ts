@@ -137,7 +137,7 @@ export class CollectionWorkerService extends TaskBase {
           undefined,
         );
       }
-      this.finish();
+      await this.finish();
     } catch (e) {
       this.logger.error('An error occurred where handling collections');
       this.logger.debug(e);

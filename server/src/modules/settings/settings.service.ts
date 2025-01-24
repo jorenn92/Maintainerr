@@ -11,6 +11,7 @@ import { SettingDto } from "./dto's/setting.dto";
 import { Settings } from './entities/settings.entities';
 import { InternalApiService } from '../api/internal-api/internal-api.service';
 import { TautulliApiService } from '../api/tautulli-api/tautulli-api.service';
+import { NotificationSettings } from './interfaces/notifications-settings.interface';
 import { RadarrSettings } from './entities/radarr_settings.entities';
 import {
   DeleteRadarrSettingResponseDto,
