@@ -70,33 +70,45 @@ const TautulliSettings = () => {
         ? tautulli_url.slice(0, -1)
         : tautulli_url
 
-      const payload = {
-        tautulli_url: `${tautulli_url}${baseUrl ? `/${baseUrl}` : ''}`,
-        tautulli_api_key: apiKey,
-      }
+      await saveSettings(tautulli_url, apiKey)
+    } else await saveSettings('', '')
+  }
 
-      const resp: { code: 0 | 1; message: string } = await PostApiHandler(
-        '/settings',
-        {
-          ...settingsCtx.settings,
-          ...payload,
-        },
-      )
-      if (Boolean(resp.code)) {
-        settingsCtx.addSettings({
-          ...settingsCtx.settings,
-          ...payload,
-        })
-        setError(false)
-        setChanged(true)
-      } else setError(true)
-    } else {
-      setError(true)
+  const saveSettings = async (
+    tautulli_url: string,
+    tautulli_api_key: string,
+  ) => {
+    const payload = {
+      tautulli_url: `${tautulli_url}${baseUrl ? `/${baseUrl}` : ''}`,
+      tautulli_api_key: tautulli_api_key,
     }
+
+    const resp: { code: 0 | 1; message: string } = await PostApiHandler(
+      '/settings',
+      {
+        ...settingsCtx.settings,
+        ...payload,
+      },
+    )
+    if (Boolean(resp.code)) {
+      settingsCtx.addSettings({
+        ...settingsCtx.settings,
+        ...payload,
+      })
+      setError(false)
+      setChanged(true)
+    } else setError(true)
   }
 
   const appTest = (result: { status: boolean; version: string }) => {
     setTestbanner({ status: result.status, version: result.version })
+  }
+
+  const clearSettings = () => {
+    setHostname('')
+    setPort('')
+    setBaseUrl('')
+    setApiKey('')
   }
 
   return (
@@ -202,6 +214,15 @@ const TautulliSettings = () => {
                 <DocsButton page="Configuration/#tautulli" />
               </span>
               <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
+                <span className="ml-3 inline-flex rounded-md shadow-sm">
+                  <Button
+                    buttonType="default"
+                    type="button"
+                    onClick={() => clearSettings()}
+                  >
+                    <span>Clear</span>
+                  </Button>
+                </span>
                 <TestButton
                   onClick={appTest}
                   testUrl="/settings/test/tautulli"
