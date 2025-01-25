@@ -1,10 +1,10 @@
-import { useRef, useState } from 'react'
+import { FormEvent, useRef, useState } from 'react'
 import { MediaType } from '../../../../contexts/constants-context'
 import Alert from '../../../Common/Alert'
 import RuleInput from './RuleInput'
 import SectionHeading from '../../../Common/SectionHeading'
 import _ from 'lodash'
-import { ClipboardListIcon } from '@heroicons/react/solid'
+import { ClipboardListIcon, DocumentAddIcon } from '@heroicons/react/solid'
 import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 
 interface IRulesToCreate {
@@ -188,63 +188,83 @@ const RuleCreator = (props: iRuleCreator) => {
 
   return (
     <div className="h-full w-full">
-      {ruleAmountArr[0].map((sid) => {
+      {ruleAmountArr[0].map((sid, i) => {
+        const addRule = (e: FormEvent) => {
+          e.preventDefault()
+          RuleAdded(sid)
+        }
         return (
-          <div key={`${sid}-${deleted.current}`}>
-            <SectionHeading
-              id={sid}
-              name={'Section'}
-              onAdd={RuleAdded}
-              addAvailable={added.current.length <= 0}
-            />
-            <div className="ml-5">
-              {ruleAmountArr[1][sid - 1].map((id) => (
-                <RuleInput
-                  key={`${sid}-${id}`}
-                  id={
-                    ruleAmount[1].length > 1
-                      ? ruleAmount[1].reduce((pv, cv, idx) =>
-                          sid === 1
-                            ? cv - (cv - id)
-                            : idx <= sid - 1
-                              ? idx === sid - 1
-                                ? cv - (cv - id) + pv
-                                : cv + pv
-                              : pv,
-                        )
-                      : ruleAmount[1][0] - (ruleAmount[1][0] - id)
-                  }
-                  tagId={id}
-                  editData={
-                    editData
-                      ? {
-                          rule: editData.rules[
-                            (ruleAmount[1].length > 1
-                              ? ruleAmount[1].reduce((pv, cv, idx) =>
-                                  sid === 1
-                                    ? cv - (cv - id)
-                                    : idx <= sid - 1
-                                      ? idx === sid - 1
-                                        ? cv - (cv - id) + pv
-                                        : cv + pv
-                                      : pv,
-                                )
-                              : ruleAmount[1][0] - (ruleAmount[1][0] - id)) - 1
-                          ],
-                        }
-                      : undefined
-                  }
-                  section={sid}
-                  newlyAdded={added.current}
-                  mediaType={props.mediaType}
-                  dataType={props.dataType}
-                  onCommit={ruleCommited}
-                  onIncomplete={ruleOmitted}
-                  onDelete={ruleDeleted}
-                />
-              ))}
+          <>
+            {i !== 0 && <hr />}
+            <div key={`${sid}-${deleted.current}`} className="mb-10">
+              <SectionHeading id={sid} name={'Section'} />
+              <div className="ml-5">
+                {ruleAmountArr[1][sid - 1].map((id) => (
+                  <RuleInput
+                    key={`${sid}-${id}`}
+                    id={
+                      ruleAmount[1].length > 1
+                        ? ruleAmount[1].reduce((pv, cv, idx) =>
+                            sid === 1
+                              ? cv - (cv - id)
+                              : idx <= sid - 1
+                                ? idx === sid - 1
+                                  ? cv - (cv - id) + pv
+                                  : cv + pv
+                                : pv,
+                          )
+                        : ruleAmount[1][0] - (ruleAmount[1][0] - id)
+                    }
+                    tagId={id}
+                    editData={
+                      editData
+                        ? {
+                            rule: editData.rules[
+                              (ruleAmount[1].length > 1
+                                ? ruleAmount[1].reduce((pv, cv, idx) =>
+                                    sid === 1
+                                      ? cv - (cv - id)
+                                      : idx <= sid - 1
+                                        ? idx === sid - 1
+                                          ? cv - (cv - id) + pv
+                                          : cv + pv
+                                        : pv,
+                                  )
+                                : ruleAmount[1][0] - (ruleAmount[1][0] - id)) -
+                                1
+                            ],
+                          }
+                        : undefined
+                    }
+                    section={sid}
+                    newlyAdded={added.current}
+                    mediaType={props.mediaType}
+                    dataType={props.dataType}
+                    onCommit={ruleCommited}
+                    onIncomplete={ruleOmitted}
+                    onDelete={ruleDeleted}
+                  />
+                ))}
+
+                {added.current.length <= 0 ? (
+                  <div className="mt-10 text-amber-500">
+                    <button
+                      className="flex h-8 rounded bg-amber-600 shadow-md hover:bg-amber-500"
+                      onClick={addRule}
+                      title={`Add rule to section ${sid}`}
+                    >
+                      {
+                        <DocumentAddIcon className="m-auto ml-5 h-5 text-zinc-200" />
+                      }
+                      <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
+                        New rule
+                      </p>
+                    </button>
+                  </div>
+                ) : undefined}
+              </div>
             </div>
-          </div>
+          </>
         )
       })}
       {added.current.length <= 0 ? (
