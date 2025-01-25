@@ -3,7 +3,6 @@ import GetApiHandler from '../../../../utils/ApiHandler'
 import Image from 'next/image'
 
 interface ModalContentProps {
-  show: boolean
   onClose: () => void
   id: number
   image?: string
@@ -47,7 +46,7 @@ const iconMap: Record<string, Record<string, string>> = {
 }
 
 const MediaModalContent: React.FC<ModalContentProps> = memo(
-  ({ show, onClose, mediaType, id, summary, year, title, tmdbid }) => {
+  ({ onClose, mediaType, id, summary, year, title, tmdbid }) => {
     const [loading, setLoading] = useState<boolean>(true)
     const [backdrop, setBackdrop] = useState<string | null>(null)
     const [machineId, setMachineId] = useState<string | null>(null)
@@ -85,17 +84,12 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
     }, [id, mediaType, tmdbid])
 
     useEffect(() => {
-      if (show) {
-        document.body.style.overflow = 'hidden'
-      } else {
-        document.body.style.overflow = ''
-      }
+      document.body.style.overflow = 'hidden'
 
       return () => {
         document.body.style.overflow = ''
       }
-    }, [show])
-
+    }, [])
     return (
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 px-3"

@@ -355,7 +355,6 @@ const MediaCard: React.FC<IMediaCard> = ({
       {!addModal && !excludeModal && showMediaModal && (
         <MediaModalContent
           id={id}
-          show={showMediaModal}
           onClose={closeMediaModal}
           title={title}
           summary={summary || 'No description available.'}
