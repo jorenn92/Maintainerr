@@ -44,10 +44,7 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
           buttonType="primary"
           buttonSize="md"
           className="mb-1 mt-2 h-6 w-full text-zinc-200 shadow-md"
-          onClick={(e) => {
-            e.stopPropagation() // Stops the MediaModal from also showing when clicked.
-            setSure(true)
-          }}
+          onClick={() => setSure(true)}
         >
           {<TrashIcon className="m-auto ml-3 h-3" />}{' '}
           <p className="rules-button-text m-auto mr-2">{'Remove'}</p>
@@ -57,10 +54,7 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
           buttonType="primary"
           buttonSize="md"
           className="mb-1 mt-2 h-6 w-full text-zinc-200 shadow-md"
-          onClick={(e) => {
-            e.stopPropagation() // Stops the MediaModal from also showing when clicked.
-            props.popup ? handlePopup : handle
-          }}
+          onClick={props.popup ? handlePopup : handle}
         >
           <p className="rules-button-text m-auto mr-2">{'Are you sure?'}</p>
         </Button>
