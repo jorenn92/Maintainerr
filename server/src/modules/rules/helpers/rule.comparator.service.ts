@@ -517,14 +517,16 @@ export class RuleComparatorService {
     }
 
     if (action === RulePossibility.BEFORE) {
-      assertIsDate(val1);
-      assertIsDate(val2);
+      if (!(val1 instanceof Date) || !(val2 instanceof Date)) {
+        return false;
+      }
       return val1 && val2 ? val1 <= val2 : false;
     }
 
     if (action === RulePossibility.AFTER) {
-      assertIsDate(val1);
-      assertIsDate(val2);
+      if (!(val1 instanceof Date) || !(val2 instanceof Date)) {
+        return false;
+      }
       return val1 && val2 ? val1 >= val2 : false;
     }
 
@@ -542,22 +544,30 @@ export class RuleComparatorService {
       );
     }
 
-    if (action === RulePossibility.COUNT_EQUALS) {
-      assertIsArray(val1);
-      return val1.length === val2;
-    }
     if (action === RulePossibility.COUNT_NOT_EQUALS) {
       return !this.doRuleAction(val1, val2, RulePossibility.COUNT_EQUALS);
     }
-    if (action === RulePossibility.COUNT_BIGGER) {
-      assertIsArray(val1);
-      assertIsNumber(val2);
-      return val1.length > val2;
-    }
-    if (action === RulePossibility.COUNT_SMALLER) {
-      assertIsArray(val1);
-      assertIsNumber(val2);
-      return val1.length < val2;
+    if (
+      [
+        RulePossibility.COUNT_EQUALS,
+        RulePossibility.COUNT_BIGGER,
+        RulePossibility.COUNT_SMALLER,
+      ].includes(action)
+    ) {
+      if (!Array.isArray(val1)) {
+        return false;
+      }
+      if (!Array.isArray(val2) && typeof val2 !== 'number') {
+        return false;
+      }
+      const val2Length = Array.isArray(val2) ? val2.length : val2;
+      if (action === RulePossibility.COUNT_EQUALS) {
+        return val1.length === val2Length;
+      } else if (action === RulePossibility.COUNT_BIGGER) {
+        return val1.length > val2Length;
+      } else if (action === RulePossibility.COUNT_SMALLER) {
+        return val1.length < val2Length;
+      }
     }
   }
 
@@ -568,39 +578,5 @@ export class RuleComparatorService {
     } catch (error) {
       return false;
     }
-  }
-}
-
-function assertIsDate(val: any): asserts val is Date | null {
-  // TODO: remove these explicit null checks + null return values once strictNullChecks is enabled.
-  if (val == null) {
-    return;
-  }
-  if (!(val instanceof Date)) {
-    throw new Error(
-      'Expected a Date but received: ' + JSON.stringify(val, undefined, 2),
-    );
-  }
-}
-
-function assertIsArray<U>(val: any): asserts val is U[] | null {
-  if (val == null) {
-    return;
-  }
-  if (!Array.isArray(val)) {
-    throw new Error(
-      'Expected an array but received: ' + JSON.stringify(val, undefined, 2),
-    );
-  }
-}
-
-function assertIsNumber(val: any): asserts val is number | null {
-  if (val == null) {
-    return;
-  }
-  if (typeof val !== 'number') {
-    throw new Error(
-      'Expected a number but received: ' + JSON.stringify(val, undefined, 2),
-    );
   }
 }
