@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useState, useMemo } from 'react'
 import GetApiHandler from '../../../../utils/ApiHandler'
+import Image from 'next/image'
 
 interface ModalContentProps {
   show: boolean
@@ -32,10 +33,21 @@ interface Metadata {
   Guid: { id: string }[]
 }
 
+const iconMap: Record<string, Record<string, string>> = {
+  imdb: {
+    audience: '/icons_logos/imdb_icon.svg',
+  },
+  rottentomatoes: {
+    critic: '/icons_logos/rt_critic.svg',
+    audience: 'icons_logos/rt_audience.svg',
+  },
+  themoviedb: {
+    audience: '/icons_logos/tmdb_icon.svg',
+  },
+}
+
 const MediaModalContent: React.FC<ModalContentProps> = memo(
   ({ show, onClose, mediaType, id, summary, year, title, tmdbid }) => {
-    if (!show) return null
-
     const [loading, setLoading] = useState<boolean>(true)
     const [backdrop, setBackdrop] = useState<string | null>(null)
     const [machineId, setMachineId] = useState<string | null>(null)
@@ -50,19 +62,6 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
       [mediaType],
     )
 
-    const iconMap: Record<string, Record<string, string>> = {
-      imdb: {
-        audience: '/icons_logos/imdb_icon.svg',
-      },
-      rottentomatoes: {
-        critic: '/icons_logos/rt_critic.svg',
-        audience: 'icons_logos/rt_audience.svg',
-      },
-      themoviedb: {
-        audience: '/icons_logos/tmdb_icon.svg',
-      },
-    }
-
     useEffect(() => {
       GetApiHandler('/plex').then((resp) =>
         setMachineId(resp.machineIdentifier),
@@ -74,10 +73,28 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
         setMetadata(data)
         setLoading(false)
       })
-      GetApiHandler(`/moviedb/backdrop/${mediaType}/${tmdbid}`).then((resp) =>
-        setBackdrop(resp),
-      )
-    }, [id])
+      GetApiHandler(`/moviedb/backdrop/${mediaType}/${tmdbid}`)
+        .then((resp) => setBackdrop(resp))
+        .catch((error) => {
+          console.error(
+            'Error fetching backdrop image. Check your Plex metadata',
+            error,
+          )
+          setBackdrop(null)
+        })
+    }, [id, mediaType, tmdbid])
+
+    useEffect(() => {
+      if (show) {
+        document.body.style.overflow = 'hidden'
+      } else {
+        document.body.style.overflow = ''
+      }
+
+      return () => {
+        document.body.style.overflow = ''
+      }
+    }, [show])
 
     return (
       <div
@@ -122,12 +139,12 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                   </div>
                   {metadata?.contentRating && (
                     <div className="pointer-events-none mt-1 rounded-lg bg-black bg-opacity-70 p-2 text-xs font-medium uppercase text-zinc-200">
-                      {`Rated:${metadata.contentRating}`}
+                      {`Rated: ${metadata.contentRating}`}
                     </div>
                   )}
                 </div>
                 {metadata?.Rating && metadata.Rating.length > 0 ? (
-                  <div className="max-w-fit">
+                  <div className="flex flex-wrap-reverse gap-1">
                     {metadata.Rating.map((rating, index) => {
                       const prefix = rating.image.split('://')[0]
                       const type = rating.type
@@ -150,11 +167,13 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                       return (
                         <div
                           key={index}
-                          className="mb-1 flex items-center justify-center space-x-1.5 rounded-lg bg-black bg-opacity-70 px-3 py-1 text-white shadow-lg"
+                          className="flex items-center justify-center space-x-1.5 rounded-lg bg-black bg-opacity-70 px-3 py-1 text-white shadow-lg"
                         >
-                          <img
+                          <Image
                             src={icon}
                             alt={`${prefix} ${type} Icon`}
+                            width={24}
+                            height={24}
                             className="h-6 w-6"
                             title={`${prefix}-${type}`}
                           />
@@ -177,9 +196,11 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                         href={`https://themoviedb.org/${mediaTypeOf}/${tmdbid}`}
                         target="_blank"
                       >
-                        <img
+                        <Image
                           src={`/icons_logos/tmdb_logo.svg`}
                           alt="TMDB Logo"
+                          width={128}
+                          height={32}
                           className="h-8 w-32 rounded-lg bg-black bg-opacity-70 p-2 shadow-lg"
                         />
                       </a>
@@ -190,9 +211,11 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                       href={`https://app.plex.tv/desktop#!/server/${machineId}/details?key=%2Flibrary%2Fmetadata%2F${id}`}
                       target="_blank"
                     >
-                      <img
+                      <Image
                         src={`/icons_logos/plex_logo.svg`}
                         alt="Plex Logo"
+                        width={128}
+                        height={32}
                         className="mt-1 h-8 w-32 rounded-lg bg-black bg-opacity-70 p-1 shadow-lg"
                       />
                     </a>
@@ -203,9 +226,11 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                         href={`${tautulliModalUrl}/info?rating_key=${id}&source=history`}
                         target="_blank"
                       >
-                        <img
+                        <Image
                           src={`/icons_logos/tautulli_logo.svg`}
                           alt="Plex Logo"
+                          width={128}
+                          height={32}
                           className="mt-1 h-8 w-32 rounded-lg bg-black bg-opacity-70 p-1.5 shadow-lg"
                         />
                       </a>
@@ -213,8 +238,8 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
                   )}
                 </div>
                 {metadata?.Genre && metadata.Genre.length > 0 ? (
-                  <div className="pointer-events-none flex flex-col flex-wrap items-center gap-1 md:flex-row lg:flex-row xl:flex-row">
-                    {metadata.Genre.slice(0, 3).map((genre, index) => (
+                  <div className="pointer-events-none flex flex-wrap-reverse items-end justify-end gap-1">
+                    {metadata.Genre.map((genre, index) => (
                       <span
                         key={index}
                         className="flex items-center rounded-lg bg-black bg-opacity-70 p-2 text-xs font-medium text-white shadow-lg"

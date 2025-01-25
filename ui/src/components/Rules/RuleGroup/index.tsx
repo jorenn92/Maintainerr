@@ -64,11 +64,11 @@ const RuleGroup = (props: {
             </div>
             <div>
               {props.group.isActive ? (
-                <span className="flex justify-center text-green-600">
+                <span className="flex justify-center text-green-500">
                   Active
                 </span>
               ) : (
-                <span className="flex justify-center text-red-600">
+                <span className="flex justify-center text-red-500">
                   Inactive
                 </span>
               )}
