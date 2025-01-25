@@ -116,16 +116,14 @@ const MediaCard: React.FC<IMediaCard> = ({
         />
       ) : undefined}
       <div
-        className={`relative transform-gpu cursor-default overflow-hidden rounded-xl bg-zinc-800 bg-cover outline-none ring-1 transition duration-300 ${
+        className={`relative transform-gpu cursor-default overflow-hidden rounded-xl bg-zinc-800 bg-cover pb-[150%] outline-none ring-1 transition duration-300 ${
           showDetail
             ? 'scale-105 shadow-lg ring-zinc-500'
             : 'scale-100 shadow ring-zinc-700'
         }`}
-        style={{
-          paddingBottom: '150%',
-        }}
         onMouseEnter={() => !isTouch && setShowDetail(true)}
         onMouseLeave={() => setShowDetail(false)}
+        onClick={openMediaModal}
         role="link"
         tabIndex={0}
       >
@@ -272,7 +270,6 @@ const MediaCard: React.FC<IMediaCard> = ({
             <div className="absolute inset-0 cursor-alias overflow-hidden rounded-xl">
               <div
                 className="absolute inset-0 h-full w-full overflow-hidden text-left"
-                onClick={openMediaModal} // Add onClick event
                 style={{
                   background:
                     'linear-gradient(180deg, rgba(45, 55, 72, 0.4) 0%, rgba(45, 55, 72, 0.9) 100%)',
