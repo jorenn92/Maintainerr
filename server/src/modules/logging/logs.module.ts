@@ -12,7 +12,7 @@ import { EventEmitterTransport } from './winston/eventEmitterTransport';
 const dataDir =
   process.env.NODE_ENV === 'production'
     ? '/opt/data'
-    : path.join(__dirname, '../../data');
+    : path.join(__dirname, '../../../../data');
 
 @Module({
   imports: [],
@@ -28,11 +28,9 @@ const dataDir =
       ) => {
         const logSettings = await settings.get();
         const logLevel =
-          process.env.NODE_ENV !== 'production' || process.env.DEBUG == 'true'
-            ? 'silly'
-            : logSettings.level; // TODO Show this is being overriden in the logs UI?
-        const maxSize = `${logSettings.max_size}m`; // TODO Default to 20m
-        const maxFiles = `${logSettings.max_files}d`; // TODO Default to 7d
+          process.env.DEBUG == 'true' ? 'silly' : logSettings.level;
+        const maxSize = `${logSettings.max_size}m`;
+        const maxFiles = `${logSettings.max_files}d`;
 
         const dailyRotateFileTransport = new DailyRotateFile({
           filename: path.join(dataDir, 'logs/maintainerr-%DATE%.log'),

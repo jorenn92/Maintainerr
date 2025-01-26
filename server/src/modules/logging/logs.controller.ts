@@ -4,17 +4,19 @@ import {
   Get,
   Param,
   Post,
-  Sse,
+  Res,
   StreamableFile,
+  MessageEvent,
 } from '@nestjs/common';
 import {
   concat,
   from,
   map,
-  Observable,
   mergeAll,
   switchMap,
   fromEvent,
+  Subject,
+  filter,
 } from 'rxjs';
 import { LogEvent } from './log-event';
 import path from 'path';
@@ -27,6 +29,7 @@ import { MaintainerrLogConfigService } from './logs.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LogFile } from './dtos/logFile.dto';
 import { Readable } from 'stream';
+import { Response } from 'express';
 
 const logsDirectory = path.join(__dirname, `../../../../data/logs`);
 
@@ -37,8 +40,51 @@ export class LogsController {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  @Sse('stream')
-  stream(): Observable<MessageEvent> {
+  connectedClients = new Map<
+    string,
+    { close: () => void; subject: Subject<MessageEvent> }
+  >();
+
+  // Source: https://github.com/nestjs/nest/issues/12670
+  @Get('stream')
+  async stream(@Res() response: Response) {
+    const subject = new Subject<MessageEvent>();
+
+    const observer = {
+      next: (msg: MessageEvent) => {
+        if (msg.type) response.write(`event: ${msg.type}\n`);
+        if (msg.id) response.write(`id: ${msg.id}\n`);
+        if (msg.retry) response.write(`retry: ${msg.retry}\n`);
+
+        response.write(`data: ${JSON.stringify(msg.data)}\n\n`);
+      },
+    };
+
+    subject.subscribe(observer);
+
+    const clientKey = String(Math.random());
+    this.connectedClients.set(clientKey, {
+      close: () => {
+        response.end();
+      },
+      subject,
+    });
+
+    response.on('close', () => {
+      subject.complete();
+      this.connectedClients.delete(clientKey);
+      response.end();
+    });
+
+    response.set({
+      'Cache-Control':
+        'private, no-cache, no-store, must-revalidate, max-age=0, no-transform',
+      Connection: 'keep-alive',
+      'Content-Type': 'text/event-stream',
+    });
+
+    response.flushHeaders();
+
     const currentLogFile = new Promise<string | undefined>(
       (resolve, reject) => {
         readdir(logsDirectory, (err, files) => {
@@ -62,7 +108,6 @@ export class LogsController {
       ),
     );
 
-    // TODO The UI seems to stop receiving after a few mins?
     const tailLogs = fromEvent(this.eventEmitter, 'log').pipe(
       map((info: any) => {
         return {
@@ -73,9 +118,10 @@ export class LogsController {
       }),
     );
 
-    return concat(
+    const logEventStream = concat(
       from(currentLogFileRecentLines).pipe(
         mergeAll(),
+        filter((x) => x !== ''),
         map((data: string) => {
           const logEvent = parseLine(data);
           const event = new MessageEvent('log', { data: logEvent });
@@ -98,6 +144,14 @@ export class LogsController {
         }),
       ),
     );
+
+    logEventStream
+      .pipe(map((x) => this.sendDataToClient(clientKey, x)))
+      .subscribe();
+  }
+
+  sendDataToClient(clientId: string, message: MessageEvent) {
+    this.connectedClients.get(clientId)?.subject.next(message);
   }
 
   @Get('files')
