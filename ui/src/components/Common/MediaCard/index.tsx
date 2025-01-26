@@ -123,7 +123,7 @@ const MediaCard: React.FC<IMediaCard> = ({
         }`}
         onMouseEnter={() => !isTouch && setShowDetail(true)}
         onMouseLeave={() => setShowDetail(false)}
-        onClick={openMediaModal}
+        onClick={() => showDetail && openMediaModal()}
         role="link"
         tabIndex={0}
       >
