@@ -184,6 +184,25 @@ export class TmdbApiService extends ExternalApiService {
     }
   };
 
+  public getBackdropImagePath = async ({
+    tmdbId,
+    type,
+  }: {
+    tmdbId: number;
+    type: 'movie' | 'show';
+  }): Promise<string> => {
+    try {
+      if (type === 'movie') {
+        return (await this.getMovie({ movieId: tmdbId }))?.backdrop_path;
+      } else {
+        return (await this.getTvShow({ tvId: tmdbId }))?.backdrop_path;
+      }
+    } catch (e) {
+      warn(`[TMDb] Failed to fetch backdrop image path: ${e.message}`);
+      this.logger.debug(e);
+    }
+  };
+
   public getTvSeason = async ({
     tvId,
     seasonNumber,

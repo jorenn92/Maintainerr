@@ -6,6 +6,7 @@ import CachedImage from '../CachedImage'
 import GetApiHandler from '../../../utils/ApiHandler'
 import Button from '../Button'
 import AddModal from '../../AddModal'
+import MediaModalContent from './MediaModal'
 import { DocumentAddIcon, DocumentRemoveIcon } from '@heroicons/react/solid'
 import RemoveFromCollectionBtn from '../../Collection/CollectionDetail/RemoveFromCollectionBtn'
 
@@ -43,6 +44,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   daysLeft = 9999,
   exclusionId = undefined,
   tmdbid = undefined,
+  userScore,
   canExpand = false,
   collectionPage = false,
   exclusionType = undefined,
@@ -52,11 +54,17 @@ const MediaCard: React.FC<IMediaCard> = ({
   const isTouch = useIsTouch()
   const [isUpdating, setIsUpdating] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
-  const [showRequestModal, setShowRequestModal] = useState(false)
-  const [image, setImage] = useState(false)
+  const [image, setImage] = useState<string | null>(null)
   const [excludeModal, setExcludeModal] = useState(false)
   const [addModal, setAddModal] = useState(false)
   const [hasExclusion, setHasExclusion] = useState(false)
+  const [showMediaModal, setShowMediaModal] = useState(false)
+
+  const openMediaModal = () => {
+    setShowMediaModal(true)
+  }
+
+  const closeMediaModal = () => setShowMediaModal(false)
 
   useEffect(() => {
     if (tmdbid) {
@@ -108,26 +116,14 @@ const MediaCard: React.FC<IMediaCard> = ({
         />
       ) : undefined}
       <div
-        className={`relative transform-gpu cursor-default overflow-hidden rounded-xl bg-zinc-800 bg-cover outline-none ring-1 transition duration-300 ${
+        className={`relative transform-gpu cursor-default overflow-hidden rounded-xl bg-zinc-800 bg-cover pb-[150%] outline-none ring-1 transition duration-300 ${
           showDetail
             ? 'scale-105 shadow-lg ring-zinc-500'
             : 'scale-100 shadow ring-zinc-700'
         }`}
-        style={{
-          paddingBottom: '150%',
-        }}
-        onMouseEnter={() => {
-          if (!isTouch) {
-            setShowDetail(true)
-          }
-        }}
+        onMouseEnter={() => !isTouch && setShowDetail(true)}
         onMouseLeave={() => setShowDetail(false)}
-        onClick={() => setShowDetail(true)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            setShowDetail(true)
-          }
-        }}
+        onClick={() => showDetail && openMediaModal()}
         role="link"
         tabIndex={0}
       >
@@ -158,7 +154,6 @@ const MediaCard: React.FC<IMediaCard> = ({
               </div>
             </div>
           </div>
-
           {hasExclusion && !collectionPage ? (
             <div className="absolute right-0 flex items-center justify-between p-2">
               <div
@@ -253,7 +248,7 @@ const MediaCard: React.FC<IMediaCard> = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-zinc-800 bg-opacity-75 text-zinc-200">
+            <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-zinc-800 bg-opacity-60 text-zinc-200">
               <CachedImage
                 priority
                 src={Spinner}
@@ -264,7 +259,7 @@ const MediaCard: React.FC<IMediaCard> = ({
           </Transition>
 
           <Transition
-            show={!image || showDetail || showRequestModal}
+            show={!image || showDetail}
             enter="transition transform opacity-0"
             enterFrom="opacity-0"
             enterTo="opacity-100"
@@ -272,15 +267,7 @@ const MediaCard: React.FC<IMediaCard> = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="absolute inset-0 overflow-hidden rounded-xl">
-              {/* <Link href={mediaType === 'movie' ? `/movie/${id}` : `/tv/${id}`}>
-                <a
-                  className="absolute inset-0 h-full w-full cursor-pointer overflow-hidden text-left"
-                  style={{
-                    background:
-                      'linear-gradient(180deg, rgba(45, 55, 72, 0.4) 0%, rgba(45, 55, 72, 0.9) 100%)',
-                  }}
-                > */}
+            <div className="absolute inset-0 cursor-alias overflow-hidden rounded-xl">
               <div
                 className="absolute inset-0 h-full w-full overflow-hidden text-left"
                 style={{
@@ -293,7 +280,7 @@ const MediaCard: React.FC<IMediaCard> = ({
                     {year && <div className="text-sm font-medium">{year}</div>}
 
                     <h1
-                      className="w-full whitespace-normal text-xl font-bold leading-tight"
+                      className="w-full whitespace-normal text-sm font-bold leading-tight"
                       style={{
                         WebkitLineClamp: 3,
                         display: '-webkit-box',
@@ -313,9 +300,7 @@ const MediaCard: React.FC<IMediaCard> = ({
                         WebkitBoxOrient: 'vertical',
                         wordBreak: 'break-word',
                       }}
-                    >
-                      {summary}
-                    </div>
+                    ></div>
 
                     {!collectionPage ? (
                       <div>
@@ -323,7 +308,8 @@ const MediaCard: React.FC<IMediaCard> = ({
                           buttonType="twin-primary-l"
                           buttonSize="md"
                           className="mb-1 mt-2 h-6 w-1/2 text-zinc-200 shadow-md"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation() // Stops the MediaModal from also showing when clicked.
                             setAddModal(true)
                           }}
                         >
@@ -336,7 +322,8 @@ const MediaCard: React.FC<IMediaCard> = ({
                           buttonSize="md"
                           buttonType="twin-primary-r"
                           className="mt-2 h-6 w-1/2"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation() // Stops the MediaModal from also showing when clicked.
                             setExcludeModal(true)
                           }}
                         >
@@ -362,6 +349,18 @@ const MediaCard: React.FC<IMediaCard> = ({
           </Transition>
         </div>
       </div>
+      {!addModal && !excludeModal && showMediaModal && (
+        <MediaModalContent
+          id={id}
+          onClose={closeMediaModal}
+          title={title}
+          summary={summary || 'No description available.'}
+          mediaType={mediaType}
+          tmdbid={tmdbid}
+          year={year}
+          userScore={userScore}
+        />
+      )}
     </div>
   )
 }
