@@ -48,69 +48,76 @@ const RuleGroup = (props: {
   }
 
   return (
-    <div className="relative mb-5 flex w-full flex-col overflow-hidden rounded-xl bg-zinc-800 bg-cover bg-center p-4 text-zinc-400 shadow ring-1 ring-zinc-700 sm:flex-row">
-      <div className="relative z-10 flex w-full min-w-0 flex-col pr-4 sm:w-5/6 sm:flex-row">
-        <div className="mb-3 flex flex-col sm:mb-0 sm:w-5/6">
-          <div className="flex text-xs font-medium text-white">
-            <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-base font-bold text-white sm:text-lg">
-              {props.group.name}
+    <>
+      <div className="inset-0 z-0 h-fit p-3">
+        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-base font-bold text-white sm:text-lg">
+          <div>{props.group.name}</div>
+        </div>
+        <div className="h-12 max-h-12 overflow-y-hidden whitespace-normal text-base text-zinc-400 hover:overflow-y-scroll">
+          {props.group.description}
+        </div>
+      </div>
+      <div className="inset-0 z-0 h-fit p-3">
+        <div className="mb-5 mt-5 grid grid-cols-3 gap-3">
+          <div>
+            <div className="align-center flex justify-center font-bold">
+              Status
+            </div>
+            <div>
+              {props.group.isActive ? (
+                <span className="flex justify-center text-green-500">
+                  Active
+                </span>
+              ) : (
+                <span className="flex justify-center text-red-500">
+                  Inactive
+                </span>
+              )}
             </div>
           </div>
-
-          <div className="my-0.5 flex text-sm sm:my-1">
-            <span className="mr-2 w-full max-w-prose overflow-hidden overflow-ellipsis font-semibold">
-              {props.group.description}
-            </span>
+          <div>
+            <div className="m-auto mr-2 flex justify-center font-bold">
+              Library
+            </div>
+            <div className="flex justify-center text-amber-500">
+              {`${
+                LibrariesCtx.libraries.find(
+                  (el) => +el.key === +props.group.libraryId,
+                )?.title ?? ''
+              }`}
+            </div>
+          </div>
+          <div>
+            <div className="m-auto mr-2 flex justify-center font-bold">
+              Rules
+            </div>
+            <div className="flex justify-center text-amber-500">
+              {props.group.rules.length}
+            </div>
           </div>
         </div>
-
-        <div className="w-full flex-col text-left sm:w-1/6">
-          <span className="text-sm font-medium">Status </span>
-          {props.group.isActive ? (
-            <span className="text-sm font-bold text-green-900">Active</span>
-          ) : (
-            <span className="text-sm font-bold text-red-900">Inactive</span>
-          )}
-          <div className="m-auto mr-2 flex text-sm font-medium">
-            {`Library ${
-              LibrariesCtx.libraries.find(
-                (el) => +el.key === +props.group.libraryId,
-              )?.title ?? ''
-            }`}
-          </div>
-          {props.group.rules.length > 0 ? (
-            <span className="mr-2 text-sm font-medium">
-              <p>
-                {props.group.rules.length > 1
-                  ? `${props.group.rules.length} rules`
-                  : `${props.group.rules.length} rule`}
-              </p>
-            </span>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="m-auto w-full sm:w-1/6">
-        <div className="mb-2 flex h-auto">
-          <EditButton
-            onClick={onEdit}
-            text="Edit"
-            svgIcon={<PencilIcon className="m-auto h-5 text-zinc-200" />}
-          />
-        </div>
-        <div>
-          {showsureDelete ? (
-            <DeleteButton onClick={confirmedDelete} text="Are you sure?" />
-          ) : (
-            <DeleteButton
-              onClick={onRemove}
-              text="Delete"
-              svgIcon={<TrashIcon className="m-auto h-5 text-zinc-200" />}
+        <div className="grid w-full grid-cols-1 xl:grid-cols-2">
+          <div>
+            <EditButton
+              onClick={onEdit}
+              text="Edit"
+              svgIcon={<PencilIcon className="m-auto h-5 text-zinc-200" />}
             />
-          )}
+          </div>
+          <div>
+            {showsureDelete ? (
+              <DeleteButton onClick={confirmedDelete} text="Are you sure?" />
+            ) : (
+              <DeleteButton
+                onClick={onRemove}
+                text="Delete"
+                svgIcon={<TrashIcon className="m-auto h-5 text-zinc-200" />}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
