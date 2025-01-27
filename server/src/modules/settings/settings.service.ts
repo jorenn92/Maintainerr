@@ -23,6 +23,8 @@ import {
   SonarrSettingRawDto,
   SonarrSettingResponseDto,
 } from "./dto's/sonarr-setting.dto";
+import { NotificationSettings } from './interfaces/notifications-settings.interface';
+import { NotificationService } from '../notifications/notifications.service';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -58,6 +60,8 @@ export class SettingsService implements SettingDto {
   tautulli_url: string;
 
   tautulli_api_key: string;
+
+  notification_settings: NotificationSettings;
 
   collection_handler_job_cron: string;
 

@@ -15,6 +15,8 @@ import cacheManager from '../../api/lib/cache';
 import { RuleComparatorService } from '../helpers/rule.comparator.service';
 import { Collection } from '../../collections/entities/collection.entities';
 import { TaskBase } from '../../tasks/task.base';
+import { NotificationService } from '../../notifications/notifications.service';
+import { NotificationType } from '../../notifications/notifications-interfaces';
 
 interface PlexData {
   page: number;
@@ -43,6 +45,7 @@ export class RuleExecutorService extends TaskBase {
     private readonly collectionService: CollectionsService,
     protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
+    private readonly notificationService: NotificationService,
     private readonly comparator: RuleComparatorService,
   ) {
     super(taskService);
@@ -63,6 +66,7 @@ export class RuleExecutorService extends TaskBase {
       return;
     }
 
+    this.notificationService.registerConfiguredAgents(true); // re-register notification agents, to avoid flukes
     await super.execute();
 
     this.logger.log('Starting Execution of all active rules');
@@ -117,6 +121,10 @@ export class RuleExecutorService extends TaskBase {
     } else {
       this.logger.log(
         'Not all applications are reachable.. Skipped rule execution.',
+      );
+      await this.notificationService.handleNotification(
+        NotificationType.RULE_HANDLING_FAILED,
+        undefined,
       );
     }
     // clean up
@@ -264,6 +272,12 @@ export class RuleExecutorService extends TaskBase {
                 : collection.title
             }'.`,
           );
+
+          await this.notificationService.handleNotification(
+            NotificationType.MEDIA_REMOVED_FROM_COLLECTION,
+            dataToRemove,
+            collection.title,
+          );
         }
 
         if (dataToAdd.length > 0) {
@@ -273,6 +287,13 @@ export class RuleExecutorService extends TaskBase {
                 ? collection.manualCollectionName
                 : collection.title
             }'.`,
+          );
+
+          await this.notificationService.handleNotification(
+            NotificationType.MEDIA_ADDED_TO_COLLECTION,
+            dataToAdd,
+            collection.title,
+            collection.deleteAfterDays,
           );
         }
 
@@ -295,9 +316,17 @@ export class RuleExecutorService extends TaskBase {
         return collection;
       } else {
         this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
+        await this.notificationService.handleNotification(
+          NotificationType.RULE_HANDLING_FAILED,
+          undefined,
+        );
       }
     } catch (err) {
-      this.logger.warn(`Execption occurred whild handling rule: `, err);
+      this.logger.error(`Execption occurred while handling rule: `, err);
+      await this.notificationService.handleNotification(
+        NotificationType.RULE_HANDLING_FAILED,
+        undefined,
+      );
     }
   }
 

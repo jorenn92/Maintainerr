@@ -30,6 +30,9 @@ import CachedImage from '../../../Common/CachedImage'
 import YamlImporterModal from '../../../Common/YamlImporterModal'
 import { CloudDownloadIcon } from '@heroicons/react/outline'
 import { useToasts } from 'react-toast-notifications'
+import ConfigureNotificationModal from './ConfigureNotificationModal'
+import { AgentConfiguration } from '../../../Settings/Notifications/CreateNotificationModal'
+import Modal from '../../../Common/Modal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -59,6 +62,7 @@ interface ICreateApiObject {
   }
   rules: IRule[]
   dataType: EPlexDataType
+  notifications: AgentConfiguration[]
 }
 
 const AddModal = (props: AddModal) => {
@@ -73,6 +77,8 @@ const AddModal = (props: AddModal) => {
   const [isLoading, setIsLoading] = useState(true)
   const [CommunityModal, setCommunityModal] = useState(false)
   const [yamlImporterModal, setYamlImporterModal] = useState(false)
+  const [configureNotificionModal, setConfigureNotificationModal] =
+    useState(false)
   const yaml = useRef<string>()
 
   const nameRef = useRef<any>()
@@ -89,6 +95,12 @@ const AddModal = (props: AddModal) => {
   const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
   const [manualCollection, setManualCollection] = useState<boolean>(false)
   const ConstantsCtx = useContext(ConstantsContext)
+  const [
+    configuredNotificationConfigurations,
+    setConfiguredNotificationConfigurations,
+  ] = useState<AgentConfiguration[]>(
+    props.editData?.notifications ? props.editData?.notifications : [],
+  )
 
   const { addToast } = useToasts()
 
@@ -351,6 +363,7 @@ const AddModal = (props: AddModal) => {
           keepLogsForMonths: +keepLogsForMonthsRef.current.value,
         },
         rules: useRules ? rules : [],
+        notifications: configuredNotificationConfigurations,
       }
 
       if (!props.editData) {
@@ -871,6 +884,29 @@ const AddModal = (props: AddModal) => {
               </div>
             </div>
 
+            <div className="form-row">
+              <label htmlFor="notifications" className="text-label">
+                Notifications
+                {/* <p className="text-xs font-normal">
+                Configure notifications
+              </p> */}
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <Button
+                    buttonType="default"
+                    type="button"
+                    name="notifications"
+                    onClick={() => {
+                      setConfigureNotificationModal(!configureNotificionModal)
+                    }}
+                  >
+                    <span>Configure</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             <hr className="mt-5" />
             <div className={`section ${useRules ? `` : `hidden`}`}>
               <div className="section">
@@ -941,6 +977,20 @@ const AddModal = (props: AddModal) => {
                   }}
                 />
               ) : undefined}
+
+              {configureNotificionModal ? (
+                <ConfigureNotificationModal
+                  onSuccess={(selection) => {
+                    setConfiguredNotificationConfigurations(selection)
+                    setConfigureNotificationModal(false)
+                  }}
+                  onCancel={() => {
+                    setConfigureNotificationModal(false)
+                  }}
+                  selectedAgents={configuredNotificationConfigurations}
+                />
+              ) : undefined}
+
               <RuleCreator
                 key={ruleCreatorVersion.current}
                 mediaType={

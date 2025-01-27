@@ -32,6 +32,7 @@ import { ECollectionLogType } from '../collections/entities/collection_log.entit
 import cacheManager from '../api/lib/cache';
 import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
 import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
+import { Notification } from '../notifications/entities/notification.entities';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -52,8 +53,6 @@ export class RulesService {
     private readonly rulesRepository: Repository<Rules>,
     @InjectRepository(RuleGroup)
     private readonly ruleGroupRepository: Repository<RuleGroup>,
-    @InjectRepository(Collection)
-    private readonly collectionRepository: Repository<Collection>,
     @InjectRepository(CollectionMedia)
     private readonly collectionMediaRepository: Repository<CollectionMedia>,
     @InjectRepository(CommunityRuleKarma)
@@ -136,6 +135,7 @@ export class RulesService {
         .innerJoinAndSelect('rg.rules', 'r')
         .orderBy('r.id')
         .innerJoinAndSelect('rg.collection', 'c')
+        .leftJoinAndSelect('rg.notifications', 'n')
         .where(
           activeOnly ? 'rg.isActive = true' : 'rg.isActive in (true, false)',
         )
@@ -164,6 +164,7 @@ export class RulesService {
     try {
       return await this.ruleGroupRepository.findOne({
         where: { id: ruleGroupId },
+        relations: ['notifications'],
       });
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
@@ -176,6 +177,7 @@ export class RulesService {
     try {
       return await this.ruleGroupRepository.findOne({
         where: { collectionId: id },
+        relations: ['notifications'],
       });
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
@@ -279,6 +281,8 @@ export class RulesService {
             },
           ]);
         }
+
+        return state;
       } else {
         // empty rule if not using rules
         await this.rulesRepository.save([
@@ -289,6 +293,7 @@ export class RulesService {
           },
         ]);
       }
+
       return state;
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
@@ -389,6 +394,7 @@ export class RulesService {
           params.isActive !== undefined ? params.isActive : true,
           params.dataType !== undefined ? params.dataType : undefined,
           group.id,
+          params.notifications,
         );
 
         // remove previous rules
@@ -418,6 +424,7 @@ export class RulesService {
             },
           ]);
         }
+
         this.logger.log(`Successfully updated rulegroup '${params.name}'.`);
         return state;
       } else {
@@ -765,6 +772,7 @@ export class RulesService {
     isActive = true,
     dataType = undefined,
     id?: number,
+    notifications?: Notification[],
   ): Promise<number> {
     try {
       const values = {
@@ -784,15 +792,34 @@ export class RulesService {
           .into(RuleGroup)
           .values(values)
           .execute();
-        return groupId.identifiers[0].id;
+
+        id = groupId.identifiers[0].id;
       } else {
         await connection
           .update(RuleGroup)
           .set(values)
           .where({ id: id })
           .execute();
-        return id;
       }
+
+      // Remove all existing notifications from the RuleGroup
+      await connection
+        .relation(RuleGroup, 'notifications')
+        .of(id)
+        .remove(
+          await connection
+            .relation(RuleGroup, 'notifications')
+            .of(id)
+            .loadMany(),
+        );
+
+      // Associate new notifications to the RuleGroup
+      await connection
+        .relation(RuleGroup, 'notifications')
+        .of(id)
+        .add(notifications.map((notification) => notification.id));
+
+      return id;
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       this.logger.debug(e);
