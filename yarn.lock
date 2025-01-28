@@ -1509,7 +1509,7 @@ __metadata:
     eslint-config-prettier: "npm:^10.0.1"
     jest: "npm:^29.7.0"
     lodash: "npm:^4.17.21"
-    nest-winston: "npm:^1.10.0"
+    nest-winston: "npm:^1.10.2"
     node-cache: "npm:^5.1.2"
     plex-api: "npm:^5.3.2"
     prettier: "npm:^3.4.2"
@@ -11174,15 +11174,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nest-winston@npm:^1.10.0":
-  version: 1.10.0
-  resolution: "nest-winston@npm:1.10.0"
+"nest-winston@npm:^1.10.2":
+  version: 1.10.2
+  resolution: "nest-winston@npm:1.10.2"
   dependencies:
     fast-safe-stringify: "npm:^2.1.1"
   peerDependencies:
-    "@nestjs/common": ^5.0.0 || ^6.6.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+    "@nestjs/common": ^5.0.0 || ^6.6.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
     winston: ^3.0.0
-  checksum: 10c0/6619c6dbb3df51332cf6ce8e9172a425595fd7231e988a13f0fff5971ed608b249bf971e0ae10f5021669956570490e6115f241fddf7514ec3183bd6f70a0c80
+  checksum: 10c0/743ee07833f066d95ff62669b752d764177193e8a3f3c080181357c3b5adb0094bc612113aa9a6f3e38816cd355163b5968e1b259d57fccd8692d1e254069428
   languageName: node
   linkType: hard
 
