@@ -53,7 +53,7 @@
     "@automock/adapters.nestjs": "^2.1.0",
     "@automock/jest": "^2.1.0",
     "@eslint/eslintrc": "^3.2.0",
-    "@eslint/js": "^9.18.0",
+    "@eslint/js": "^9.19.0",
     "@nestjs/cli": "^10.4.9",
     "@nestjs/schematics": "^10.2.3",
     "@nestjs/testing": "^10.4.15",
