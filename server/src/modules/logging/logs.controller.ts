@@ -72,6 +72,7 @@ export class LogsController {
 
     response.on('close', () => {
       subject.complete();
+      logEventStreamSubscription.unsubscribe();
       this.connectedClients.delete(clientKey);
       response.end();
     });
@@ -112,7 +113,7 @@ export class LogsController {
       map((info: any) => {
         return {
           date: strToDate(info.timestamp),
-          level: info.level,
+          level: info.level.toUpperCase(),
           message: info.message,
         };
       }),
@@ -145,7 +146,7 @@ export class LogsController {
       ),
     );
 
-    logEventStream
+    const logEventStreamSubscription = logEventStream
       .pipe(map((x) => this.sendDataToClient(clientKey, x)))
       .subscribe();
   }
@@ -173,7 +174,7 @@ export class LogsController {
   }
 
   @Get('files/:file')
-  async getFile(@Param('file') file: String) {
+  async getFile(@Param('file') file: string) {
     const sanitizedFile = file.replace(/^(\.\.(\/|\\|$))+/, '');
     const filePath = path.join(logsDirectory, sanitizedFile);
     const fileMimeType = mime.lookup(filePath);
@@ -213,11 +214,13 @@ export class LogsController {
   }
 }
 
-function strToDate(dtStr) {
+const strToDate = (dtStr) => {
   if (!dtStr) return null;
-  let dateParts = dtStr.split('/');
-  let timeParts = dateParts[2].split(' ')[1].split(':');
+
+  const dateParts = dtStr.split('/');
+  const timeParts = dateParts[2].split(' ')[1].split(':');
   dateParts[2] = dateParts[2].split(' ')[0];
+
   return new Date(
     +dateParts[2],
     dateParts[1] - 1,
@@ -226,7 +229,7 @@ function strToDate(dtStr) {
     timeParts[1],
     timeParts[2],
   );
-}
+};
 
 const parseLine = (line: string): LogEvent => {
   const regex =
