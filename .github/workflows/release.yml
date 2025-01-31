@@ -100,3 +100,17 @@ jobs:
             jorenn92/maintainerr:${{ steps.package-version.outputs.current-version}}
             jorenn92/maintainerr:latest
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Mkdocs Deploy
+        if: ${{ success() }}
+        continue-on-error: true
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DOCS_DEPLOY }}
+          repository: ydkmlt84/Maintainerr_docs
+          event-type: maintainerr-release
+          client-payload: |
+            {
+              "ref": "refs/heads/main",
+              "versionInput": "${{ steps.package-version.outputs.current-version}}"
+            }          
