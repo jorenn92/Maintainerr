@@ -192,10 +192,10 @@ export class CollectionWorkerService extends TaskBase {
           }
         } else {
           if (collection.arrAction !== ServarrAction.UNMONITOR) {
-            this.plexApi.deleteMediaFromDisk(media.plexId.toString());
             this.infoLogger(
-              `Couldn't find movie with tmdb id ${tmdbid} in Radarr, so no Radarr action was taken for movie with Plex ID ${media.plexId}. But the movie was removed from the filesystem`,
+              `Couldn't find movie with tmdb id ${tmdbid} in Radarr, so no Radarr action was taken for movie with Plex ID ${media.plexId}. Attempting to remove from the filesystem via Plex.`,
             );
+            this.plexApi.deleteMediaFromDisk(media.plexId.toString());
           } else {
             this.infoLogger(
               `Radarr unmonitor action was not possible, couldn't find movie with tmdb id ${tmdbid} in Radarr. No action was taken for movie with Plex ID ${media.plexId}`,
@@ -420,10 +420,10 @@ export class CollectionWorkerService extends TaskBase {
           }
         } else {
           if (collection.arrAction !== ServarrAction.UNMONITOR) {
-            this.plexApi.deleteMediaFromDisk(plexData.ratingKey);
             this.infoLogger(
-              `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. But media item was removed through Plex`,
+              `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. Attempting to remove from the filesystem via Plex.`,
             );
+            this.plexApi.deleteMediaFromDisk(media.plexId.toString());
           } else {
             this.infoLogger(
               `Couldn't find correct tvdb id. No unmonitor action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
@@ -438,7 +438,7 @@ export class CollectionWorkerService extends TaskBase {
     } else if (!radarrApiClient && !sonarrApiClient) {
       if (collection.arrAction !== ServarrAction.UNMONITOR) {
         this.infoLogger(
-          `Couldn't utilize *arr to find and remove the media with id ${media.plexId}, so media will be removed from the filesystem through Plex. No unmonitor action was taken.`,
+          `Couldn't utilize *arr to find and remove the media with id ${media.plexId}. Attempting to remove from the filesystem via Plex. No unmonitor action was taken.`,
         );
         await this.plexApi.deleteMediaFromDisk(media.plexId.toString());
       } else {
