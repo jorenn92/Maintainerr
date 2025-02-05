@@ -1,3 +1,18 @@
+# [2.9.0](https://github.com/jorenn92/Maintainerr/compare/v2.8.0...v2.9.0) (2025-02-05)
+
+
+### Bug Fixes
+
+* Deleting Show via Plex fallback ([#1547](https://github.com/jorenn92/Maintainerr/issues/1547)) ([0025c42](https://github.com/jorenn92/Maintainerr/commit/0025c420efe784bc6f533e0b5cbed41cf68408a9))
+* Media Modal and Remove button clash ([#1544](https://github.com/jorenn92/Maintainerr/issues/1544)) ([0f19906](https://github.com/jorenn92/Maintainerr/commit/0f19906b8f38f11b1861c0503f979299215c8e38))
+* update optional page route param to new syntax ([#1528](https://github.com/jorenn92/Maintainerr/issues/1528)) ([65471de](https://github.com/jorenn92/Maintainerr/commit/65471de5b81622187b954cf2bf2d6f50a33968dd))
+
+
+### Features
+
+* Add media modal to overview & restyle rules ([#1505](https://github.com/jorenn92/Maintainerr/issues/1505)) ([6601709](https://github.com/jorenn92/Maintainerr/commit/6601709ca7fda95a99d5ac3fa3f16045439106bc))
+* Added a boolean check for watchlisted status ([#1506](https://github.com/jorenn92/Maintainerr/issues/1506)) ([41b5c37](https://github.com/jorenn92/Maintainerr/commit/41b5c37cfe89ac6eeab70256b986c1a9222c52d0))
+
 # [2.8.0](https://github.com/jorenn92/Maintainerr/compare/v2.7.0...v2.8.0) (2025-01-14)
 
 
