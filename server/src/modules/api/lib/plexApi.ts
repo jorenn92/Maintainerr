@@ -1,6 +1,7 @@
 import cacheManager, { Cache } from './cache';
 import { PlexLibraryResponse } from '../plex-api/interfaces/library.interfaces';
 import xml2js from 'xml2js';
+import { Logger } from '@nestjs/common';
 
 type PlexApiOptions = {
   hostname: string;
@@ -26,11 +27,16 @@ class PlexApi {
   private cache: Cache;
   private options: PlexApiOptions;
   private serverUrl: string;
+  private readonly logger = new Logger(PlexApi.name);
 
   constructor(options: PlexApiOptions) {
     this.options = options;
     this.serverUrl = options.hostname + ':' + this.options.port;
     this.cache = cacheManager.getCache('plexguid');
+
+    this.logger.debug(
+      `Initialized PlexApi with options: ${JSON.stringify(options)}`,
+    );
   }
 
   async query<T>(
@@ -105,6 +111,9 @@ class PlexApi {
     const cachedItem = this.cache.data.get<T>(cacheKey);
 
     if (cachedItem && doCache) {
+      this.logger.debug(
+        `[queryWithCache]: Returning cached item for: GET ${options.uri} - Headers: ${JSON.stringify(options.extraHeaders)}`,
+      );
       return cachedItem;
     } else {
       const response = await this.getQuery<T>(options);
@@ -171,18 +180,26 @@ class PlexApi {
     const parseResponse = options.parseResponse;
     const extraHeaders = options.extraHeaders || {};
 
+    const headers = {
+      Accept: 'application/json',
+      'X-Plex-Token': this.options.token,
+      ...extraHeaders,
+    };
+
+    this.logger.debug(
+      `[_request]: About to call: ${method} ${reqUrl} - Options: ${JSON.stringify(options)} - Headers: ${JSON.stringify(headers)}`,
+    );
+
     try {
       const response = await fetch(reqUrl, {
         method: method,
-        headers: {
-          Accept: 'application/json',
-          'X-Plex-Token': this.options.token,
-          ...extraHeaders,
-        },
+        headers,
         signal: timeout ? AbortSignal.timeout(timeout) : undefined,
       });
 
       if (!response.ok) {
+        this.logger.debug(`Response NOT OK`);
+
         if (response.status === 403) {
           throw new Error(
             'Plex Server denied request due to lack of managed user permissions! In case of a delete request, delete content must be allowed in plex-media-server options.',
@@ -195,6 +212,10 @@ class PlexApi {
           `Plex Server didnt respond with a valid 2xx status code, response code: ${response.status}`,
         );
       } else {
+        this.logger.debug(
+          `Response OK, parse response: ${parseResponse}. Response headers: ${JSON.stringify(response.headers)}`,
+        );
+
         if (parseResponse) {
           const contentType = response.headers.get('content-type');
 
@@ -213,6 +234,10 @@ class PlexApi {
         }
       }
     } catch (err) {
+      this.logger.error(
+        `[_request]: Error occurred while calling: ${method} ${reqUrl} - Options: ${JSON.stringify(options)} - Extra Headers: ${JSON.stringify(extraHeaders)}`,
+        err,
+      );
       throw err;
     }
   }
@@ -311,7 +336,7 @@ const addDirectoryUriProperty = (parentUrl: string, directory: any) => {
 
 const attachUri = (parentUrl: string) => {
   return function resolveAndAttachUris(result: any) {
-    const children = result._children || [];
+    const children = result?._children || [];
 
     children.forEach(function (child: any) {
       const childType = child._elementType.toLowerCase();

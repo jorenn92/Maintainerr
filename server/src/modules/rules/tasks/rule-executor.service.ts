@@ -97,6 +97,14 @@ export class RuleExecutorService extends TaskBase {
               // Run rules data shunks of 50
               while (!this.plexData.finished) {
                 await this.getPlexData(rulegroup.libraryId);
+
+                this.logger.debug(
+                  `Got Plex data, rating keys to process are: ${this.plexData.data.map((x) => x.ratingKey).join(', ')}`,
+                );
+                this.logger.debug(
+                  `Rulegroup to process is: ${JSON.stringify(rulegroup)}`,
+                );
+
                 const ruleResult = await this.comparator.executeRulesWithData(
                   rulegroup,
                   this.plexData.data,

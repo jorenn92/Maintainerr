@@ -21,35 +21,42 @@ async function bootstrap() {
           ? 'silly'
           : 'info',
       format: winston.format.combine(
+        winston.format.errors({ stack: true }),
         // winston.format.colorize(),
         winston.format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }),
         // winston.format.timestamp(),
-        winston.format.printf(({ level, message, timestamp, context }) => {
-          const coloredTimestamp = chalk.white(timestamp);
-          level = `[${level.toUpperCase()}]`;
-          const coloredLevel =
-            level === '[DEBUG]'
-              ? chalk.gray(level)
-              : level === '[ERROR]'
-                ? chalk.red(level)
-                : level === '[WARN]'
-                  ? chalk.yellow(level)
-                  : level === '[INFO]'
-                    ? chalk.green(level)
-                    : chalk.cyan(level);
+        winston.format.printf(
+          ({ level, message, timestamp, context, stack }) => {
+            const coloredTimestamp = chalk.white(timestamp);
+            level = `[${level.toUpperCase()}]`;
+            const coloredLevel =
+              level === '[DEBUG]'
+                ? chalk.gray(level)
+                : level === '[ERROR]'
+                  ? chalk.red(level)
+                  : level === '[WARN]'
+                    ? chalk.yellow(level)
+                    : level === '[INFO]'
+                      ? chalk.green(level)
+                      : chalk.cyan(level);
 
-          const coloredMessage =
-            level === '[DEBUG]'
-              ? chalk.gray(message)
-              : level === '[ERROR]'
-                ? chalk.red(message)
-                : level === '[WARN]'
-                  ? chalk.yellow(message)
-                  : level === '[INFO]'
-                    ? chalk.green(message)
-                    : chalk.cyan(message);
-          return `${chalk.green(`[maintainerr] |`)} ${coloredTimestamp}  ${coloredLevel} ${chalk.blue(`[${context}]`)} ${coloredMessage}`;
-        }),
+            if (stack) {
+              console.error({ stack });
+            }
+
+            const coloredMessage =
+              level === '[DEBUG]'
+                ? chalk.gray(message)
+                : level === '[ERROR]'
+                  ? chalk.red(message)
+                  : level === '[WARN]'
+                    ? chalk.yellow(message)
+                    : level === '[INFO]'
+                      ? chalk.green(message)
+                      : chalk.cyan(message);
+            return `${chalk.green(`[maintainerr] |`)} ${coloredTimestamp}  ${coloredLevel} ${chalk.blue(`[${context}]`)} ${coloredMessage}`;
+          },
+        ),
       ),
       transports: [
         new winston.transports.Console(),
@@ -61,9 +68,12 @@ async function bootstrap() {
           maxFiles: '7d',
           format: winston.format.combine(
             winston.format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }),
-            winston.format.printf(({ level, message, timestamp, context }) => {
-              return `[maintainerr]  |  ${timestamp}  [${level.toUpperCase()}] [${context}] ${message}`;
-            }),
+            winston.format.printf(
+              ({ level, message, timestamp, context, stack }) => {
+                const newStack = stack as unknown as any;
+                return `[maintainerr]  |  ${timestamp}  [${level.toUpperCase()}] [${context}] ${message}`;
+              },
+            ),
           ),
         }) as winston.transport,
       ],
