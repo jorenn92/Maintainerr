@@ -1,19 +1,48 @@
-import NodePlexAPI from 'plex-api';
 import cacheManager, { Cache } from './cache';
-import { AxiosHeaderValue } from 'axios';
 import { PlexLibraryResponse } from '../plex-api/interfaces/library.interfaces';
+import xml2js from 'xml2js';
+import { Logger } from '@nestjs/common';
 
-// NodePlexApi wrapped with a cache
-class PlexApi extends NodePlexAPI {
-  public cache: Cache;
-  public authToken: any | AxiosHeaderValue;
+type PlexApiOptions = {
+  hostname: string;
+  port: number;
+  https?: boolean;
+  token: string;
+  timeout?: number;
+};
 
-  constructor(options) {
-    super(options);
+type InternalRequestOptions = {
+  uri: string;
+  method: string;
+  parseResponse?: boolean;
+  extraHeaders?: Record<string, string>;
+};
+
+type RequestOptions = {
+  uri: string;
+  extraHeaders?: Record<string, string>;
+};
+
+class PlexApi {
+  private cache: Cache;
+  private options: PlexApiOptions;
+  private serverUrl: string;
+  private readonly logger = new Logger(PlexApi.name);
+
+  constructor(options: PlexApiOptions) {
+    this.options = options;
+    this.serverUrl = options.hostname + ':' + this.options.port;
     this.cache = cacheManager.getCache('plexguid');
+
+    this.logger.debug(
+      `Initialized PlexApi with options: ${JSON.stringify(options)}`,
+    );
   }
 
-  async query<T>(options, docache: boolean = true): Promise<T> {
+  async query<T>(
+    options: RequestOptions | string,
+    docache: boolean = true,
+  ): Promise<T> {
     return this.queryWithCache(options, docache);
   }
 
@@ -68,7 +97,10 @@ class PlexApi extends NodePlexAPI {
     return result as unknown as T;
   }
 
-  async queryWithCache<T>(options, doCache: boolean = true): Promise<T> {
+  async queryWithCache<T>(
+    options: RequestOptions | string,
+    doCache: boolean = true,
+  ): Promise<T> {
     if (typeof options === 'string') {
       options = {
         uri: options,
@@ -79,22 +111,135 @@ class PlexApi extends NodePlexAPI {
     const cachedItem = this.cache.data.get<T>(cacheKey);
 
     if (cachedItem && doCache) {
+      this.logger.debug(
+        `[queryWithCache]: Returning cached item for: GET ${options.uri} - Headers: ${JSON.stringify(options.extraHeaders)}`,
+      );
       return cachedItem;
     } else {
-      const response = await super.query<T>(options);
+      const response = await this.getQuery<T>(options);
       if (doCache) this.cache.data.set(cacheKey, response);
       return response;
     }
   }
 
-  deleteQuery(arg) {
-    return super.deleteQuery(arg);
+  private getQuery<T>(options: RequestOptions | string) {
+    const newOptions: InternalRequestOptions = {
+      uri: typeof options === 'string' ? options : options.uri,
+      method: 'GET',
+      parseResponse: true,
+      extraHeaders: typeof options === 'string' ? {} : options.extraHeaders,
+    };
+
+    return this._request<T>(newOptions).then(attachUri(newOptions.uri));
   }
-  postQuery(arg) {
-    return super.postQuery(arg);
+
+  deleteQuery(options: RequestOptions) {
+    const newOptions: InternalRequestOptions = {
+      uri: typeof options === 'string' ? options : options.uri,
+      method: 'DELETE',
+      parseResponse: false,
+      extraHeaders: typeof options === 'string' ? {} : options.extraHeaders,
+    };
+
+    return this._request(newOptions);
   }
-  putQuery(arg) {
-    return super.putQuery(arg);
+
+  postQuery<T>(options: RequestOptions) {
+    const newOptions: InternalRequestOptions = {
+      uri: typeof options === 'string' ? options : options.uri,
+      method: 'POST',
+      parseResponse: true,
+      extraHeaders: typeof options === 'string' ? {} : options.extraHeaders,
+    };
+
+    return this._request<T>(newOptions).then(attachUri(newOptions.uri));
+  }
+
+  putQuery<T>(options: RequestOptions) {
+    const newOptions = {
+      uri: typeof options === 'string' ? options : options.uri,
+      method: 'PUT',
+      parseResponse: true,
+      extraHeaders: typeof options === 'string' ? {} : options.extraHeaders,
+    };
+
+    return this._request<T>(newOptions).then(attachUri(newOptions.uri));
+  }
+
+  private getServerScheme() {
+    if (this.options.https != null) {
+      return this.options.https ? 'https://' : 'http://';
+    }
+    return this.options.port === 443 ? 'https://' : 'http://';
+  }
+
+  private async _request<T>(options: InternalRequestOptions) {
+    const reqUrl = this.getServerScheme() + this.serverUrl + options.uri;
+    const method = options.method;
+    const timeout = this.options.timeout;
+    const parseResponse = options.parseResponse;
+    const extraHeaders = options.extraHeaders || {};
+
+    const headers = {
+      Accept: 'application/json',
+      'X-Plex-Token': this.options.token,
+      ...extraHeaders,
+    };
+
+    this.logger.debug(
+      `[_request]: About to call: ${method} ${reqUrl} - Options: ${JSON.stringify(options)} - Headers: ${JSON.stringify(headers)}`,
+    );
+
+    try {
+      const response = await fetch(reqUrl, {
+        method: method,
+        headers,
+        signal: timeout ? AbortSignal.timeout(timeout) : undefined,
+      });
+
+      if (!response.ok) {
+        this.logger.debug(`Response NOT OK`);
+
+        if (response.status === 403) {
+          throw new Error(
+            'Plex Server denied request due to lack of managed user permissions! In case of a delete request, delete content must be allowed in plex-media-server options.',
+          );
+        } else if (response.status === 401) {
+          throw new Error('Plex Server denied request');
+        }
+
+        throw new Error(
+          `Plex Server didnt respond with a valid 2xx status code, response code: ${response.status}`,
+        );
+      } else {
+        this.logger.debug(
+          `Response OK, parse response: ${parseResponse}. Response headers: ${JSON.stringify(response.headers)}`,
+        );
+
+        if (parseResponse) {
+          const contentType = response.headers.get('content-type');
+
+          if (contentType === 'application/json') {
+            return response.json() as T;
+          } else if (contentType?.includes('xml')) {
+            const text = await response.text();
+            return xml2js.parseStringPromise(text, {
+              attrkey: 'attributes',
+            }) as T;
+          } else {
+            return response.text();
+          }
+        } else {
+          return;
+        }
+      }
+    } catch (err) {
+      this.logger.error(
+        `[_request]: Error occurred while calling: ${method} ${reqUrl} - Options: ${JSON.stringify(options)} - Extra Headers: ${JSON.stringify(extraHeaders)}`,
+        err,
+      );
+      throw err;
+    }
   }
 
   private serializeCacheKey(params: Record<string, unknown>) {
@@ -165,5 +310,45 @@ class PlexApi extends NodePlexAPI {
     }
   }
 }
+
+const uriResolvers = {
+  directory: function directory(parentUrl: string, dir: any) {
+    addDirectoryUriProperty(parentUrl, dir);
+  },
+  server: function server(parentUrl: string, srv: any) {
+    addServerUriProperty(srv);
+  },
+};
+
+const addServerUriProperty = (server: any) => {
+  server.uri = '/system/players/' + server.address;
+};
+
+const addDirectoryUriProperty = (parentUrl: string, directory: any) => {
+  if (parentUrl[parentUrl.length - 1] !== '/') {
+    parentUrl += '/';
+  }
+  if (directory.key[0] === '/') {
+    parentUrl = '';
+  }
+  directory.uri = parentUrl + directory.key;
+};
+
+const attachUri = (parentUrl: string) => {
+  return function resolveAndAttachUris(result: any) {
+    const children = result?._children || [];
+
+    children.forEach(function (child: any) {
+      const childType = child._elementType.toLowerCase();
+      const resolver = uriResolvers[childType];
+
+      if (resolver) {
+        resolver(parentUrl, child);
+      }
+    });
+
+    return result;
+  };
+};
 
 export default PlexApi;

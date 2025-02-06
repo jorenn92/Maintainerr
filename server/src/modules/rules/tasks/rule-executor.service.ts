@@ -65,60 +65,76 @@ export class RuleExecutorService extends TaskBase {
 
     await super.execute();
 
-    this.logger.log('Starting Execution of all active rules');
-    const appStatus = await this.settings.testConnections();
+    try {
+      this.logger.log('Starting Execution of all active rules');
+      const appStatus = await this.settings.testConnections();
 
-    // reset API caches, make sure latest data is used
-    cacheManager.flushAll();
+      // reset API caches, make sure latest data is used
+      cacheManager.flushAll();
 
-    if (appStatus) {
-      const ruleGroups = await this.getAllActiveRuleGroups();
-      if (ruleGroups) {
-        for (const rulegroup of ruleGroups) {
-          if (rulegroup.useRules) {
-            this.logger.log(`Executing rules for '${rulegroup.name}'`);
-            this.startTime = new Date();
+      if (appStatus) {
+        const ruleGroups = await this.getAllActiveRuleGroups();
+        if (ruleGroups) {
+          for (const rulegroup of ruleGroups) {
+            if (rulegroup.useRules) {
+              this.logger.log(`Executing rules for '${rulegroup.name}'`);
+              this.startTime = new Date();
 
-            // reset Plex cache if group uses a rule that requires it (collection rules for example)
-            await this.rulesService.resetPlexCacheIfgroupUsesRuleThatRequiresIt(
-              rulegroup,
-            );
-
-            // prepare
-            this.workerData = [];
-            this.resultData = [];
-            this.plexData = { page: 0, finished: false, data: [] };
-
-            this.plexDataType = rulegroup.dataType
-              ? rulegroup.dataType
-              : undefined;
-
-            // Run rules data shunks of 50
-            while (!this.plexData.finished) {
-              await this.getPlexData(rulegroup.libraryId);
-              const ruleResult = await this.comparator.executeRulesWithData(
+              // reset Plex cache if group uses a rule that requires it (collection rules for example)
+              await this.rulesService.resetPlexCacheIfgroupUsesRuleThatRequiresIt(
                 rulegroup,
-                this.plexData.data,
               );
-              if (ruleResult) {
-                this.resultData.push(...ruleResult?.data);
+
+              // prepare
+              this.workerData = [];
+              this.resultData = [];
+              this.plexData = { page: 0, finished: false, data: [] };
+
+              this.plexDataType = rulegroup.dataType
+                ? rulegroup.dataType
+                : undefined;
+
+              // Run rules data shunks of 50
+              while (!this.plexData.finished) {
+                await this.getPlexData(rulegroup.libraryId);
+
+                this.logger.debug(
+                  `Got Plex data, rating keys to process are: ${this.plexData.data.map((x) => x.ratingKey).join(', ')}`,
+                );
+                this.logger.debug(
+                  `Rulegroup to process is: ${JSON.stringify(rulegroup)}`,
+                );
+
+                const ruleResult = await this.comparator.executeRulesWithData(
+                  rulegroup,
+                  this.plexData.data,
+                );
+                if (ruleResult) {
+                  this.resultData.push(...ruleResult?.data);
+                }
               }
+              await this.handleCollection(
+                await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
+              );
+              this.logger.log(
+                `Execution of rules for '${rulegroup.name}' done.`,
+              );
             }
-            await this.handleCollection(
+            await this.syncManualPlexMediaToCollectionDB(
               await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
             );
-            this.logger.log(`Execution of rules for '${rulegroup.name}' done.`);
           }
-          await this.syncManualPlexMediaToCollectionDB(
-            await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
-          );
         }
+      } else {
+        this.logger.log(
+          'Not all applications are reachable.. Skipped rule execution.',
+        );
       }
-    } else {
-      this.logger.log(
-        'Not all applications are reachable.. Skipped rule execution.',
-      );
+    } catch (err) {
+      this.logger.log('Error running rules executor.');
+      this.logger.debug(err);
     }
+
     // clean up
     await this.finish();
   }
