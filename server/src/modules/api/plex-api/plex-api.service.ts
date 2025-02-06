@@ -61,7 +61,7 @@ export class PlexApiService {
     platform: 'Maintainerr',
   };
 
-  private async getDbSettings(): Promise<PlexSettings> {
+  private getDbSettings(): PlexSettings {
     return {
       name: this.settings.plex_name,
       machineId: this.machineId,
@@ -83,7 +83,7 @@ export class PlexApiService {
     timeout?: number;
   }) {
     try {
-      const settingsPlex = await this.getDbSettings();
+      const settingsPlex = this.getDbSettings();
       plexToken = plexToken || settingsPlex.auth_token;
       if (settingsPlex.ip && plexToken) {
         this.plexClient = new PlexApi({
@@ -92,21 +92,7 @@ export class PlexApiService {
           https: settingsPlex.useSsl,
           timeout: timeout,
           token: plexToken,
-          authenticator: {
-            authenticate: (
-              _plexApi,
-              cb: (err?: string, token?: string) => void,
-            ) => {
-              if (!plexToken) {
-                return cb('Plex Token not found!');
-              }
-              cb(undefined, plexToken);
-            },
-          },
-          // requestOptions: {
-          //   includeChildren: 1,
-          // },
-          options: this.maintainerrClientOptions,
+          //options: this.maintainerrClientOptions,
         });
 
         this.plexTvClient = new PlexTvApi(plexToken);
@@ -287,13 +273,15 @@ export class PlexApiService {
   public async getDiscoverDataUserState(
     metaDataRatingKey: string,
   ): Promise<any> {
+    const settings = this.getDbSettings();
+
     try {
       const response = await axios.get(
         `https://discover.provider.plex.tv/library/metadata/${metaDataRatingKey}/userState`,
         {
           headers: {
             'content-type': 'application/json',
-            'X-Plex-Token': this.plexClient.authToken,
+            'X-Plex-Token': settings.auth_token,
           },
         },
       );
@@ -665,18 +653,7 @@ export class PlexApiService {
                   https: connection.protocol === 'https',
                   timeout: 5000,
                   token: settings.plex_auth_token,
-                  authenticator: {
-                    authenticate: (
-                      _plexApi,
-                      cb: (err?: string, token?: string) => void,
-                    ) => {
-                      if (!settings.plex_auth_token) {
-                        return cb('Plex Token not found!');
-                      }
-                      cb(undefined, settings.plex_auth_token);
-                    },
-                  },
-                  options: this.maintainerrClientOptions,
+                  //options: this.maintainerrClientOptions,
                 });
 
                 // test connection
