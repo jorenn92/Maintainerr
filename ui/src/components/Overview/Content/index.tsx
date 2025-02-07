@@ -7,7 +7,10 @@ import MediaCard from '../../Common/MediaCard'
 import _ from 'lodash'
 
 interface IOverviewContent {
-  data: IPlexMetadata[]
+  data: {
+    librarySectionTitle: string
+    items: IPlexMetadata[]
+  }
   dataFinished: boolean
   loading: boolean
   extrasLoading?: boolean
@@ -23,6 +26,7 @@ export interface IPlexMetadata {
   ratingKey: string
   key: string
   parentRatingKey?: string
+  librarySectionTitle: string
   grandparentRatingKey?: string
   art: string
   audienceRating?: number
@@ -131,14 +135,15 @@ const OverviewContent = (props: IOverviewContent) => {
     return <LoadingSpinner />
   }
 
-  if (props.data && props.data.length > 0) {
+  if (props.data && props.data.items.length > 0) {
     return (
       <ul className="cards-vertical">
-        {props.data.map((el) => (
+        {props.data.items.map((el) => (
           <li key={+el.ratingKey}>
             <MediaCard
               id={+el.ratingKey}
               libraryId={props.libraryId}
+              librarySectionTitle={props.data.librarySectionTitle}
               type={
                 el.type === 'movie'
                   ? 1
@@ -216,6 +221,7 @@ const OverviewContent = (props: IOverviewContent) => {
             />
           </li>
         ))}
+
         {props.extrasLoading ? <SmallLoadingSpinner /> : undefined}
       </ul>
     )

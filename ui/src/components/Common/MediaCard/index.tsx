@@ -22,6 +22,7 @@ interface IMediaCard {
   inProgress?: boolean
   tmdbid?: string
   libraryId?: number
+  librarySectionTitle?: string
   type?: 1 | 2 | 3 | 4
   collectionPage: boolean
   daysLeft?: number
@@ -39,6 +40,7 @@ const MediaCard: React.FC<IMediaCard> = ({
   mediaType,
   title,
   libraryId,
+  librarySectionTitle,
   type,
   collectionId = 0,
   daysLeft = 9999,
@@ -137,7 +139,7 @@ const MediaCard: React.FC<IMediaCard> = ({
               style={{ objectFit: 'cover' }}
             />
           ) : undefined}
-          <div className="absolute left-0 right-0 flex items-center justify-between p-2">
+          <div className="absolute left-0 right-0 flex justify-between p-2">
             <div
               className={`pointer-events-none z-40 rounded-full shadow ${
                 mediaType === 'movie'
@@ -301,6 +303,9 @@ const MediaCard: React.FC<IMediaCard> = ({
                         wordBreak: 'break-word',
                       }}
                     ></div>
+                    <div className="mt-1 flex items-center text-xs font-semibold">
+                      Library: {librarySectionTitle}
+                    </div>
 
                     {!collectionPage ? (
                       <div>

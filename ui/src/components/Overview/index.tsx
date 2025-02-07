@@ -13,8 +13,20 @@ const Overview = () => {
 
   const [loadingExtra, setLoadingExtra] = useState<boolean>(false)
 
-  const [data, setData] = useState<IPlexMetadata[]>([])
-  const dataRef = useRef<IPlexMetadata[]>([])
+  const [data, setData] = useState<{
+    librarySectionTitle: string
+    items: IPlexMetadata[]
+  }>({
+    librarySectionTitle: '',
+    items: [],
+  })
+  const dataRef = useRef<{
+    librarySectionTitle: string
+    items: IPlexMetadata[]
+  }>({
+    librarySectionTitle: '',
+    items: [],
+  })
 
   const [totalSize, setTotalSize] = useState<number>(999)
   const totalSizeRef = useRef<number>(999)
@@ -38,7 +50,7 @@ const Overview = () => {
     setTimeout(() => {
       if (
         loadingRef.current &&
-        data.length === 0 &&
+        data.items.length === 0 &&
         SearchCtx.search.text === '' &&
         LibrariesCtx.libraries.length > 0
       ) {
@@ -56,14 +68,20 @@ const Overview = () => {
           setsearchUsed(true)
           setTotalSize(resp.length)
           pageData.current = resp.length * 50
-          setData(resp ? resp : [])
+          setData({
+            librarySectionTitle: 'Search Results', // Placeholder title
+            items: resp || [], // Ensures we always pass an array
+          })
           setIsLoading(false)
         },
       )
       setSelectedLibrary(+LibrariesCtx.libraries[0]?.key)
     } else {
       setsearchUsed(false)
-      setData([])
+      setData({
+        librarySectionTitle: '',
+        items: [],
+      })
       setTotalSize(999)
       pageData.current = 0
       setIsLoading(true)
@@ -89,8 +107,14 @@ const Overview = () => {
     setIsLoading(true)
     pageData.current = 0
     setTotalSize(999)
-    setData([])
-    dataRef.current = []
+    setData({
+      librarySectionTitle: '',
+      items: [],
+    })
+    dataRef.current = {
+      librarySectionTitle: '',
+      items: [],
+    }
     setsearchUsed(false)
     setSelectedLibrary(libraryId)
   }
@@ -104,18 +128,23 @@ const Overview = () => {
     ) {
       const askedLib = clone(selectedLibraryRef.current)
 
-      const resp: { totalSize: number; items: IPlexMetadata[] } =
-        await GetApiHandler(
-          `/plex/library/${selectedLibraryRef.current}/content/${
-            pageData.current + 1
-          }?amount=${fetchAmount}`,
-        )
-
+      const resp: {
+        totalSize: number
+        librarySectionTitle: string
+        items: IPlexMetadata[]
+      } = await GetApiHandler(
+        `/plex/library/${selectedLibraryRef.current}/content/${
+          pageData.current + 1
+        }?amount=${fetchAmount}`,
+      )
       if (askedLib === selectedLibraryRef.current) {
         // check lib again, we don't want to change array when lib was changed
         setTotalSize(resp.totalSize)
         pageData.current = pageData.current + 1
-        setData([...dataRef.current, ...resp.items])
+        setData((prevData) => ({
+          librarySectionTitle: resp.librarySectionTitle,
+          items: [...prevData.items, ...resp.items],
+        }))
         setIsLoading(false)
       }
       setLoadingExtra(false)

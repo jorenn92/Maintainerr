@@ -21,7 +21,13 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
   // TODO: this component uses it's own lazy loading mechanism instead of the one from OverviewContent. Update this.
   props: ICollectionDetail,
 ) => {
-  const [data, setData] = useState<IPlexMetadata[]>([])
+  const [data, setData] = useState<{
+    librarySectionTitle: string
+    items: IPlexMetadata[]
+  }>({
+    librarySectionTitle: '',
+    items: [],
+  })
   const [media, setMedia] = useState<ICollectionMedia[]>([])
   const [selectedTab, setSelectedTab] = useState<string>('media')
   const [mediaTestModalOpen, setMediaTestModalOpen] = useState<boolean>(false)
@@ -30,7 +36,13 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
   const fetchAmount = 25
   const [totalSize, setTotalSize] = useState<number>(999)
   const totalSizeRef = useRef<number>(999)
-  const dataRef = useRef<IPlexMetadata[]>([])
+  const dataRef = useRef<{
+    librarySectionTitle: string
+    items: IPlexMetadata[]
+  }>({
+    librarySectionTitle: '',
+    items: [],
+  })
   const mediaRef = useRef<ICollectionMedia[]>([])
   const loadingRef = useRef<boolean>(true)
   const loadingExtraRef = useRef<boolean>(false)
@@ -89,13 +101,16 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
     // pageData.current = pageData.current + 1
     setMedia([...mediaRef.current, ...resp.items])
 
-    setData([
-      ...dataRef.current,
-      ...resp.items.map((el) => {
-        el.plexData!.maintainerrIsManual = el.isManual ? el.isManual : false
-        return el.plexData ? el.plexData : ({} as IPlexMetadata)
-      }),
-    ])
+    setData({
+      librarySectionTitle: props.collection.title || 'Unknown Library', // Set a library title
+      items: [
+        ...dataRef.current.items, // Keep previous data
+        ...resp.items.map((el) => {
+          el.plexData!.maintainerrIsManual = el.isManual ? el.isManual : false
+          return el.plexData ? el.plexData : ({} as IPlexMetadata)
+        }),
+      ],
+    })
     loadingRef.current = false
     loadingExtraRef.current = false
   }
@@ -196,7 +211,12 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
             }
             onRemove={(id: string) =>
               setTimeout(() => {
-                setData(dataRef.current.filter((el) => +el.ratingKey !== +id))
+                setData({
+                  librarySectionTitle: dataRef.current.librarySectionTitle, // Keep the title
+                  items: dataRef.current.items.filter(
+                    (el) => +el.ratingKey !== +id,
+                  ), // ✅ Filter only items
+                })
                 setMedia(mediaRef.current.filter((el) => +el.plexId !== +id))
               }, 500)
             }

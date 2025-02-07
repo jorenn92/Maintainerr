@@ -224,7 +224,11 @@ export class PlexApiService {
     id: string,
     { offset = 0, size = 50 }: { offset?: number; size?: number } = {},
     datatype?: EPlexDataType,
-  ): Promise<{ totalSize: number; items: PlexLibraryItem[] }> {
+  ): Promise<{
+    totalSize: number;
+    librarySectionTitle: string;
+    items: PlexLibraryItem[];
+  }> {
     try {
       const type = datatype ? '&type=' + datatype : '';
       const response = await this.plexClient.query<PlexLibraryResponse>({
@@ -237,6 +241,7 @@ export class PlexApiService {
 
       return {
         totalSize: response.MediaContainer.totalSize,
+        librarySectionTitle: response.MediaContainer.librarySectionTitle,
         items: (response.MediaContainer.Metadata as PlexLibraryItem[]) ?? [],
       };
     } catch (err) {
