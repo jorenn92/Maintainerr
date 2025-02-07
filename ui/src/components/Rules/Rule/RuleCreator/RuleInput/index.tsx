@@ -294,43 +294,48 @@ const RuleInput = (props: IRuleInput) => {
     return prop
   }
   return (
-    <div className="mt-10 h-full w-full" onSubmit={submit}>
-      <div className="section h-full w-full">
-        <h3 className="sm-heading max-width-form flex">
-          <div>
-            {props.tagId
-              ? `Rule #${props.tagId}`
-              : props.id
-                ? `Rule #${props.id}`
-                : `Rule #1`}
-          </div>
-
-          {props.allowDelete ? (
-            <button
-              className="ml-auto flex h-8 rounded bg-amber-900 text-zinc-200 shadow-md hover:bg-amber-800"
-              onClick={onDelete}
-              title={`Remove rule ${props.tagId}, section ${props.section}`}
-            >
-              {<TrashIcon className="m-auto ml-5 h-5" />}
-              <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
-                Delete
-              </p>
-            </button>
-          ) : undefined}
+    <div
+      className="w-full max-w-sm rounded-2xl bg-zinc-800 p-4 text-zinc-100 shadow-lg"
+      onSubmit={submit}
+    >
+      {/* Header Section */}
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-semibold">
+          {props.tagId
+            ? `Rule #${props.tagId}`
+            : props.id
+              ? `Rule #${props.id}`
+              : `Rule #1`}
         </h3>
+
+        {props.id && props.id > 1 ? (
+          <button
+            className="flex items-center rounded-lg bg-red-600 px-3 py-1 text-zinc-100 shadow-md hover:bg-red-500"
+            onClick={onDelete}
+            title={`Remove rule ${props.tagId}, section ${props.section}`}
+          >
+            <TrashIcon className="mr-1 h-5 w-5" />
+            Delete
+          </button>
+        ) : null}
       </div>
+
+      {/*
       {props.id !== 1 ? (
         (props.id && props.id > 0) || (props.section && props.section > 1) ? (
-          <div className="form-row">
-            <label htmlFor="operator" className="text-label">
+          <div className="form-row mb-4">
+            <label
+              htmlFor="operator"
+              className="text-label mb-1 block text-sm font-medium"
+            >
               Operator
               {!props.id ||
               (props.tagId ? props.tagId === 1 : props.id === 1) ? (
-                <span className="label-tip">
+                <span className="label-tip mt-1 block text-xs text-zinc-400">
                   {`Section ${props.section}'s action on all previous section results.`}
                 </span>
               ) : (
-                <span className="label-tip">
+                <span className="label-tip mt-1 block text-xs text-zinc-400">
                   {`Action on the previous rule.`}
                 </span>
               )}
@@ -342,6 +347,7 @@ const RuleInput = (props: IRuleInput) => {
                   id="operator"
                   onChange={updateOperator}
                   value={operator}
+                  className="w-full rounded-lg bg-zinc-700 p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
                 >
                   <option value={undefined}> </option>
                   {Object.keys(RuleOperators).map(
@@ -359,204 +365,202 @@ const RuleInput = (props: IRuleInput) => {
               </div>
             </div>
           </div>
-        ) : undefined
-      ) : undefined}
-
-      <div className="form-row">
-        <label htmlFor="first_val" className="text-label">
-          First value
+        ) : null
+      ) : null}
+*/}
+      {/* First Value Selection */}
+      <div className="mb-4">
+        <label htmlFor="first_val" className="mb-1 block text-sm font-medium">
+          First Value
         </label>
-        <div className="form-input">
-          <div className="form-input-field">
-            <select
-              name="first_val"
-              id="first_val"
-              onChange={updateFirstValue}
-              value={firstval}
-            >
-              <option value={undefined}></option>
-              {ConstantsCtx.constants.applications?.map((app) => {
-                return app.mediaType === MediaType.BOTH ||
-                  props.mediaType === app.mediaType ? (
-                  <optgroup key={app.id} label={app.name}>
-                    {app.props.map((prop) => {
-                      return (prop.mediaType === MediaType.BOTH ||
-                        props.mediaType === prop.mediaType) &&
-                        (props.mediaType === MediaType.MOVIE ||
-                          prop.showType === undefined ||
-                          prop.showType.includes(props.dataType!)) ? (
-                        <option
-                          key={app.id + 10 + prop.id}
-                          value={JSON.stringify([app.id, prop.id])}
-                        >{`${app.name} - ${prop.humanName}`}</option>
-                      ) : undefined
-                    })}
-                  </optgroup>
-                ) : undefined
-              })}
-            </select>
-          </div>
-        </div>
+        <select
+          name="first_val"
+          id="first_val"
+          onChange={updateFirstValue}
+          value={firstval}
+          className="w-full rounded-lg bg-zinc-700 p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+        >
+          <option value={undefined}>Select First Value...</option>
+          {ConstantsCtx.constants.applications?.map((app) =>
+            app.mediaType === MediaType.BOTH ||
+            props.mediaType === app.mediaType ? (
+              <optgroup key={app.id} label={app.name}>
+                {app.props.map((prop) =>
+                  (prop.mediaType === MediaType.BOTH ||
+                    props.mediaType === prop.mediaType) &&
+                  (props.mediaType === MediaType.MOVIE ||
+                    prop.showType === undefined ||
+                    prop.showType.includes(props.dataType!)) ? (
+                    <option
+                      key={`${app.id}-${prop.id}`}
+                      value={JSON.stringify([app.id, prop.id])}
+                    >
+                      {`${app.name} - ${prop.humanName}`}
+                    </option>
+                  ) : null,
+                )}
+              </optgroup>
+            ) : null,
+          )}
+        </select>
       </div>
 
-      <div className="form-row">
-        <label htmlFor="action" className="text-label">
+      {/* Action Selection */}
+      <div className="mb-4">
+        <label htmlFor="action" className="mb-1 block text-sm font-medium">
           Action
         </label>
-        <div className="form-input">
-          <div className="form-input-field">
-            <select
-              name="action"
-              id="action"
-              onChange={updateAction}
-              value={action}
-            >
-              <option value={undefined}> </option>
-              {possibilities.map((action) => (
-                <option key={action} value={action}>
-                  {RulePossibilityTranslations[action]}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <select
+          name="action"
+          id="action"
+          onChange={updateAction}
+          value={action}
+          className="w-full rounded-lg bg-zinc-700 p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+        >
+          <option value={undefined}>Select Action...</option>
+          {Object.keys(RulePossibility).map((value: string, key: number) => {
+            if (!isNaN(+value)) {
+              if (possibilities.includes(+value)) {
+                return (
+                  <option key={+value} value={+value}>
+                    {Object.values(RulePossibilityTranslations)[+value]}
+                  </option>
+                )
+              }
+            }
+          })}
+        </select>
       </div>
 
-      <div className="form-row">
-        <label htmlFor="second_val" className="text-label">
-          Second value
+      {/* Second Value Selection */}
+      <div className="mb-4">
+        <label htmlFor="second_val" className="mb-1 block text-sm font-medium">
+          Second Value
         </label>
-        <div className="form-input">
-          <div className="form-input-field">
-            <select
-              name="second_val"
-              id="second_val"
-              onChange={updateSecondValue}
-              value={secondVal}
-            >
-              <option value={undefined}> </option>
-              <optgroup label="Custom values">
-                {ruleType === RuleType.DATE ? (
-                  <>
-                    <option value={CustomParams.CUSTOM_DAYS}>
-                      Amount of days
+        <select
+          name="second_val"
+          id="second_val"
+          onChange={updateSecondValue}
+          value={secondVal}
+          className="w-full rounded-lg bg-zinc-700 p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+        >
+          <option value={undefined}>Select Second Value...</option>
+          <optgroup label="Custom Values">
+            {ruleType === RuleType.DATE && (
+              <>
+                <option value={CustomParams.CUSTOM_DAYS}>Amount of Days</option>
+                {action &&
+                  +action !== +RulePossibility.IN_LAST &&
+                  +action !== +RulePossibility.IN_NEXT && (
+                    <option value={CustomParams.CUSTOM_DATE}>
+                      Specific Date
                     </option>
-                    {action &&
-                    action !== RulePossibility.IN_LAST &&
-                    action !== RulePossibility.IN_NEXT ? (
-                      <option value={CustomParams.CUSTOM_DATE}>
-                        Specific date
-                      </option>
-                    ) : undefined}
-                  </>
-                ) : undefined}
-                {ruleType === RuleType.NUMBER ? (
-                  <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
-                ) : undefined}
-                {ruleType === RuleType.BOOL ? (
-                  <option value={CustomParams.CUSTOM_BOOLEAN}>Boolean</option>
-                ) : undefined}
-                {ruleType === RuleType.TEXT ? (
-                  <option value={CustomParams.CUSTOM_TEXT}>Text</option>
-                ) : undefined}
-                <MaybeTextListOptions ruleType={ruleType} action={action} />
+                  )}
+              </>
+            )}
+            {ruleType === RuleType.NUMBER && (
+              <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
+            )}
+            {ruleType === RuleType.BOOL && (
+              <option value={CustomParams.CUSTOM_BOOLEAN}>Boolean</option>
+            )}
+            {ruleType === RuleType.TEXT && (
+              <option value={CustomParams.CUSTOM_TEXT}>Text</option>
+            )}
+          </optgroup>
+
+          {/* Existing Properties as Options */}
+          {ConstantsCtx.constants.applications?.map((app) =>
+            (app.mediaType === MediaType.BOTH ||
+              props.mediaType === app.mediaType) &&
+            action &&
+            +action !== +RulePossibility.IN_LAST &&
+            +action !== +RulePossibility.IN_NEXT ? (
+              <optgroup key={app.id} label={app.name}>
+                {app.props.map((prop) =>
+                  +prop.type.key === ruleType &&
+                  (prop.mediaType === MediaType.BOTH ||
+                    props.mediaType === prop.mediaType) &&
+                  (!prop.showType ||
+                    prop.showType.includes(props.dataType!)) ? (
+                    <option
+                      key={`${app.id}-${prop.id}`}
+                      value={JSON.stringify([app.id, prop.id])}
+                    >
+                      {`${app.name} - ${prop.humanName}`}
+                    </option>
+                  ) : null,
+                )}
               </optgroup>
-              {ConstantsCtx.constants.applications?.map((app) => {
-                return (app.mediaType === MediaType.BOTH ||
-                  props.mediaType === app.mediaType) &&
-                  action &&
-                  action !== RulePossibility.IN_LAST &&
-                  action !== RulePossibility.IN_NEXT ? (
-                  <optgroup key={app.id} label={app.name}>
-                    {app.props.map((prop) => {
-                      // Add valid application-specific second values. Note that the second value
-                      // type may be different to the rule type - e.g. a rule type of "text list"
-                      // may be able to be matched to values of type "text list" as well as "text".
-                      const secondValueTypes = getSecondValueTypes(ruleType)
-                      for (const type of secondValueTypes) {
-                        if (+prop.type.key === type) {
-                          return (prop.mediaType === MediaType.BOTH ||
-                            props.mediaType === prop.mediaType) &&
-                            (props.mediaType === MediaType.MOVIE ||
-                              prop.showType === undefined ||
-                              prop.showType.includes(props.dataType!)) ? (
-                            <option
-                              key={app.id + 10 + prop.id}
-                              value={JSON.stringify([app.id, prop.id])}
-                            >{`${app.name} - ${prop.humanName}`}</option>
-                          ) : undefined
-                        }
-                      }
-                    })}
-                  </optgroup>
-                ) : undefined
-              })}
-            </select>
-          </div>
-        </div>
+            ) : null,
+          )}
+        </select>
       </div>
 
-      {customValActive ? (
-        <div className="form-row">
-          <label htmlFor="custom_val" className="text-label">
-            Custom value
+      {/* Custom Value Input */}
+      {customValActive && (
+        <div className="mb-4">
+          <label
+            htmlFor="custom_val"
+            className="mb-1 block text-sm font-medium"
+          >
+            Custom Value
           </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              {customValType === RuleType.TEXT &&
-              secondVal === CustomParams.CUSTOM_DAYS ? (
-                <input
-                  type="number"
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal ? +customVal / 86400 : undefined}
-                  placeholder="Amount of days"
-                ></input>
-              ) : (customValType === RuleType.TEXT &&
-                  secondVal === CustomParams.CUSTOM_TEXT) ||
-                customValType === RuleType.TEXT_LIST ? (
-                <input
-                  type="text"
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal}
-                  placeholder="Text"
-                ></input>
-              ) : customValType === RuleType.DATE ? (
-                <input
-                  type="date"
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal}
-                  placeholder="Date"
-                ></input>
-              ) : customValType === RuleType.BOOL ? (
-                <select
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal}
-                >
-                  <option value={1}>True</option>
-                  <option value={0}>False</option>
-                </select>
-              ) : (
-                <input
-                  type="number"
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal}
-                  placeholder="Number"
-                ></input>
-              )}
-            </div>
-          </div>
+          {customValType === RuleType.TEXT &&
+          secondVal === CustomParams.CUSTOM_DAYS ? (
+            <input
+              type="number"
+              name="custom_val"
+              id="custom_val"
+              onChange={updateCustomValue}
+              value={customVal ? +customVal / 86400 : undefined}
+              placeholder="Amount of Days"
+              className="w-full rounded-lg bg-zinc-700 p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+            />
+          ) : customValType === RuleType.TEXT &&
+            secondVal === CustomParams.CUSTOM_TEXT ? (
+            <input
+              type="text"
+              name="custom_val"
+              id="custom_val"
+              onChange={updateCustomValue}
+              value={customVal}
+              placeholder="Text"
+              className="w-full rounded-lg bg-zinc-700 p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+            />
+          ) : customValType === RuleType.DATE ? (
+            <input
+              type="date"
+              name="custom_val"
+              id="custom_val"
+              onChange={updateCustomValue}
+              value={customVal}
+              className="w-full rounded-lg bg-zinc-700 p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+            />
+          ) : customValType === RuleType.BOOL ? (
+            <select
+              name="custom_val"
+              id="custom_val"
+              onChange={updateCustomValue}
+              value={customVal}
+              className="w-full rounded-lg bg-zinc-700 p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+            >
+              <option value={1}>True</option>
+              <option value={0}>False</option>
+            </select>
+          ) : (
+            <input
+              type="number"
+              name="custom_val"
+              id="custom_val"
+              onChange={updateCustomValue}
+              value={customVal}
+              placeholder="Number"
+              className="w-full rounded-lg bg-zinc-700 p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+            />
+          )}
         </div>
-      ) : null}
+      )}
     </div>
   )
 }

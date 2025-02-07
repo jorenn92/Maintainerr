@@ -1,11 +1,10 @@
+import { ClipboardListIcon } from '@heroicons/react/solid'
 import { useRef, useState } from 'react'
 import { MediaType } from '../../../../contexts/constants-context'
-import Alert from '../../../Common/Alert'
-import RuleInput from './RuleInput'
-import SectionHeading from '../../../Common/SectionHeading'
-import _ from 'lodash'
-import { ClipboardListIcon } from '@heroicons/react/solid'
 import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
+import Alert from '../../../Common/Alert'
+import SectionHeading from '../../../Common/SectionHeading'
+import RuleInput from './RuleInput'
 
 interface IRulesToCreate {
   id: number
@@ -166,17 +165,28 @@ const RuleCreator = (props: iRuleCreator) => {
 
     added.current = [...added.current, ruleId]
 
-    rulesCreated.current.map((e) => {
-      if (e.id >= ruleId) {
-        e.id = e.id + 1
-      }
-      return e
+    // Initialize the new rule with default values
+    rulesCreated.current.push({
+      id: ruleId,
+      rule: {
+        operator: operators[ruleId] || '0', // Default operator to AND
+        firstVal: ['', ''],
+        action: 0,
+        section: section - 1,
+      },
     })
+
+    // Initialize operator for the new rule immediately
+    setOperators((prevOperators) => ({
+      ...prevOperators,
+      [ruleId]: '0', // Default to AND
+    }))
 
     const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] + 1
 
     updateRuleAmount([ruleAmount[0], rules])
+    props.onUpdate(rulesCreated.current.map((el) => el.rule))
   }
 
   const addSection = (e: any) => {
@@ -196,6 +206,29 @@ const RuleCreator = (props: iRuleCreator) => {
     setRuleAmountArr(calculateRuleAmountArr(ruleAmount))
     setRuleAmount(ruleAmount)
   }
+  const [operators, setOperators] = useState<{ [key: number]: string }>({})
+
+  const handleOperatorChange = (ruleId: number, newOperator: string) => {
+    // Update the operator in the operators state
+    setOperators((prevOperators) => ({
+      ...prevOperators,
+      [ruleId]: newOperator,
+    }))
+
+    // Also update the operator in the rules list to ensure it's synced
+    const updatedRules = rulesCreated.current.map((rule) => {
+      if (rule.id === ruleId) {
+        return { ...rule, rule: { ...rule.rule, operator: newOperator } }
+      }
+      return rule
+    })
+
+    rulesCreated.current = updatedRules
+
+    // Trigger re-render and update to parent
+    setEditData({ rules: updatedRules.map((el) => el.rule) })
+    props.onUpdate(updatedRules.map((el) => el.rule))
+  }
 
   return (
     <div className="h-full w-full">
@@ -208,52 +241,77 @@ const RuleCreator = (props: iRuleCreator) => {
               onAdd={RuleAdded}
               addAvailable={added.current.length <= 0}
             />
-            <div className="ml-5">
-              {ruleAmountArr[1][sid - 1].map((id) => (
-                <RuleInput
+            <div className="ml-5 flex flex-wrap space-x-4">
+              {ruleAmountArr[1][sid - 1].map((id, index) => (
+                <div
                   key={`${sid}-${id}`}
-                  id={
-                    ruleAmount[1].length > 1
-                      ? ruleAmount[1].reduce((pv, cv, idx) =>
-                          sid === 1
-                            ? cv - (cv - id)
-                            : idx <= sid - 1
-                              ? idx === sid - 1
-                                ? cv - (cv - id) + pv
-                                : cv + pv
-                              : pv,
-                        )
-                      : ruleAmount[1][0] - (ruleAmount[1][0] - id)
-                  }
-                  tagId={id}
-                  editData={
-                    editData
-                      ? {
-                          rule: editData.rules[
-                            (ruleAmount[1].length > 1
-                              ? ruleAmount[1].reduce((pv, cv, idx) =>
-                                  sid === 1
-                                    ? cv - (cv - id)
-                                    : idx <= sid - 1
-                                      ? idx === sid - 1
-                                        ? cv - (cv - id) + pv
-                                        : cv + pv
-                                      : pv,
-                                )
-                              : ruleAmount[1][0] - (ruleAmount[1][0] - id)) - 1
-                          ],
+                  className="flex items-center space-x-4"
+                >
+                  <div className="w-64">
+                    <RuleInput
+                      id={
+                        ruleAmount[1].length > 1
+                          ? ruleAmount[1].reduce((pv, cv, idx) =>
+                              sid === 1
+                                ? cv - (cv - id)
+                                : idx <= sid - 1
+                                  ? idx === sid - 1
+                                    ? cv - (cv - id) + pv
+                                    : cv + pv
+                                  : pv,
+                            )
+                          : ruleAmount[1][0] - (ruleAmount[1][0] - id)
+                      }
+                      tagId={id}
+                      editData={
+                        editData
+                          ? {
+                              rule: editData.rules[
+                                (ruleAmount[1].length > 1
+                                  ? ruleAmount[1].reduce((pv, cv, idx) =>
+                                      sid === 1
+                                        ? cv - (cv - id)
+                                        : idx <= sid - 1
+                                          ? idx === sid - 1
+                                            ? cv - (cv - id) + pv
+                                            : cv + pv
+                                          : pv,
+                                    )
+                                  : ruleAmount[1][0] -
+                                    (ruleAmount[1][0] - id)) - 1
+                              ],
+                            }
+                          : undefined
+                      }
+                      section={sid}
+                      newlyAdded={added.current}
+                      mediaType={props.mediaType}
+                      dataType={props.dataType}
+                      onCommit={ruleCommited}
+                      onIncomplete={ruleOmitted}
+                      onDelete={ruleDeleted}
+                    />
+                  </div>
+                  {/* Interactive Operator Selector Between Cards */}
+                  {index < ruleAmountArr[1][sid - 1].length - 1 && (
+                    <div className="flex items-center justify-center">
+                      <select
+                        value={
+                          rulesCreated.current.find(
+                            (rule) => rule.id === id + 1,
+                          )?.rule.operator || '0'
                         }
-                      : undefined
-                  }
-                  section={sid}
-                  newlyAdded={added.current}
-                  mediaType={props.mediaType}
-                  dataType={props.dataType}
-                  onCommit={ruleCommited}
-                  onIncomplete={ruleOmitted}
-                  onDelete={ruleDeleted}
-                  allowDelete={ruleAmount[0] > 1 || ruleAmount[1][sid - 1] > 1}
-                />
+                        onChange={(e) =>
+                          handleOperatorChange(id + 1, e.target.value)
+                        }
+                        className="appearance-none rounded-lg bg-zinc-600 px-4 py-2 text-zinc-100 shadow-md focus:border-amber-500 focus:ring-amber-500"
+                      >
+                        <option value="0">AND</option>
+                        <option value="1">OR</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
