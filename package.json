@@ -72,7 +72,8 @@
       "semantic-release-gha-output"
     ],
     "branches": [
-      "main"
+      "main",
+      "release-workflow"
     ],
     "npmPublish": false,
     "publish": [
