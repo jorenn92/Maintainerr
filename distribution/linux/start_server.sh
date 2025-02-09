@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Starting Maintainerr server..."
 
 NODE_ENV=production

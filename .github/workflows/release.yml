@@ -119,10 +119,10 @@ jobs:
             name: linux
             architecture: arm64
             yarn_setup: yarn config set supportedArchitectures.cpu "arm64"
-          #- os: windows-latest
-          #  name: win
-          #  architecture: x64
-          #  yarn_setup: yarn config set supportedArchitectures.cpu "x64"
+          - os: windows-latest
+            name: win
+            architecture: x64
+            yarn_setup: yarn config set supportedArchitectures.cpu "x64"
           #- os: macos-latest
           #  name: osx
           #  architecture: x64
@@ -157,10 +157,17 @@ jobs:
         run: yarn turbo build
 
       - name: Prepare artifact
+        if: ${{ matrix.name == 'linux' || matrix.name == 'osx' }}
         shell: bash
         run: |
           chmod +x distribution/prepare_artifact_linux.sh
           ./distribution/prepare_artifact_linux.sh ${{ github.sha }}
+
+      - name: Prepare artifact
+        if: ${{ matrix.name == 'win' }}
+        shell: pwsh
+        run: |
+          ./distribution/prepare_artifact_win.ps1 ${{ github.sha }}
 
       - name: Create zip
         uses: thedoctor0/zip-release@0.7.5

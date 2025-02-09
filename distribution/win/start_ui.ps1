@@ -1,7 +1,5 @@
-#!/bin/bash
+Write-Output "Starting Maintainerr UI..."
 
-echo "Starting Maintainerr UI..."
-
-NODE_ENV=production
+$env:NODE_ENV = "production"
 
 node ./ui/server.js --env-file=./ui/.env --env-file=./ui/.env.production
