@@ -11,11 +11,9 @@ COPY . .
 RUN yarn install --network-timeout 99999999
 RUN yarn cache clean
 
-RUN <<EOF cat >> ./ui/.env
-NEXT_PUBLIC_BASE_PATH=/__PATH_PREFIX__
-EOF
-
 RUN sed -i "s,basePath: '',basePath: '/__PATH_PREFIX__',g" ./ui/next.config.js
+
+RUN mv ./ui/.env.docker ./ui/.env.production
 
 RUN yarn turbo build
 
@@ -32,15 +30,15 @@ COPY --from=builder --chmod=777 --chown=node:node /app/ui/public ./ui/public
 COPY --from=builder --chmod=777 --chown=node:node /app/server/dist ./server
 COPY --from=builder --chmod=777 --chown=node:node /app/server/package.json ./server/package.json
 COPY --from=builder --chmod=777 --chown=node:node /app/server/node_modules ./server/node_modules
+COPY --from=builder --chmod=777 --chown=node:node /app/server/.env ./server/.env
+COPY --from=builder --chmod=777 --chown=node:node /app/server/.env.docker ./server/.env.production
 
 COPY distribution/docker/supervisord.conf /etc/supervisord.conf
 COPY --chmod=777 --chown=node:node distribution/docker/start.sh /opt/app/start.sh
 
 ARG GIT_SHA
 
-RUN mv /opt/app/ui/.env.docker /opt/app/ui/.env.production
-RUN mv /opt/app/server/.env.docker /opt/app/server/.env.production
-RUN sed -i "s/%GIT_SHA%/$GIT_SHA/g" _output/server/.env.production
+RUN sed -i "s/%GIT_SHA%/$GIT_SHA/g" ./server/.env.production
 
 # Create required directories
 RUN mkdir -m 777 /opt/data && \

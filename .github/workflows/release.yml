@@ -169,30 +169,20 @@ jobs:
         run: |
           ./distribution/prepare_artifact_win.ps1 ${{ github.sha }}
 
-      - name: Create zip
-        uses: thedoctor0/zip-release@0.7.5
-        if: ${{ matrix.name == 'win' || matrix.name == 'osx' }}
-        with:
-          type: "zip"
-          directory: "./_output/"
-          path: "."
-          filename: "../_artifacts/Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.zip"
-
-      - name: Publish zip artifact
+      - name: Create and publish zip artifact
         uses: actions/upload-artifact@v4
-        if: ${{ matrix.name == 'win' || matrix.name == 'osx' }}
+        if: ${{ matrix.name == 'win' }}
         with:
+          include-hidden-files: true
           name: Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.zip
-          path: ${{ github.workspace }}/_artifacts/
+          path: ${{ github.workspace }}/_output/
 
       - name: Create tar
-        uses: thedoctor0/zip-release@0.7.5
         if: ${{ matrix.name == 'osx' || matrix.name == 'linux' }}
-        with:
-          type: "tar"
-          directory: "./_output/"
-          path: "."
-          filename: "../_artifacts/Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.tar.gz"
+        shell: pwsh
+        run: |
+          cd ./_output/
+          tar -zcf ../_artifacts/Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.tar.gz .
 
       - name: Publish tar artifact
         uses: actions/upload-artifact@v4
