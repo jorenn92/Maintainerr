@@ -26,6 +26,7 @@ import Router from 'next/router'
 import Link from 'next/link'
 import Button from '../../../Common/Button'
 import CommunityRuleModal from '../../../Common/CommunityRuleModal'
+import RuleChartModal from '../../Rule/RuleCreator/RuleInput/RuleChartModal'
 import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 import CachedImage from '../../../Common/CachedImage'
 import YamlImporterModal from '../../../Common/YamlImporterModal'
@@ -178,6 +179,13 @@ const AddModal = (props: AddModal) => {
 
   function updateRules(rules: IRule[]) {
     setRules(rules)
+  }
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const toggleRuleChart = (e?: any) => {
+    if (e) e.preventDefault() // Only prevent default if an event is passed
+
+    setIsModalOpen((prev) => !prev) // Toggle modal state
   }
 
   const toggleCommunityRuleModal = (e: any) => {
@@ -919,10 +927,9 @@ const AddModal = (props: AddModal) => {
                   </div>
                 </div>
                 <div className="mt-4 flex max-w-6xl items-center justify-center sm:justify-end">
-                  {/* Place Holder for Future Use
                   <button
                     className="ml-3 flex h-fit rounded bg-amber-600 p-1 text-sm text-zinc-900 shadow-md hover:bg-amber-500 md:h-10 md:text-base"
-                    onClick={toggleYamlImporter}
+                    onClick={toggleRuleChart}
                   >
                     {
                       <PresentationChartLineIcon className="m-auto ml-4 h-6 w-6 text-zinc-200 md:h-6" />
@@ -931,7 +938,13 @@ const AddModal = (props: AddModal) => {
                       Chart
                     </p>
                   </button>
-                  */}
+                  {isModalOpen && (
+                    <RuleChartModal
+                      isOpen={isModalOpen}
+                      onClose={toggleRuleChart}
+                    />
+                  )}
+
                   <button
                     className="ml-3 flex h-fit rounded bg-amber-600 p-1 text-sm text-zinc-900 shadow-md hover:bg-amber-500 md:h-10 md:text-base"
                     onClick={toggleYamlImporter}

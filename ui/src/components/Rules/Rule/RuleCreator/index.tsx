@@ -169,18 +169,12 @@ const RuleCreator = (props: iRuleCreator) => {
     rulesCreated.current.push({
       id: ruleId,
       rule: {
-        operator: operators[ruleId] || '0', // Default operator to AND
+        operator: null,
         firstVal: ['', ''],
         action: 0,
         section: section - 1,
       },
     })
-
-    // Initialize operator for the new rule immediately
-    setOperators((prevOperators) => ({
-      ...prevOperators,
-      [ruleId]: '0', // Default to AND
-    }))
 
     const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] + 1
@@ -205,29 +199,6 @@ const RuleCreator = (props: iRuleCreator) => {
   const updateRuleAmount = (ruleAmount: [number, number[]]) => {
     setRuleAmountArr(calculateRuleAmountArr(ruleAmount))
     setRuleAmount(ruleAmount)
-  }
-  const [operators, setOperators] = useState<{ [key: number]: string }>({})
-
-  const handleOperatorChange = (ruleId: number, newOperator: string) => {
-    // Update the operator in the operators state
-    setOperators((prevOperators) => ({
-      ...prevOperators,
-      [ruleId]: newOperator,
-    }))
-
-    // Also update the operator in the rules list to ensure it's synced
-    const updatedRules = rulesCreated.current.map((rule) => {
-      if (rule.id === ruleId) {
-        return { ...rule, rule: { ...rule.rule, operator: newOperator } }
-      }
-      return rule
-    })
-
-    rulesCreated.current = updatedRules
-
-    // Trigger re-render and update to parent
-    setEditData({ rules: updatedRules.map((el) => el.rule) })
-    props.onUpdate(updatedRules.map((el) => el.rule))
   }
 
   return (
@@ -293,25 +264,6 @@ const RuleCreator = (props: iRuleCreator) => {
                         onDelete={ruleDeleted}
                       />
                     </div>
-                    {/* Interactive Operator Selector Between Cards */}
-                    {index < ruleAmountArr[1][sid - 1].length - 1 && (
-                      <div className="my-2">
-                        <select
-                          value={
-                            rulesCreated.current.find(
-                              (rule) => rule.id === id + 1,
-                            )?.rule.operator || '0'
-                          }
-                          onChange={(e) =>
-                            handleOperatorChange(id + 1, e.target.value)
-                          }
-                          className="appearance-none rounded-lg bg-zinc-600 px-4 py-2 text-zinc-100 shadow-md focus:border-amber-500 focus:ring-amber-500"
-                        >
-                          <option value="0">AND</option>
-                          <option value="1">OR</option>
-                        </select>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>

@@ -320,6 +320,49 @@ const RuleInput = (props: IRuleInput) => {
         ) : null}
       </div>
 
+      {props.id !== 1 ? (
+        (props.id && props.id > 0) || (props.section && props.section > 1) ? (
+          <div className="form-row">
+            <label htmlFor="operator" className="text-label">
+              Operator
+              {!props.id ||
+              (props.tagId ? props.tagId === 1 : props.id === 1) ? (
+                <span className="label-tip">
+                  {`Section ${props.section}'s action on all previous section results.`}
+                </span>
+              ) : (
+                <span className="label-tip">
+                  {`Action on the previous rule.`}
+                </span>
+              )}
+            </label>
+            <div className="form-input">
+              <div className="form-input-field">
+                <select
+                  name="operator"
+                  id="operator"
+                  onChange={updateOperator}
+                  value={operator}
+                >
+                  <option value={undefined}> </option>
+                  {Object.keys(RuleOperators).map(
+                    (value: string, key: number) => {
+                      if (!isNaN(+value)) {
+                        return (
+                          <option key={key} value={key}>
+                            {RuleOperators[key]}
+                          </option>
+                        )
+                      }
+                    },
+                  )}
+                </select>
+              </div>
+            </div>
+          </div>
+        ) : undefined
+      ) : undefined}
+
       {/* First Value Selection */}
       <div className="grid grid-cols-1 gap-1.5 gap-x-2 md:grid-cols-2">
         <div>
