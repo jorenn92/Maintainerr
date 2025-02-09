@@ -36,6 +36,12 @@ COPY --from=builder --chmod=777 --chown=node:node /app/server/node_modules ./ser
 COPY distribution/docker/supervisord.conf /etc/supervisord.conf
 COPY --chmod=777 --chown=node:node distribution/docker/start.sh /opt/app/start.sh
 
+ARG GIT_SHA
+
+RUN mv /opt/app/ui/.env.docker /opt/app/ui/.env.production
+RUN mv /opt/app/server/.env.docker /opt/app/server/.env.production
+RUN sed -i "s/%GIT_SHA%/$GIT_SHA/g" _output/server/.env.production
+
 # Create required directories
 RUN mkdir -m 777 /opt/data && \
     mkdir -m 777 /opt/data/logs && \
@@ -51,33 +57,9 @@ RUN chmod 777 /opt/app/start.sh && \
 
 RUN apk --update --no-cache add curl supervisor
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
-ARG DEBUG=false
-ENV DEBUG=${DEBUG}
-
-ARG API_PORT=3001
-ENV API_PORT=${API_PORT}
-
-ARG UI_PORT=6246
-ENV UI_PORT=${UI_PORT}
-
-ARG UI_HOSTNAME=0.0.0.0
-ENV UI_HOSTNAME=${UI_HOSTNAME}
-
-# Hash of the last GIT commit
-ARG GIT_SHA
-ENV GIT_SHA=$GIT_SHA
-
-ENV DATA_DIR=/opt/data
-
-# container version type. develop, stable, edge,.. a release=stable
-ARG VERSION_TAG=develop
-ENV VERSION_TAG=$VERSION_TAG
-
-ARG BASE_PATH
-ENV BASE_PATH=${BASE_PATH}
+ENV NODE_ENV=production
+ENV UI_PORT=6246
+ENV UI_HOSTNAME=0.0.0.0
 
 # Temporary workaround for https://github.com/libuv/libuv/pull/4141
 ENV UV_USE_IO_URING=0

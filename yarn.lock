@@ -1808,6 +1808,7 @@ __metadata:
     "@eslint/js": "npm:^9.19.0"
     "@nestjs/cli": "npm:^11.0.2"
     "@nestjs/common": "npm:^11.0.9"
+    "@nestjs/config": "npm:^4.0.0"
     "@nestjs/core": "npm:^11.0.9"
     "@nestjs/platform-express": "npm:^11.0.9"
     "@nestjs/schedule": "npm:^5.0.1"
@@ -1969,6 +1970,20 @@ __metadata:
     class-validator:
       optional: true
   checksum: 10c0/c4de6fa8e6e459cedacc4972d96799ee27120356b17fe3587854e4250a8a61e2a0739ee0988e9adcc5d57f2d233c019f320adc01d3da31dfebfca714e5a93e16
+  languageName: node
+  linkType: hard
+
+"@nestjs/config@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@nestjs/config@npm:4.0.0"
+  dependencies:
+    dotenv: "npm:16.4.7"
+    dotenv-expand: "npm:12.0.1"
+    lodash: "npm:4.17.21"
+  peerDependencies:
+    "@nestjs/common": ^10.0.0 || ^11.0.0
+    rxjs: ^7.1.0
+  checksum: 10c0/e741997048ab7fd9413c240f459590f168ce7b3ec54888e9b3f0cfccf4a29db4814884aa0119b9af9127f0b6833a1c59158d414aa86f3400929190dc91febd97
   languageName: node
   linkType: hard
 
@@ -6106,6 +6121,22 @@ __metadata:
   dependencies:
     is-obj: "npm:^2.0.0"
   checksum: 10c0/93f0d343ef87fe8869320e62f2459f7e70f49c6098d948cc47e060f4a3f827d0ad61e83cb82f2bd90cd5b9571b8d334289978a43c0f98fea4f0e99ee8faa0599
+  languageName: node
+  linkType: hard
+
+"dotenv-expand@npm:12.0.1":
+  version: 12.0.1
+  resolution: "dotenv-expand@npm:12.0.1"
+  dependencies:
+    dotenv: "npm:^16.4.5"
+  checksum: 10c0/51996bfa670073d7a441b8fbed26ac991026fba2c05e9a937a898ce7d2a2e7166f7b6ec4eb8879e576defb5d1ad399ed1300db8f803d6977577fea55b4d82dac
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:16.4.7, dotenv@npm:^16.4.5":
+  version: 16.4.7
+  resolution: "dotenv@npm:16.4.7"
+  checksum: 10c0/be9f597e36a8daf834452daa1f4cc30e5375a5968f98f46d89b16b983c567398a330580c88395069a77473943c06b877d1ca25b4afafcdd6d4adb549e8293462
   languageName: node
   linkType: hard
 
@@ -10401,7 +10432,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.0.0, lodash@npm:^4.17.11, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
+"lodash@npm:4.17.21, lodash@npm:^4.0.0, lodash@npm:^4.17.11, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: 10c0/d8cbea072bb08655bb4c989da418994b073a608dffa608b09ac04b43a791b12aeae7cd7ad919aa4c925f33b48490b5cfe6c1f71d827956071dae2e7bb3a6b74c

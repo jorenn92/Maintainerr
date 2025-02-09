@@ -13,7 +13,7 @@ export class InternalApiService {
   ) {}
 
   public async init() {
-    const apiPort = process.env.API_PORT || 3001;
+    const apiPort = process.env.API_PORT;
 
     this.api = new InternalApi({
       url: `http://localhost:${apiPort}/api/`,

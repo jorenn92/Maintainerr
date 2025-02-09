@@ -1,10 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Welcome to the Maintainerr installation script!"
-echo "This script can only be ran once. If you need to re-run it, please delete the installation directory and extract the archive again."
+
+if [ -f .installed ]; then
+  echo "The script has already been ran. If you need to re-run it, please delete the installation directory, backing up any customized .env files in server/ and ui/ and extract the archive again."
+  exit 1
+fi
+
 echo "The user running this script must have write permissions to the installation directory."
 
-# Ask the user to confirm and check the input:
 echo "Do you want to continue with the installation? (y/n):"
 
 read CONTINUE
@@ -14,7 +18,7 @@ if [ "$CONTINUE" != "y" ]; then
   exit 1
 fi
 
-echo "Are you hosting Maintainerr under a subfolder? If so, please provide the subfolder (e.g. /maintainerr) or press ENTER to continue without a subfolder:"
+echo "Will you be hosting Maintainerr under a subfolder (e.g. http://192.168.0.1/maintainerr)? If so, please provide the subfolder (e.g. /maintainerr) or press ENTER to continue without a subfolder:"
 
 read BASE_PATH
 
@@ -29,6 +33,8 @@ if [ -n "$BASE_PATH" ]; then
 fi
 
 find ./ui -type f -not -path '*/node_modules/*' -print0 | xargs -0 sed -i "s,/__PATH_PREFIX__,$BASE_PATH,g"
+
+touch .installed
 
 echo "Subfolder configuration set."
 

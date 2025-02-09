@@ -14,9 +14,7 @@ export class AppService {
         ? process.env.npm_package_version
         : '0.0.1';
 
-      const versionTag = process.env.VERSION_TAG
-        ? process.env.VERSION_TAG
-        : 'develop';
+      const versionTag = process.env.VERSION_TAG;
 
       const calculatedVersion =
         versionTag !== 'stable'

@@ -11,6 +11,10 @@ on:
         type: boolean
         description: Build and push docker images
         default: true
+      with-artifacts:
+        type: boolean
+        description: Build and push artifacts
+        default: true
 
 jobs:
   semantic-release-dry:
@@ -27,21 +31,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Activate corepack
         run: |
           corepack install
           corepack enable
+
       - name: Install dependencies
         run: yarn --immutable
+
       - name: Release
         id: release-version
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          npx semantic-release --dry-run
+          npx semantic-release --dry-run --repository-url "$(git config --get remote.origin.url)"
     outputs:
       version: ${{ steps.release-version.outputs.version }}
-      tag: ${{ steps.release-version.outputs.tag }}
 
   build-docker-image:
     if: ${{ github.event.inputs.with-docker-images == 'true' }}
@@ -98,6 +104,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   build_artifacts:
+    if: ${{ github.event.inputs.with-artifacts == 'true' }}
     name: Build artifacts
     needs: semantic-release-dry
     strategy:
@@ -152,16 +159,8 @@ jobs:
       - name: Prepare artifact
         shell: bash
         run: |
-          mkdir _output
-          mkdir _artifacts
-          cp -r ui/.next/standalone/ui _output/ui
-          cp -r ui/.next/static _output/ui/.next/static
-          cp -r ui/public _output/ui/public
-          cp -r server/dist _output/server
-          cp server/package.json _output/server/package.json
-          cp -r server/node_modules _output/server/node_modules
-          cp -rT distribution/${{ matrix.name }} _output
-          sed -i 's/%GIT_SHA%/${{ github.sha }}/g' _output/server/.env
+          chmod +x distribution/prepare_artifact_linux.sh
+          ./distribution/prepare_artifact_linux.sh ${{ github.sha }}
 
       - name: Create zip
         uses: thedoctor0/zip-release@0.7.5
@@ -197,7 +196,7 @@ jobs:
 
   semantic-release:
     name: Tag and release latest version
-    needs: [build_artifacts, build-docker-image]
+    needs: [semantic-release-dry, build_artifacts, build-docker-image]
     if: ${{ always() && !cancelled() && !contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-22.04
     steps:
@@ -216,20 +215,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Activate corepack
         run: |
           corepack install
           corepack enable
+
       - name: Install dependencies
         run: yarn --immutable
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           if [ "${{ github.event.inputs.dry-run-semantic-release }}" == "true" ]; then
-          npx semantic-release --dry-run
+          npx semantic-release --dry-run --repository-url "$(git config --get remote.origin.url)"
           else
-          npx semantic-release
+          npx semantic-release --repository-url "$(git config --get remote.origin.url)"
           fi
 
       - name: Mkdocs Deploy
@@ -243,5 +245,5 @@ jobs:
           client-payload: |
             {
               "ref": "refs/heads/main",
-              "versionInput": "${{ steps.package-version.outputs.current-version}}"
+              "versionInput": "${{ needs.semantic-release-dry.outputs.version }}"
             }
