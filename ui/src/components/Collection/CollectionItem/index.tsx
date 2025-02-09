@@ -20,7 +20,7 @@ const CollectionItem = (props: ICollectionItem) => {
           : {})}
       >
         {props.collection.media && props.collection.media.length > 1 ? (
-          <div className="z-1 absolute inset-0 flex flex-row overflow-hidden">
+          <div className="z-1 pointer-events-none absolute inset-0 flex flex-row overflow-hidden">
             <CachedImage
               className="backdrop-image"
               width="600"
@@ -35,7 +35,6 @@ const CollectionItem = (props: ICollectionItem) => {
               src={`https://image.tmdb.org/t/p/w500/${props.collection.media[1].image_path}`}
               alt="img"
             />
-            <div className="collection-backdrop"></div>
           </div>
         ) : undefined}
         <div className="inset-0 z-0 h-fit p-3">
