@@ -20,6 +20,7 @@ import {
   QuestionMarkCircleIcon,
   SaveIcon,
   UploadIcon,
+  PresentationChartLineIcon,
 } from '@heroicons/react/solid'
 import Router from 'next/router'
 import Link from 'next/link'
@@ -896,7 +897,7 @@ const AddModal = (props: AddModal) => {
             <hr className="mt-5" />
             <div className={`section ${useRules ? `` : `hidden`}`}>
               <div className="section">
-                <div className="max-width-form-head flex">
+                <div className="flex max-w-6xl">
                   <div className="ml-0">
                     <h3 className="heading">Rules</h3>
                     <p className="description">
@@ -917,13 +918,26 @@ const AddModal = (props: AddModal) => {
                     </button>
                   </div>
                 </div>
-                <div className="max-width-form-head mt-4 flex items-center justify-center sm:justify-end">
+                <div className="mt-4 flex max-w-6xl items-center justify-center sm:justify-end">
+                  {/* Place Holder for Future Use
                   <button
-                    className="ml-3 flex h-fit rounded bg-amber-600 p-1 text-zinc-900 shadow-md hover:bg-amber-500 md:h-10"
+                    className="ml-3 flex h-fit rounded bg-amber-600 p-1 text-sm text-zinc-900 shadow-md hover:bg-amber-500 md:h-10 md:text-base"
                     onClick={toggleYamlImporter}
                   >
                     {
-                      <DownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200" />
+                      <PresentationChartLineIcon className="m-auto ml-4 h-6 w-6 text-zinc-200 md:h-6" />
+                    }
+                    <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
+                      Chart
+                    </p>
+                  </button>
+                  */}
+                  <button
+                    className="ml-3 flex h-fit rounded bg-amber-600 p-1 text-sm text-zinc-900 shadow-md hover:bg-amber-500 md:h-10 md:text-base"
+                    onClick={toggleYamlImporter}
+                  >
+                    {
+                      <DownloadIcon className="m-auto ml-4 h-6 w-6 text-zinc-200 md:h-6" />
                     }
                     <p className="button-text m-auto ml-1 mr-4 text-zinc-100">
                       Import
@@ -931,7 +945,7 @@ const AddModal = (props: AddModal) => {
                   </button>
 
                   <button
-                    className="ml-3 flex h-fit rounded bg-amber-900 p-1 text-zinc-900 shadow-md hover:bg-amber-800 md:h-10"
+                    className="ml-3 flex h-fit rounded bg-amber-900 p-1 text-sm shadow-md hover:bg-amber-800 md:h-10 md:text-base"
                     onClick={toggleYamlExporter}
                   >
                     {

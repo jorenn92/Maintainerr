@@ -231,98 +231,100 @@ const RuleCreator = (props: iRuleCreator) => {
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="max-w-6xl text-zinc-100 shadow-lg">
       {ruleAmountArr[0].map((sid) => {
         return (
-          <div key={`${sid}-${deleted.current}`}>
-            <SectionHeading
-              id={sid}
-              name={'Section'}
-              onAdd={RuleAdded}
-              addAvailable={added.current.length <= 0}
-            />
-            <div className="ml-5 flex flex-wrap space-x-4">
-              {ruleAmountArr[1][sid - 1].map((id, index) => (
-                <div
-                  key={`${sid}-${id}`}
-                  className="flex items-center space-x-4"
-                >
-                  <div className="w-64">
-                    <RuleInput
-                      id={
-                        ruleAmount[1].length > 1
-                          ? ruleAmount[1].reduce((pv, cv, idx) =>
-                              sid === 1
-                                ? cv - (cv - id)
-                                : idx <= sid - 1
-                                  ? idx === sid - 1
-                                    ? cv - (cv - id) + pv
-                                    : cv + pv
-                                  : pv,
-                            )
-                          : ruleAmount[1][0] - (ruleAmount[1][0] - id)
-                      }
-                      tagId={id}
-                      editData={
-                        editData
-                          ? {
-                              rule: editData.rules[
-                                (ruleAmount[1].length > 1
-                                  ? ruleAmount[1].reduce((pv, cv, idx) =>
-                                      sid === 1
-                                        ? cv - (cv - id)
-                                        : idx <= sid - 1
-                                          ? idx === sid - 1
-                                            ? cv - (cv - id) + pv
-                                            : cv + pv
-                                          : pv,
-                                    )
-                                  : ruleAmount[1][0] -
-                                    (ruleAmount[1][0] - id)) - 1
-                              ],
-                            }
-                          : undefined
-                      }
-                      section={sid}
-                      newlyAdded={added.current}
-                      mediaType={props.mediaType}
-                      dataType={props.dataType}
-                      onCommit={ruleCommited}
-                      onIncomplete={ruleOmitted}
-                      onDelete={ruleDeleted}
-                    />
-                  </div>
-                  {/* Interactive Operator Selector Between Cards */}
-                  {index < ruleAmountArr[1][sid - 1].length - 1 && (
-                    <div className="flex items-center justify-center">
-                      <select
-                        value={
-                          rulesCreated.current.find(
-                            (rule) => rule.id === id + 1,
-                          )?.rule.operator || '0'
+          <div key={`${sid}-${deleted.current}`} className="mb-4">
+            <div className="rounded-lg bg-zinc-700 px-6 py-0.5 shadow-md">
+              <SectionHeading
+                id={sid}
+                name={'Section'}
+                onAdd={RuleAdded}
+                addAvailable={added.current.length <= 0}
+              />
+              <div className="flex flex-col space-y-4">
+                {ruleAmountArr[1][sid - 1].map((id, index) => (
+                  <div
+                    key={`${sid}-${id}`}
+                    className="flex w-full flex-col items-start"
+                  >
+                    <div className="mb-4 w-full max-w-6xl">
+                      <RuleInput
+                        id={
+                          ruleAmount[1].length > 1
+                            ? ruleAmount[1].reduce((pv, cv, idx) =>
+                                sid === 1
+                                  ? cv - (cv - id)
+                                  : idx <= sid - 1
+                                    ? idx === sid - 1
+                                      ? cv - (cv - id) + pv
+                                      : cv + pv
+                                    : pv,
+                              )
+                            : ruleAmount[1][0] - (ruleAmount[1][0] - id)
                         }
-                        onChange={(e) =>
-                          handleOperatorChange(id + 1, e.target.value)
+                        tagId={id}
+                        editData={
+                          editData
+                            ? {
+                                rule: editData.rules[
+                                  (ruleAmount[1].length > 1
+                                    ? ruleAmount[1].reduce((pv, cv, idx) =>
+                                        sid === 1
+                                          ? cv - (cv - id)
+                                          : idx <= sid - 1
+                                            ? idx === sid - 1
+                                              ? cv - (cv - id) + pv
+                                              : cv + pv
+                                            : pv,
+                                      )
+                                    : ruleAmount[1][0] -
+                                      (ruleAmount[1][0] - id)) - 1
+                                ],
+                              }
+                            : undefined
                         }
-                        className="appearance-none rounded-lg bg-zinc-600 px-4 py-2 text-zinc-100 shadow-md focus:border-amber-500 focus:ring-amber-500"
-                      >
-                        <option value="0">AND</option>
-                        <option value="1">OR</option>
-                      </select>
+                        section={sid}
+                        newlyAdded={added.current}
+                        mediaType={props.mediaType}
+                        dataType={props.dataType}
+                        onCommit={ruleCommited}
+                        onIncomplete={ruleOmitted}
+                        onDelete={ruleDeleted}
+                      />
                     </div>
-                  )}
-                </div>
-              ))}
+                    {/* Interactive Operator Selector Between Cards */}
+                    {index < ruleAmountArr[1][sid - 1].length - 1 && (
+                      <div className="my-2">
+                        <select
+                          value={
+                            rulesCreated.current.find(
+                              (rule) => rule.id === id + 1,
+                            )?.rule.operator || '0'
+                          }
+                          onChange={(e) =>
+                            handleOperatorChange(id + 1, e.target.value)
+                          }
+                          className="appearance-none rounded-lg bg-zinc-600 px-4 py-2 text-zinc-100 shadow-md focus:border-amber-500 focus:ring-amber-500"
+                        >
+                          <option value="0">AND</option>
+                          <option value="1">OR</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )
       })}
       {added.current.length <= 0 ? (
-        <div className="mt-5 flex w-full">
+        <div className="mb-3 mt-3 flex w-full">
           <div className="m-auto xl:m-0">
             <button
               type="button"
-              className="ml-auto flex h-8 rounded bg-amber-600 text-zinc-200 shadow-md hover:bg-amber-500"
+              className="flex h-8 rounded bg-amber-600 text-zinc-200 shadow-md hover:bg-amber-500"
               onClick={addSection}
               title={`Add a new section`}
             >
