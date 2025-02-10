@@ -1796,7 +1796,7 @@ __metadata:
     "@eslint/eslintrc": "npm:^3.2.0"
     "@eslint/js": "npm:^9.19.0"
     "@nestjs/cli": "npm:^11.0.2"
-    "@nestjs/common": "npm:^11.0.6"
+    "@nestjs/common": "npm:^11.0.9"
     "@nestjs/core": "npm:^11.0.7"
     "@nestjs/platform-express": "npm:^11.0.3"
     "@nestjs/schedule": "npm:^5.0.1"
@@ -1940,9 +1940,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:^11.0.6":
-  version: 11.0.6
-  resolution: "@nestjs/common@npm:11.0.6"
+"@nestjs/common@npm:^11.0.9":
+  version: 11.0.9
+  resolution: "@nestjs/common@npm:11.0.9"
   dependencies:
     iterare: "npm:1.2.1"
     tslib: "npm:2.8.1"
@@ -1957,7 +1957,7 @@ __metadata:
       optional: true
     class-validator:
       optional: true
-  checksum: 10c0/e1c773c480634bf991a06f4db8862f10a6d6e7f45c60eee69b671ccd447fc501d5a7e2efb96739980deccaaeeb189c5f5502e8feb0456c858e9c1abb2d6fcbae
+  checksum: 10c0/c4de6fa8e6e459cedacc4972d96799ee27120356b17fe3587854e4250a8a61e2a0739ee0988e9adcc5d57f2d233c019f320adc01d3da31dfebfca714e5a93e16
   languageName: node
   linkType: hard
 
