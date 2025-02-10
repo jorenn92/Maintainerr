@@ -1,12 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ExternalApiService } from '../modules/api/external-api/external-api.service';
 import { VersionResponse } from './dto/version-response.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
 
-  constructor(private readonly externalApi: ExternalApiService) {}
+  constructor(
+    private readonly externalApi: ExternalApiService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async getAppVersionStatus(): Promise<VersionResponse> {
     try {
@@ -14,12 +18,13 @@ export class AppService {
         ? process.env.npm_package_version
         : '0.0.1';
 
-      const versionTag = process.env.VERSION_TAG;
+      const versionTag = this.configService.get<string>('VERSION_TAG');
+      const gitSha = this.configService.get<string>('GIT_SHA');
 
       const calculatedVersion =
         versionTag !== 'stable'
-          ? process.env.GIT_SHA
-            ? `${versionTag}-${process.env.GIT_SHA.substring(0, 7)}`
+          ? gitSha
+            ? `${versionTag}-${gitSha.substring(0, 7)}`
             : `${versionTag}-`
           : `${packageVersion}`;
 
@@ -67,8 +72,10 @@ export class AppService {
       this.logger.warn(`Couldn't fetch latest release version from GitHub`);
       return false;
     } else {
+      const gitSha = this.configService.get<string>('GIT_SHA');
+
       // in case of develop, compare SHA's
-      if (process.env.GIT_SHA) {
+      if (gitSha) {
         const githubResp: { sha: string } = await this.externalApi.get(
           'https://api.github.com/repos/jorenn92/maintainerr/commits/main',
           {},

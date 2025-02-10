@@ -2,10 +2,14 @@ import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ConfigResponse } from './dto/config-response.dto';
 import { VersionResponse } from './dto/version-response.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('/api/app')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private configService: ConfigService,
+  ) {}
 
   @Get('/status')
   async getAppStatus(): Promise<VersionResponse> {
@@ -14,9 +18,11 @@ export class AppController {
 
   @Get('/config')
   getConfig(): ConfigResponse {
+    const dataDir = this.configService.get<string>('DATA_DIR');
+
     return {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      dataDirectory: process.env.DATA_DIR,
+      dataDirectory: dataDir,
     };
   }
 }

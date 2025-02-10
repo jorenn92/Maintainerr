@@ -174,7 +174,7 @@ jobs:
         if: ${{ matrix.name == 'win' }}
         with:
           include-hidden-files: true
-          name: Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.zip
+          name: Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}
           path: ${{ github.workspace }}/_output/
 
       - name: Create tar
