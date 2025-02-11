@@ -1,5 +1,4 @@
-import { TrashIcon } from '@heroicons/react/solid'
-import _ from 'lodash'
+import { QuestionMarkCircleIcon, TrashIcon } from '@heroicons/react/solid'
 import { FormEvent, useContext, useEffect, useState } from 'react'
 import { IRule } from '../'
 import ConstantsContext, {
@@ -39,6 +38,7 @@ interface IRuleInput {
   section?: number
   newlyAdded?: number[]
   editData?: { rule: IRule }
+  onOpenHelpModal: () => void
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
   onDelete: (section: number, id: number) => void
@@ -322,7 +322,7 @@ const RuleInput = (props: IRuleInput) => {
 
       {props.id !== 1 ? (
         (props.id && props.id > 0) || (props.section && props.section > 1) ? (
-          <div className="form-row">
+          <div className="form-row flex items-center">
             <label htmlFor="operator" className="text-label">
               Operator
               {!props.id ||
@@ -337,7 +337,7 @@ const RuleInput = (props: IRuleInput) => {
               )}
             </label>
             <div className="form-input">
-              <div className="form-input-field">
+              <div className="form-input-field w-fit px-2">
                 <select
                   name="operator"
                   id="operator"
@@ -357,6 +357,17 @@ const RuleInput = (props: IRuleInput) => {
                     },
                   )}
                 </select>
+                <button
+                  className="ml-1 p-1 text-sm"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    props.onOpenHelpModal()
+                  }}
+                >
+                  {
+                    <QuestionMarkCircleIcon className="h-5 w-5 text-amber-600 hover:text-amber-500" />
+                  }
+                </button>
               </div>
             </div>
           </div>
