@@ -79,9 +79,5 @@
     "publish": [
       "@semantic-release/github"
     ]
-  },
-  "dependencies": {
-    "@types/mermaid": "^9.2.0",
-    "react-mermaid": "^0.1.3"
   }
 }
