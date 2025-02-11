@@ -300,7 +300,7 @@ const RuleInput = (props: IRuleInput) => {
     >
       {/* Header Section */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">
+        <h3 className="text-lg font-semibold text-amber-600">
           {props.tagId
             ? `Rule #${props.tagId}`
             : props.id
@@ -322,22 +322,14 @@ const RuleInput = (props: IRuleInput) => {
 
       {props.id !== 1 ? (
         (props.id && props.id > 0) || (props.section && props.section > 1) ? (
-          <div className="form-row flex items-center">
-            <label htmlFor="operator" className="text-label">
-              Operator
-              {!props.id ||
-              (props.tagId ? props.tagId === 1 : props.id === 1) ? (
-                <span className="label-tip">
-                  {`Section ${props.section}'s action on all previous section results.`}
-                </span>
-              ) : (
-                <span className="label-tip">
-                  {`Action on the previous rule.`}
-                </span>
-              )}
-            </label>
-            <div className="form-input">
-              <div className="form-input-field w-fit px-2">
+          <div className="mb-3 mt-2 md:flex md:items-center">
+            {!props.id || (props.tagId ? props.tagId === 1 : props.id === 1) ? (
+              <label htmlFor="operator">Section Operator</label>
+            ) : (
+              <label htmlFor="operator">Operator</label>
+            )}
+            <div className="md:ml-4">
+              <div className="flex w-1/2 md:w-fit">
                 <select
                   name="operator"
                   id="operator"
@@ -365,7 +357,7 @@ const RuleInput = (props: IRuleInput) => {
                   }}
                 >
                   {
-                    <QuestionMarkCircleIcon className="h-5 w-5 text-amber-600 hover:text-amber-500" />
+                    <QuestionMarkCircleIcon className="h-5 w-5 text-amber-500 hover:text-amber-600" />
                   }
                 </button>
               </div>
@@ -375,7 +367,7 @@ const RuleInput = (props: IRuleInput) => {
       ) : undefined}
 
       {/* First Value Selection */}
-      <div className="grid grid-cols-1 gap-1.5 gap-x-2 md:grid-cols-2">
+      <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-2">
         <div>
           <label htmlFor="first_val" className="block text-sm font-medium">
             First Value

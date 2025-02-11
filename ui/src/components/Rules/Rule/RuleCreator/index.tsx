@@ -208,7 +208,7 @@ const RuleCreator = (props: iRuleCreator) => {
   }
 
   return (
-    <div className="max-w-6xl text-zinc-100 shadow-lg">
+    <div className="text-zinc-100">
       {ruleAmountArr[0].map((sid) => {
         return (
           <div key={`${sid}-${deleted.current}`} className="mb-4">
@@ -219,13 +219,13 @@ const RuleCreator = (props: iRuleCreator) => {
                 onAdd={RuleAdded}
                 addAvailable={added.current.length <= 0}
               />
-              <div className="flex flex-col space-y-4">
+              <div className="flex flex-col space-y-2">
                 {ruleAmountArr[1][sid - 1].map((id, index) => (
                   <div
                     key={`${sid}-${id}`}
                     className="flex w-full flex-col items-start"
                   >
-                    <div className="mb-4 w-full max-w-6xl">
+                    <div className="mb-4 w-full">
                       <RuleInput
                         id={
                           ruleAmount[1].length > 1
@@ -280,7 +280,7 @@ const RuleCreator = (props: iRuleCreator) => {
               )}
 
               {added.current.length <= 0 ? (
-                <div className="flex w-full justify-end py-4">
+                <div className="mb-2 flex w-full justify-end">
                   <button
                     type="button"
                     className="flex h-8 rounded bg-amber-600 text-zinc-200 shadow-md hover:bg-amber-500"
