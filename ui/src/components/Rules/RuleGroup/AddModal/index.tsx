@@ -428,19 +428,18 @@ const AddModal = (props: AddModal) => {
             {/* Start Left side of top section */}
             <div className="flex flex-col items-center">
               <h2 className="mb-2 flex justify-center font-semibold text-zinc-100">
-                {' '}
-                General{' '}
+                General
               </h2>
-              <div className="flex w-full flex-col rounded-lg bg-zinc-800 px-3 py-1">
+              <div className="flex w-full flex-col rounded-lg bg-zinc-800 px-3 py-1 md:ml-8">
                 <div className="md:p-4">
-                  <div className="form-row items-center">
+                  <div className="form-row mt-2 items-center">
                     <label htmlFor="name" className="text-label">
                       Name *
                       <p className="text-xs font-normal">
                         Will also be the name of the collection in Plex.
                       </p>
                     </label>
-                    <div className="form-input mt-2">
+                    <div className="form-input">
                       <div className="form-input-field">
                         <input
                           name="name"
@@ -453,11 +452,11 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row items-center">
+                  <div className="form-row mt-2 items-center">
                     <label htmlFor="description" className="text-label">
                       Description
                     </label>
-                    <div className="form-input mt-2">
+                    <div className="form-input">
                       <div className="form-input-field">
                         <textarea
                           name="description"
@@ -470,7 +469,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row items-center">
+                  <div className="form-row mt-2 items-center">
                     <label htmlFor="library" className="text-label">
                       Library *
                     </label>
@@ -524,7 +523,7 @@ const AddModal = (props: AddModal) => {
 
                   {selectedLibrary && selectedLibrary!.type !== 'movie' && (
                     <>
-                      <div className="form-row items-center">
+                      <div className="form-row mt-2 items-center">
                         <label htmlFor="type" className="text-label">
                           Media type*
                           <p className="text-xs font-normal">
@@ -625,7 +624,9 @@ const AddModal = (props: AddModal) => {
                     </>
                   )}
 
-                  <div className="form-row items-center">
+                  <div
+                    className={`form-row mt-2 items-center ${!tautulliEnabled ? 'mb-2' : ''}`}
+                  >
                     <label
                       htmlFor="collection_deleteDays"
                       className="text-label"
@@ -636,7 +637,7 @@ const AddModal = (props: AddModal) => {
                         deletion/unmonitor
                       </p>
                     </label>
-                    <div className="form-input items-center">
+                    <div className="form-input">
                       <div className="form-input-field">
                         <input
                           type="number"
@@ -652,7 +653,7 @@ const AddModal = (props: AddModal) => {
                   </div>
 
                   {tautulliEnabled && (
-                    <div className="form-row items-center">
+                    <div className="form-row my-2 items-center">
                       <label
                         htmlFor="tautulli_watched_percent_override"
                         className="text-label"
@@ -664,7 +665,7 @@ const AddModal = (props: AddModal) => {
                           watched
                         </p>
                       </label>
-                      <div className="form-input items-center">
+                      <div className="form-input">
                         <div className="form-input-field">
                           <input
                             type="number"
@@ -688,7 +689,7 @@ const AddModal = (props: AddModal) => {
             </div>
             {/* Start Right side of top section */}
             <div className="flex flex-col items-center">
-              <h2 className="mb-2 flex justify-center font-semibold text-zinc-100">
+              <h2 className="mb-2 flex font-semibold text-zinc-100">
                 {' '}
                 Options{' '}
               </h2>
