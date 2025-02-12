@@ -171,22 +171,17 @@ const RuleCreator = (props: iRuleCreator) => {
 
     added.current = [...added.current, ruleId]
 
-    // Initialize the new rule with default values
-    rulesCreated.current.push({
-      id: ruleId,
-      rule: {
-        operator: null,
-        firstVal: ['', ''],
-        action: 0,
-        section: section - 1,
-      },
+    rulesCreated.current.map((e) => {
+      if (e.id >= ruleId) {
+        e.id = e.id + 1
+      }
+      return e
     })
 
     const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] + 1
 
     updateRuleAmount([ruleAmount[0], rules])
-    props.onUpdate(rulesCreated.current.map((el) => el.rule))
   }
 
   const addSection = (e: any) => {
