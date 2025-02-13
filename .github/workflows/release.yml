@@ -169,13 +169,14 @@ jobs:
         run: |
           ./distribution/prepare_artifact_win.ps1 ${{ github.sha }}
 
-      - name: Create and publish zip artifact
-        uses: actions/upload-artifact@v4
+      - name: Create zip
+        uses: thedoctor0/zip-release@0.7.5
         if: ${{ matrix.name == 'win' }}
         with:
-          include-hidden-files: true
-          name: Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}
-          path: ${{ github.workspace }}/_output/
+          type: "zip"
+          directory: "./_output/"
+          path: "."
+          filename: "../_artifacts/Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.zip"
 
       - name: Create tar
         if: ${{ matrix.name == 'osx' || matrix.name == 'linux' }}
@@ -184,11 +185,19 @@ jobs:
           cd ./_output/
           tar -zcf ../_artifacts/Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.tar.gz .
 
-      - name: Publish tar artifact
+      - name: Publish artifact
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.name == 'win' }}
+        with:
+          include-hidden-files: true
+          name: release_windows
+          path: ${{ github.workspace }}/_artifacts/
+
+      - name: Publish artifact
         uses: actions/upload-artifact@v4
         if: ${{ matrix.name == 'osx' || matrix.name == 'linux' }}
         with:
-          name: Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.tar.gz
+          name: release_${{ matrix.name }}
           path: ${{ github.workspace }}/_artifacts/
 
   semantic-release:
@@ -206,6 +215,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: _artifacts
+          pattern: release_*
           merge-multiple: true
 
       - name: Set up Node.js
