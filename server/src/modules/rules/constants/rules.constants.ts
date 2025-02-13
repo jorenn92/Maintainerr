@@ -514,7 +514,7 @@ export class RuleConstants {
         {
           id: 2,
           name: 'tags',
-          humanName: '[list] Tags (Text if 1, otherwise list)',
+          humanName: '[list] Tags',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT_LIST, // return text[]
         },
