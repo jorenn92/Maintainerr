@@ -563,9 +563,9 @@ export class RuleConstants {
         {
           id: 9,
           name: 'fileQuality',
-          humanName: '[list] File - quality (2160, 1080,..)',
+          humanName: 'File - quality (2160, 1080,..)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.NUMBER_LIST,
+          type: RuleType.NUMBER,
         },
         {
           id: 10,
