@@ -2430,12 +2430,12 @@ __metadata:
   linkType: hard
 
 "@octokit/endpoint@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "@octokit/endpoint@npm:10.0.0"
+  version: 10.1.3
+  resolution: "@octokit/endpoint@npm:10.1.3"
   dependencies:
-    "@octokit/types": "npm:^12.0.0"
+    "@octokit/types": "npm:^13.6.2"
     universal-user-agent: "npm:^7.0.2"
-  checksum: 10c0/acb7b718f3a661978c80cf9c976b9a75a30112ea72c81b3ccbc4b1930cb6aa7c3f4f5fd3451a530da385109e9a0a452a752f28cc67170f46c9b7d049178e28da
+  checksum: 10c0/096956534efee1f683b4749673c2d1673c6fbe5362b9cce553f9f4b956feaf59bde816594de72f4352f749b862d0b15bc0e2fa7fb0e198deb1fe637b5f4a8bc7
   languageName: node
   linkType: hard
 
@@ -2461,6 +2461,13 @@ __metadata:
   version: 22.2.0
   resolution: "@octokit/openapi-types@npm:22.2.0"
   checksum: 10c0/a45bfc735611e836df0729f5922bbd5811d401052b972d1e3bc1278a2d2403e00f4552ce9d1f2793f77f167d212da559c5cb9f1b02c935114ad6d898779546ee
+  languageName: node
+  linkType: hard
+
+"@octokit/openapi-types@npm:^23.0.1":
+  version: 23.0.1
+  resolution: "@octokit/openapi-types@npm:23.0.1"
+  checksum: 10c0/ab734ceb26343d9f051a59503b8cb5bdc7fec9ca044b60511b227179bec73141dd9144a6b2d68bcd737741881b136c1b7d5392da89ae2e35e39acc489e5eb4c1
   languageName: node
   linkType: hard
 
@@ -2536,6 +2543,15 @@ __metadata:
   dependencies:
     "@octokit/openapi-types": "npm:^22.2.0"
   checksum: 10c0/891334b5786ba6aef953384cec05d53e05132dd577c0c22db124d55eaa69609362d1e3147853b46e91bf226e046ba24d615c55214c8f8f4e7c3a5c38429b38e9
+  languageName: node
+  linkType: hard
+
+"@octokit/types@npm:^13.6.2":
+  version: 13.8.0
+  resolution: "@octokit/types@npm:13.8.0"
+  dependencies:
+    "@octokit/openapi-types": "npm:^23.0.1"
+  checksum: 10c0/e08c2fcf10e374f18e4c9fa12a6ada33a40f112d1209012a39f0ce40ae7aa9dcf0598b6007b467f63cc4a97e7b1388d6eed34ddef61494655e08b5a95afaad97
   languageName: node
   linkType: hard
 
