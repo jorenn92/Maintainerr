@@ -10,7 +10,7 @@ const ApiHandler = async <Response,>(
     payload?: any,
     method: 'get' | 'post' | 'delete' | 'put' = 'get',
   ) => {
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH
 
     switch (method) {
       case 'get':

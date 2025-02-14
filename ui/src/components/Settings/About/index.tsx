@@ -10,19 +10,24 @@ interface VersionResponse {
   updateAvailable: boolean
 }
 
+interface ConfigResponse {
+  timezone: string
+  dataDirectory: string
+}
+
 const AboutSettings = () => {
   useEffect(() => {
     document.title = 'Maintainerr - Settings - About'
   }, [])
 
-  // Maintainerr Timezone
-  const [timezone, setTimezone] = useState<string>('')
+  // Maintainerr Config
+  const [config, setConfig] = useState<ConfigResponse>()
   useEffect(() => {
-    GetApiHandler<string>('/app/timezone').then((resp) => {
-      setTimezone(resp)
+    GetApiHandler<ConfigResponse>('/app/config').then((resp) => {
+      setConfig(resp)
     })
   }, [])
-  // End Maintainerr Timezone
+  // End Maintainerr Config
 
   // Maintainerr Version
   const [version, setVersion] = useState<string>('')
@@ -115,7 +120,7 @@ const AboutSettings = () => {
           <div className="form-input">
             <div className="form-input-field">
               <span className="">
-                <code>/opt/data</code>
+                <code>{config?.dataDirectory}</code>
               </span>
             </div>
           </div>
@@ -128,7 +133,7 @@ const AboutSettings = () => {
           <div className="form-input">
             <div className="form-input-field">
               <span className="">
-                <code>{timezone}</code>
+                <code>{config?.timezone}</code>
               </span>
             </div>
           </div>

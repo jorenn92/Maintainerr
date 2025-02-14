@@ -5,3 +5,5 @@ server/dist
 ui/.next
 Dockerfile
 **/*.md
+**/.env.local
+**/.env.distribution

@@ -11,11 +11,9 @@ COPY . .
 RUN yarn install --network-timeout 99999999
 RUN yarn cache clean
 
-RUN <<EOF cat >> ./ui/.env
-NEXT_PUBLIC_BASE_PATH=/__PATH_PREFIX__
-EOF
-
 RUN sed -i "s,basePath: '',basePath: '/__PATH_PREFIX__',g" ./ui/next.config.js
+
+RUN mv ./ui/.env.docker ./ui/.env.production
 
 RUN yarn turbo build
 
@@ -32,9 +30,15 @@ COPY --from=builder --chmod=777 --chown=node:node /app/ui/public ./ui/public
 COPY --from=builder --chmod=777 --chown=node:node /app/server/dist ./server
 COPY --from=builder --chmod=777 --chown=node:node /app/server/package.json ./server/package.json
 COPY --from=builder --chmod=777 --chown=node:node /app/server/node_modules ./server/node_modules
+COPY --from=builder --chmod=777 --chown=node:node /app/server/.env ./server/.env
+COPY --from=builder --chmod=777 --chown=node:node /app/server/.env.docker ./server/.env.production
 
-COPY docker/supervisord.conf /etc/supervisord.conf
-COPY --chmod=777 --chown=node:node docker/start.sh /opt/app/start.sh
+COPY distribution/docker/supervisord.conf /etc/supervisord.conf
+COPY --chmod=777 --chown=node:node distribution/docker/start.sh /opt/app/start.sh
+
+ARG GIT_SHA
+
+RUN sed -i "s/%GIT_SHA%/$GIT_SHA/g" ./server/.env.production
 
 # Create required directories
 RUN mkdir -m 777 /opt/data && \
@@ -51,33 +55,9 @@ RUN chmod 777 /opt/app/start.sh && \
 
 RUN apk --update --no-cache add curl supervisor
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
-ARG DEBUG=false
-ENV DEBUG=${DEBUG}
-
-ARG API_PORT=3001
-ENV API_PORT=${API_PORT}
-
-ARG UI_PORT=6246
-ENV UI_PORT=${UI_PORT}
-
-ARG UI_HOSTNAME=0.0.0.0
-ENV UI_HOSTNAME=${UI_HOSTNAME}
-
-# Hash of the last GIT commit
-ARG GIT_SHA
-ENV GIT_SHA=$GIT_SHA
-
-ENV DATA_DIR=/opt/data
-
-# container version type. develop, stable, edge,.. a release=stable
-ARG VERSION_TAG=develop
-ENV VERSION_TAG=$VERSION_TAG
-
-ARG BASE_PATH
-ENV BASE_PATH=${BASE_PATH}
+ENV NODE_ENV=production
+ENV UI_PORT=6246
+ENV UI_HOSTNAME=0.0.0.0
 
 # Temporary workaround for https://github.com/libuv/libuv/pull/4141
 ENV UV_USE_IO_URING=0

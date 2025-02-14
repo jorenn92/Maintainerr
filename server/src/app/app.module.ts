@@ -16,10 +16,18 @@ import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(ormConfig),
+    ConfigModule.forRoot({
+      envFilePath: ['.env.local', '.env', '.env.production'],
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: ormConfig,
+      inject: [ConfigService],
+    }),
     SettingsModule,
     PlexApiModule,
     ExternalApiModule,
