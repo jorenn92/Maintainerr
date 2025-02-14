@@ -21,6 +21,7 @@ interface IOverviewContent {
 
 export interface IPlexMetadata {
   ratingKey: string
+  librarySectionID: string
   key: string
   parentRatingKey?: string
   grandparentRatingKey?: string
@@ -138,7 +139,7 @@ const OverviewContent = (props: IOverviewContent) => {
           <li key={+el.ratingKey}>
             <MediaCard
               id={+el.ratingKey}
-              libraryId={props.libraryId}
+              libraryId={+el.librarySectionID || props.libraryId}
               type={
                 el.type === 'movie'
                   ? 1
