@@ -2507,16 +2507,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/request-error@npm:^6.0.0, @octokit/request-error@npm:^6.0.1":
-  version: 6.0.2
-  resolution: "@octokit/request-error@npm:6.0.2"
-  dependencies:
-    "@octokit/types": "npm:^12.0.0"
-  checksum: 10c0/76c602a8fc3ec045d41c4d41c7854f48c20418c655ce1c3246fef38c94919f2965cc46aaa035073bf11eb4ad28350aded6aa4c0a7daa7223ac1d8f6f0fa039f6
-  languageName: node
-  linkType: hard
-
-"@octokit/request-error@npm:^6.1.6":
+"@octokit/request-error@npm:^6.0.0, @octokit/request-error@npm:^6.0.1, @octokit/request-error@npm:^6.1.6":
   version: 6.1.7
   resolution: "@octokit/request-error@npm:6.1.7"
   dependencies:
