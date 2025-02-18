@@ -2869,19 +2869,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/exec@npm:^6.0.3":
-  version: 6.0.3
-  resolution: "@semantic-release/exec@npm:6.0.3"
+"@semantic-release/exec@npm:^7.0.3":
+  version: 7.0.3
+  resolution: "@semantic-release/exec@npm:7.0.3"
   dependencies:
-    "@semantic-release/error": "npm:^3.0.0"
+    "@semantic-release/error": "npm:^4.0.0"
     aggregate-error: "npm:^3.0.0"
     debug: "npm:^4.0.0"
-    execa: "npm:^5.0.0"
-    lodash: "npm:^4.17.4"
-    parse-json: "npm:^5.0.0"
+    execa: "npm:^9.0.0"
+    lodash-es: "npm:^4.17.21"
+    parse-json: "npm:^8.0.0"
   peerDependencies:
-    semantic-release: ">=18.0.0"
-  checksum: 10c0/87c1f5dcd96e8b51cfa084ff2fd570fa1e2b6368064fba54403797636279e1159b62c199b3e8219d31189acfe8aa6f1b596f6cda6508fd3e1a7e5739c86a1a65
+    semantic-release: ">=24.1.0"
+  checksum: 10c0/99d2dbed9b9b4427553f746c2b7fafc1f6fdd6cafb1e29a159d666a2b58879fb1cf1ce3d21ad14155ec36a7bdf65d2999ca496b7f1d6a15261e6b82fbc4b1da8
   languageName: node
   linkType: hard
 
@@ -10548,7 +10548,7 @@ __metadata:
   dependencies:
     "@semantic-release/changelog": "npm:^6.0.3"
     "@semantic-release/commit-analyzer": "npm:^13.0.1"
-    "@semantic-release/exec": "npm:^6.0.3"
+    "@semantic-release/exec": "npm:^7.0.3"
     "@semantic-release/git": "npm:^10.0.1"
     "@types/node": "npm:^22.13.1"
     knip: "npm:^5.43.6"
