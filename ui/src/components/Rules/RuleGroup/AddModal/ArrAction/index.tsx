@@ -71,7 +71,7 @@ const ArrAction = (props: ArrActionProps) => {
 
   return (
     <div>
-      <div className="form-row">
+      <div className="form-row mt-2 items-center">
         <label htmlFor={`${props.type}-server`} className="text-label">
           {props.type} server *
         </label>
@@ -107,7 +107,7 @@ const ArrAction = (props: ArrActionProps) => {
           </div>
         </div>
       </div>
-      <div className="form-row">
+      <div className="form-row mt-2 items-center">
         <label htmlFor={`${props.type}-action`} className="text-label">
           {noneServerSelected ? 'Plex' : props.type} action
         </label>
