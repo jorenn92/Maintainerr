@@ -2,9 +2,6 @@
   "name": "@maintainerr/server",
   "version": "2.10.0",
   "private": true,
-  "exports": {
-    "./*": "./src/*.ts"
-  },
   "installConfig": {
     "hoistingLimits": "workspaces"
   },
@@ -25,7 +22,8 @@
     "migration:run": "ts-node node_modules/typeorm/cli.js migration:run -d ./src/datasource-config.ts",
     "migration:revert": "ts-node node_modules/typeorm/cli.js migration:revert -d ./src/datasource-config.ts",
     "migration:generate": "ts-node node_modules/typeorm/cli.js migration:generate --dataSource ./src/datasource-config.ts -p",
-    "migration:show": "ts-node node_modules/typeorm/cli.js migration:show --dataSource ./src/datasource-config.ts"
+    "migration:show": "ts-node node_modules/typeorm/cli.js migration:show --dataSource ./src/datasource-config.ts",
+    "generate-metadata": "ts-node src/generate-metadata.ts"
   },
   "dependencies": {
     "@maintainerr/contracts": "*",

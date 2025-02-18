@@ -3,7 +3,7 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["generate-metadata", "^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
@@ -30,6 +30,9 @@
     },
     "check-types": {
       "dependsOn": ["topo"]
+    },
+    "generate-metadata": {
+      "dependsOn": ["^generate-metadata"]
     }
   }
 }
