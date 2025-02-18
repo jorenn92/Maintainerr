@@ -13,11 +13,12 @@ interface IRemoveFromCollectionBtn {
 }
 const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
   const [sure, setSure] = useState<boolean>(false)
-  const [popup, setppopup] = useState<boolean>(false)
+  const [popup, setPopup] = useState<boolean>(false)
 
-  const handlePopup = () => {
+  const handlePopup = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
     if (props.popup) {
-      setppopup(!popup)
+      setPopup(!popup)
     }
   }
 
@@ -49,7 +50,7 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
             setSure(true)
           }}
         >
-          {<TrashIcon className="m-auto ml-3 h-3" />}{' '}
+          <TrashIcon className="m-auto ml-3 h-3" />
           <p className="rules-button-text m-auto mr-2">{'Remove'}</p>
         </Button>
       ) : (
@@ -58,9 +59,9 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
           buttonSize="md"
           className="mb-1 mt-2 h-6 w-full text-zinc-200 shadow-md"
           onClick={(e) => {
-            e.stopPropagation() // Stops the MediaModal from also showing when clicked.
+            e.stopPropagation()
             if (props.popup) {
-              handlePopup()
+              handlePopup(e)
             } else {
               handle()
             }
@@ -71,12 +72,14 @@ const RemoveFromCollectionBtn = (props: IRemoveFromCollectionBtn) => {
       )}
 
       {popup ? (
-        <Modal title="Warning" onOk={handle} onCancel={handlePopup}>
-          <p>
-            This item is excluded <b>globally</b>. Removing this exclusion will
-            apply the change to all collections
-          </p>
-        </Modal>
+        <div onClick={(e) => e.stopPropagation()}>
+          <Modal title="Warning" onOk={handle} onCancel={handlePopup}>
+            <p>
+              This item is excluded <b>globally</b>. Removing this exclusion
+              will apply the change to all collections.
+            </p>
+          </Modal>
+        </div>
       ) : undefined}
     </div>
   )

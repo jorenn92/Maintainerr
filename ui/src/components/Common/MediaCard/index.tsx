@@ -68,20 +68,43 @@ const MediaCard: React.FC<IMediaCard> = ({
 
   useEffect(() => {
     if (tmdbid) {
-      GetApiHandler(`/moviedb/image/${mediaType}/${tmdbid}`).then((resp) =>
-        setImage(resp),
-      )
+      GetApiHandler(`/moviedb/image/${mediaType}/${tmdbid}`).then(setImage)
     }
-    getExclusions()
-  }, [])
 
-  const getExclusions = () => {
     if (!collectionPage) {
       GetApiHandler(`/rules/exclusion?plexId=${id}`).then((resp: []) =>
-        resp.length > 0 ? setHasExclusion(true) : setHasExclusion(false),
+        setHasExclusion(resp.length > 0),
       )
     }
-  }
+  }, [tmdbid, id, collectionPage])
+
+  const [libraryMap, setLibraryMap] = useState<Record<number, string>>({})
+
+  useEffect(() => {
+    GetApiHandler('/plex/libraries').then(
+      (libraries: { key: string; title: string }[]) => {
+        if (!libraries || !Array.isArray(libraries)) return
+
+        // Convert librarySectionID (key) to integer before storing it
+        const libraryMapping = libraries.reduce<Record<number, string>>(
+          (acc, library) => {
+            acc[parseInt(library.key, 10)] = library.title
+            return acc
+          },
+          {},
+        )
+
+        setLibraryMap(libraryMapping)
+      },
+    )
+  }, [])
+
+  const isLibraryMapReady = Object.keys(libraryMap).length > 0
+
+  const libraryTitle = React.useMemo(() => {
+    if (!isLibraryMapReady || typeof libraryId !== 'number') return ''
+    return libraryMap[libraryId] ?? 'Unknown Library'
+  }, [isLibraryMapReady, libraryId, libraryMap])
 
   // Just to get the year from the date
   if (year && mediaType !== 'episode') {
@@ -272,7 +295,7 @@ const MediaCard: React.FC<IMediaCard> = ({
                 className="absolute inset-0 h-full w-full overflow-hidden text-left"
                 style={{
                   background:
-                    'linear-gradient(180deg, rgba(45, 55, 72, 0.4) 0%, rgba(45, 55, 72, 0.9) 100%)',
+                    'linear-gradient(180deg, rgba(30, 40, 55, 0.65) 0%, rgba(30, 40, 55, 1) 100%)',
                 }}
               >
                 <div className="flex h-full w-full items-end">
@@ -291,8 +314,9 @@ const MediaCard: React.FC<IMediaCard> = ({
                     >
                       {title}
                     </h1>
+                    <hr className="mt-1"></hr>
                     <div
-                      className="whitespace-normal text-xs"
+                      className="mt-1 flex h-4 text-xs"
                       style={{
                         WebkitLineClamp: 5,
                         display: '-webkit-box',
@@ -300,8 +324,14 @@ const MediaCard: React.FC<IMediaCard> = ({
                         WebkitBoxOrient: 'vertical',
                         wordBreak: 'break-word',
                       }}
-                    ></div>
-
+                    >
+                      {libraryTitle && (
+                        <span className="whitespace-normal text-white">
+                          <span className="font-semibold">Library: </span>
+                          {libraryTitle}
+                        </span>
+                      )}
+                    </div>
                     {!collectionPage ? (
                       <div>
                         <Button
