@@ -832,6 +832,7 @@ export class RulesService {
       this.logger.log(`Duplicate rule name detected. This is not allowed.`);
       return this.createReturnStatus(false, 'Name already exists');
     }
+    const hasRules = Array.isArray(rule.JsonRules) && rule.JsonRules.length > 0;
 
     return axios
       .patch(this.communityUrl, [
@@ -842,6 +843,7 @@ export class RulesService {
             id: rules.length,
             karma: 5,
             appVersion: appVersion,
+            hasRules,
             ...rule,
           },
         },

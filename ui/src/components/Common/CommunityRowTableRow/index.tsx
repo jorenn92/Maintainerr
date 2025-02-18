@@ -41,13 +41,13 @@ const CommunityRuleTableRow = (props: ICommunityRuleTableRow) => {
       <td
         onClick={onClick}
         onDoubleClick={onDoubleClick}
-        className="md:w-105 whitespace-wrap inline-block max-h-44 w-60 overflow-hidden overflow-ellipsis px-4 py-4 text-left text-sm leading-5 text-white"
+        className="whitespace-wrap inline-block max-h-44 w-60 overflow-hidden overflow-ellipsis px-4 py-4 text-left text-sm leading-5 text-white md:w-96"
       >
         {props.rule.name}
       </td>
       <td className="px-4 py-4 text-center text-sm leading-5 text-white">
         <div
-          className="content-left flex"
+          className="flex items-center justify-center"
           title={
             props.thumbsActive
               ? ''
@@ -80,6 +80,9 @@ const CommunityRuleTableRow = (props: ICommunityRuleTableRow) => {
             }
           />
         </div>
+      </td>
+      <td className="px-4 py-4 text-center text-sm leading-5 text-white">
+        {props.rule.uploadedBy ? props.rule.uploadedBy : '?'}
       </td>
     </tr>
   )

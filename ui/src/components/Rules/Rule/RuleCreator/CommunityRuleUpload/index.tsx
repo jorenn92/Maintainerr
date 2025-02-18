@@ -14,6 +14,7 @@ interface ICommunityRuleUpload {
 const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
   const nameRef = useRef<any>()
   const descriptionRef = useRef<any>()
+  const uploadedByRef = useRef<any>()
   const [thanksModal, setThanksModal] = useState<boolean>(false)
   const [failed, setFailed] = useState<boolean>(false)
 
@@ -24,6 +25,7 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
         type: props.type,
         description: descriptionRef.current.value,
         JsonRules: props.rules,
+        uploadedBy: uploadedByRef.current.value || undefined,
       })
         .then((resp) => {
           if (resp.code === 1) {
@@ -43,17 +45,18 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
         loading={false}
         backgroundClickable={false}
         onCancel={props.onCancel}
-        cancelText={'Close'}
+        cancelText={'Cancel'}
         okDisabled={false}
         onOk={handleUpload}
         okText={'Upload'}
         okButtonType={'primary'}
-        title={'Upload Community Rules'}
+        title={'Upload Community Rule'}
         iconSvg={''}
       >
         <div className="mt-6">
           <Alert
-            title={`Please make sure your rules are working correctly. You won't be able to edit them once uploaded`}
+            title={`Every attempt should be made to only upload working rules.
+                    Rules with less than -100 karma and uploads with no rules, are removed nightly.`}
             type="warning"
           />
 
@@ -65,9 +68,9 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
           ) : undefined}
 
           <form>
-            <div className="form-row">
+            <div className="form-row items-center">
               <label htmlFor="name" className="text-label">
-                Name *
+                Community Short Name *
               </label>
               <div className="form-input">
                 <div className="form-input-field">
@@ -82,9 +85,9 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
               </div>
             </div>
 
-            <div className="form-row">
+            <div className="form-row items-center">
               <label htmlFor="description" className="text-label">
-                Description *
+                Extended Description *
               </label>
               <div className="form-input">
                 <div className="form-input-field">
@@ -95,6 +98,25 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
                     rows={5}
                     ref={descriptionRef}
                   ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row items-center">
+              <label htmlFor="uploadedBy" className="text-label">
+                Uploaded by (optional)
+              </label>
+              <div className="form-input">
+                <div className="form-input-field items-center">
+                  <input
+                    className="!bg-zinc-800"
+                    name="uploadedBy"
+                    id="uploadedBy"
+                    type="text"
+                    maxLength={20}
+                    placeholder="Max 20 characters"
+                    ref={uploadedByRef}
+                  ></input>
                 </div>
               </div>
             </div>
