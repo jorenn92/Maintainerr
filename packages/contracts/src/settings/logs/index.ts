@@ -1,2 +1,2 @@
 export * from "./logSetting";
-export * from "./logSettingDto";
+export * from "./logSetting.dto";

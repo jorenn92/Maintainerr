@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "module": "CommonJS",
     "moduleDetection": "force",
     "declaration": true,
     "declarationMap": true,
