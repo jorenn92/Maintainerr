@@ -18,6 +18,8 @@ import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.modu
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
 import { LogsModule } from '../modules/logging/logs.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { APP_PIPE } from '@nestjs/core';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Module({
   imports: [
@@ -35,7 +37,13 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     CollectionsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
+    },
+  ],
 })
 export class AppModule implements OnModuleInit {
   constructor(
