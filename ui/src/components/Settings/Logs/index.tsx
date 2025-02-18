@@ -7,8 +7,8 @@ import GetApiHandler, {
   PostApiHandler,
 } from '../../../utils/ApiHandler'
 import { useForm } from 'react-hook-form'
-import { logSettingSchema } from '@maintainerr/contracts/settings/logs/logSetting'
-import { LogSettingDto } from '@maintainerr/contracts/settings/logs/logSettingDto'
+import { logSettingSchema } from '@maintainerr/contracts'
+import { LogSettingDto } from '@maintainerr/contracts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Alert from '../../Common/Alert'
 import { InputGroup } from '../../Forms/Input'

@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import { MaintainerrLogger } from './modules/logging/logs.service';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { patchNestJsSwagger } from 'nestjs-zod';
+import metadata from './metadata';
 
 const dataDir =
   process.env.NODE_ENV === 'production'
@@ -17,6 +18,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+
+  await SwaggerModule.loadPluginMetadata(metadata);
 
   const config = new DocumentBuilder().setTitle('Maintainerr').build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);

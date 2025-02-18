@@ -244,7 +244,7 @@ export class LogsController {
   }
 
   @Get('settings')
-  async getLogSettings() {
+  async getLogSettings(): Promise<LogSettingDto> {
     return await this.logSettingsService.get();
   }
 
