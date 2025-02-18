@@ -1,3 +1,5 @@
+import { LogLevel } from '@maintainerr/contracts';
+
 export class SettingDto {
   id: number;
 
@@ -34,4 +36,10 @@ export class SettingDto {
   collection_handler_job_cron: string;
 
   rules_handler_job_cron: string;
+
+  log_level: LogLevel;
+
+  log_max_size: number;
+
+  log_max_files: number;
 }
