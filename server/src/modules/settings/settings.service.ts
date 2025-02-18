@@ -1,10 +1,4 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  Logger,
-  LogLevel,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
@@ -34,7 +28,7 @@ import {
   SonarrSettingRawDto,
   SonarrSettingResponseDto,
 } from "./dto's/sonarr-setting.dto";
-import { LogSettings } from '../logging/dtos/logSettings.dto';
+import { LogSettingDto, LogLevel } from '@maintainerr/contracts';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -75,7 +69,7 @@ export class SettingsService implements SettingDto {
 
   rules_handler_job_cron: string;
 
-  log_level: string;
+  log_level: LogLevel;
 
   log_max_size: number;
 
@@ -642,7 +636,7 @@ export class LogSettingsService {
     private readonly settingsRepo: Repository<Settings>,
   ) {}
 
-  public async get(): Promise<LogSettings> {
+  public async get(): Promise<LogSettingDto> {
     const settingsDb = await this.settingsRepo.findOne({ where: {} });
 
     if (!settingsDb) {
@@ -657,30 +651,23 @@ export class LogSettingsService {
       };
     } else {
       return {
-        level: settingsDb.log_level,
+        level: settingsDb.log_level as LogLevel,
         max_size: settingsDb.log_max_size,
         max_files: settingsDb.log_max_files,
       };
     }
   }
 
-  public async update(settings: LogSettings) {
-    try {
-      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+  public async update(settings: LogSettingDto) {
+    const settingsDb = await this.settingsRepo.findOne({ where: {} });
 
-      const data = {
-        ...settingsDb,
-        log_level: settings.level,
-        log_max_size: settings.max_size,
-        log_max_files: settings.max_files,
-      };
+    const data = {
+      ...settingsDb,
+      log_level: settings.level,
+      log_max_size: settings.max_size,
+      log_max_files: settings.max_files,
+    };
 
-      await this.settingsRepo.save(data);
-
-      return { status: 'OK', code: 1, message: 'Success' };
-    } catch (e) {
-      this.logger.error('Error while updating log settings: ', e);
-      return { status: 'NOK', code: 0, message: 'Failed' };
-    }
+    await this.settingsRepo.save(data);
   }
 }

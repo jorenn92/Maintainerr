@@ -28,11 +28,13 @@
     "migration:show": "ts-node node_modules/typeorm/cli.js migration:show --dataSource ./src/datasource-config.ts"
   },
   "dependencies": {
+    "@maintainerr/contracts": "*",
     "@nestjs/common": "^11.0.10",
     "@nestjs/core": "^11.0.10",
-    "@nestjs/event-emitter": "^2.1.1",
+    "@nestjs/event-emitter": "^3.0.0",
     "@nestjs/platform-express": "^11.0.10",
     "@nestjs/schedule": "^5.0.1",
+    "@nestjs/swagger": "^11.0.3",
     "@nestjs/typeorm": "^11.0.0",
     "@types/express": "^5.0.0",
     "axios": "^1.7.9",
@@ -40,7 +42,7 @@
     "cron-validator": "^1.3.1",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
-    "nest-winston": "^1.10.2",
+    "nestjs-zod": "^4.3.1",
     "node-cache": "^5.1.2",
     "read-last-lines": "^1.8.0",
     "reflect-metadata": "^0.2.2",
@@ -50,7 +52,8 @@
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
     "xml2js": "^0.6.2",
-    "yaml": "^2.7.0"
+    "yaml": "^2.7.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@automock/adapters.nestjs": "^2.1.0",

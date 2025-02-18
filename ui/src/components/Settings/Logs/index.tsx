@@ -6,6 +6,13 @@ import GetApiHandler, {
   API_BASE_PATH,
   PostApiHandler,
 } from '../../../utils/ApiHandler'
+import { useForm } from 'react-hook-form'
+import { logSettingSchema } from '@maintainerr/contracts/settings/logs/logSetting'
+import { LogSettingDto } from '@maintainerr/contracts/settings/logs/logSettingDto'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Alert from '../../Common/Alert'
+import { InputGroup } from '../../Forms/Input'
+import { SelectGroup } from '../../Forms/Select'
 
 type LogLine = {
   date: number
@@ -16,12 +23,6 @@ type LogLine = {
 type LogFile = {
   name: string
   size: number
-}
-
-type LogSetting = {
-  level: string
-  max_size: number
-  max_files: number
 }
 
 const LogSettings = () => {
@@ -39,32 +40,29 @@ const LogSettings = () => {
 }
 
 const LogSettingsForm = () => {
-  const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false)
-  const [logLevel, setLogLevel] = useState<string>('')
-  const [maxFiles, setMaxFiles] = useState<string>('')
-  const [maxSize, setMaxSize] = useState<string>('')
+  const [saveError, setSaveError] = useState<boolean>(false)
+  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState<boolean>(false)
 
-  useEffect(() => {
-    GetApiHandler<LogSetting>('/logs/settings').then((resp) => {
-      setLogLevel(resp.level)
-      setMaxFiles(resp.max_files.toString())
-      setMaxSize(resp.max_size.toString())
-      setSettingsLoaded(true)
-    })
-  }, [])
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isLoading },
+  } = useForm<LogSettingDto>({
+    resolver: zodResolver(logSettingSchema),
+    defaultValues: async () =>
+      await GetApiHandler<LogSettingDto>('/logs/settings'),
+  })
 
-  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const onSubmit = async (data: LogSettingDto) => {
+    setSaveError(false)
+    setIsSubmitSuccessful(false)
 
-    if (logLevel == null || maxSize == null || maxFiles == null) {
-      return
+    try {
+      await PostApiHandler('/logs/settings', data)
+      setIsSubmitSuccessful(true)
+    } catch (err) {
+      setSaveError(true)
     }
-
-    await PostApiHandler('/logs/settings', {
-      level: logLevel,
-      max_size: parseInt(maxSize),
-      max_files: parseInt(maxFiles),
-    } satisfies LogSetting)
   }
 
   return (
@@ -74,72 +72,53 @@ const LogSettingsForm = () => {
         <p className="description">Log configuration</p>
       </div>
 
+      {saveError ? (
+        <Alert type="warning" title="Something went wrong" />
+      ) : isSubmitSuccessful ? (
+        <Alert type="info" title="Log settings successfully updated" />
+      ) : undefined}
+
       <div className="section">
-        <form onSubmit={submit}>
-          <div className="form-row">
-            <label htmlFor="logLevel" className="text-label">
-              Level
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <select
-                  id="logLevel"
-                  name="logLevel"
-                  value={logLevel}
-                  onChange={(e) => setLogLevel(e.target.value)}
-                  className="rounded-l-only"
-                >
-                  {!settingsLoaded && <option value="" disabled></option>}
-                  <option value="silly">Silly</option>
-                  <option value="debug">Debug</option>
-                  <option value="verbose">Verbose</option>
-                  <option value="log">Info</option>
-                  <option value="warn">Warn</option>
-                  <option value="error">Error</option>
-                </select>
-              </div>
-            </div>
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <SelectGroup
+            label="Level"
+            error={errors.level?.message}
+            {...register('level')}
+          >
+            {isLoading && <option value="" disabled></option>}
+            <option value="debug">Debug</option>
+            <option value="verbose">Verbose</option>
+            <option value="info">Info</option>
+            <option value="warn">Warn</option>
+            <option value="error">Error</option>
+            <option value="fatal">Fatal</option>
+          </SelectGroup>
 
-          <div className="form-row">
-            <label htmlFor="maxSize" className="text-label">
-              Max Size (MB)
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="maxSize"
-                  id="maxSize"
-                  type="number"
-                  value={maxSize}
-                  onChange={(e) => setMaxSize(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
+          <InputGroup
+            type="number"
+            label="Max Size (MB)"
+            error={errors.max_size?.message}
+            {...register('max_size', {
+              valueAsNumber: true,
+            })}
+            required
+          />
 
-          <div className="form-row">
-            <label htmlFor="maxFiles" className="text-label">
-              Max Backups
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="maxFiles"
-                  id="maxFiles"
-                  type="number"
-                  value={maxFiles}
-                  onChange={(e) => setMaxFiles(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
+          <InputGroup
+            type="number"
+            label="Max Backups"
+            error={errors.max_files?.message}
+            {...register('max_files', {
+              valueAsNumber: true,
+            })}
+            required
+          />
 
           <div className="actions mt-5 flex w-full justify-end">
             <Button
               buttonType="primary"
               type="submit"
-              disabled={!settingsLoaded}
+              disabled={isLoading || isSubmitting}
             >
               <SaveIcon />
               <span>Save Changes</span>
@@ -247,7 +226,12 @@ const Logs = () => {
                 <span className={`font-semibold ${levelColor} px-2`}>
                   {row.level}
                 </span>
-                <span className="text-white">{row.message}</span>
+                <pre
+                  className="inline text-white"
+                  dangerouslySetInnerHTML={{
+                    __html: row.message.replace(/(?:\r\n|\r|\n)/g, '<br>'),
+                  }}
+                ></pre>
               </div>
             )
           })}

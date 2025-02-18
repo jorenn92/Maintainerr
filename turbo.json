@@ -24,6 +24,12 @@
     },
     "format:check": {
       "dependsOn": ["^format:check"]
+    },
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
+    "check-types": {
+      "dependsOn": ["topo"]
     }
   }
 }
