@@ -30,6 +30,8 @@ export interface ICommunityRule {
   appVersion?: string
   name: string
   description: string
+  hasRules: boolean
+  uploadedBy: string
   JsonRules: IRule[]
 }
 
@@ -130,14 +132,18 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
 
   const handleSearch = (input: string) => {
     searchText.current = input
+
     if (input === '') {
       setCommunityRules(originalRules)
     } else {
       setCommunityRules(
         originalRules.filter(
-          (el) =>
-            el.name.toLowerCase().includes(input.trim().toLowerCase()) ||
-            el.description.toLowerCase().includes(input.trim().toLowerCase()),
+          (rule) =>
+            rule.name.toLowerCase().includes(input.trim().toLowerCase()) ||
+            rule.description
+              .toLowerCase()
+              .includes(input.trim().toLowerCase()) ||
+            rule.uploadedBy?.toLowerCase().includes(input.trim().toLowerCase()),
         ),
       )
     }
@@ -221,15 +227,18 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
           <div className="flex flex-col">
             <div className="-mx-4 my-2 overflow-x-auto md:mx-0 lg:mx-0">
               <div className="inline-block min-w-full py-2 align-middle">
-                <div className="overflow-hidden rounded-lg shadow md:mx-0 lg:mx-0">
+                <div className="overflow-hidden shadow md:mx-0 lg:mx-0">
                   <table className="ml-2 mr-2 min-w-full table-fixed">
                     <tbody className="divide-y divide-zinc-600 bg-zinc-800">
                       <tr>
-                        <th className="truncate bg-gray-500 px-4 py-3 text-left text-xs font-medium uppercase leading-4 tracking-wider text-gray-200">
+                        <th className="w-60 truncate bg-gray-500 px-4 py-3 text-xs font-medium uppercase text-gray-200 md:w-80">
                           <span>Name</span>
                         </th>
-                        <th className="truncate bg-gray-500 px-4 py-3 text-center text-xs font-medium uppercase leading-4 tracking-wider text-gray-200">
+                        <th className="truncate bg-gray-500 text-center text-xs font-medium uppercase text-gray-200">
                           <span>Karma</span>
+                        </th>
+                        <th className="truncate bg-gray-500 px-3 text-center text-xs font-medium uppercase text-gray-200">
+                          <span>Uploaded By</span>
                         </th>
                       </tr>
                       {shownRules.map((cr) => {
