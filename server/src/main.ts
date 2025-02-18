@@ -3,16 +3,24 @@ import { AppModule } from './app/app.module';
 import path from 'path';
 import * as fs from 'fs';
 import { MaintainerrLogger } from './modules/logging/logs.service';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { patchNestJsSwagger } from 'nestjs-zod';
 
 const dataDir =
   process.env.NODE_ENV === 'production'
     ? '/opt/data'
     : path.join(__dirname, '../../data');
 
+patchNestJsSwagger();
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+
+  const config = new DocumentBuilder().setTitle('Maintainerr').build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/swagger', app, documentFactory);
 
   app.useLogger(app.get(MaintainerrLogger));
   app.enableCors({ origin: true });

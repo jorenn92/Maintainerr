@@ -2,6 +2,7 @@ import { CronExpression } from '@nestjs/schedule';
 import { randomUUID } from 'crypto';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { SettingDto } from "../dto's/setting.dto";
+import { LogLevel } from '@maintainerr/contracts';
 
 export const DEFAULT_LOG_LEVEL = 'info';
 export const DEFAULT_LOG_MAX_SIZE = 20;
@@ -64,7 +65,7 @@ export class Settings implements SettingDto {
   rules_handler_job_cron: string;
 
   @Column({ nullable: false, default: DEFAULT_LOG_LEVEL })
-  log_level: string;
+  log_level: LogLevel;
 
   @Column({ nullable: false, default: DEFAULT_LOG_MAX_SIZE })
   log_max_size: number;

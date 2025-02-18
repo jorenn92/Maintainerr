@@ -1,71 +1,128 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  LoggerService,
-  LogLevel,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable, LoggerService } from '@nestjs/common';
 import winston from 'winston';
 import { LogSettingsService } from '../settings/settings.service';
 import DailyRotateFile from 'winston-daily-rotate-file';
-import { LogSettings } from './dtos/logSettings.dto';
+import { LogSettingDto } from '@maintainerr/contracts';
 
 @Injectable()
 export class MaintainerrLogger implements LoggerService {
+  private context?: string;
+
   constructor(private readonly logger: winston.Logger) {}
 
-  log(message: string, ...optionalParams: any[]) {
-    this.logger.log('info', message, this.getContextMetaData(optionalParams));
+  public setContext(context: string) {
+    this.context = context;
   }
 
-  error(error: Error, ...optionalParams: any[]) {
-    this.logger.error({
-      ...error,
-      ...this.getContextMetaData(optionalParams, true),
+  public log(message: any, context?: string): any {
+    context = context || this.context;
+
+    if (!!message && typeof message === 'object') {
+      const { message: msg, level = 'info', ...meta } = message;
+
+      return this.logger.log(level, msg as string, { context, ...meta });
+    }
+
+    return this.logger.info(message, { context });
+  }
+
+  public fatal(message: any, trace?: string, context?: string): any {
+    context = context || this.context;
+
+    if (message instanceof Error) {
+      const { message: msg, stack, ...meta } = message;
+
+      return this.logger.log({
+        level: 'fatal',
+        message: msg,
+        context,
+        stack: [trace || stack],
+        error: message,
+        ...meta,
+      });
+    }
+
+    if (!!message && typeof message === 'object') {
+      const { message: msg, ...meta } = message;
+
+      return this.logger.log({
+        level: 'fatal',
+        message: msg,
+        context,
+        stack: [trace],
+        ...meta,
+      });
+    }
+
+    return this.logger.log({
+      level: 'fatal',
+      message,
+      context,
+      stack: [trace],
     });
   }
 
-  warn(message: string, ...optionalParams: any[]) {
-    this.logger.warn(message, this.getContextMetaData(optionalParams));
-  }
+  public error(message: any, trace?: string, context?: string): any {
+    context = context || this.context;
 
-  debug(message: string, ...optionalParams: any[]) {
-    this.logger.debug(message, this.getContextMetaData(optionalParams));
-  }
+    if (message instanceof Error) {
+      const { message: msg, stack, ...meta } = message;
 
-  verbose(message: string, ...optionalParams: any[]) {
-    this.logger.verbose(message, this.getContextMetaData(optionalParams));
-  }
-
-  fatal(message: string, ...optionalParams: any[]) {
-    this.logger.error(message, this.getContextMetaData(optionalParams));
-  }
-
-  private getContextMetaData(optionalParams: any[], isError = false) {
-    const meta = this.extractMeta(optionalParams, isError);
-    return meta;
-  }
-
-  private extractMeta(optionalParams: any[], isError = false): any {
-    const meta: any = {};
-    if (!optionalParams) {
-      return undefined;
+      return this.logger.error(msg, {
+        context,
+        stack: [trace || stack],
+        error: message,
+        ...meta,
+      });
     }
 
-    const context = optionalParams.pop(); // last argument is expected to be the context,
-    if (context) {
-      meta.context = context;
+    if (!!message && typeof message == 'object') {
+      const { message: msg, ...meta } = message;
+
+      return this.logger.error(msg as string, {
+        context,
+        stack: [trace],
+        ...meta,
+      });
     }
 
-    if (isError) {
-      // with error logs we can also expect the second to last argument (if exists, to be the error stack).
-      const stack = optionalParams.pop(); // one before last argument is expected to be the context;
-      if (stack) {
-        meta.stack = stack;
-      }
+    return this.logger.error(message, { context, stack: [trace] });
+  }
+
+  public warn(message: any, context?: string): any {
+    context = context || this.context;
+
+    if (!!message && typeof message === 'object') {
+      const { message: msg, ...meta } = message;
+
+      return this.logger.warn(msg as string, { context, ...meta });
     }
 
-    return Object.keys(meta).length ? meta : undefined;
+    return this.logger.warn(message, { context });
+  }
+
+  public debug?(message: any, context?: string): any {
+    context = context || this.context;
+
+    if (!!message && typeof message === 'object') {
+      const { message: msg, ...meta } = message;
+
+      return this.logger.debug(msg as string, { context, ...meta });
+    }
+
+    return this.logger.debug(message, { context });
+  }
+
+  public verbose?(message: any, context?: string): any {
+    context = context || this.context;
+
+    if (!!message && typeof message === 'object') {
+      const { message: msg, ...meta } = message;
+
+      return this.logger.verbose(msg as string, { context, ...meta });
+    }
+
+    return this.logger.verbose(message, { context });
   }
 }
 
@@ -77,7 +134,7 @@ export class MaintainerrLogConfigService {
     private readonly settings: LogSettingsService,
   ) {}
 
-  public async update(settings: LogSettings) {
+  public async update(settings: LogSettingDto) {
     this.logger.level = settings.level;
     const rotateTransport = this.logger.transports.find(
       (x): x is DailyRotateFile => x instanceof DailyRotateFile,
