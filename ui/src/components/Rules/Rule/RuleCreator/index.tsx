@@ -123,6 +123,13 @@ const RuleCreator = (props: iRuleCreator) => {
       let rules = rulesCreated.current?.filter((el) => el.id !== id)
       rules = rules.map((e) => {
         e.id = e.id > id ? e.id - 1 : e.id
+        
+        if (section === 1 && rules.filter(r => r.rule.section === 0).length === 0) {
+          if (e.rule.section && e.rule.section > 0) {
+            e.rule.section -= 1
+          }
+        }
+
         return e
       })
       rulesCreated.current = [...rules]
@@ -130,17 +137,22 @@ const RuleCreator = (props: iRuleCreator) => {
     }
 
     added.current = added.current.filter((e) => e !== id)
+    setEditData({ rules: rulesCreated.current.map((el) => el.rule) })
+
     const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] - 1
 
-    if (rulesCreated.current.length > 0) {
-      setEditData({ rules: rulesCreated.current.map((el) => el.rule) })
+    // If the section becomes empty, remove it from the list
+    if (rules[section - 1] <= 0) {
+      rules.splice(section - 1, 1)
     }
 
+    // Find sections that still contain rules
     const nonEmptySections = rules.filter((e) => e > 0)
 
+    // Update the rule count while ensuring at least one section remains
     updateRuleAmount([
-      ruleAmount[0] - rules.filter((e) => e <= 0).length,
+      nonEmptySections.length,
       nonEmptySections.length > 0 ? nonEmptySections : [1],
     ])
 
@@ -241,6 +253,7 @@ const RuleCreator = (props: iRuleCreator) => {
                   onCommit={ruleCommited}
                   onIncomplete={ruleOmitted}
                   onDelete={ruleDeleted}
+                  allowDelete={ruleAmount[0] > 1 || ruleAmount[1][sid - 1] > 1}
                 />
               ))}
             </div>
