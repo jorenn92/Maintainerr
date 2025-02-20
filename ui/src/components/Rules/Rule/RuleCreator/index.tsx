@@ -129,7 +129,11 @@ const RuleCreator = (props: iRuleCreator) => {
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
     }
 
-    added.current = added.current.filter((e) => e !== id)
+    added.current = added.current
+      .filter((e) => e !== id)
+      .map((e) => {
+        return e = e > id ? e - 1 : e
+      })
     const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] - 1
 
