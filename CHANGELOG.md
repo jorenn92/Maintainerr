@@ -1,3 +1,10 @@
+# [2.10.0](https://github.com/jorenn92/Maintainerr/compare/v2.9.0...v2.10.0) (2025-02-19)
+
+
+### Features
+
+* Replace plex-api ([#1561](https://github.com/jorenn92/Maintainerr/issues/1561)) ([e061715](https://github.com/jorenn92/Maintainerr/commit/e061715b96ffe17ebd8283b0dff64f7b753b18c5))
+
 # [2.9.0](https://github.com/jorenn92/Maintainerr/compare/v2.8.0...v2.9.0) (2025-02-05)
 
 
