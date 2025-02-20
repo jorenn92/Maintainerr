@@ -27,7 +27,7 @@ import readLastLines from 'read-last-lines';
 import { createReadStream, readdir } from 'fs';
 import { readdir as readdirp, stat } from 'fs/promises';
 import mime from 'mime-types';
-import { MaintainerrLogConfigService } from './logs.service';
+import { LogSettingsService } from './logs.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LogFile } from './dtos/logFile.dto';
 import { Readable } from 'stream';
@@ -41,7 +41,7 @@ const safeLogFileRegex = /maintainerr-\d{4}-\d{2}-\d{2}\.log(\.gz)?/;
 @Controller('/api/logs')
 export class LogsController {
   constructor(
-    private readonly logSettingsService: MaintainerrLogConfigService,
+    private readonly logSettingsService: LogSettingsService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 

@@ -25,8 +25,8 @@ import { ZodValidationPipe } from 'nestjs-zod';
   imports: [
     TypeOrmModule.forRoot(ormConfig),
     EventEmitterModule.forRoot(),
-    SettingsModule,
     LogsModule,
+    SettingsModule,
     PlexApiModule,
     ExternalApiModule,
     TmdbApiModule,
