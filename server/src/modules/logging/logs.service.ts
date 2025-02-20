@@ -1,8 +1,70 @@
-import { forwardRef, Inject, Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, LoggerService } from '@nestjs/common';
 import winston from 'winston';
-import { LogSettingsService } from '../settings/settings.service';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import { LogSettingDto } from '@maintainerr/contracts';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import {
+  DEFAULT_LOG_LEVEL,
+  DEFAULT_LOG_MAX_FILES,
+  DEFAULT_LOG_MAX_SIZE,
+  LogSettings,
+} from './entities/logSettings.entities';
+
+@Injectable()
+export class LogSettingsService {
+  constructor(
+    private readonly logger: winston.Logger,
+    @InjectRepository(LogSettings)
+    private readonly logSettingsRepo: Repository<LogSettings>,
+  ) {}
+
+  public async get(): Promise<LogSettingDto> {
+    const logSetting = await this.logSettingsRepo.findOne({ where: {} });
+
+    if (!logSetting) {
+      this.logger.warn(
+        'Using default log settings as none were found. This is normal on first boot.',
+      );
+
+      return {
+        level: DEFAULT_LOG_LEVEL,
+        max_size: DEFAULT_LOG_MAX_SIZE,
+        max_files: DEFAULT_LOG_MAX_FILES,
+      };
+    } else {
+      return {
+        level: logSetting.level,
+        max_size: logSetting.max_size,
+        max_files: logSetting.max_files,
+      };
+    }
+  }
+
+  public async update(settings: LogSettingDto): Promise<void> {
+    this.logger.level = settings.level;
+
+    const rotateTransport = this.logger.transports.find(
+      (x): x is DailyRotateFile => x instanceof DailyRotateFile,
+    );
+
+    if (rotateTransport) {
+      rotateTransport.options.maxFiles = settings.max_files;
+      rotateTransport.options.maxSize = `${settings.max_size}m`;
+    }
+
+    const logSetting = await this.logSettingsRepo.findOne({ where: {} });
+
+    const data = {
+      ...logSetting,
+      log_level: settings.level,
+      log_max_size: settings.max_size,
+      log_max_files: settings.max_files,
+    };
+
+    await this.logSettingsRepo.save(data);
+  }
+}
 
 @Injectable()
 export class MaintainerrLogger implements LoggerService {
@@ -123,36 +185,5 @@ export class MaintainerrLogger implements LoggerService {
     }
 
     return this.logger.verbose(message, { context });
-  }
-}
-
-@Injectable()
-export class MaintainerrLogConfigService {
-  constructor(
-    private readonly logger: winston.Logger,
-    @Inject(forwardRef(() => LogSettingsService))
-    private readonly settings: LogSettingsService,
-  ) {}
-
-  public async update(settings: LogSettingDto) {
-    this.logger.level = settings.level;
-    const rotateTransport = this.logger.transports.find(
-      (x): x is DailyRotateFile => x instanceof DailyRotateFile,
-    );
-
-    if (rotateTransport) {
-      rotateTransport.options.maxFiles = settings.max_files;
-      rotateTransport.options.maxSize = `${settings.max_size}m`;
-    }
-
-    return this.settings.update(settings);
-  }
-
-  public async get() {
-    return this.settings.get();
-  }
-
-  public getLogger() {
-    return this.logger;
   }
 }

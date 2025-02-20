@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
 import { LogsController } from './logs.controller';
-import { MaintainerrLogConfigService, MaintainerrLogger } from './logs.service';
+import { LogSettingsService, MaintainerrLogger } from './logs.service';
 import winston from 'winston';
 import chalk from 'chalk';
 import path from 'path';
 import DailyRotateFile from 'winston-daily-rotate-file';
-import { LogSettingsService } from '../settings/settings.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EventEmitterTransport } from './winston/eventEmitterTransport';
 import { formatLogMessage } from './logFormatting';
+import { Repository } from 'typeorm';
+import { LogSettings } from './entities/logSettings.entities';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 
 const dataDir =
   process.env.NODE_ENV === 'production'
@@ -16,18 +18,18 @@ const dataDir =
     : path.join(__dirname, '../../../../data');
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forFeature([LogSettings])],
   providers: [
     MaintainerrLogger,
-    MaintainerrLogConfigService,
+    LogSettingsService,
     {
       provide: winston.Logger,
-      inject: [LogSettingsService, EventEmitter2],
+      inject: [getRepositoryToken(LogSettings), EventEmitter2],
       useFactory: async (
-        settings: LogSettingsService,
+        logSettingsRepo: Repository<LogSettings>,
         eventEmitter: EventEmitter2,
       ) => {
-        const logSettings = await settings.get();
+        const logSettings = await logSettingsRepo.findOne({ where: {} });
         const logLevel =
           process.env.DEBUG == 'true' ? 'debug' : logSettings.level;
         const maxSize = `${logSettings.max_size}m`;
@@ -92,7 +94,7 @@ const dataDir =
       },
     },
   ],
-  exports: [MaintainerrLogger, MaintainerrLogConfigService],
+  exports: [MaintainerrLogger, LogSettingsService],
   controllers: [LogsController],
 })
 export class LogsModule {}

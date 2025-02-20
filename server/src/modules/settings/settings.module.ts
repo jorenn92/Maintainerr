@@ -1,7 +1,7 @@
 import { forwardRef, Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Settings } from './entities/settings.entities';
-import { LogSettingsService, SettingsService } from './settings.service';
+import { SettingsService } from './settings.service';
 import { SettingsController } from './settings.controller';
 import { PlexApiModule } from '../api/plex-api/plex-api.module';
 import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
@@ -22,8 +22,8 @@ import { SonarrSettings } from './entities/sonarr_settings.entities';
     TypeOrmModule.forFeature([Settings, RadarrSettings]),
     TypeOrmModule.forFeature([Settings, SonarrSettings]),
   ],
-  providers: [SettingsService, LogSettingsService],
-  exports: [SettingsService, LogSettingsService],
+  providers: [SettingsService],
+  exports: [SettingsService],
   controllers: [SettingsController],
 })
 export class SettingsModule {}
