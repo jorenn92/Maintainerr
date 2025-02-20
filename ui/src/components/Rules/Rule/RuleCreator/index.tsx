@@ -96,7 +96,7 @@ const RuleCreator = (props: iRuleCreator) => {
   )
   const rulesCreated = useRef<IRulesToCreate[]>([])
   const deleted = useRef<number>(0)
-  const added = useRef<number[]>([])
+  const added = useRef<number[]>([1])
 
   const ruleCommited = (id: number, rule: IRule) => {
     if (rulesCreated) {
