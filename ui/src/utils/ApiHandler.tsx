@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+export const API_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
 const ApiHandler = async <Response,>(
   url: string,
   payload: any = '',
@@ -10,24 +12,22 @@ const ApiHandler = async <Response,>(
     payload?: any,
     method: 'get' | 'post' | 'delete' | 'put' = 'get',
   ) => {
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-
     switch (method) {
       case 'get':
         return await axios
-          .get<Response>(`${basePath}/api${url}`)
+          .get<Response>(`${API_BASE_PATH}/api${url}`)
           .then((res) => res.data)
       case 'post':
         return await axios
-          .post<Response>(`${basePath}/api${url}`, payload)
+          .post<Response>(`${API_BASE_PATH}/api${url}`, payload)
           .then((res) => res.data)
       case 'put':
         return await axios
-          .put<Response>(`${basePath}/api${url}`, payload)
+          .put<Response>(`${API_BASE_PATH}/api${url}`, payload)
           .then((res) => res.data)
       case 'delete':
         return await axios
-          .delete<Response>(`${basePath}/api${url}`, payload)
+          .delete<Response>(`${API_BASE_PATH}/api${url}`, payload)
           .then((res) => res.data)
     }
   }

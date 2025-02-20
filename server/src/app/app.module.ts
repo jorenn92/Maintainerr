@@ -16,10 +16,16 @@ import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { LogsModule } from '../modules/logging/logs.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { APP_PIPE } from '@nestjs/core';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
+    EventEmitterModule.forRoot(),
+    LogsModule,
     SettingsModule,
     PlexApiModule,
     ExternalApiModule,
@@ -31,7 +37,13 @@ import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.ser
     CollectionsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
+    },
+  ],
 })
 export class AppModule implements OnModuleInit {
   constructor(

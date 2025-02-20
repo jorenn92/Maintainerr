@@ -10,15 +10,17 @@
   "license": "MIT",
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "dev": "turbo run dev @maintainerr/server#generate-metadata",
     "lint": "turbo lint",
     "format": "turbo format",
     "format:check": "turbo format:check",
-    "knip": "knip"
+    "knip": "knip",
+    "check-types": "turbo check-types"
   },
   "workspaces": [
     "ui",
-    "server"
+    "server",
+    "packages/*"
   ],
   "engines": {
     "node": ">=18"
