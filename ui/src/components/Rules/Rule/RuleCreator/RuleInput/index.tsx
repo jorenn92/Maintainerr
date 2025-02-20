@@ -54,6 +54,7 @@ interface IRuleInput {
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
   onDelete: (section: number, id: number) => void
+  allowDelete?: boolean
 }
 
 const RuleInput = (props: IRuleInput) => {
@@ -304,7 +305,7 @@ const RuleInput = (props: IRuleInput) => {
                 : `Rule #1`}
           </div>
 
-          {props.id && props.id > 1 ? (
+          {props.allowDelete ? (
             <button
               className="ml-auto flex h-8 rounded bg-amber-900 text-zinc-200 shadow-md hover:bg-amber-800"
               onClick={onDelete}
