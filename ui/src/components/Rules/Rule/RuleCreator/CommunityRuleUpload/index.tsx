@@ -16,7 +16,7 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
   const descriptionRef = useRef<any>()
   const uploadedByRef = useRef<any>()
   const [thanksModal, setThanksModal] = useState<boolean>(false)
-  const [failed, setFailed] = useState<boolean>(false)
+  const [failed, setFailed] = useState<string | false>(false)
 
   const handleUpload = async () => {
     if (nameRef.current.value && descriptionRef.current.value) {
@@ -31,11 +31,11 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
           if (resp.code === 1) {
             setThanksModal(true)
           } else {
-            setFailed(true)
+            setFailed(resp.result)
           }
         })
         .catch((e) => {
-          setFailed(true)
+          setFailed('Failed to connect to the server. Please try again later.')
         })
     }
   }
@@ -61,10 +61,7 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
           />
 
           {failed ? (
-            <Alert
-              title={`Something went wrong uploading your rules. Please try again later`}
-              type="warning"
-            />
+            <Alert title={`Error: ${failed}`} type="warning" />
           ) : undefined}
 
           <form>
