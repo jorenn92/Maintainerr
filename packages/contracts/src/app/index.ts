@@ -1,1 +1,1 @@
-export * from "./versionResponse.dto";
+export * from './versionResponse.dto'
