@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo run dev @maintainerr/server#generate-metadata",
+    "dev": "turbo run dev",
     "lint": "turbo lint",
     "format": "turbo format",
     "format:check": "turbo format:check",

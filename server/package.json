@@ -6,8 +6,12 @@
     "hoistingLimits": "workspaces"
   },
   "scripts": {
-    "dev": "nest start --watch",
-    "build": "nest build",
+    "dev": "concurrently npm:swagger:dev npm:nest:dev",
+    "nest:dev": "nest start --watch",
+    "swagger:dev": "ts-node src/generate-metadata.ts --watch",
+    "build": "npm run swagger:build && npm run nest:build",
+    "nest:build": "nest build",
+    "swagger:build": "ts-node src/generate-metadata.ts",
     "start": "node dist/main",
     "start:release": "node main",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
@@ -22,11 +26,10 @@
     "migration:run": "ts-node node_modules/typeorm/cli.js migration:run -d ./src/datasource-config.ts",
     "migration:revert": "ts-node node_modules/typeorm/cli.js migration:revert -d ./src/datasource-config.ts",
     "migration:generate": "ts-node node_modules/typeorm/cli.js migration:generate --dataSource ./src/datasource-config.ts -p",
-    "migration:show": "ts-node node_modules/typeorm/cli.js migration:show --dataSource ./src/datasource-config.ts",
-    "generate-metadata": "ts-node src/generate-metadata.ts"
+    "migration:show": "ts-node node_modules/typeorm/cli.js migration:show --dataSource ./src/datasource-config.ts"
   },
   "dependencies": {
-    "@maintainerr/contracts": "*",
+    "@maintainerr/contracts": "workspace:^",
     "@nestjs/common": "^11.0.10",
     "@nestjs/core": "^11.0.10",
     "@nestjs/event-emitter": "^3.0.0",
@@ -68,6 +71,7 @@
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^8.24.0",
     "@typescript-eslint/parser": "^8.22.0",
+    "concurrently": "^9.1.2",
     "eslint": "^9.20.1",
     "eslint-config-prettier": "^10.0.1",
     "jest": "^29.7.0",

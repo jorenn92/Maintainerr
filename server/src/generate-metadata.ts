@@ -5,6 +5,6 @@ const generator = new PluginMetadataGenerator();
 generator.generate({
   visitors: [new ReadonlyVisitor({ pathToSource: __dirname })],
   outputDir: __dirname,
-  watch: true,
+  watch: process.argv.includes('--watch'),
   tsconfigPath: 'tsconfig.build.json',
 });

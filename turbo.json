@@ -3,7 +3,7 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["generate-metadata", "^build"],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
@@ -25,14 +25,11 @@
     "format:check": {
       "dependsOn": ["^format:check"]
     },
-    "topo": {
-      "dependsOn": ["^topo"]
+    "transit": {
+      "dependsOn": ["^transit"]
     },
     "check-types": {
-      "dependsOn": ["topo"]
-    },
-    "generate-metadata": {
-      "dependsOn": ["^generate-metadata"]
+      "dependsOn": ["transit"]
     }
   }
 }

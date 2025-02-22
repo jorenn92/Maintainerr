@@ -7,7 +7,7 @@ import {
   CodeIcon,
   ServerIcon,
 } from '@heroicons/react/outline'
-import type { VersionResponse } from '@maintainerr/server/app/dto/version-response.dto'
+import { type VersionResponse } from '@maintainerr/contracts'
 
 enum messages {
   DEVELOP = 'Maintainerr Develop',
