@@ -54,7 +54,18 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
     GetApiHandler('/rules/community/').then((resp: ICommunityRule[]) => {
       if (resp) {
         if (!('code' in resp)) {
-          resp = resp.filter((e) => e.type === props.type)
+          resp = resp.filter((e) => {
+            const versionCheck =
+              !e.appVersion ||
+              e.appVersion.localeCompare(
+                appVersion.current || '0.0.0',
+                undefined,
+                { numeric: true },
+              ) <= 0
+            const typeCheck = e.type === props.type
+
+            return versionCheck && typeCheck
+          })
           resp = resp.sort((a, b) => b.karma! - a.karma!)
           setCommunityRules(resp)
           setoriginalRules(resp)
