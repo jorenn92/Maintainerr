@@ -16,7 +16,7 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
   const descriptionRef = useRef<any>()
   const uploadedByRef = useRef<any>()
   const [thanksModal, setThanksModal] = useState<boolean>(false)
-  const [failed, setFailed] = useState<string | false>(false)
+  const [failed, setFailed] = useState<string>('')
 
   const handleUpload = async () => {
     if (nameRef.current.value && descriptionRef.current.value) {
