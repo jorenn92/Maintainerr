@@ -10,6 +10,7 @@ import LoadingSpinner from '../LoadingSpinner'
 import Modal from '../Modal'
 import Pagination from '../Pagination'
 import SearchBar from '../SearchBar'
+import { compareVersions } from 'compare-versions'
 
 interface ICommunityRuleModal {
   onUpdate: (rules: IRule[]) => void
@@ -56,11 +57,9 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         if (!('code' in resp)) {
           resp = resp.filter((e) => {
             const versionCheck =
-              !e.appVersion ||
-              e.appVersion.localeCompare(
+              compareVersions(
+                e.appVersion || '0.0.0',
                 appVersion.current || '0.0.0',
-                undefined,
-                { numeric: true },
               ) <= 0
             const typeCheck = e.type === props.type
 
