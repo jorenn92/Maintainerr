@@ -21,7 +21,6 @@ import {
   mergeMap,
   catchError,
 } from 'rxjs';
-import { LogEvent } from './logEvent';
 import path from 'path';
 import readLastLines from 'read-last-lines';
 import { createReadStream, readdir } from 'fs';
@@ -29,10 +28,9 @@ import { readdir as readdirp, stat } from 'fs/promises';
 import mime from 'mime-types';
 import { LogSettingsService } from './logs.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { LogFile } from './dtos/logFile.dto';
+import { LogFile, LogSettingDto, LogEvent } from '@maintainerr/contracts';
 import { Readable } from 'stream';
 import { Response } from 'express';
-import { LogSettingDto } from '@maintainerr/contracts';
 import { formatLogMessage } from './logFormatting';
 
 const logsDirectory = path.join(__dirname, `../../../../data/logs`);
@@ -210,7 +208,7 @@ export class LogsController {
   }
 
   @Get('files')
-  async getFiles() {
+  async getFiles(): Promise<LogFile[]> {
     const files = (await readdirp(logsDirectory))
       .filter((x) => safeLogFileRegex.test(x))
       .sort();

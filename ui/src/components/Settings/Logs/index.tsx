@@ -7,23 +7,16 @@ import GetApiHandler, {
   PostApiHandler,
 } from '../../../utils/ApiHandler'
 import { useForm } from 'react-hook-form'
-import { logSettingSchema } from '@maintainerr/contracts'
-import { LogSettingDto } from '@maintainerr/contracts'
+import {
+  logSettingSchema,
+  LogFile,
+  LogSettingDto,
+  LogEvent,
+} from '@maintainerr/contracts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Alert from '../../Common/Alert'
 import { InputGroup } from '../../Forms/Input'
 import { SelectGroup } from '../../Forms/Select'
-
-type LogLine = {
-  date: number
-  message: string
-  level: string
-}
-
-type LogFile = {
-  name: string
-  size: number
-}
 
 const LogSettings = () => {
   useEffect(() => {
@@ -131,7 +124,7 @@ const LogSettingsForm = () => {
 }
 
 const Logs = () => {
-  const [logLines, setLogLines] = useState<LogLine[]>([])
+  const [logLines, setLogLines] = useState<LogEvent[]>([])
   const [logFilter, setLogFilter] = useState<string>('')
   const [scrollToBottom, setScrollToBottom] = useState<boolean>(true)
   const logsRef = useRef<HTMLDivElement>(null)
@@ -139,7 +132,7 @@ const Logs = () => {
   useEffect(() => {
     const es = new EventSource('/api/logs/stream')
     es.addEventListener('log', (event) => {
-      const message: LogLine = JSON.parse(event.data)
+      const message: LogEvent = JSON.parse(event.data)
       setLogLines((prev) => [...prev, message])
     })
 
