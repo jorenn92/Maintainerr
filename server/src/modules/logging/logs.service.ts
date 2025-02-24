@@ -1,15 +1,10 @@
-import { Injectable, LoggerService } from '@nestjs/common';
-import winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
 import { LogSettingDto } from '@maintainerr/contracts';
+import { Injectable, LoggerService } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  DEFAULT_LOG_LEVEL,
-  DEFAULT_LOG_MAX_FILES,
-  DEFAULT_LOG_MAX_SIZE,
-  LogSettings,
-} from './entities/logSettings.entities';
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import { LogSettings } from './entities/logSettings.entities';
 
 @Injectable()
 export class LogSettingsService {
@@ -20,25 +15,13 @@ export class LogSettingsService {
   ) {}
 
   public async get(): Promise<LogSettingDto> {
-    const logSetting = await this.logSettingsRepo.findOne({ where: {} });
+    const logSetting = await this.logSettingsRepo.findOneOrFail({ where: {} });
 
-    if (!logSetting) {
-      this.logger.warn(
-        'Using default log settings as none were found. This is normal on first boot.',
-      );
-
-      return {
-        level: DEFAULT_LOG_LEVEL,
-        max_size: DEFAULT_LOG_MAX_SIZE,
-        max_files: DEFAULT_LOG_MAX_FILES,
-      };
-    } else {
-      return {
-        level: logSetting.level,
-        max_size: logSetting.max_size,
-        max_files: logSetting.max_files,
-      };
-    }
+    return {
+      level: logSetting.level,
+      max_size: logSetting.max_size,
+      max_files: logSetting.max_files,
+    };
   }
 
   public async update(settings: LogSettingDto): Promise<void> {
@@ -57,10 +40,10 @@ export class LogSettingsService {
 
     const data = {
       ...logSetting,
-      log_level: settings.level,
-      log_max_size: settings.max_size,
-      log_max_files: settings.max_files,
-    };
+      level: settings.level,
+      max_size: settings.max_size,
+      max_files: settings.max_files,
+    } satisfies LogSettings;
 
     await this.logSettingsRepo.save(data);
   }
