@@ -4,6 +4,8 @@ export class AddLogSettings1740094282798 implements MigrationInterface {
   name = 'AddLogSettings1740094282798';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    const logLevel = process.env.DEBUG == 'true' ? 'debug' : 'info';
+
     await queryRunner.query(`
             CREATE TABLE "log_settings" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -15,7 +17,7 @@ export class AddLogSettings1740094282798 implements MigrationInterface {
 
     await queryRunner.query(`
             INSERT INTO "log_settings"("level", "max_size", "max_files")
-            SELECT 'info',
+            SELECT '${logLevel}',
                 20,
                 7
         `);
