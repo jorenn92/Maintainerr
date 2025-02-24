@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
-import { LogsController } from './logs.controller';
-import { LogSettingsService, MaintainerrLogger } from './logs.service';
-import winston from 'winston';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import chalk from 'chalk';
 import path from 'path';
-import DailyRotateFile from 'winston-daily-rotate-file';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventEmitterTransport } from './winston/eventEmitterTransport';
-import { formatLogMessage } from './logFormatting';
 import { Repository } from 'typeorm';
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import { LogSettings } from './entities/logSettings.entities';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { formatLogMessage } from './logFormatting';
+import { LogsController } from './logs.controller';
+import { LogSettingsService, MaintainerrLogger } from './logs.service';
+import { EventEmitterTransport } from './winston/eventEmitterTransport';
 
 const dataDir =
   process.env.NODE_ENV === 'production'
@@ -30,8 +30,6 @@ const dataDir =
         eventEmitter: EventEmitter2,
       ) => {
         const logSettings = await logSettingsRepo.findOne({ where: {} });
-        const logLevel =
-          process.env.DEBUG == 'true' ? 'debug' : logSettings.level;
         const maxSize = `${logSettings.max_size}m`;
         const maxFiles = `${logSettings.max_files}d`;
 
@@ -52,7 +50,7 @@ const dataDir =
         });
 
         return winston.createLogger({
-          level: logLevel,
+          level: logSettings.level,
           levels: {
             fatal: 0,
             error: 1,

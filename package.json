@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo run dev",
+    "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo format",
     "format:check": "turbo format:check",
