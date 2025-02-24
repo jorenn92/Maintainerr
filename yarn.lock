@@ -2006,7 +2006,7 @@ __metadata:
     prettier-plugin-tailwindcss: "npm:^0.6.10"
     react: "npm:18.2.0"
     react-dom: "npm:18.3.1"
-    react-markdown: "npm:9.0.3"
+    react-markdown: "npm:10.0.0"
     react-select: "npm:^5.10.0"
     react-toast-notifications: "npm:^2.5.1"
     react-transition-group: "npm:^4.4.5"
@@ -12979,11 +12979,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-markdown@npm:9.0.3":
-  version: 9.0.3
-  resolution: "react-markdown@npm:9.0.3"
+"react-markdown@npm:10.0.0":
+  version: 10.0.0
+  resolution: "react-markdown@npm:10.0.0"
   dependencies:
     "@types/hast": "npm:^3.0.0"
+    "@types/mdast": "npm:^4.0.0"
     devlop: "npm:^1.0.0"
     hast-util-to-jsx-runtime: "npm:^2.0.0"
     html-url-attributes: "npm:^3.0.0"
@@ -12996,7 +12997,7 @@ __metadata:
   peerDependencies:
     "@types/react": ">=18"
     react: ">=18"
-  checksum: 10c0/7f1aef171b49af9b84896917c033cbc0f45d0d2b4a5db5a339bf96977a143ae19f21cb7a69a6878b718d5578db021e96372fa33621b79bf57a87efb9b3c84166
+  checksum: 10c0/9846efb451f5c9a47371458c81117c03bc75d51e11917a8ae2a43b3902624aa29534124edd635b81f421111ab4c7978a904ad49199d010d2bbd50c42674eeae6
   languageName: node
   linkType: hard
 
