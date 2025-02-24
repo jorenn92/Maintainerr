@@ -3,9 +3,7 @@
  * @type {import("prettier").Config}
  */
 const config = {
-  arrowParens: 'always',
   singleQuote: true,
-  tabWidth: 2,
   semi: false,
   tailwindConfig: './tailwind.config.js',
   plugins: ['prettier-plugin-tailwindcss'],

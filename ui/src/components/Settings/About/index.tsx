@@ -2,13 +2,7 @@ import { InformationCircleIcon } from '@heroicons/react/solid'
 import React, { useEffect, useState } from 'react'
 import GetApiHandler from '../../../utils/ApiHandler'
 import Releases from './Releases'
-
-interface VersionResponse {
-  status: 1 | 0
-  version: string
-  commitTag: string
-  updateAvailable: boolean
-}
+import { type VersionResponse } from '@maintainerr/contracts'
 
 const AboutSettings = () => {
   useEffect(() => {

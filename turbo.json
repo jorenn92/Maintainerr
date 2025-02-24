@@ -24,6 +24,12 @@
     },
     "format:check": {
       "dependsOn": ["^format:check"]
+    },
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
+    "check-types": {
+      "dependsOn": ["transit"]
     }
   }
 }
