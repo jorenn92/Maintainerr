@@ -7,5 +7,4 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./server/src:/app/server/src:rw,cached
-      - ./ui/src:/app/ui/src:rw,cached
+      - .:/app:rw,cached
