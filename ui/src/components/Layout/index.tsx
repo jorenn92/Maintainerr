@@ -3,6 +3,7 @@ import { debounce } from 'lodash'
 import Head from 'next/head'
 import router from 'next/router'
 import { ReactNode, useContext, useEffect, useState } from 'react'
+import { useAuth } from '../../contexts/auth-context'
 import SearchContext from '../../contexts/search-context'
 import SettingsContext from '../../contexts/settings-context'
 import GetApiHandler from '../../utils/ApiHandler'
@@ -13,7 +14,7 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
   children?: ReactNode
 }) => {
   const [isScrolled, setIsScrolled] = useState(false)
-
+  const { authEnabled } = useAuth()
   const [navBarOpen, setNavBarOpen] = useState(false)
   const SearchCtx = useContext(SearchContext)
   const SettingsCtx = useContext(SettingsContext)
@@ -42,7 +43,11 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
         <div className="absolute top-0 h-64 w-full bg-gradient-to-bl from-zinc-800 to-zinc-900">
           <div className="relative inset-0 h-full w-full bg-gradient-to-t from-zinc-900 to-transparent" />
         </div>
-        <NavBar open={navBarOpen} setClosed={handleNavbar}></NavBar>
+        <NavBar
+          open={navBarOpen}
+          setClosed={handleNavbar}
+          authEnabled={authEnabled ?? false}
+        ></NavBar>
         <div className="relative mb-16 flex w-0 min-w-0 flex-1 flex-col lg:ml-64"></div>
         <div
           className={`searchbar fixed left-0 right-0 top-0 z-10 flex flex-shrink-0 bg-opacity-80 transition duration-300 ${

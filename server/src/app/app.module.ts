@@ -13,6 +13,7 @@ import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
 import { ServarrApiModule } from '../modules/api/servarr-api/servarr-api.module';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+<<<<<<< HEAD
 import { TmdbApiModule } from '../modules/api/tmdb-api/tmdb.module';
 import { CollectionsModule } from '../modules/collections/collections.module';
 import { LogsModule } from '../modules/logging/logs.module';
@@ -23,6 +24,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import ormConfig from './config/typeOrmConfig';
 
+=======
+import { AuthenticationModule } from '../modules/authentication/authentication.module';
+>>>>>>> b8f6f94 (feat: implement authentication module with middleware and settings management)
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
@@ -38,6 +42,7 @@ import ormConfig from './config/typeOrmConfig';
     JellyseerrApiModule,
     RulesModule,
     CollectionsModule,
+    AuthenticationModule,
   ],
   controllers: [AppController],
   providers: [
@@ -56,6 +61,7 @@ export class AppModule implements OnModuleInit {
     private readonly tautulliApi: TautulliApiService,
     private readonly jellyseerrApi: JellyseerrApiService,
   ) {}
+
   async onModuleInit() {
     // Initialize stuff needing settings here.. Otherwise problems
     await this.settings.init();

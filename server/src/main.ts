@@ -2,10 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import path from 'path';
 import * as fs from 'fs';
+<<<<<<< HEAD
 import { MaintainerrLogger } from './modules/logging/logs.service';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { patchNestJsSwagger } from 'nestjs-zod';
 import metadata from './metadata';
+=======
+import cookieParser from 'cookie-parser';
+>>>>>>> b8f6f94 (feat: implement authentication module with middleware and settings management)
 
 const dataDir =
   process.env.NODE_ENV === 'production'
@@ -19,6 +23,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+<<<<<<< HEAD
   await SwaggerModule.loadPluginMetadata(metadata);
 
   const config = new DocumentBuilder().setTitle('Maintainerr').build();
@@ -27,6 +32,14 @@ async function bootstrap() {
 
   app.useLogger(app.get(MaintainerrLogger));
   app.enableCors({ origin: true });
+=======
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: 'http://localhost:3000', // ✅ Allow frontend requests
+    credentials: true, // ✅ Allow cookies to be sent
+  });
+>>>>>>> b8f6f94 (feat: implement authentication module with middleware and settings management)
 
   const apiPort = process.env.API_PORT || 3001;
   await app.listen(apiPort);

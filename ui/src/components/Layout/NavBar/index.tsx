@@ -11,6 +11,8 @@ import SearchContext from '../../../contexts/search-context'
 import Transition from '../../Transition'
 import VersionStatus from '../../VersionStatus'
 import CachedImage from '../../Common/CachedImage'
+import { clearAuthSession } from '../../../utils/LogOut'
+import { LogoutIcon } from '@heroicons/react/outline'
 
 interface NavBarLink {
   key: string
@@ -54,12 +56,25 @@ let navBarItems: NavBarLink[] = [
 interface NavBarProps {
   open?: boolean
   setClosed: () => void
+  authEnabled: boolean
 }
 
-const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
+const NavBar: React.FC<NavBarProps> = ({ open, setClosed, authEnabled }) => {
   const navRef = useRef<HTMLDivElement>(null)
   const SearchCtx = useContext(SearchContext)
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/authentication/logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+      window.location.href = '/login'
+    } catch (error) {
+      console.error('Failed to log out:', error)
+    }
+  }
 
   useEffect(() => {
     setTimeout(() => {
@@ -233,6 +248,15 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                 })}
               </nav>
               <VersionStatus />
+              {authEnabled && (
+                <button
+                  onClick={handleLogout}
+                  className="mt-4 flex w-full items-center justify-center rounded-md bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
+                >
+                  <LogoutIcon className="mr-2 h-5 w-5" />
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         </div>
