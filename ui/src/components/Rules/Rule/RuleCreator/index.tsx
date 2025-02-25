@@ -96,7 +96,7 @@ const RuleCreator = (props: iRuleCreator) => {
   )
   const rulesCreated = useRef<IRulesToCreate[]>([])
   const deleted = useRef<number>(0)
-  const added = useRef<number[]>([])
+  const added = useRef<number[]>(initialSections ? [] : [1])
 
   const ruleCommited = (id: number, rule: IRule) => {
     if (rulesCreated) {
@@ -129,7 +129,11 @@ const RuleCreator = (props: iRuleCreator) => {
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
     }
 
-    added.current = added.current.filter((e) => e !== id)
+    added.current = added.current
+      .filter((e) => e !== id)
+      .map((e) => {
+        return e = e > id ? e - 1 : e
+      })
     const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] - 1
 
