@@ -123,8 +123,11 @@ const RuleCreator = (props: iRuleCreator) => {
       let rules = rulesCreated.current?.filter((el) => el.id !== id)
       rules = rules.map((e) => {
         e.id = e.id > id ? e.id - 1 : e.id
-        
-        if (section === 1 && rules.filter(r => r.rule.section === 0).length === 0) {
+
+        if (
+          section === 1 &&
+          rules.filter((r) => r.rule.section === 0).length === 0
+        ) {
           if (e.rule.section && e.rule.section > 0) {
             e.rule.section -= 1
           }
@@ -139,7 +142,7 @@ const RuleCreator = (props: iRuleCreator) => {
     added.current = added.current
       .filter((e) => e !== id)
       .map((e) => {
-        return e = e > id ? e - 1 : e
+        return (e = e > id ? e - 1 : e)
       })
     setEditData({ rules: rulesCreated.current.map((el) => el.rule) })
 
