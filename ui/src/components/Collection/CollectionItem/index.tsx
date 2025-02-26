@@ -11,6 +11,13 @@ interface ICollectionItem {
 const CollectionItem = (props: ICollectionItem) => {
   const LibrariesCtx = useContext(LibrariesContext)
 
+    const renderDeleteAfterText = () => {
+      if (props.collection.deleteAfterDays === undefined) {
+        return "Never"
+      }
+      return `After ${props.collection.deleteAfterDays} days`
+    }
+
   return (
     <>
       <a
@@ -89,7 +96,7 @@ const CollectionItem = (props: ICollectionItem) => {
 
             <div className="mr-0 sm:mr-0">
               <p className="font-bold">Delete</p>
-              <p className="text-amber-500">{` After ${props.collection.deleteAfterDays} days`}</p>
+              <p className="text-amber-500">{renderDeleteAfterText()}</p>
             </div>
           </div>
         </div>
