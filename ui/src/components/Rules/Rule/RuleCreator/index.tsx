@@ -149,11 +149,6 @@ const RuleCreator = (props: iRuleCreator) => {
     const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] - 1
 
-    // If the section becomes empty, remove it from the list
-    if (rules[section - 1] <= 0) {
-      rules.splice(section - 1, 1)
-    }
-
     // Find sections that still contain rules
     const nonEmptySections = rules.filter((e) => e > 0)
 
