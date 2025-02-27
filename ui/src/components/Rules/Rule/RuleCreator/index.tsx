@@ -121,16 +121,13 @@ const RuleCreator = (props: iRuleCreator) => {
   const ruleDeleted = (section = 0, id: number) => {
     if (rulesCreated.current.length > 0) {
       let rules = rulesCreated.current?.filter((el) => el.id !== id)
+      const section1IsEmpty = !rules.some((r) => r.rule.section === 0)
+
       rules = rules.map((e) => {
         e.id = e.id > id ? e.id - 1 : e.id
 
-        if (
-          section === 1 &&
-          rules.filter((r) => r.rule.section === 0).length === 0
-        ) {
-          if (e.rule.section && e.rule.section > 0) {
-            e.rule.section -= 1
-          }
+        if (section1IsEmpty && section === 1 && e.rule.section) {
+          e.rule.section -= 1
         }
 
         return e
