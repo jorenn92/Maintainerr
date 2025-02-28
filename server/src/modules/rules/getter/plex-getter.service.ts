@@ -9,6 +9,7 @@ import {
   Application,
   Property,
   RuleConstants,
+  RuleValueType,
 } from '../constants/rules.constants';
 import { RulesDto } from '../dtos/rules.dto';
 import { PlexMetadata } from '../../api/plex-api/interfaces/media.interface';
@@ -31,7 +32,7 @@ export class PlexGetterService {
     libItem: PlexLibraryItem,
     dataType?: EPlexDataType,
     ruleGroup?: RulesDto,
-  ) {
+  ): Promise<RuleValueType> {
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
 

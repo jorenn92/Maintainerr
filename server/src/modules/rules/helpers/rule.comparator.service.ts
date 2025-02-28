@@ -3,6 +3,7 @@ import {
   RuleOperators,
   RulePossibility,
   RuleType,
+  RuleValueType,
 } from '../constants/rules.constants';
 import { RuleDto } from '../dtos/rule.dto';
 import _ from 'lodash';
@@ -28,9 +29,9 @@ interface ISectionComparisonResults {
 
 interface IRuleComparisonResult {
   firstValueName: string;
-  firstValue: any;
+  firstValue: RuleValueType;
   secondValueName: string;
-  secondValue: any;
+  secondValue: RuleValueType;
   action: string;
   operator?: string;
   result: boolean;
@@ -172,8 +173,8 @@ export class RuleComparatorService {
 
   private async executeRule(rule: RuleDto, ruleGroup: RulesDto) {
     let data: PlexLibraryItem[];
-    let firstVal: any;
-    let secondVal: any;
+    let firstVal: RuleValueType;
+    let secondVal: RuleValueType;
 
     if (rule.operator === null || +rule.operator === +RuleOperators.OR) {
       data = _.cloneDeep(this.plexData);
@@ -237,9 +238,9 @@ export class RuleComparatorService {
     rule: RuleDto,
     data: PlexLibraryItem,
     rulegroup: RulesDto,
-    firstVal: any,
-  ): Promise<any> {
-    let secondVal;
+    firstVal: RuleValueType,
+  ): Promise<RuleValueType> {
+    let secondVal: RuleValueType;
     if (rule.lastVal) {
       secondVal = await this.valueGetter.get(
         rule.lastVal,
@@ -281,7 +282,8 @@ export class RuleComparatorService {
       if (
         // if custom secondval is text, check if it's parsable as an array
         rule.customVal.ruleTypeId === +RuleType.TEXT &&
-        this.isStringParsableToArray(secondVal as string)
+        typeof secondVal === 'string' &&
+        this.isStringParsableToArray(secondVal)
       ) {
         secondVal = JSON.parse(secondVal);
       }
@@ -309,8 +311,8 @@ export class RuleComparatorService {
 
   private addStatistictoParent(
     rule: RuleDto,
-    firstVal: any,
-    secondVal: any,
+    firstVal: RuleValueType,
+    secondVal: RuleValueType,
     plexId: number,
     result: boolean,
   ) {
@@ -373,25 +375,25 @@ export class RuleComparatorService {
     this.workerData = [];
   }
 
-  private doRuleAction<T>(val1: T, val2: T, action: RulePossibility): boolean {
+  private doRuleAction(
+    val1: RuleValueType,
+    val2: RuleValueType,
+    action: RulePossibility,
+  ): boolean {
     if (typeof val1 === 'string') {
-      val1 = val1.toLowerCase() as T;
+      val1 = val1.toLowerCase();
     }
 
     if (typeof val2 === 'string') {
-      val2 = val2.toLowerCase() as T;
+      val2 = val2.toLowerCase();
     }
 
     if (Array.isArray(val1)) {
-      val1 = val1.map((el) =>
-        typeof el == 'string' ? el.toLowerCase() : el,
-      ) as T;
+      val1 = val1.map((el) => (typeof el == 'string' ? el.toLowerCase() : el));
     }
 
     if (Array.isArray(val2)) {
-      val2 = val2.map((el) =>
-        typeof el == 'string' ? el.toLowerCase() : el,
-      ) as T;
+      val2 = val2.map((el) => (typeof el == 'string' ? el.toLowerCase() : el));
     }
 
     if (action === RulePossibility.BIGGER) {
@@ -420,8 +422,8 @@ export class RuleComparatorService {
         const val2Array = Array.isArray(val2) ? val2 : [val2];
 
         if (val1.length === val2Array.length) {
-          const set1 = new Set(val1);
-          const set2 = new Set(val2Array);
+          const set1 = new Set<RuleValueType>(val1);
+          const set2 = new Set<RuleValueType>(val2Array);
           return [...set1].every((value) => set2.has(value));
         } else {
           return false;
@@ -436,11 +438,11 @@ export class RuleComparatorService {
     if (action === RulePossibility.CONTAINS) {
       try {
         if (!Array.isArray(val2)) {
-          return (val1 as unknown as T[])?.includes(val2);
+          return (val1 as unknown[])?.includes(val2);
         } else {
           if (val2.length > 0) {
             return val2.some((el) => {
-              return (val1 as unknown as T[])?.includes(el);
+              return (val1 as unknown[])?.includes(el);
             });
           } else {
             return false;
@@ -455,7 +457,7 @@ export class RuleComparatorService {
       try {
         if (!Array.isArray(val2)) {
           return (
-            (Array.isArray(val1) ? (val1 as unknown as T[]) : [val1]).some(
+            (Array.isArray(val1) ? (val1 as unknown[]) : [val1]).some(
               (line) => {
                 return typeof line === 'string' &&
                   val2 != undefined &&
@@ -471,7 +473,7 @@ export class RuleComparatorService {
           if (val2.length > 0) {
             return val2.some((el) => {
               return (
-                (val1 as unknown as T[]).some((line) => {
+                (val1 as unknown[]).some((line) => {
                   return typeof line === 'string' &&
                     el != undefined &&
                     el.length > 0
@@ -500,25 +502,57 @@ export class RuleComparatorService {
     }
 
     if (action === RulePossibility.BEFORE) {
+      if (!(val1 instanceof Date) || !(val2 instanceof Date)) {
+        return false;
+      }
       return val1 && val2 ? val1 <= val2 : false;
     }
 
     if (action === RulePossibility.AFTER) {
+      if (!(val1 instanceof Date) || !(val2 instanceof Date)) {
+        return false;
+      }
       return val1 && val2 ? val1 >= val2 : false;
     }
 
     if (action === RulePossibility.IN_LAST) {
       return (
-        val1 >= val2 && // time in s
+        (val1 as Date) >= val2 && // time in s
         (val1 as unknown as Date) <= new Date()
       );
     }
 
     if (action === RulePossibility.IN_NEXT) {
       return (
-        val1 <= val2 && //  time in s
+        (val1 as Date) <= val2 && //  time in s
         (val1 as unknown as Date) >= new Date()
       );
+    }
+
+    if (action === RulePossibility.COUNT_NOT_EQUALS) {
+      return !this.doRuleAction(val1, val2, RulePossibility.COUNT_EQUALS);
+    }
+    if (
+      [
+        RulePossibility.COUNT_EQUALS,
+        RulePossibility.COUNT_BIGGER,
+        RulePossibility.COUNT_SMALLER,
+      ].includes(action)
+    ) {
+      if (!Array.isArray(val1)) {
+        return false;
+      }
+      if (!Array.isArray(val2) && typeof val2 !== 'number') {
+        return false;
+      }
+      const val2Length = Array.isArray(val2) ? val2.length : val2;
+      if (action === RulePossibility.COUNT_EQUALS) {
+        return val1.length === val2Length;
+      } else if (action === RulePossibility.COUNT_BIGGER) {
+        return val1.length > val2Length;
+      } else if (action === RulePossibility.COUNT_SMALLER) {
+        return val1.length < val2Length;
+      }
     }
   }
 
