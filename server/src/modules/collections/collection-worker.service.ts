@@ -73,25 +73,31 @@ export class CollectionWorkerService extends TaskBase {
         where: { isActive: true },
       });
       for (const collection of collections) {
+
+        if (collection.arrAction === ServarrAction.DO_NOTHING) {
+          this.infoLogger(`Skipping collection '${collection.title}' as it's action is 'Do Nothing'`);
+          continue;
+        }
+
         this.infoLogger(`Handling collection '${collection.title}'`);
 
-        const collectionMedia = await this.collectionMediaRepo.find({
-          where: {
-            collectionId: collection.id,
-          },
-        });
+            const collectionMedia = await this.collectionMediaRepo.find({
+              where: {
+                collectionId: collection.id,
+              },
+            });
+            
+            const dangerDate = new Date(
+              new Date().getTime() - +collection.deleteAfterDays * 86400000,
+            );
 
-        const dangerDate = new Date(
-          new Date().getTime() - +collection.deleteAfterDays * 86400000,
-        );
-
-        for (const media of collectionMedia) {
-          // handle media addate <= due date
-          if (new Date(media.addDate) <= dangerDate) {
-            await this.handleMedia(collection, media);
-            handledCollections++;
-          }
-        }
+            for (const media of collectionMedia) {
+              // handle media addate <= due date
+              if (new Date(media.addDate) <= dangerDate) {
+                await this.handleMedia(collection, media);
+                handledCollections++;
+              }
+            }
 
         this.infoLogger(`Handling collection '${collection.title}' finished`);
       }
@@ -119,6 +125,11 @@ export class CollectionWorkerService extends TaskBase {
   }
 
   private async handleMedia(collection: Collection, media: CollectionMedia) {
+    if (collection.arrAction === ServarrAction.DO_NOTHING) {
+      // Sanity check, ideally we shouldn't ever call handleMedia on a collection with servarr
+      // action DO_NOTHING, but if we do, ensure we do nothing.
+      return;
+    }
     let plexData: PlexMetadata = undefined;
 
     const plexLibrary = (await this.plexApi.getLibraries()).find(
