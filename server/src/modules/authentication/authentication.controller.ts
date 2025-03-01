@@ -53,38 +53,7 @@ export class AuthenticationController {
     @Body() body: { username: string; password: string },
     @Res({ passthrough: true }) res: Response,
   ) {
-    const settings =
-      await this.authenticationService.getAuthenticationSettings();
-
-    if (!settings.authEnabled) {
-      return { success: false, message: 'Authentication is disabled' };
-    }
-
-    if (!settings.username || !settings.passwordHash) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const isValidUser = body.username === settings.username;
-    const isValidPassword = await bcrypt.compare(
-      body.password,
-      settings.passwordHash,
-    );
-
-    if (!isValidUser || !isValidPassword) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const sessionToken = crypto.randomBytes(32).toString('hex');
-
-    // ✅ Securely store authentication session in HttpOnly cookie
-    res.cookie('sessionToken', sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
-
-    return { success: true, message: 'Login successful' };
+    return this.authenticationService.login(body.username, body.password, res);
   }
 
   @Post('logout')

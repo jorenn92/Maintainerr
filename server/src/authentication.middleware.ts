@@ -5,12 +5,17 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticationService } from './modules/authentication/authentication.service';
+import * as jwt from 'jsonwebtoken';
+
+interface AuthenticatedRequest extends Request {
+  user?: any;
+}
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
-  async use(req: Request, res: Response, next: NextFunction) {
+  async use(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const settings =
       await this.authenticationService.getAuthenticationSettings();
 
@@ -22,31 +27,38 @@ export class AuthenticationMiddleware implements NestMiddleware {
     const referer = req.headers['referer'];
     const origin = req.headers['origin'];
 
-    // ✅ Allow UI requests without API key when auth is disabled
-    if (!settings.authEnabled && (origin || referer)) {
+    // ✅ Always allow UI requests (regardless of authentication)
+    if (origin || referer) {
       return next();
     }
 
-    // ✅ Allow the login and logout endpoints without API key or session token
+    // ✅ Allow the login/logout/status endpoints without authentication
     if (
       req.path.startsWith('/api/authentication/login') ||
-      req.path.startsWith('/api/authentication/logout')
+      req.path.startsWith('/api/authentication/logout') ||
+      req.path.startsWith('/api/authentication/status')
     ) {
       return next();
     }
 
-    // ✅ If sessionToken is present, allow request
+    // ✅ Non-UI Requests Require API Key or Session Token
     if (sessionToken) {
-      return next();
+      try {
+        const secret = this.authenticationService.getJwtSecret();
+        const decoded = jwt.verify(sessionToken, secret);
+        req.user = decoded;
+        return next(); // ✅ Valid session token → allow
+      } catch (error) {
+        console.warn('[Middleware] Invalid or Expired JWT:', error.message);
+        throw new UnauthorizedException('Invalid or expired session token');
+      }
     }
 
-    // ✅ Require API key for API requests when session token is missing
     if (!apiKeyHeader) {
       console.warn('[Middleware] Missing API Key - Unauthorized.');
       throw new UnauthorizedException('Missing API key');
     }
 
-    // ✅ Validate API key
     if (apiKeyHeader !== settings.apiKey) {
       console.warn('[Middleware] Invalid API Key - Unauthorized.');
       throw new UnauthorizedException('Invalid API key');
