@@ -3,11 +3,14 @@ import {
   SaveIcon,
   EyeIcon,
   EyeOffIcon,
+  ClipboardCopyIcon,
+  CheckIcon,
 } from '@heroicons/react/solid'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
-import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
+import { PostApiHandler } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
+import { useToasts } from 'react-toast-notifications'
 import Button from '../../Common/Button'
 import DocsButton from '../../Common/DocsButton'
 import { clearAuthSession } from '../../../utils/LogOut'
@@ -15,7 +18,6 @@ import { clearAuthSession } from '../../../utils/LogOut'
 const MainSettings = () => {
   const settingsCtx = useContext(SettingsContext)
   const hostnameRef = useRef<HTMLInputElement>(null)
-  const apiKeyRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
   const [cacheImage, setCacheImage] = useState<boolean>()
@@ -173,10 +175,13 @@ const MainSettings = () => {
       console.error('Failed to regenerate API key:', error)
     }
   }
-
+  const { addToast } = useToasts()
   const copyApiKeyToClipboard = () => {
     navigator.clipboard.writeText(apiKey)
-    alert('API Key copied to clipboard')
+    addToast('API Key copied', {
+      appearance: 'success',
+      autoDismiss: true,
+    })
   }
 
   return (
@@ -213,7 +218,8 @@ const MainSettings = () => {
           </div>
           {/* Enable/Disable Authentication */}
           <div className="form-row">
-            <label className="flex items-center space-x-2">
+            <label className="text-label"> Enable Authentication</label>
+            <div className="form-input">
               <input
                 type="checkbox"
                 checked={authEnabled}
@@ -229,8 +235,7 @@ const MainSettings = () => {
                 }} // ✅ Directly toggle authentication
                 className="h-5 w-5"
               />
-              <span>Enable Authentication</span>
-            </label>
+            </div>
           </div>
           {/* Show Password Field Only if Authentication is Enabled */}
           {authEnabled && (
@@ -272,6 +277,7 @@ const MainSettings = () => {
                       handleInputChange(setNewPassword, e.target.value)
                     }
                     className="form-input-field"
+                    autoComplete="new-password"
                   />
                   {/* Eye Icon in Box */}
                   {isChangingPassword && (
@@ -302,6 +308,7 @@ const MainSettings = () => {
                         handleInputChange(setConfirmPassword, e.target.value)
                       }
                       className="form-input-field"
+                      autoComplete="new-password"
                     />
                     {/* Eye Icon in Box */}
                     <button
@@ -330,6 +337,7 @@ const MainSettings = () => {
             <div className="form-input flex">
               <input
                 type={showApiKey ? 'text' : 'password'}
+                onChange={() => setHasChanges(true)}
                 value={
                   apiKey ? (showApiKey ? apiKey : '•••••••••••••••••••••') : ''
                 }
@@ -356,7 +364,7 @@ const MainSettings = () => {
                 className="ml-2 flex items-center justify-center rounded bg-blue-600 px-3 py-2 hover:bg-blue-500"
                 onClick={copyApiKeyToClipboard}
               >
-                📋 Copy
+                <ClipboardCopyIcon className="h-5 w-5 text-white" />
               </button>
 
               {/* Regenerate API Key Button */}
@@ -385,6 +393,7 @@ const MainSettings = () => {
                   type="checkbox"
                   onClick={() => {
                     setCacheImage(!cacheImage)
+                    setHasChanges(true)
                   }}
                   checked={cacheImage}
                 ></input>
@@ -401,7 +410,7 @@ const MainSettings = () => {
                   <Button
                     buttonType="primary"
                     type="submit"
-                    disabled={!hasChanges || isSaveDisabled}
+                    disabled={!hasChanges}
                   >
                     <SaveIcon />
                     <span>Save Changes</span>

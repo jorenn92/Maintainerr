@@ -36,7 +36,8 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: 'http://localhost:3000', // ✅ Allow frontend requests
+    origin: true, // ✅ Allow frontend requests
+    exposedHeaders: ['X-Auth-Enabled'], // ✅ Allow X-Auth-Enabled header to be sent
     credentials: true, // ✅ Allow cookies to be sent
   });
 >>>>>>> b8f6f94 (feat: implement authentication module with middleware and settings management)
