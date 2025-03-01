@@ -11,8 +11,8 @@ import SearchContext from '../../../contexts/search-context'
 import Transition from '../../Transition'
 import VersionStatus from '../../VersionStatus'
 import CachedImage from '../../Common/CachedImage'
-import { clearAuthSession } from '../../../utils/LogOut'
 import { LogoutIcon } from '@heroicons/react/outline'
+import { useAuth } from '../../../contexts/auth-context'
 
 interface NavBarLink {
   key: string
@@ -59,10 +59,11 @@ interface NavBarProps {
   authEnabled: boolean
 }
 
-const NavBar: React.FC<NavBarProps> = ({ open, setClosed, authEnabled }) => {
+const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
   const navRef = useRef<HTMLDivElement>(null)
   const SearchCtx = useContext(SearchContext)
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+  const { authEnabled, isAuthenticated } = useAuth()
 
   const handleLogout = async () => {
     try {
@@ -190,6 +191,15 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed, authEnabled }) => {
                   <span className="mb-4">
                     <VersionStatus />
                   </span>
+                  {authEnabled && (
+                    <button
+                      onClick={handleLogout}
+                      className="mx-2 my-4 flex items-center justify-center rounded-lg bg-red-600 p-2 font-semibold text-zinc-100 transition duration-300 hover:bg-red-500"
+                    >
+                      <LogoutIcon className="mr-2 h-5 w-5" />
+                      Logout
+                    </button>
+                  )}
                 </div>
                 <div className="w-14 flex-shrink-0">
                   {/* <!-- Force sidebar to shrink to fit close icon --> */}
@@ -251,7 +261,7 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed, authEnabled }) => {
               {authEnabled && (
                 <button
                   onClick={handleLogout}
-                  className="mt-4 flex w-full items-center justify-center rounded-md bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
+                  className="mx-auto mt-4 flex w-1/2 items-center justify-center rounded-full bg-red-700 p-2 font-semibold text-zinc-100 transition duration-300 hover:bg-red-600"
                 >
                   <LogoutIcon className="mr-2 h-5 w-5" />
                   Logout

@@ -20,29 +20,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchAuthStatus = async () => {
     try {
-      const settingsRes = await fetch('/api/authentication/settings', {
+      const statusRes = await fetch('/api/authentication/status', {
         credentials: 'include',
       })
-      const settingsData = await settingsRes.json()
+      const authEnabledHeader = statusRes.headers.get('X-Auth-Enabled')
+      const authEnabled = authEnabledHeader === 'true'
+      setAuthEnabled(authEnabled)
 
-      setAuthEnabled(settingsData.authEnabled)
-
-      if (settingsData.authEnabled) {
-        const statusRes = await fetch('/api/authentication/status', {
-          credentials: 'include',
-        })
-        const statusData = await statusRes.json()
-        setIsAuthenticated(statusData.isAuthenticated)
-      } else {
-        setIsAuthenticated(true) // If auth is disabled, assume user is authenticated
-      }
+      const statusData = await statusRes.json()
+      setIsAuthenticated(statusData.isAuthenticated)
     } catch (error) {
       console.error('Failed to fetch authentication status:', error)
       setAuthEnabled(false)
       setIsAuthenticated(false)
     }
   }
-
   useEffect(() => {
     fetchAuthStatus()
   }, [])

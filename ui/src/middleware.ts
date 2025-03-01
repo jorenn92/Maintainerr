@@ -4,6 +4,17 @@ const apiPort = process.env.API_PORT || 3001
 
 export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
+  const baseUrl = request.nextUrl.origin
+  let authEnabled = false
+
+  // ✅ Allow the login page to load freely
+  if (
+    url.pathname.startsWith('/login') ||
+    url.pathname.startsWith('/_next/') ||
+    url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|css|woff|woff2|ttf)$/)
+  ) {
+    return NextResponse.next()
+  }
 
   // ✅ Check if this is an API request and rewrite it
   if (url.pathname.startsWith('/api/')) {
@@ -15,22 +26,29 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(url)
   }
 
-  // ✅ Fetch `authEnabled` only for non-API requests
   try {
-    const res = await fetch(
-      `http://localhost:${apiPort}/api/authentication/settings`,
+    // ✅ Fetch authentication status
+    const authRes = await fetch(
+      `http://localhost:${apiPort}/api/authentication/status`,
       {
         credentials: 'include',
       },
     )
-    const data = await res.json()
-
-    // ✅ Inject `authEnabled` as a response header
-    const response = NextResponse.next()
-    response.headers.set('X-Auth-Enabled', String(data.authEnabled))
-    return response
+    const authEnabled = authRes.headers.get('X-Auth-Enabled') === 'true'
+    if (!authEnabled) {
+      return NextResponse.next()
+    }
   } catch (error) {
-    console.error('Failed to fetch authentication settings:', error)
-    return NextResponse.next()
+    authEnabled = false
   }
+
+  const sessionToken = request.cookies.get('sessionToken')?.value || null
+  // ✅ If no session token exists and auth is enabled, redirect to /login
+  if (!sessionToken) {
+    console.log('Middleware - Not authenticated, redirecting to /login')
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  return NextResponse.next()
 }
