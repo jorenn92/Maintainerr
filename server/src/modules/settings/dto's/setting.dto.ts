@@ -31,6 +31,10 @@ export class SettingDto {
 
   tautulli_api_key: string;
 
+  jellyseerr_url: string;
+
+  jellyseerr_api_key: string;
+
   collection_handler_job_cron: string;
 
   rules_handler_job_cron: string;

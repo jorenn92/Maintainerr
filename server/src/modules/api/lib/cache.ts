@@ -6,7 +6,8 @@ type AvailableCacheIds =
   | 'plextv'
   | 'overseerr'
   | 'plexcommunity'
-  | 'tautulli';
+  | 'tautulli'
+  | 'jellyseerr';
 
 type CacheType = AvailableCacheIds | 'radarr' | 'sonarr';
 
@@ -63,6 +64,7 @@ class CacheManager {
       'plexcommunity',
     ),
     tautulli: new Cache('tautulli', 'Tautulli API', 'tautulli'),
+    jellyseerr: new Cache('jellyseerr', 'Jellyseerr API', 'jellyseerr'),
   };
 
   public createCache(
