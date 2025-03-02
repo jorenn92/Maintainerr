@@ -1,15 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/app.module';
-import path from 'path';
-import * as fs from 'fs';
-<<<<<<< HEAD
-import { MaintainerrLogger } from './modules/logging/logs.service';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { patchNestJsSwagger } from 'nestjs-zod';
-import metadata from './metadata';
-=======
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
->>>>>>> b8f6f94 (feat: implement authentication module with middleware and settings management)
+import * as fs from 'fs';
+import { patchNestJsSwagger } from 'nestjs-zod';
+import path from 'path';
+import { AppModule } from './app/app.module';
+import metadata from './metadata';
+import { MaintainerrLogger } from './modules/logging/logs.service';
 
 const dataDir =
   process.env.NODE_ENV === 'production'
@@ -23,7 +20,6 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
-<<<<<<< HEAD
   await SwaggerModule.loadPluginMetadata(metadata);
 
   const config = new DocumentBuilder().setTitle('Maintainerr').build();
@@ -32,7 +28,6 @@ async function bootstrap() {
 
   app.useLogger(app.get(MaintainerrLogger));
   app.enableCors({ origin: true });
-=======
   app.use(cookieParser());
 
   app.enableCors({
@@ -40,7 +35,6 @@ async function bootstrap() {
     exposedHeaders: ['X-Auth-Enabled'], // ✅ Allow X-Auth-Enabled header to be sent
     credentials: true, // ✅ Allow cookies to be sent
   });
->>>>>>> b8f6f94 (feat: implement authentication module with middleware and settings management)
 
   const apiPort = process.env.API_PORT || 3001;
   await app.listen(apiPort);

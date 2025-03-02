@@ -13,8 +13,8 @@ import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
 import { ServarrApiModule } from '../modules/api/servarr-api/servarr-api.module';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
-<<<<<<< HEAD
 import { TmdbApiModule } from '../modules/api/tmdb-api/tmdb.module';
+import { AuthenticationModule } from '../modules/authentication/authentication.module';
 import { CollectionsModule } from '../modules/collections/collections.module';
 import { LogsModule } from '../modules/logging/logs.module';
 import { RulesModule } from '../modules/rules/rules.module';
@@ -24,9 +24,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import ormConfig from './config/typeOrmConfig';
 
-=======
-import { AuthenticationModule } from '../modules/authentication/authentication.module';
->>>>>>> b8f6f94 (feat: implement authentication module with middleware and settings management)
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
