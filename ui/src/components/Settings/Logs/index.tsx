@@ -1,20 +1,20 @@
-import { SaveIcon } from '@heroicons/react/solid'
+import { DownloadIcon, SaveIcon } from '@heroicons/react/solid'
+import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  LogEvent,
+  LogFile,
+  LogSettingDto,
+  logSettingSchema,
+} from '@maintainerr/contracts'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import Table from '../../Common/Table'
-import Button from '../../Common/Button'
+import { useForm } from 'react-hook-form'
 import GetApiHandler, {
   API_BASE_PATH,
   PostApiHandler,
 } from '../../../utils/ApiHandler'
-import { useForm } from 'react-hook-form'
-import {
-  logSettingSchema,
-  LogFile,
-  LogSettingDto,
-  LogEvent,
-} from '@maintainerr/contracts'
-import { zodResolver } from '@hookform/resolvers/zod'
 import Alert from '../../Common/Alert'
+import Button from '../../Common/Button'
+import Table from '../../Common/Table'
 import { InputGroup } from '../../Forms/Input'
 import { SelectGroup } from '../../Forms/Select'
 
@@ -284,8 +284,12 @@ const LogFiles = () => {
             return (
               <tr key={`log-${index}`}>
                 <Table.TD>
-                  <a href={`${API_BASE_PATH}/api/logs/files/${row.name}`}>
+                  <a
+                    href={`${API_BASE_PATH}/api/logs/files/${row.name}`}
+                    className="flex items-center gap-x-2"
+                  >
                     {row.name}
+                    <DownloadIcon className="h-5 w-5 text-amber-500" />
                   </a>
                 </Table.TD>
                 <Table.TD>{Math.ceil(row.size / 1024)} KB</Table.TD>
