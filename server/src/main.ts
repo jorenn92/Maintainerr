@@ -1,76 +1,31 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { WinstonModule } from 'nest-winston';
-import winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
-import chalk from 'chalk';
 import path from 'path';
 import * as fs from 'fs';
+import { MaintainerrLogger } from './modules/logging/logs.service';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { patchNestJsSwagger } from 'nestjs-zod';
+import metadata from './metadata';
 
 const dataDir =
   process.env.NODE_ENV === 'production'
     ? '/opt/data'
     : path.join(__dirname, '../../data');
 
+patchNestJsSwagger();
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    // Winston logger config
-    logger: WinstonModule.createLogger({
-      level:
-        process.env.NODE_ENV !== 'production' || process.env.DEBUG == 'true'
-          ? 'silly'
-          : 'info',
-      format: winston.format.combine(
-        // winston.format.colorize(),
-        winston.format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }),
-        // winston.format.timestamp(),
-        winston.format.printf(({ level, message, timestamp, context }) => {
-          const coloredTimestamp = chalk.white(timestamp);
-          level = `[${level.toUpperCase()}]`;
-          const coloredLevel =
-            level === '[DEBUG]'
-              ? chalk.gray(level)
-              : level === '[ERROR]'
-                ? chalk.red(level)
-                : level === '[WARN]'
-                  ? chalk.yellow(level)
-                  : level === '[INFO]'
-                    ? chalk.green(level)
-                    : chalk.cyan(level);
-
-          const coloredMessage =
-            level === '[DEBUG]'
-              ? chalk.gray(message)
-              : level === '[ERROR]'
-                ? chalk.red(message)
-                : level === '[WARN]'
-                  ? chalk.yellow(message)
-                  : level === '[INFO]'
-                    ? chalk.green(message)
-                    : chalk.cyan(message);
-          return `${chalk.green(`[maintainerr] |`)} ${coloredTimestamp}  ${coloredLevel} ${chalk.blue(`[${context}]`)} ${coloredMessage}`;
-        }),
-      ),
-      transports: [
-        new winston.transports.Console(),
-        new DailyRotateFile({
-          filename: path.join(dataDir, 'logs/maintainerr-%DATE%.log'),
-          datePattern: 'YYYY-MM-DD',
-          zippedArchive: true,
-          maxSize: '20m',
-          maxFiles: '7d',
-          format: winston.format.combine(
-            winston.format.timestamp({ format: 'DD/MM/YYYY HH:mm:ss' }),
-            winston.format.printf(({ level, message, timestamp, context }) => {
-              return `[maintainerr]  |  ${timestamp}  [${level.toUpperCase()}] [${context}] ${message}`;
-            }),
-          ),
-        }) as winston.transport,
-      ],
-    }),
+    bufferLogs: true,
   });
-  // End Winston logger config
 
+  await SwaggerModule.loadPluginMetadata(metadata);
+
+  const config = new DocumentBuilder().setTitle('Maintainerr').build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/swagger', app, documentFactory);
+
+  app.useLogger(app.get(MaintainerrLogger));
   app.enableCors({ origin: true });
 
   const apiPort = process.env.API_PORT || 3001;
