@@ -16,7 +16,7 @@ import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
-
+import { AuthenticationModule } from '../modules/authentication/authentication.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
@@ -29,6 +29,7 @@ import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.ser
     TautulliApiModule,
     RulesModule,
     CollectionsModule,
+    AuthenticationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -40,6 +41,7 @@ export class AppModule implements OnModuleInit {
     private readonly overseerApi: OverseerrApiService,
     private readonly tautulliApi: TautulliApiService,
   ) {}
+
   async onModuleInit() {
     // Initialize stuff needing settings here.. Otherwise problems
     await this.settings.init();

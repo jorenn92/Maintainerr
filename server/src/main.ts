@@ -6,6 +6,7 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 import chalk from 'chalk';
 import path from 'path';
 import * as fs from 'fs';
+import cookieParser from 'cookie-parser';
 
 const dataDir =
   process.env.NODE_ENV === 'production'
@@ -71,7 +72,13 @@ async function bootstrap() {
   });
   // End Winston logger config
 
-  app.enableCors({ origin: true });
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: true, // ✅ Allow frontend requests
+    exposedHeaders: ['X-Auth-Enabled'], // ✅ Allow X-Auth-Enabled header to be sent
+    credentials: true, // ✅ Allow cookies to be sent
+  });
 
   const apiPort = process.env.API_PORT || 3001;
   await app.listen(apiPort);

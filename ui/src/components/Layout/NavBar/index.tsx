@@ -11,6 +11,8 @@ import SearchContext from '../../../contexts/search-context'
 import Transition from '../../Transition'
 import VersionStatus from '../../VersionStatus'
 import CachedImage from '../../Common/CachedImage'
+import { LogoutIcon } from '@heroicons/react/outline'
+import { useAuth } from '../../../contexts/auth-context'
 
 interface NavBarLink {
   key: string
@@ -54,12 +56,26 @@ let navBarItems: NavBarLink[] = [
 interface NavBarProps {
   open?: boolean
   setClosed: () => void
+  authEnabled: boolean
 }
 
 const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
   const navRef = useRef<HTMLDivElement>(null)
   const SearchCtx = useContext(SearchContext)
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+  const { authEnabled, isAuthenticated } = useAuth()
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/authentication/logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+      window.location.href = '/login'
+    } catch (error) {
+      console.error('Failed to log out:', error)
+    }
+  }
 
   useEffect(() => {
     setTimeout(() => {
@@ -175,6 +191,15 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                   <span className="mb-4">
                     <VersionStatus />
                   </span>
+                  {authEnabled && (
+                    <button
+                      onClick={handleLogout}
+                      className="mx-2 my-4 flex items-center justify-center rounded-lg bg-red-600 p-2 font-semibold text-zinc-100 transition duration-300 hover:bg-red-500"
+                    >
+                      <LogoutIcon className="mr-2 h-5 w-5" />
+                      Logout
+                    </button>
+                  )}
                 </div>
                 <div className="w-14 flex-shrink-0">
                   {/* <!-- Force sidebar to shrink to fit close icon --> */}
@@ -233,6 +258,15 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                 })}
               </nav>
               <VersionStatus />
+              {authEnabled && (
+                <button
+                  onClick={handleLogout}
+                  className="mx-auto mt-4 flex w-1/2 items-center justify-center rounded-full bg-red-700 p-2 font-semibold text-zinc-100 transition duration-300 hover:bg-red-600"
+                >
+                  <LogoutIcon className="mr-2 h-5 w-5" />
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         </div>
