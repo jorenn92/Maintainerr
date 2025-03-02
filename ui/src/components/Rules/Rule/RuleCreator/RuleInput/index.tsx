@@ -218,7 +218,9 @@ const RuleInput = (props: IRuleInput) => {
           return (
             (prop.mediaType === MediaType.BOTH ||
               props.mediaType === prop.mediaType) &&
-            (!prop.showType || prop.showType.includes(props.dataType!))
+            (props.mediaType === MediaType.MOVIE ||
+              prop.showType === undefined ||
+              prop.showType.includes(props.dataType!))
           )
         })
         return app
@@ -481,7 +483,8 @@ const RuleInput = (props: IRuleInput) => {
                       if (+prop.type.key === ruleType) {
                         return (prop.mediaType === MediaType.BOTH ||
                           props.mediaType === prop.mediaType) &&
-                          (!prop.showType ||
+                          (props.mediaType === MediaType.MOVIE ||
+                            prop.showType === undefined ||
                             prop.showType.includes(props.dataType!)) ? (
                           <option
                             key={app.id + 10 + prop.id}

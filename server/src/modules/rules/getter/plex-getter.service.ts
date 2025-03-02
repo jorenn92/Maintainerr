@@ -509,6 +509,35 @@ export class PlexGetterService {
           // originallyAvailableAt is usually an ISO 8601 date string, no need to convert from epoch time
           return lastEpDate ? new Date(lastEpDate) : null;
         }
+        case 'rating_imdb': {
+          return (
+            metadata.Rating?.find(
+              (x) => x.image.startsWith('imdb') && x.type == 'audience',
+            )?.value ?? null
+          );
+        }
+        case 'rating_rottenTomatoesCritic': {
+          return (
+            metadata.Rating?.find(
+              (x) => x.image.startsWith('rottentomatoes') && x.type == 'critic',
+            )?.value ?? null
+          );
+        }
+        case 'rating_rottenTomatoesAudience': {
+          return (
+            metadata.Rating?.find(
+              (x) =>
+                x.image.startsWith('rottentomatoes') && x.type == 'audience',
+            )?.value ?? null
+          );
+        }
+        case 'rating_tmdb': {
+          return (
+            metadata.Rating?.find(
+              (x) => x.image.startsWith('themoviedb') && x.type == 'audience',
+            )?.value ?? null
+          );
+        }
         default: {
           return null;
         }

@@ -64,6 +64,12 @@ export interface PlexActor {
   thumb: string;
 }
 
+export interface PlexRating {
+  image: string;
+  value: number;
+  type: 'audience' | 'critic';
+}
+
 export interface PlexLibrary {
   type: 'show' | 'movie';
   key: string;
