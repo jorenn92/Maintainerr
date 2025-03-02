@@ -2255,6 +2255,7 @@ __metadata:
   linkType: soft
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@microsoft/tsdoc@npm:0.15.0":
   version: 0.15.0
   resolution: "@microsoft/tsdoc@npm:0.15.0"
@@ -2269,6 +2270,8 @@ __metadata:
   version: 1.5.0
   resolution: "@monaco-editor/loader@npm:1.5.0"
 =======
+=======
+>>>>>>> 0f778f5 (feat: add JWT secret to authentication settings and implement token refresh functionality)
 "@mapbox/node-pre-gyp@npm:^1.0.11":
   version: 1.0.11
   resolution: "@mapbox/node-pre-gyp@npm:1.0.11"
@@ -2288,10 +2291,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@monaco-editor/loader@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@monaco-editor/loader@npm:1.4.0"
->>>>>>> 6d5848b (feat: implement authentication module with middleware and settings management)
+"@monaco-editor/loader@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "@monaco-editor/loader@npm:1.5.0"
   dependencies:
     state-local: "npm:^1.0.6"
   checksum: 10c0/d8e1fd75fea113b4d91405784ed4db757df450c6e57a85e87728281e819a73a3ef9fe0cbb1dc1509456f1e895ad9c11e4748f80b68900cb6cf600170e14ce6ed

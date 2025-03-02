@@ -36,7 +36,8 @@ export class AuthenticationMiddleware implements NestMiddleware {
     if (
       req.path.startsWith('/api/authentication/login') ||
       req.path.startsWith('/api/authentication/logout') ||
-      req.path.startsWith('/api/authentication/status')
+      req.path.startsWith('/api/authentication/status') ||
+      req.path.startsWith('/api/authentication/refresh')
     ) {
       return next();
     }
@@ -44,7 +45,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
     // ✅ Non-UI Requests Require API Key or Session Token
     if (sessionToken) {
       try {
-        const secret = this.authenticationService.getJwtSecret();
+        const secret = await this.authenticationService.getJwtSecret();
         const decoded = jwt.verify(sessionToken, secret);
         req.user = decoded;
         return next(); // ✅ Valid session token → allow

@@ -26,6 +26,7 @@ export async function middleware(request: NextRequest) {
 
   // ✅ Check if this is an API request and rewrite it
   if (url.pathname.startsWith('/api/')) {
+<<<<<<< HEAD
 >>>>>>> b8f6f94 (feat: implement authentication module with middleware and settings management)
     const destination = new URL(`http://localhost:${apiPort}`)
     url.host = destination.host
@@ -33,6 +34,10 @@ export async function middleware(request: NextRequest) {
     url.protocol = destination.protocol
     url.basePath = ''
     return NextResponse.rewrite(url)
+=======
+    const destination = `http://localhost:${apiPort}${url.pathname}`
+    return NextResponse.rewrite(destination)
+>>>>>>> 0f778f5 (feat: add JWT secret to authentication settings and implement token refresh functionality)
   }
 
   try {
@@ -52,11 +57,48 @@ export async function middleware(request: NextRequest) {
   }
 
   const sessionToken = request.cookies.get('sessionToken')?.value || null
-  // ✅ If no session token exists and auth is enabled, redirect to /login
+
   if (!sessionToken) {
-    console.log('Middleware - Not authenticated, redirecting to /login')
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+    const refreshToken = request.cookies.get('refreshToken')?.value || null
+
+    if (refreshToken) {
+      try {
+        const refreshRes = await fetch(
+          `http://localhost:${apiPort}/api/authentication/refresh`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Cookie: `refreshToken=${refreshToken}`,
+            },
+          },
+        )
+        const updatedCookies = await refreshRes.json()
+
+        if (
+          refreshRes.ok &&
+          updatedCookies.success &&
+          updatedCookies.sessionToken
+        ) {
+          const response = NextResponse.next()
+          response.cookies.set('sessionToken', updatedCookies.sessionToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 60 * 60, // 1 hour in seconds
+          })
+          return response
+        } else {
+          console.warn('Middleware - Token refresh failed.')
+        }
+      } catch (error) {
+        console.error('Middleware - Refresh request failed:', error)
+      }
+
+      url.pathname = '/login'
+      return NextResponse.redirect(url)
+    }
   }
 
   return NextResponse.next()

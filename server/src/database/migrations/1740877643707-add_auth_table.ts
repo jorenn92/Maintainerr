@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddAuthTable1740804194089 implements MigrationInterface {
-    name = 'AddAuthTable1740804194089'
+export class AddAuthTable1740877643707 implements MigrationInterface {
+    name = 'AddAuthTable1740877643707'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -10,8 +10,46 @@ export class AddAuthTable1740804194089 implements MigrationInterface {
                 "authEnabled" boolean NOT NULL DEFAULT (0),
                 "username" text,
                 "passwordHash" text,
+                "jwt_secret" text,
                 "apiKey" text
             )
+        `);
+        await queryRunner.query(`
+            DROP INDEX "idx_collection_log_collection_id"
+        `);
+        await queryRunner.query(`
+            CREATE TABLE "temporary_collection_log" (
+                "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+                "collectionId" integer,
+                "timestamp" datetime NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+                "message" varchar NOT NULL,
+                "type" integer
+            )
+        `);
+        await queryRunner.query(`
+            INSERT INTO "temporary_collection_log"(
+                    "id",
+                    "collectionId",
+                    "timestamp",
+                    "message",
+                    "type"
+                )
+            SELECT "id",
+                "collectionId",
+                "timestamp",
+                "message",
+                "type"
+            FROM "collection_log"
+        `);
+        await queryRunner.query(`
+            DROP TABLE "collection_log"
+        `);
+        await queryRunner.query(`
+            ALTER TABLE "temporary_collection_log"
+                RENAME TO "collection_log"
+        `);
+        await queryRunner.query(`
+            CREATE INDEX "idx_collection_log_collection_id" ON "collection_log" ("collectionId")
         `);
         await queryRunner.query(`
             CREATE TABLE "temporary_task_running" (
@@ -39,7 +77,7 @@ export class AddAuthTable1740804194089 implements MigrationInterface {
         await queryRunner.query(`
             CREATE TABLE "temporary_settings" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                "clientId" varchar DEFAULT ('941d85c1-313e-420e-a71f-9641d9a240e8'),
+                "clientId" varchar DEFAULT ('4c73e38d-bb86-4d86-ae39-ea78f935a5a6'),
                 "applicationTitle" varchar NOT NULL DEFAULT ('Maintainerr'),
                 "applicationUrl" varchar NOT NULL DEFAULT ('localhost'),
                 "apikey" varchar,
@@ -105,43 +143,6 @@ export class AddAuthTable1740804194089 implements MigrationInterface {
         await queryRunner.query(`
             ALTER TABLE "temporary_settings"
                 RENAME TO "settings"
-        `);
-        await queryRunner.query(`
-            DROP INDEX "idx_collection_log_collection_id"
-        `);
-        await queryRunner.query(`
-            CREATE TABLE "temporary_collection_log" (
-                "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                "collectionId" integer,
-                "timestamp" datetime NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-                "message" varchar NOT NULL,
-                "type" integer
-            )
-        `);
-        await queryRunner.query(`
-            INSERT INTO "temporary_collection_log"(
-                    "id",
-                    "collectionId",
-                    "timestamp",
-                    "message",
-                    "type"
-                )
-            SELECT "id",
-                "collectionId",
-                "timestamp",
-                "message",
-                "type"
-            FROM "collection_log"
-        `);
-        await queryRunner.query(`
-            DROP TABLE "collection_log"
-        `);
-        await queryRunner.query(`
-            ALTER TABLE "temporary_collection_log"
-                RENAME TO "collection_log"
-        `);
-        await queryRunner.query(`
-            CREATE INDEX "idx_collection_log_collection_id" ON "collection_log" ("collectionId")
         `);
         await queryRunner.query(`
             CREATE TABLE "temporary_exclusion" (
@@ -272,43 +273,6 @@ export class AddAuthTable1740804194089 implements MigrationInterface {
             DROP TABLE "temporary_exclusion"
         `);
         await queryRunner.query(`
-            DROP INDEX "idx_collection_log_collection_id"
-        `);
-        await queryRunner.query(`
-            ALTER TABLE "collection_log"
-                RENAME TO "temporary_collection_log"
-        `);
-        await queryRunner.query(`
-            CREATE TABLE "collection_log" (
-                "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                "collectionId" integer NOT NULL,
-                "timestamp" datetime NOT NULL,
-                "message" varchar NOT NULL,
-                "type" integer NOT NULL
-            )
-        `);
-        await queryRunner.query(`
-            INSERT INTO "collection_log"(
-                    "id",
-                    "collectionId",
-                    "timestamp",
-                    "message",
-                    "type"
-                )
-            SELECT "id",
-                "collectionId",
-                "timestamp",
-                "message",
-                "type"
-            FROM "temporary_collection_log"
-        `);
-        await queryRunner.query(`
-            DROP TABLE "temporary_collection_log"
-        `);
-        await queryRunner.query(`
-            CREATE INDEX "idx_collection_log_collection_id" ON "collection_log" ("collectionId")
-        `);
-        await queryRunner.query(`
             ALTER TABLE "settings"
                 RENAME TO "temporary_settings"
         `);
@@ -400,6 +364,43 @@ export class AddAuthTable1740804194089 implements MigrationInterface {
         `);
         await queryRunner.query(`
             DROP TABLE "temporary_task_running"
+        `);
+        await queryRunner.query(`
+            DROP INDEX "idx_collection_log_collection_id"
+        `);
+        await queryRunner.query(`
+            ALTER TABLE "collection_log"
+                RENAME TO "temporary_collection_log"
+        `);
+        await queryRunner.query(`
+            CREATE TABLE "collection_log" (
+                "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+                "collectionId" integer NOT NULL,
+                "timestamp" datetime NOT NULL,
+                "message" varchar NOT NULL,
+                "type" integer NOT NULL
+            )
+        `);
+        await queryRunner.query(`
+            INSERT INTO "collection_log"(
+                    "id",
+                    "collectionId",
+                    "timestamp",
+                    "message",
+                    "type"
+                )
+            SELECT "id",
+                "collectionId",
+                "timestamp",
+                "message",
+                "type"
+            FROM "temporary_collection_log"
+        `);
+        await queryRunner.query(`
+            DROP TABLE "temporary_collection_log"
+        `);
+        await queryRunner.query(`
+            CREATE INDEX "idx_collection_log_collection_id" ON "collection_log" ("collectionId")
         `);
         await queryRunner.query(`
             DROP TABLE "auth_settings"

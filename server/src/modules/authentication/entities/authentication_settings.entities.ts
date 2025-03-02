@@ -15,5 +15,8 @@ export class AuthenticationSettings {
   passwordHash: string | null;
 
   @Column({ type: 'text', nullable: true })
+  jwt_secret: string;
+
+  @Column({ type: 'text', nullable: true })
   apiKey: string;
 }
