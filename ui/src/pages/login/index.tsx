@@ -69,6 +69,7 @@ const Login = () => {
               type="text"
               ref={usernameRef} // ✅ Using ref instead of state
               className="form-input-field border-none focus:outline-none focus:ring-2 focus:ring-amber-600"
+              autoComplete="username"
               required
             />
           </div>
@@ -81,6 +82,7 @@ const Login = () => {
                 type={showPassword ? 'text' : 'password'}
                 ref={passwordRef} // ✅ Using ref instead of state
                 className="form-input-field border-none focus:ring-2 focus:ring-amber-600"
+                autoComplete="current-password"
                 required
               />
               <button

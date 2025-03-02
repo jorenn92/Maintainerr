@@ -8,12 +8,9 @@ import {
   HttpStatus,
   Req,
   Res,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthenticationService } from './authentication.service';
-import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
 
 @Controller('api/authentication')
 export class AuthenticationController {
@@ -56,15 +53,15 @@ export class AuthenticationController {
     return this.authenticationService.login(body.username, body.password, res);
   }
 
+  @Post('refresh')
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    return this.authenticationService.refreshToken(req, res);
+  }
+
   @Post('logout')
-  logout(@Res() res) {
-    res.clearCookie('sessionToken', {
-      path: '/',
-      httpOnly: true,
-      secure: true, // Ensure it's secure
-      sameSite: 'strict',
-    });
-    res.status(200).send({ message: 'Logged out' });
+  async logout(@Res() res: Response) {
+    const result = await this.authenticationService.logout(res);
+    res.status(200).send(result);
   }
 
   @Get('status')

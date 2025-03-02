@@ -13,7 +13,6 @@ import Alert from '../../Common/Alert'
 import { useToasts } from 'react-toast-notifications'
 import Button from '../../Common/Button'
 import DocsButton from '../../Common/DocsButton'
-import { clearAuthSession } from '../../../utils/LogOut'
 
 const MainSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -149,11 +148,14 @@ const MainSettings = () => {
       if (authEnabled) {
         // Redirect to login
         window.location.href = '/login'
-        await clearAuthSession(authEnabled)
+        await fetch('/api/authentication/logout', {
+          method: 'POST',
+          credentials: 'include',
+        })
       } else {
         // Clear authentication state & refresh
-        localStorage.removeItem('isAuthenticated')
         document.cookie = 'sessionToken=; Max-Age=0; path=/;'
+        document.cookie = 'refreshToken=; Max-Age=0; path=/;'
         window.location.reload()
       }
     }
