@@ -2213,6 +2213,7 @@ __metadata:
     axios: "npm:^1.7.9"
     bowser: "npm:^2.11.0"
     clsx: "npm:^2.1.1"
+    compare-versions: "npm:^6.1.1"
     cron-validator: "npm:^1.3.1"
     eslint: "npm:^9.20.1"
     eslint-config-next: "npm:15.1.7"
@@ -6170,6 +6171,13 @@ __metadata:
     array-ify: "npm:^1.0.0"
     dot-prop: "npm:^5.1.0"
   checksum: 10c0/78bd4dd4ed311a79bd264c9e13c36ed564cde657f1390e699e0f04b8eee1fc06ffb8698ce2dfb5fbe7342d509579c82d4e248f08915b708f77f7b72234086cc3
+  languageName: node
+  linkType: hard
+
+"compare-versions@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "compare-versions@npm:6.1.1"
+  checksum: 10c0/415205c7627f9e4f358f571266422980c9fe2d99086be0c9a48008ef7c771f32b0fbe8e97a441ffedc3910872f917a0675fe0fe3c3b6d331cda6d8690be06338
   languageName: node
   linkType: hard
 

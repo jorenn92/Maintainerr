@@ -1,25 +1,27 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { ExternalApiModule } from '../modules/api/external-api/external-api.module';
-import { TmdbApiModule } from '../modules/api/tmdb-api/tmdb.module';
-import { PlexApiModule } from '../modules/api/plex-api/plex-api.module';
-import { ServarrApiModule } from '../modules/api/servarr-api/servarr-api.module';
-import { RulesModule } from '../modules/rules/rules.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { APP_PIPE } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ZodValidationPipe } from 'nestjs-zod';
+import { ExternalApiModule } from '../modules/api/external-api/external-api.module';
+import { JellyseerrApiModule } from '../modules/api/jellyseerr-api/jellyseerr-api.module';
+import { JellyseerrApiService } from '../modules/api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiModule } from '../modules/api/overseerr-api/overseerr-api.module';
-import { CollectionsModule } from '../modules/collections/collections.module';
-import { SettingsModule } from '../modules/settings/settings.module';
-import { SettingsService } from '../modules/settings/settings.service';
-import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
 import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.service';
-import ormConfig from './config/typeOrmConfig';
+import { PlexApiModule } from '../modules/api/plex-api/plex-api.module';
+import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
+import { ServarrApiModule } from '../modules/api/servarr-api/servarr-api.module';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { TmdbApiModule } from '../modules/api/tmdb-api/tmdb.module';
+import { CollectionsModule } from '../modules/collections/collections.module';
 import { LogsModule } from '../modules/logging/logs.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { APP_PIPE } from '@nestjs/core';
-import { ZodValidationPipe } from 'nestjs-zod';
+import { RulesModule } from '../modules/rules/rules.module';
+import { SettingsModule } from '../modules/settings/settings.module';
+import { SettingsService } from '../modules/settings/settings.service';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import ormConfig from './config/typeOrmConfig';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { ZodValidationPipe } from 'nestjs-zod';
     ServarrApiModule,
     OverseerrApiModule,
     TautulliApiModule,
+    JellyseerrApiModule,
     RulesModule,
     CollectionsModule,
   ],
@@ -51,6 +54,7 @@ export class AppModule implements OnModuleInit {
     private readonly plexApi: PlexApiService,
     private readonly overseerApi: OverseerrApiService,
     private readonly tautulliApi: TautulliApiService,
+    private readonly jellyseerrApi: JellyseerrApiService,
   ) {}
   async onModuleInit() {
     // Initialize stuff needing settings here.. Otherwise problems
@@ -58,5 +62,6 @@ export class AppModule implements OnModuleInit {
     await this.plexApi.initialize({});
     await this.overseerApi.init();
     await this.tautulliApi.init();
+    await this.jellyseerrApi.init();
   }
 }

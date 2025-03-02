@@ -10,6 +10,7 @@ import LoadingSpinner from '../LoadingSpinner'
 import Modal from '../Modal'
 import Pagination from '../Pagination'
 import SearchBar from '../SearchBar'
+import { compareVersions } from 'compare-versions'
 
 interface ICommunityRuleModal {
   onUpdate: (rules: IRule[]) => void
@@ -54,11 +55,16 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
     GetApiHandler('/rules/community/').then((resp: ICommunityRule[]) => {
       if (resp) {
         if (!('code' in resp)) {
-          resp = resp.filter(
-            (e) =>
-              e.appVersion!.replaceAll('.', '') <=
-                appVersion.current.replaceAll('.', '') && e.type === props.type,
-          )
+          resp = resp.filter((e) => {
+            const versionCheck =
+              compareVersions(
+                e.appVersion || '0.0.0',
+                appVersion.current || '0.0.0',
+              ) <= 0
+            const typeCheck = e.type === props.type
+
+            return versionCheck && typeCheck
+          })
           resp = resp.sort((a, b) => b.karma! - a.karma!)
           setCommunityRules(resp)
           setoriginalRules(resp)

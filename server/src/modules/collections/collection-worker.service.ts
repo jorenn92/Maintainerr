@@ -15,6 +15,7 @@ import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TaskBase } from '../tasks/task.base';
+import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -31,6 +32,7 @@ export class CollectionWorkerService extends TaskBase {
     private readonly collectionService: CollectionsService,
     private readonly plexApi: PlexApiService,
     private readonly overseerrApi: OverseerrApiService,
+    private readonly jellyseerrApi: JellyseerrApiService,
     private readonly servarrApi: ServarrService,
     private readonly tmdbApi: TmdbApiService,
     protected readonly taskService: TasksService,
@@ -72,6 +74,7 @@ export class CollectionWorkerService extends TaskBase {
       const collections = await this.collectionRepo.find({
         where: { isActive: true },
       });
+
       for (const collection of collections) {
         this.infoLogger(`Handling collection '${collection.title}'`);
 
@@ -95,6 +98,7 @@ export class CollectionWorkerService extends TaskBase {
 
         this.infoLogger(`Handling collection '${collection.title}' finished`);
       }
+
       if (handledCollections > 0) {
         if (this.settings.overseerrConfigured()) {
           setTimeout(() => {
@@ -104,6 +108,30 @@ export class CollectionWorkerService extends TaskBase {
                 this.infoLogger(
                   `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
                 );
+              })
+              .catch((err) => {
+                this.logger.error(
+                  `Failed to trigger Overseerr's availability-sync: ${err}`,
+                );
+                this.logger.debug(err);
+              });
+          }, 7000);
+        }
+
+        if (this.settings.jellyseerrConfigured()) {
+          setTimeout(() => {
+            this.jellyseerrApi.api
+              .post('/settings/jobs/availability-sync/run')
+              .then(() => {
+                this.infoLogger(
+                  `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
+                );
+              })
+              .catch((err) => {
+                this.logger.error(
+                  `Failed to trigger Jellyseerr's availability-sync: ${err}`,
+                );
+                this.logger.debug(err);
               });
           }, 7000);
         }

@@ -30,6 +30,8 @@ import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { TautulliGetterService } from './getter/tautulli-getter.service';
 import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
+import { JellyseerrApiModule } from '../api/jellyseerr-api/jellyseerr-api.module';
+import { JellyseerrGetterService } from './getter/jellyseerr-getter.service';
 
 @Module({
   imports: [
@@ -48,6 +50,7 @@ import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
     ]),
     OverseerrApiModule,
     TautulliApiModule,
+    JellyseerrApiModule,
     TmdbApiModule,
     CollectionsModule,
     TasksModule,
@@ -62,6 +65,7 @@ import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
     SonarrGetterService,
     OverseerrGetterService,
     TautulliGetterService,
+    JellyseerrGetterService,
     ValueGetterService,
     RuleYamlService,
     RuleComparatorService,

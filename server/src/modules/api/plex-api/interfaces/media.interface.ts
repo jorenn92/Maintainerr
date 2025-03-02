@@ -1,4 +1,4 @@
-import { PlexActor, PlexGenre } from './library.interfaces';
+import { PlexActor, PlexGenre, PlexRating } from './library.interfaces';
 
 export interface PlexMetadata {
   ratingKey: string;
@@ -33,6 +33,7 @@ export interface PlexMetadata {
   Genre?: PlexGenre[];
   parentTitle?: string;
   grandparentTitle?: string;
+  Rating?: PlexRating[];
 }
 
 export interface Media {
