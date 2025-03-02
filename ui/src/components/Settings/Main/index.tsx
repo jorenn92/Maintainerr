@@ -4,7 +4,6 @@ import {
   EyeIcon,
   EyeOffIcon,
   ClipboardCopyIcon,
-  CheckIcon,
 } from '@heroicons/react/solid'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
@@ -33,10 +32,11 @@ const MainSettings = () => {
   const [originalApiKey, setOriginalApiKey] = useState<string>('')
   const [showApiKey, setShowApiKey] = useState(false)
 
+  const apiPort = process.env.API_PORT || 3001
+
   useEffect(() => {
     document.title = 'Maintainerr - Settings - General'
-
-    fetch('http://localhost:3000/api/authentication/settings', {
+    fetch(`http://localhost:${apiPort}/api/authentication/settings`, {
       credentials: 'include',
     })
       .then((res) => res.json())
@@ -127,7 +127,7 @@ const MainSettings = () => {
 
     // ✅ Also save authentication settings
     const authResponse = await fetch(
-      'http://localhost:3000/api/authentication/settings',
+      `http://localhost:${apiPort}/api/authentication/settings`,
       {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
