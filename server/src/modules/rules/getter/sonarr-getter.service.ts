@@ -1,20 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
+import _ from 'lodash';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
+import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
+import { SonarrSeason } from '../../../modules/api/servarr-api/interfaces/sonarr.interface';
 import { ServarrService } from '../../../modules/api/servarr-api/servarr.service';
+import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
+import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
+import { SonarrApi } from '../../api/servarr-api/helpers/sonarr.helper';
 import {
   Application,
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
-import { PlexApiService } from '../../api/plex-api/plex-api.service';
-import _ from 'lodash';
-import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
-import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
-import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
-import { SonarrSeason } from '../../../modules/api/servarr-api/interfaces/sonarr.interface';
 import { RulesDto } from '../dtos/rules.dto';
-import { SonarrApi } from '../../api/servarr-api/helpers/sonarr.helper';
 
 @Injectable()
 export class SonarrGetterService {
@@ -299,7 +299,10 @@ export class SonarrGetterService {
         }
       }
     } catch (e) {
-      this.logger.warn(`Sonarr-Getter - Action failed : ${e.message}`);
+      this.logger.warn(
+        `Sonarr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      );
+      this.logger.debug(e);
       return undefined;
     }
   }
