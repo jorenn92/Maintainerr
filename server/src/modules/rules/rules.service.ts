@@ -106,6 +106,13 @@ export class RulesService {
           (el) => el.id !== Application.TAUTULLI,
         );
       }
+
+      // remove jellyseerr if not configured
+      if (!settings.jellyseerr_url || !settings.jellyseerr_api_key) {
+        localConstants.applications = localConstants.applications.filter(
+          (el) => el.id !== Application.JELLYSEERR,
+        );
+      }
     }
 
     return localConstants;
@@ -944,6 +951,7 @@ export class RulesService {
     this.plexApi.resetMetadataCache(mediaId);
     cacheManager.getCache('overseerr').data.flushAll();
     cacheManager.getCache('tautulli').data.flushAll();
+    cacheManager.getCache('jellyseerr').flush();
     cacheManager
       .getCachesByType('radarr')
       .forEach((cache) => cache.data.flushAll());

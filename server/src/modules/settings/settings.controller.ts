@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  LogLevel,
   Param,
   ParseIntPipe,
   Post,
@@ -59,6 +60,10 @@ export class SettingsController {
   @Get('/test/overseerr')
   testOverseerr() {
     return this.settingsService.testOverseerr();
+  }
+  @Get('/test/jellyseerr')
+  testJellyseerr() {
+    return this.settingsService.testJellyseerr();
   }
   @Post('/test/radarr')
   testRadarr(@Body() payload: RadarrSettingRawDto) {

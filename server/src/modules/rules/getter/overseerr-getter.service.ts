@@ -1,11 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { warn } from 'console';
+import _ from 'lodash';
 import {
   OverseerrApiService,
   OverSeerrMediaResponse,
   OverseerrMediaStatus,
   OverseerrRequest,
 } from '../../api/overseerr-api/overseerr-api.service';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { TmdbIdService } from '../../api/tmdb-api/tmdb-id.service';
@@ -15,8 +17,6 @@ import {
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
-import _ from 'lodash';
 
 @Injectable()
 export class OverseerrGetterService {
@@ -279,7 +279,9 @@ export class OverseerrGetterService {
         return null;
       }
     } catch (e) {
-      warn(`Overseerr-Getter - Action failed : ${e.message}`);
+      warn(
+        `Overseerr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      );
       this.logger.debug(e);
       return undefined;
     }

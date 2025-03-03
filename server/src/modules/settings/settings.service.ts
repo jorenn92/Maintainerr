@@ -23,6 +23,7 @@ import {
   SonarrSettingRawDto,
   SonarrSettingResponseDto,
 } from "./dto's/sonarr-setting.dto";
+import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -59,6 +60,10 @@ export class SettingsService implements SettingDto {
 
   tautulli_api_key: string;
 
+  jellyseerr_url: string;
+
+  jellyseerr_api_key: string;
+
   collection_handler_job_cron: string;
 
   rules_handler_job_cron: string;
@@ -72,6 +77,8 @@ export class SettingsService implements SettingDto {
     private readonly overseerr: OverseerrApiService,
     @Inject(forwardRef(() => TautulliApiService))
     private readonly tautulli: TautulliApiService,
+    @Inject(forwardRef(() => JellyseerrApiService))
+    private readonly jellyseerr: JellyseerrApiService,
     @Inject(forwardRef(() => InternalApiService))
     private readonly internalApi: InternalApiService,
     @InjectRepository(Settings)
@@ -103,6 +110,8 @@ export class SettingsService implements SettingDto {
       this.overseerr_api_key = settingsDb?.overseerr_api_key;
       this.tautulli_url = settingsDb?.tautulli_url;
       this.tautulli_api_key = settingsDb?.tautulli_api_key;
+      this.jellyseerr_url = settingsDb?.jellyseerr_url;
+      this.jellyseerr_api_key = settingsDb?.jellyseerr_api_key;
       this.collection_handler_job_cron =
         settingsDb?.collection_handler_job_cron;
       this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;
@@ -392,6 +401,7 @@ export class SettingsService implements SettingDto {
         this.overseerr.init();
         this.tautulli.init();
         this.internalApi.init();
+        this.jellyseerr.init();
 
         // reload Rule handler job if changed
         if (
@@ -450,6 +460,18 @@ export class SettingsService implements SettingDto {
   public async testOverseerr(): Promise<BasicResponseDto> {
     try {
       const resp = await this.overseerr.status();
+      return resp?.version != null
+        ? { status: 'OK', code: 1, message: resp.version }
+        : { status: 'NOK', code: 0, message: 'Failure' };
+    } catch (e) {
+      this.logger.debug(e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async testJellyseerr(): Promise<BasicResponseDto> {
+    try {
+      const resp = await this.jellyseerr.status();
       return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
@@ -527,6 +549,7 @@ export class SettingsService implements SettingDto {
       let sonarrState = true;
       let overseerrState = true;
       let tautulliState = true;
+      let jellyseerrState = true;
 
       const radarrSettings = await this.radarrSettingsRepo.find();
       for (const radarrSetting of radarrSettings) {
@@ -550,12 +573,17 @@ export class SettingsService implements SettingDto {
         tautulliState = (await this.testTautulli()).status === 'OK';
       }
 
+      if (this.jellyseerrConfigured()) {
+        jellyseerrState = (await this.testJellyseerr()).status === 'OK';
+      }
+
       if (
         plexState &&
         radarrState &&
         sonarrState &&
         overseerrState &&
-        tautulliState
+        tautulliState &&
+        jellyseerrState
       ) {
         return true;
       } else {
@@ -573,6 +601,10 @@ export class SettingsService implements SettingDto {
 
   public tautulliConfigured(): boolean {
     return this.tautulli_url !== null && this.tautulli_api_key !== null;
+  }
+
+  public jellyseerrConfigured(): boolean {
+    return this.jellyseerr_url !== null && this.jellyseerr_api_key !== null;
   }
 
   // Test if all required settings are set.

@@ -54,6 +54,7 @@ interface IRuleInput {
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
   onDelete: (section: number, id: number) => void
+  allowDelete?: boolean
 }
 
 const RuleInput = (props: IRuleInput) => {
@@ -217,7 +218,9 @@ const RuleInput = (props: IRuleInput) => {
           return (
             (prop.mediaType === MediaType.BOTH ||
               props.mediaType === prop.mediaType) &&
-            (!prop.showType || prop.showType.includes(props.dataType!))
+            (props.mediaType === MediaType.MOVIE ||
+              prop.showType === undefined ||
+              prop.showType.includes(props.dataType!))
           )
         })
         return app
@@ -304,7 +307,7 @@ const RuleInput = (props: IRuleInput) => {
                 : `Rule #1`}
           </div>
 
-          {props.id && props.id > 1 ? (
+          {props.allowDelete ? (
             <button
               className="ml-auto flex h-8 rounded bg-amber-900 text-zinc-200 shadow-md hover:bg-amber-800"
               onClick={onDelete}
@@ -480,7 +483,8 @@ const RuleInput = (props: IRuleInput) => {
                       if (+prop.type.key === ruleType) {
                         return (prop.mediaType === MediaType.BOTH ||
                           props.mediaType === prop.mediaType) &&
-                          (!prop.showType ||
+                          (props.mediaType === MediaType.MOVIE ||
+                            prop.showType === undefined ||
                             prop.showType.includes(props.dataType!)) ? (
                           <option
                             key={app.id + 10 + prop.id}

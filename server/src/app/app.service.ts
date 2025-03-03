@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ExternalApiService } from '../modules/api/external-api/external-api.service';
-import { VersionResponse } from './dto/version-response.dto';
+import { type VersionResponse } from '@maintainerr/contracts';
 
 @Injectable()
 export class AppService {
