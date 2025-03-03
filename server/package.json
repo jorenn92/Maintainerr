@@ -13,7 +13,6 @@
     "nest:build": "nest build",
     "swagger:build": "ts-node src/generate-metadata.ts",
     "start": "node dist/main",
-    "start:release": "node main",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
