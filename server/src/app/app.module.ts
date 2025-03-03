@@ -14,6 +14,7 @@ import { ServarrApiModule } from '../modules/api/servarr-api/servarr-api.module'
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
 import { TmdbApiModule } from '../modules/api/tmdb-api/tmdb.module';
+import { AuthenticationModule } from '../modules/authentication/authentication.module';
 import { CollectionsModule } from '../modules/collections/collections.module';
 import { LogsModule } from '../modules/logging/logs.module';
 import { RulesModule } from '../modules/rules/rules.module';
@@ -38,6 +39,7 @@ import ormConfig from './config/typeOrmConfig';
     JellyseerrApiModule,
     RulesModule,
     CollectionsModule,
+    AuthenticationModule,
   ],
   controllers: [AppController],
   providers: [
@@ -56,6 +58,7 @@ export class AppModule implements OnModuleInit {
     private readonly tautulliApi: TautulliApiService,
     private readonly jellyseerrApi: JellyseerrApiService,
   ) {}
+
   async onModuleInit() {
     // Initialize stuff needing settings here.. Otherwise problems
     await this.settings.init();

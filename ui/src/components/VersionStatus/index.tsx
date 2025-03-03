@@ -47,8 +47,7 @@ const VersionStatus = ({ onClick }: VersionStatusProps) => {
     <>
       {!loading ? (
         <Link
-          href="https://github.com/jorenn92/Maintainerr/releases"
-          target="_blank"
+          href="/settings/about"
           onClick={onClick}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && onClick) {
