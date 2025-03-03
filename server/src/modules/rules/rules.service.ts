@@ -1,11 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
+import _ from 'lodash';
 import { DataSource, Repository } from 'typeorm';
+import cacheManager from '../api/lib/cache';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
+import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
 import { Collection } from '../collections/entities/collection.entities';
+import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
+import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
+import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
+import { Settings } from '../settings/entities/settings.entities';
+import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
 import {
   Application,
   Property,
@@ -21,17 +30,8 @@ import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Exclusion } from './entities/exclusion.entities';
 import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
-import { Settings } from '../settings/entities/settings.entities';
-import _ from 'lodash';
-import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
+import { RuleComparatorServiceFactory } from './helpers/rule.comparator.service';
 import { RuleYamlService } from './helpers/yaml.service';
-import { RuleComparatorService } from './helpers/rule.comparator.service';
-import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
-import { ECollectionLogType } from '../collections/entities/collection_log.entities';
-import cacheManager from '../api/lib/cache';
-import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
-import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -68,7 +68,7 @@ export class RulesService {
     private readonly plexApi: PlexApiService,
     private readonly connection: DataSource,
     private readonly ruleYamlService: RuleYamlService,
-    private readonly RuleComparatorService: RuleComparatorService,
+    private readonly ruleComparatorServiceFactory: RuleComparatorServiceFactory,
   ) {
     this.ruleConstants = new RuleConstants();
   }
@@ -963,7 +963,8 @@ export class RulesService {
     const group = await this.getRuleGroupById(rulegroupId);
     if (group && mediaResp) {
       group.rules = await this.getRules(group.id.toString());
-      const result = await this.RuleComparatorService.executeRulesWithData(
+      const ruleComparator = this.ruleComparatorServiceFactory.create();
+      const result = await ruleComparator.executeRulesWithData(
         group as RulesDto,
         [mediaResp as unknown as PlexLibraryItem],
         true,
