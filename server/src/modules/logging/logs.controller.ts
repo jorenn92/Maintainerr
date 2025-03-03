@@ -1,39 +1,43 @@
+import { LogEvent, LogFile, LogSettingDto } from '@maintainerr/contracts';
 import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
+  MessageEvent as NestMessageEvent,
   Param,
   Post,
   Res,
   StreamableFile,
-  MessageEvent as NestMessageEvent,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
-import {
-  concat,
-  from,
-  map,
-  switchMap,
-  fromEvent,
-  Subject,
-  filter,
-  mergeMap,
-  catchError,
-} from 'rxjs';
-import path from 'path';
-import readLastLines from 'read-last-lines';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Response } from 'express';
 import { createReadStream, readdir } from 'fs';
 import { readdir as readdirp, stat } from 'fs/promises';
 import mime from 'mime-types';
-import { LogSettingsService } from './logs.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { LogFile, LogSettingDto, LogEvent } from '@maintainerr/contracts';
+import path from 'path';
+import readLastLines from 'read-last-lines';
+import {
+  catchError,
+  concat,
+  filter,
+  from,
+  fromEvent,
+  map,
+  mergeMap,
+  Subject,
+  switchMap,
+} from 'rxjs';
 import { Readable } from 'stream';
-import { Response } from 'express';
 import { formatLogMessage } from './logFormatting';
+import { LogSettingsService } from './logs.service';
 
-const logsDirectory = path.join(__dirname, `../../../../data/logs`);
+const logsDirectory =
+  process.env.NODE_ENV === 'production'
+    ? '/opt/data/logs'
+    : path.join(__dirname, `../../../../data/logs`);
+
 const safeLogFileRegex = /maintainerr-\d{4}-\d{2}-\d{2}\.log(\.gz)?/;
 
 @Controller('/api/logs')
