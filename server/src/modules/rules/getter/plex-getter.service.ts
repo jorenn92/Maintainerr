@@ -5,14 +5,14 @@ import {
   SimplePlexUser,
 } from '../../..//modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import { PlexMetadata } from '../../api/plex-api/interfaces/media.interface';
 import {
   Application,
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
 import { RulesDto } from '../dtos/rules.dto';
-import { PlexMetadata } from '../../api/plex-api/interfaces/media.interface';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 
 @Injectable()
 export class PlexGetterService {
@@ -543,7 +543,10 @@ export class PlexGetterService {
         }
       }
     } catch (e) {
-      this.logger.warn(`Plex-Getter - Action failed : ${e.message}`);
+      this.logger.warn(
+        `Plex-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      );
+      this.logger.debug(e);
       return undefined;
     }
   }
