@@ -2184,7 +2184,7 @@ __metadata:
     class-transformer: "npm:^0.5.1"
     class-validator: "npm:^0.14.1"
     eslint: "npm:^9.19.0"
-    eslint-config-prettier: "npm:^10.0.1"
+    eslint-config-prettier: "npm:^10.0.2"
     globals: "npm:^15.14.0"
     nestjs-zod: "npm:^4.3.1"
     prettier: "npm:^3.4.2"
@@ -2229,7 +2229,7 @@ __metadata:
     concurrently: "npm:^9.1.2"
     cron-validator: "npm:^1.3.1"
     eslint: "npm:^9.20.1"
-    eslint-config-prettier: "npm:^10.0.1"
+    eslint-config-prettier: "npm:^10.0.2"
     jest: "npm:^29.7.0"
     lodash: "npm:^4.17.21"
     mime-types: "npm:^2.1.35"
@@ -2281,7 +2281,7 @@ __metadata:
     cron-validator: "npm:^1.3.1"
     eslint: "npm:^9.20.1"
     eslint-config-next: "npm:15.1.7"
-    eslint-config-prettier: "npm:^10.0.1"
+    eslint-config-prettier: "npm:^10.0.2"
     lodash: "npm:^4.17.21"
     monaco-editor: "npm:0.52.2"
     next: "npm:15.1.7"
@@ -7598,14 +7598,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:^10.0.1":
-  version: 10.0.1
-  resolution: "eslint-config-prettier@npm:10.0.1"
+"eslint-config-prettier@npm:^10.0.2":
+  version: 10.0.2
+  resolution: "eslint-config-prettier@npm:10.0.2"
   peerDependencies:
     eslint: ">=7.0.0"
   bin:
     eslint-config-prettier: build/bin/cli.js
-  checksum: 10c0/e2434931669d211663c0493f2c1640a670a02ba4503a68f056a7eda133f383acbbb983a4a7bd0ad6cb3b2bc4d5731c3be8b32fe28e35087a76fea45f7061ae70
+  checksum: 10c0/e0ef3c442661a26fc6e82acec5bb9a418c4a8f65ec8adf0983d3aaba7716d2ed448358b063cce6e3c272c847d14cb856ddf30031770c6571e2b2c3e2a439afd4
   languageName: node
   linkType: hard
 
