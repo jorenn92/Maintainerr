@@ -89,7 +89,11 @@ const CollectionItem = (props: ICollectionItem) => {
 
             <div className="mr-0 sm:mr-0">
               <p className="font-bold">Delete</p>
-              <p className="text-amber-500">{` After ${props.collection.deleteAfterDays} days`}</p>
+              <p className="text-amber-500">
+                {props.collection.deleteAfterDays == null
+                  ? 'Never'
+                  : `After ${props.collection.deleteAfterDays} days`}
+              </p>
             </div>
           </div>
         </div>
