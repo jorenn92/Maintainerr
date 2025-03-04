@@ -113,7 +113,7 @@ const OverviewContent = (props: IOverviewContent) => {
         (colEl) => colEl.plexId === +plexId,
       )
       if (collectionData && collectionData.collection) {
-        if (collectionData.collection.deleteAfterDays === undefined) {
+        if (collectionData.collection.deleteAfterDays == null) {
           return undefined
         }
 
