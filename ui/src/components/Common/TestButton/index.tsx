@@ -6,7 +6,7 @@ import { SmallLoadingSpinner } from '../LoadingSpinner'
 
 interface ITestButton {
   testUrl: string
-  onClick?: (result: { status: boolean; version: string }) => void
+  onClick?: (result: { status: boolean; message: string }) => void
 }
 
 interface TestStatus {
@@ -28,13 +28,12 @@ const TestButton = (props: ITestButton) => {
   })
 
   const performTest = async (e: FormEvent) => {
-    e.preventDefault()
     setLoading(true)
     await GetApiHandler(props.testUrl).then((resp: BasicResponse) => {
       setClicked({ clicked: true, status: resp.code == 1 ? true : false })
       props.onClick?.({
         status: resp.code === 1 ? true : false,
-        version: resp.message,
+        message: resp.message,
       })
       setLoading(false)
     })
@@ -43,6 +42,7 @@ const TestButton = (props: ITestButton) => {
   return (
     <span className="ml-3 inline-flex rounded-md shadow-sm">
       <Button
+        type="button"
         buttonType={
           clicked.clicked ? (clicked.status ? 'success' : 'danger') : 'default'
         }
