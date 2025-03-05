@@ -1,17 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
+import _ from 'lodash';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
+import { RuleConstanstService } from '../constants/constants.service';
 import {
   RuleOperators,
   RulePossibility,
   RuleType,
 } from '../constants/rules.constants';
 import { RuleDto } from '../dtos/rule.dto';
-import _ from 'lodash';
-import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
+import { RuleDbDto } from '../dtos/ruleDb.dto';
 import { RulesDto } from '../dtos/rules.dto';
 import { ValueGetterService } from '../getter/getter.service';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
-import { RuleDbDto } from '../dtos/ruleDb.dto';
-import { RuleConstanstService } from '../constants/constants.service';
 
 interface IComparisonStatistics {
   plexId: number;
@@ -39,6 +39,21 @@ interface IRuleComparisonResult {
 interface IComparatorReturnValue {
   stats: IComparisonStatistics[];
   data: PlexLibraryItem[];
+}
+
+@Injectable()
+export class RuleComparatorServiceFactory {
+  constructor(
+    private readonly valueGetter: ValueGetterService,
+    private readonly ruleConstanstService: RuleConstanstService,
+  ) {}
+
+  create(): RuleComparatorService {
+    return new RuleComparatorService(
+      this.valueGetter,
+      this.ruleConstanstService,
+    );
+  }
 }
 
 @Injectable()
@@ -136,7 +151,7 @@ export class RuleComparatorService {
     }
   }
 
-  updateStatisticResults() {
+  private updateStatisticResults() {
     if (this.enabledStats) {
       this.statistics.forEach((el) => {
         el.result = this.resultData.some((i) => +i.ratingKey === +el.plexId);
@@ -233,7 +248,7 @@ export class RuleComparatorService {
     }
   }
 
-  async getSecondValue(
+  private async getSecondValue(
     rule: RuleDto,
     data: PlexLibraryItem,
     rulegroup: RulesDto,

@@ -30,7 +30,7 @@ import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Exclusion } from './entities/exclusion.entities';
 import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
-import { RuleComparatorService } from './helpers/rule.comparator.service';
+import { RuleComparatorServiceFactory } from './helpers/rule.comparator.service';
 import { RuleYamlService } from './helpers/yaml.service';
 
 export interface ReturnStatus {
@@ -68,7 +68,7 @@ export class RulesService {
     private readonly plexApi: PlexApiService,
     private readonly connection: DataSource,
     private readonly ruleYamlService: RuleYamlService,
-    private readonly RuleComparatorService: RuleComparatorService,
+    private readonly ruleComparatorServiceFactory: RuleComparatorServiceFactory,
   ) {
     this.ruleConstants = new RuleConstants();
   }
@@ -963,7 +963,8 @@ export class RulesService {
     const group = await this.getRuleGroupById(rulegroupId);
     if (group && mediaResp) {
       group.rules = await this.getRules(group.id.toString());
-      const result = await this.RuleComparatorService.executeRulesWithData(
+      const ruleComparator = this.ruleComparatorServiceFactory.create();
+      const result = await ruleComparator.executeRulesWithData(
         group as RulesDto,
         [mediaResp as unknown as PlexLibraryItem],
         true,
