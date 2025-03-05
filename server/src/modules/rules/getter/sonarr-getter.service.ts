@@ -129,13 +129,13 @@ export class SonarrGetterService {
                 : null;
             }
           } else {
-            return showResponse.statistics.sizeOnDisk
+            return showResponse.statistics?.sizeOnDisk
               ? +showResponse.statistics.sizeOnDisk / 1048576
               : null;
           }
         }
         case 'filePath': {
-          return showResponse?.path ? showResponse.path : null;
+          return showResponse.path ? showResponse.path : null;
         }
         case 'tags': {
           const tagIds = showResponse.tags;
@@ -169,7 +169,7 @@ export class SonarrGetterService {
               ? +season.statistics.totalEpisodeCount
               : null;
           } else {
-            return showResponse.statistics.seasonCount
+            return showResponse.statistics?.seasonCount
               ? +showResponse.statistics.seasonCount
               : null;
           }
@@ -329,7 +329,7 @@ export class SonarrGetterService {
         epResp[0] && epResp[0].airDate === undefined
           ? false
           : s.statistics?.nextAiring !== undefined
-            ? s.statistics.previousAiring !== undefined
+            ? s.statistics?.previousAiring !== undefined
             : true;
 
       if (resp) return s;
