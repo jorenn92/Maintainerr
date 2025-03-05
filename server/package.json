@@ -30,6 +30,7 @@
   "dependencies": {
     "@maintainerr/contracts": "workspace:^",
     "@nestjs/common": "^11.0.11",
+    "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.11",
     "@nestjs/event-emitter": "^3.0.1",
     "@nestjs/platform-express": "^11.0.11",

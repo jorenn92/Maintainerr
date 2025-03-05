@@ -70,14 +70,26 @@
         {
           "addReleases": "bottom"
         }
-      ]
+      ],
+      "semantic-release-gha-output"
     ],
     "branches": [
       "main"
     ],
     "npmPublish": false,
     "publish": [
-      "@semantic-release/github"
+      {
+        "path": "@semantic-release/github",
+        "assets": [
+          {
+            "path": "_artifacts/*",
+            "label": "Release Artifact"
+          }
+        ]
+      }
     ]
+  },
+  "dependencies": {
+    "semantic-release-gha-output": "^1.1.0"
   }
 }
