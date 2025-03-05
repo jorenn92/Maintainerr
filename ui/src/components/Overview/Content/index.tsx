@@ -113,18 +113,21 @@ const OverviewContent = (props: IOverviewContent) => {
         (colEl) => colEl.plexId === +plexId,
       )
       if (collectionData && collectionData.collection) {
+        if (collectionData.collection.deleteAfterDays == null) {
+          return undefined
+        }
+
         const date = new Date(collectionData.addDate)
         const today = new Date()
 
-        date.setDate(
-          date.getDate() + collectionData.collection.deleteAfterDays!,
-        )
+        date.setDate(date.getDate() + collectionData.collection.deleteAfterDays)
 
         const diffTime = date.getTime() - today.getTime()
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
         return diffDays
       }
     }
+    return undefined
   }
 
   if (props.loading) {
