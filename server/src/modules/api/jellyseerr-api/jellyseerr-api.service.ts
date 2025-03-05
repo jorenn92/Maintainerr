@@ -365,6 +365,10 @@ export class JellyseerrApiService {
         message: 'Success',
       };
     } catch (e) {
+      this.logger.warn(
+        `A failure occurred testing Jellyseerr connectivity: ${e}`,
+      );
+
       if (e instanceof AxiosError) {
         if (e.response?.status === 403) {
           return {
@@ -381,16 +385,10 @@ export class JellyseerrApiService {
         }
       }
 
-      this.logger.log("Couldn't validate Jellyseerr API connectivity!", {
-        label: 'Jellyseerr API',
-        errorMessage: e.message,
-      });
-      this.logger.debug(e);
-
       return {
         status: 'NOK',
         code: 0,
-        message: 'Unknown error',
+        message: `Failure: ${e.message}`,
       };
     }
   }

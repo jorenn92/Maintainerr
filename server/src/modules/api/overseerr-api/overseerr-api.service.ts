@@ -365,6 +365,10 @@ export class OverseerrApiService {
         message: 'Success',
       };
     } catch (e) {
+      this.logger.warn(
+        `A failure occurred testing Overseerr connectivity: ${e}`,
+      );
+
       if (e instanceof AxiosError) {
         if (e.response?.status === 403) {
           return {
@@ -381,16 +385,10 @@ export class OverseerrApiService {
         }
       }
 
-      this.logger.log("Couldn't validate Overseerr API connectivity!", {
-        label: 'Overseerr API',
-        errorMessage: e.message,
-      });
-      this.logger.debug(e);
-
       return {
         status: 'NOK',
         code: 0,
-        message: 'Unknown error',
+        message: `Failure: ${e.message}`,
       };
     }
   }
