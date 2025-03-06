@@ -1,5 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { AxiosError } from 'axios';
 import { SettingsService } from '../../../modules/settings/settings.service';
+import { BasicResponseDto } from '../external-api/dto/basic-response.dto';
 import { OverseerrApi } from './helpers/overseerr-api.helper';
 
 export interface OverSeerrMediaResponse {
@@ -348,6 +350,46 @@ export class OverseerrApiService {
       });
       this.logger.debug(e);
       return null;
+    }
+  }
+
+  public async validateApiConnectivity(): Promise<BasicResponseDto> {
+    try {
+      await this.api.getRawWithoutCache(`/settings/about`, {
+        signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
+      });
+
+      return {
+        status: 'OK',
+        code: 1,
+        message: 'Success',
+      };
+    } catch (e) {
+      this.logger.warn(
+        `A failure occurred testing Overseerr connectivity: ${e}`,
+      );
+
+      if (e instanceof AxiosError) {
+        if (e.response?.status === 403) {
+          return {
+            status: 'NOK',
+            code: 0,
+            message: 'Invalid API key',
+          };
+        } else if (e.response?.status) {
+          return {
+            status: 'NOK',
+            code: 0,
+            message: `Failure, received response: ${e.response?.status} ${e.response?.statusText}.`,
+          };
+        }
+      }
+
+      return {
+        status: 'NOK',
+        code: 0,
+        message: `Failure: ${e.message}`,
+      };
     }
   }
 }

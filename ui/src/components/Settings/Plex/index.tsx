@@ -1,5 +1,9 @@
+import { RefreshIcon } from '@heroicons/react/outline'
 import { SaveIcon } from '@heroicons/react/solid'
+import axios from 'axios'
+import { orderBy } from 'lodash'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useToasts } from 'react-toast-notifications'
 import SettingsContext from '../../../contexts/settings-context'
 import GetApiHandler, {
   DeleteApiHandler,
@@ -7,13 +11,9 @@ import GetApiHandler, {
 } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
-import PlexLoginButton from '../../Login/Plex'
-import axios from 'axios'
-import TestButton from '../../Common/TestButton'
 import DocsButton from '../../Common/DocsButton'
-import { orderBy } from 'lodash'
-import { RefreshIcon } from '@heroicons/react/outline'
-import { useToasts } from 'react-toast-notifications'
+import TestButton from '../../Common/TestButton'
+import PlexLoginButton from '../../Login/Plex'
 
 interface PresetServerDisplay {
   name: string
@@ -231,8 +231,8 @@ const PlexSettings = () => {
     if (settingsCtx.settings.plex_auth_token) verifyToken()
   }, [])
 
-  const appTest = (result: { status: boolean; version: string }) => {
-    setTestbanner({ status: result.status, version: result.version })
+  const appTest = (result: { status: boolean; message: string }) => {
+    setTestbanner({ status: result.status, version: result.message })
   }
 
   function setFieldValue(

@@ -1,29 +1,29 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isValidCron } from 'cron-validator';
 import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
-import { isValidCron } from 'cron-validator';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
+import { InternalApiService } from '../api/internal-api/internal-api.service';
+import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
-import { SettingDto } from "./dto's/setting.dto";
-import { Settings } from './entities/settings.entities';
-import { InternalApiService } from '../api/internal-api/internal-api.service';
 import { TautulliApiService } from '../api/tautulli-api/tautulli-api.service';
-import { RadarrSettings } from './entities/radarr_settings.entities';
 import {
   DeleteRadarrSettingResponseDto,
   RadarrSettingRawDto,
   RadarrSettingResponseDto,
 } from "./dto's/radarr-setting.dto";
-import { SonarrSettings } from './entities/sonarr_settings.entities';
+import { SettingDto } from "./dto's/setting.dto";
 import {
   DeleteSonarrSettingResponseDto,
   SonarrSettingRawDto,
   SonarrSettingResponseDto,
 } from "./dto's/sonarr-setting.dto";
-import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
+import { RadarrSettings } from './entities/radarr_settings.entities';
+import { Settings } from './entities/settings.entities';
+import { SonarrSettings } from './entities/sonarr_settings.entities';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -459,10 +459,21 @@ export class SettingsService implements SettingDto {
 
   public async testOverseerr(): Promise<BasicResponseDto> {
     try {
-      const resp = await this.overseerr.status();
-      return resp?.version != null
-        ? { status: 'OK', code: 1, message: resp.version }
-        : { status: 'NOK', code: 0, message: 'Failure' };
+      const validateResponse = await this.overseerr.validateApiConnectivity();
+
+      if (validateResponse.status === 'OK') {
+        const resp = await this.overseerr.status();
+        return resp?.version != null
+          ? { status: 'OK', code: 1, message: resp.version }
+          : {
+              status: 'NOK',
+              code: 0,
+              message:
+                'Connection failed! Double check your entries and make sure to Save Changes before you Test.',
+            };
+      } else {
+        return validateResponse;
+      }
     } catch (e) {
       this.logger.debug(e);
       return { status: 'NOK', code: 0, message: 'Failure' };
@@ -471,10 +482,21 @@ export class SettingsService implements SettingDto {
 
   public async testJellyseerr(): Promise<BasicResponseDto> {
     try {
-      const resp = await this.jellyseerr.status();
-      return resp?.version != null
-        ? { status: 'OK', code: 1, message: resp.version }
-        : { status: 'NOK', code: 0, message: 'Failure' };
+      const validateResponse = await this.jellyseerr.validateApiConnectivity();
+
+      if (validateResponse.status === 'OK') {
+        const resp = await this.jellyseerr.status();
+        return resp?.version != null
+          ? { status: 'OK', code: 1, message: resp.version }
+          : {
+              status: 'NOK',
+              code: 0,
+              message:
+                'Connection failed! Double check your entries and make sure to Save Changes before you Test.',
+            };
+      } else {
+        return validateResponse;
+      }
     } catch (e) {
       this.logger.debug(e);
       return { status: 'NOK', code: 0, message: 'Failure' };
