@@ -199,7 +199,7 @@ const JellyseerrSettings = () => {
               </span>
               <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
                 <TestButton
-                  onClick={appTest}
+                  onTestComplete={appTest}
                   testUrl="/settings/test/jellyseerr"
                 />
                 <span className="ml-3 inline-flex rounded-md shadow-sm">
