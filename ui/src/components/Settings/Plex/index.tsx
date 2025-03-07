@@ -507,7 +507,10 @@ const PlexSettings = () => {
                 <DocsButton page="Configuration/#plex" />
               </span>
               <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
-                <TestButton onClick={appTest} testUrl="/settings/test/plex" />
+                <TestButton
+                  onTestComplete={appTest}
+                  testUrl="/settings/test/plex"
+                />
 
                 <span className="ml-3 inline-flex rounded-md shadow-sm">
                   <Button
