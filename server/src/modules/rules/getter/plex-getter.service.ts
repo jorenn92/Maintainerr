@@ -452,22 +452,20 @@ export class PlexGetterService {
           const plexUsers: SimplePlexUser[] =
             await this.plexApi.getCorrectedUsers();
 
-          const userFilterPromises = plexUsers.map(async (u) => {
-            if (u.uuid === undefined || media_uuid === undefined) return false; // break if uuids are unavailable
-            try {
-              const watchlist = await this.plexApi.getWatchlistIdsForUser(
-                u.uuid,
-              );
-              return (
-                watchlist.find((i) => i.id === media_uuid[1]) !== undefined
-              );
-            } catch (e) {
-              return false;
+          const usernames: string[] = [];
+          for (const u of plexUsers.filter(
+            (u) => u.uuid !== undefined && media_uuid !== undefined,
+          )) {
+            const watchlist = await this.plexApi.getWatchlistIdsForUser(
+              u.uuid,
+              u.username,
+            );
+            if (watchlist?.find((i) => i.id === media_uuid[1]) !== undefined) {
+              usernames.push(u.username);
             }
-          });
-          const filterResults = await Promise.all(userFilterPromises);
-          const result = plexUsers.filter((_, index) => filterResults[index]);
-          return result.map((u) => u.username);
+          }
+
+          return usernames;
         }
         case 'watchlist_isWatchlisted': {
           const guid = grandparent
@@ -480,23 +478,19 @@ export class PlexGetterService {
           const plexUsers: SimplePlexUser[] =
             await this.plexApi.getCorrectedUsers();
 
-          const userFilterPromises = plexUsers.map(async (u) => {
-            if (u.uuid === undefined || media_uuid === undefined) return false; // break if UUIDs are unavailable
-            try {
-              const watchlist = await this.plexApi.getWatchlistIdsForUser(
-                u.uuid,
-              );
-              return (
-                watchlist.find((i) => i.id === media_uuid[1]) !== undefined
-              );
-            } catch (e) {
-              return false;
+          for (const u of plexUsers.filter(
+            (u) => u.uuid !== undefined && media_uuid !== undefined,
+          )) {
+            const watchlist = await this.plexApi.getWatchlistIdsForUser(
+              u.uuid,
+              u.username,
+            );
+            if (watchlist?.find((i) => i.id === media_uuid[1]) !== undefined) {
+              return true;
             }
-          });
-          const filterResults = await Promise.all(userFilterPromises);
-          const result = plexUsers.filter((_, index) => filterResults[index]);
+          }
 
-          return result.length > 0;
+          return false;
         }
         case 'sw_seasonLastEpisodeAiredAt': {
           const lastEpDate = await this.plexApi

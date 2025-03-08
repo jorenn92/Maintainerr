@@ -168,7 +168,7 @@ export class ExternalApiService {
     data?: string,
     config?: RawAxiosRequestConfig,
     ttl?: number,
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     const url = this.axios.getUri({ ...config, url: endpoint });
 
     try {
