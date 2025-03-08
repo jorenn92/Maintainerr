@@ -457,6 +457,7 @@ export class PlexGetterService {
             try {
               const watchlist = await this.plexApi.getWatchlistIdsForUser(
                 u.uuid,
+                u.username,
               );
               return (
                 watchlist.find((i) => i.id === media_uuid[1]) !== undefined
@@ -485,6 +486,7 @@ export class PlexGetterService {
             try {
               const watchlist = await this.plexApi.getWatchlistIdsForUser(
                 u.uuid,
+                u.username,
               );
               return (
                 watchlist.find((i) => i.id === media_uuid[1]) !== undefined
