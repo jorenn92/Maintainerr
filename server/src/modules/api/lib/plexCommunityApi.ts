@@ -12,6 +12,28 @@ export interface GraphQLQuery {
   };
 }
 
+export interface PlexCommunityErrorResponse {
+  errors: {
+    message: string;
+  }[];
+  data: null;
+}
+
+export interface PlexCommunityWatchListResponse {
+  data: {
+    user: {
+      watchlist: {
+        nodes: PlexCommunityWatchList[];
+        pageInfo: {
+          endCursor: string | null;
+          hasNextPage: boolean;
+        };
+      };
+    };
+  };
+  errors?: never;
+}
+
 export interface PlexCommunityWatchList {
   id: string;
   key: string;
@@ -46,9 +68,9 @@ export class PlexCommunityApi extends ExternalApiService {
     this.logger = new Logger(PlexCommunityApi.name);
   }
 
-  public async query(query: GraphQLQuery): Promise<any> {
+  public async query<T = any>(query: GraphQLQuery): Promise<T> {
     try {
-      const resp = await this.postRolling('/', JSON.stringify(query));
+      const resp = await this.postRolling<T>('/', JSON.stringify(query));
       return resp;
     } catch (e) {
       this.logger.warn('Failed to execute community.plex.tv GraphQL query');
