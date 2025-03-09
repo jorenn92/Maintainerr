@@ -57,8 +57,16 @@ export class JellyfinApiService {
             "SELECT DISTINCT IFNULL(NULLIF(SUBSTR(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) ItemName, strftime('%s', strftime('%s', DateCreated), 'unixepoch') lastView FROM PlaybackActivity WHERE SUBSTR(ItemName, 0, INSTR(ItemName, ' - ')) != '' GROUP BY IFNULL(NULLIF(SUBSTR(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) ORDER BY DateCreated DESC",
         },
       );
-      const lastSeen = +response.results.find((el) => el[0] == title)[1];
-      return new Date(lastSeen * 1000);
+      const result = response.results.find((el) => el[0] == title);
+      if (result) {
+        const lastSeen = +result[1];
+        return new Date(lastSeen * 1000);
+      } else {
+        this.logger.warn(
+          `'${title}' not found in Jellyfin watch history.. Returning 1st january 2000 as lastSeen date.`,
+        );
+        return new Date('2000-01-01');
+      }
     } catch (err) {
       this.logger.warn(
         'Jellyfin api communication failure.. Is the application running?',
