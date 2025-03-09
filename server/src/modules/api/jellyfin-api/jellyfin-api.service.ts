@@ -52,7 +52,10 @@ export class JellyfinApiService {
     try {
       const response: JellyfinUsageResponse = await this.api.post(
         '/user_usage_stats/submit_custom_query',
-        "SELECT DISTINCT IFNULL(NULLIF(SUBSTR(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) ItemName, strftime('%s', strftime('%s', DateCreated), 'unixepoch') lastView FROM PlaybackActivity WHERE SUBSTR(ItemName, 0, INSTR(ItemName, ' - ')) != '' GROUP BY IFNULL(NULLIF(SUBSTR(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) ORDER BY DateCreated DESC",
+        {
+          CustomQueryString:
+            "SELECT DISTINCT IFNULL(NULLIF(SUBSTR(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) ItemName, strftime('%s', strftime('%s', DateCreated), 'unixepoch') lastView FROM PlaybackActivity WHERE SUBSTR(ItemName, 0, INSTR(ItemName, ' - ')) != '' GROUP BY IFNULL(NULLIF(SUBSTR(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) ORDER BY DateCreated DESC",
+        },
       );
       const lastSeen = +response.results.find((el) => el[0] == title)[1];
       return new Date(lastSeen * 1000);
