@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, MenuAlt2Icon } from '@heroicons/react/solid'
-import { debounce } from 'lodash'
+import { debounce, includes } from 'lodash'
 import Head from 'next/head'
 import router from 'next/router'
 import { ReactNode, useContext, useEffect, useState } from 'react'
@@ -24,11 +24,13 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
   }
 
   useEffect(() => {
-    GetApiHandler('/settings/test/setup').then((setupDone) => {
-      if (!setupDone) {
-        router.push('/settings/plex')
-      }
-    })
+    if(!["/settings/plex", "/settings/jellyfin"].includes(router.pathname)) {
+      GetApiHandler('/settings/test/setup').then((setupDone) => {
+        if (!setupDone) {
+          router.push('/settings/plex')
+        }
+      })
+    }
   }, [])
 
   return (

@@ -10,6 +10,7 @@ import { InternalApiModule } from '../api/internal-api/internal-api.module';
 import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { RadarrSettings } from './entities/radarr_settings.entities';
 import { SonarrSettings } from './entities/sonarr_settings.entities';
+import { JellyfinApiModule } from '../api/jellyfin-api/jellyfin-api.module';
 
 @Global()
 @Module({
@@ -19,6 +20,7 @@ import { SonarrSettings } from './entities/sonarr_settings.entities';
     forwardRef(() => OverseerrApiModule),
     forwardRef(() => TautulliApiModule),
     forwardRef(() => InternalApiModule),
+    forwardRef(() => JellyfinApiModule),
     TypeOrmModule.forFeature([Settings, RadarrSettings]),
     TypeOrmModule.forFeature([Settings, SonarrSettings]),
   ],

@@ -1,10 +1,9 @@
-import { clone, debounce } from 'lodash'
+import { clone } from 'lodash'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import LibrariesContext from '../../contexts/libraries-context'
 import SearchContext from '../../contexts/search-context'
 import GetApiHandler from '../../utils/ApiHandler'
 import LibrarySwitcher from '../Common/LibrarySwitcher'
-import { SmallLoadingSpinner } from '../Common/LoadingSpinner'
 import OverviewContent, { IPlexMetadata } from './Content'
 
 const Overview = () => {

@@ -12,7 +12,6 @@ export interface ISettings {
   applicationTitle: string
   applicationUrl: string
   apikey: string
-  overseerr_url: string
   locale: string
   cacheImages: number
   plex_name: string
@@ -20,6 +19,11 @@ export interface ISettings {
   plex_port: number
   plex_ssl: number
   plex_auth_token: string | null
+  jellyfin_url: string
+  jellyfin_api_key: string
+  jellyfin_username: string
+  jellyfin_password: string
+  overseerr_url: string
   overseerr_api_key: string
   tautulli_url: string
   tautulli_api_key: string

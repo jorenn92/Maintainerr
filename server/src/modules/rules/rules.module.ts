@@ -30,10 +30,13 @@ import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { TautulliGetterService } from './getter/tautulli-getter.service';
 import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
+import { JellyfinGetterService } from './getter/jellyfin-getter.service';
+import { JellyfinApiModule } from '../api/jellyfin-api/jellyfin-api.module';
 
 @Module({
   imports: [
     PlexApiModule,
+    JellyfinApiModule,
     ServarrApiModule,
     TypeOrmModule.forFeature([
       Rules,
@@ -58,6 +61,7 @@ import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
     RuleMaintenanceService,
     ExclusionTypeCorrectorService,
     PlexGetterService,
+    JellyfinGetterService,
     RadarrGetterService,
     SonarrGetterService,
     OverseerrGetterService,

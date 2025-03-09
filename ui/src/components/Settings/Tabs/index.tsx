@@ -7,6 +7,7 @@ export interface SettingsRoute {
   content?: React.ReactNode
   route: string
   regex: RegExp
+  enable: boolean
 }
 export interface ISettingsLink {
   tabType: 'default' | 'button'
@@ -97,7 +98,7 @@ const SettingsTabs: React.FC<{
         >
           {settingsRoutes.map((route, index) => (
             <SettingsLink
-              disabled={!allEnabled}
+              disabled={!route.enable}
               tabType={tabType}
               currentPath={router.pathname}
               route={route.route}
@@ -115,7 +116,7 @@ const SettingsTabs: React.FC<{
           <nav className="-mx-2 -my-1 flex flex-wrap" aria-label="Tabs">
             {settingsRoutes.map((route, index) => (
               <SettingsLink
-                disabled={!allEnabled}
+                disabled={!route.enable}
                 tabType={tabType}
                 currentPath={router.pathname}
                 route={route.route}
@@ -132,7 +133,7 @@ const SettingsTabs: React.FC<{
           <nav className="flex">
             {settingsRoutes.map((route, index) => (
               <SettingsLink
-                disabled={!allEnabled}
+                disabled={!route.enable}
                 tabType={tabType}
                 currentPath={router.pathname}
                 route={route.route}

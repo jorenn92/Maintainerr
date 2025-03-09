@@ -45,6 +45,18 @@ export class Settings implements SettingDto {
   plex_auth_token: string;
 
   @Column({ nullable: true })
+  jellyfin_url: string;
+
+  @Column({ nullable: true })
+  jellyfin_api_key: string;
+
+  @Column({ nullable: true })
+  jellyfin_username: string;
+
+  @Column({ nullable: true })
+  jellyfin_password: string;
+
+  @Column({ nullable: true })
   overseerr_api_key: string;
 
   @Column({ nullable: true })

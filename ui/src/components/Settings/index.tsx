@@ -10,46 +10,64 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
   const settingsCtx = useContext(SettingsContext)
   const [loaded, setLoaded] = useState(false)
 
+  const setupDone =
+    settingsCtx.settings.plex_auth_token !== null ||
+    settingsCtx.settings.jellyfin_api_key != null;
+
   const settingsRoutes: SettingsRoute[] = [
     {
       text: 'General',
       route: '/settings/main',
       regex: /^\/settings(\/main)?$/,
+      enable: setupDone,
     },
     {
       text: 'Overseerr',
       route: '/settings/overseerr',
       regex: /^\/settings(\/overseerr)?$/,
+      enable: setupDone,
     },
     {
       text: 'Plex',
       route: '/settings/plex',
       regex: /^\/settings(\/plex)?$/,
+      enable: true,
+    },
+    {
+      text: 'Jellyfin',
+      route: '/settings/jellyfin',
+      regex: /^\/settings(\/jellyfin)?$/,
+      enable: true,
     },
     {
       text: 'Radarr',
       route: '/settings/radarr',
       regex: /^\/settings(\/radarr)?$/,
+      enable: setupDone,
     },
     {
       text: 'Sonarr',
       route: '/settings/sonarr',
       regex: /^\/settings(\/sonarr)?$/,
+      enable: setupDone,
     },
     {
       text: 'Tautulli',
       route: '/settings/tautulli',
       regex: /^\/settings(\/tautulli)?$/,
+      enable: setupDone,
     },
     {
       text: 'Jobs',
       route: '/settings/jobs',
       regex: /^\/settings(\/jobs)?$/,
+      enable: setupDone,
     },
     {
       text: 'About',
       route: '/settings/about',
       regex: /^\/settings(\/about)?$/,
+      enable: setupDone,
     },
   ]
 
@@ -70,7 +88,7 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
         <div className="mt-6">
           <SettingsTabs
             settingsRoutes={settingsRoutes}
-            allEnabled={settingsCtx.settings.plex_auth_token !== null}
+            allEnabled={setupDone}
           />
         </div>
         <div className="mt-10 text-white">{props.children}</div>

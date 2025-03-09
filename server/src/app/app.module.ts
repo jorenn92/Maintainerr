@@ -16,6 +16,8 @@ import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.
 import ormConfig from './config/typeOrmConfig';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { JellyfinApiService } from '../modules/api/jellyfin-api/jellyfin-api.service';
+import { JellyfinApiModule } from '../modules/api/jellyfin-api/jellyfin-api.module';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.ser
     ServarrApiModule,
     OverseerrApiModule,
     TautulliApiModule,
+    JellyfinApiModule,
     RulesModule,
     CollectionsModule,
   ],
@@ -39,6 +42,7 @@ export class AppModule implements OnModuleInit {
     private readonly plexApi: PlexApiService,
     private readonly overseerApi: OverseerrApiService,
     private readonly tautulliApi: TautulliApiService,
+    private readonly jellyfinApi: JellyfinApiService,
   ) {}
   async onModuleInit() {
     // Initialize stuff needing settings here.. Otherwise problems
@@ -46,5 +50,6 @@ export class AppModule implements OnModuleInit {
     await this.plexApi.initialize({});
     await this.overseerApi.init();
     await this.tautulliApi.init();
+    await this.jellyfinApi.initialize();
   }
 }

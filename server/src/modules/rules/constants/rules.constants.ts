@@ -26,6 +26,7 @@ export const enum Application {
   SONARR,
   OVERSEERR,
   TAUTULLI,
+  JELLYFIN,
 }
 
 export const enum ArrAction {
@@ -351,6 +352,20 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           type: RuleType.DATE,
           showType: [EPlexDataType.EPISODES],
+        },
+      ],
+    },
+    {
+      id: Application.JELLYFIN,
+      name: 'Jellyfin',
+      mediaType: MediaType.BOTH,
+      props: [
+        {
+          id: 0,
+          name: 'lastViewedAt',
+          humanName: 'Last view date',
+          mediaType: MediaType.BOTH,
+          type: RuleType.DATE,
         },
       ],
     },
