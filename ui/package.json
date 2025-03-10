@@ -18,7 +18,7 @@
     "@hookform/resolvers": "^3.10.0",
     "@maintainerr/contracts": "workspace:^",
     "@monaco-editor/react": "^4.7.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "bowser": "^2.11.0",
     "clsx": "^2.1.1",
     "compare-versions": "^6.1.1",
