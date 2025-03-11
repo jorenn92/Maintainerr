@@ -533,6 +533,7 @@ export class PlexGetterService {
             )?.value ?? null
           );
         }
+<<<<<<< HEAD
         case 'rating_imdbShow': {
           const showMetadata =
             metadata.type === 'season' ? parent : grandparent;
@@ -732,6 +733,8 @@ export class PlexGetterService {
 
           return Array.from(combinedCollections).map((el) => el.trim());
         }
+=======
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
         default: {
           return null;
         }

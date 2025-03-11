@@ -308,16 +308,19 @@ const RuleInput = (props: IRuleInput) => {
               : `Rule #1`}
         </h3>
 
-        {props.id && props.id > 1 ? (
-          <button
-            className="flex items-center rounded-lg bg-red-600 px-3 py-1 text-zinc-100 shadow-md hover:bg-red-500"
-            onClick={onDelete}
-            title={`Remove rule ${props.tagId}, section ${props.section}`}
-          >
-            <TrashIcon className="mr-1 h-5 w-5" />
-            Delete
-          </button>
-        ) : null}
+          {props.allowDelete ? (
+            <button
+              className="ml-auto flex h-8 rounded bg-amber-900 text-zinc-200 shadow-md hover:bg-amber-800"
+              onClick={onDelete}
+              title={`Remove rule ${props.tagId}, section ${props.section}`}
+            >
+              {<TrashIcon className="m-auto ml-5 h-5" />}
+              <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
+                Delete
+              </p>
+            </button>
+          ) : undefined}
+        </h3>
       </div>
 
       {props.id !== 1 ? (
@@ -459,47 +462,48 @@ const RuleInput = (props: IRuleInput) => {
                       <option value={CustomParams.CUSTOM_DATE}>
                         Specific Date
                       </option>
-                    )}
-                </>
-              )}
-              {ruleType === RuleType.NUMBER && (
-                <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
-              )}
-              {ruleType === RuleType.BOOL && (
-                <option value={CustomParams.CUSTOM_BOOLEAN}>Boolean</option>
-              )}
-              {ruleType === RuleType.TEXT && (
-                <option value={CustomParams.CUSTOM_TEXT}>Text</option>
-              )}
-            </optgroup>
-
-            {/* Existing Properties as Options */}
-            {ConstantsCtx.constants.applications?.map((app) =>
-              (app.mediaType === MediaType.BOTH ||
-                props.mediaType === app.mediaType) &&
-              action &&
-              +action !== +RulePossibility.IN_LAST &&
-              +action !== +RulePossibility.IN_NEXT ? (
-                <optgroup key={app.id} label={app.name}>
-                  {app.props.map((prop) =>
-                    +prop.type.key === ruleType &&
-                    (prop.mediaType === MediaType.BOTH ||
-                      props.mediaType === prop.mediaType) &&
-                    (!prop.showType ||
-                      prop.showType.includes(props.dataType!)) ? (
-                      <option
-                        key={`${app.id}-${prop.id}`}
-                        value={JSON.stringify([app.id, prop.id])}
-                      >
-                        {`${app.name} - ${prop.humanName}`}
-                      </option>
-                    ) : null,
-                  )}
-                </optgroup>
-              ) : null,
-            )}
-          </select>
+                    ) : undefined}
+                  </>
+                ) : undefined}
+                {ruleType === RuleType.NUMBER ? (
+                  <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
+                ) : undefined}
+                {ruleType === RuleType.BOOL ? (
+                  <option value={CustomParams.CUSTOM_BOOLEAN}>Boolean</option>
+                ) : undefined}
+                {ruleType === RuleType.TEXT ? (
+                  <option value={CustomParams.CUSTOM_TEXT}>Text</option>
+                ) : undefined}
+              </optgroup>
+              {ConstantsCtx.constants.applications?.map((app) => {
+                return (app.mediaType === MediaType.BOTH ||
+                  props.mediaType === app.mediaType) &&
+                  action &&
+                  +action !== +RulePossibility.IN_LAST &&
+                  action &&
+                  +action !== +RulePossibility.IN_NEXT ? (
+                  <optgroup key={app.id} label={app.name}>
+                    {app.props.map((prop) => {
+                      if (+prop.type.key === ruleType) {
+                        return (prop.mediaType === MediaType.BOTH ||
+                          props.mediaType === prop.mediaType) &&
+                          (props.mediaType === MediaType.MOVIE ||
+                            prop.showType === undefined ||
+                            prop.showType.includes(props.dataType!)) ? (
+                          <option
+                            key={app.id + 10 + prop.id}
+                            value={JSON.stringify([app.id, prop.id])}
+                          >{`${app.name} - ${prop.humanName}`}</option>
+                        ) : undefined
+                      }
+                    })}
+                  </optgroup>
+                ) : undefined
+              })}
+            </select>
+          </div>
         </div>
+      </div>
 
         {/* Custom Value Input */}
         {customValActive && (

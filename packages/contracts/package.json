@@ -28,25 +28,46 @@
     "format:check": "prettier --check --ignore-path .gitignore .",
     "check-types": "tsc --noEmit"
   },
+<<<<<<< HEAD
   "devDependencies": {
     "@eslint/js": "^9.23.0",
+=======
+  "installConfig": {
+    "hoistingLimits": "workspaces"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.1.1",
     "globals": "^15.14.0",
     "prettier": "^3.5.3",
     "tsup": "^8.3.6",
     "typescript": "^5.8.2",
+<<<<<<< HEAD
     "typescript-eslint": "^8.29.0"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.12",
     "@nestjs/core": "^11.0.12",
     "@nestjs/swagger": "^11.1.0",
+=======
+    "typescript-eslint": "^8.22.0"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.11",
+    "@nestjs/core": "^11.0.11",
+    "@nestjs/swagger": "^11.0.6",
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "nestjs-zod": "^4.3.1",
     "reflect-metadata": "^0.2.2",
+<<<<<<< HEAD
     "rxjs": "^7.8.2",
+=======
+    "rxjs": "^7.8.1",
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
     "zod": "^3.24.1"
   }
 }

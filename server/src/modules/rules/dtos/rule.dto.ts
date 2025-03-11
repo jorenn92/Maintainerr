@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { ApiProperty } from '@nestjs/swagger';
+=======
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
 import { RuleOperators, RulePossibility } from '../constants/rules.constants';
 
 export class RuleDto {

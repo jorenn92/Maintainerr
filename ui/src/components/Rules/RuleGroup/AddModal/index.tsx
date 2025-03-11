@@ -469,7 +469,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row mt-2 items-center">
+                  <div className="form-row">
                     <label htmlFor="library" className="text-label">
                       Library *
                     </label>
@@ -516,6 +516,10 @@ const AddModal = (props: AddModal) => {
                         {
                           id: 3,
                           name: 'Unmonitor and keep files',
+                        },
+                        {
+                          id: 4,
+                          name: 'Do nothing',
                         },
                       ]}
                     />
@@ -592,6 +596,10 @@ const AddModal = (props: AddModal) => {
                                   id: 3,
                                   name: 'Unmonitor show and keep files',
                                 },
+                                {
+                                  id: 4,
+                                  name: 'Do nothing',
+                                },
                               ]
                             : +selectedType === EPlexDataType.SEASONS
                               ? [
@@ -607,6 +615,10 @@ const AddModal = (props: AddModal) => {
                                     id: 3,
                                     name: 'Unmonitor season and keep files',
                                   },
+                                  {
+                                    id: 4,
+                                    name: 'Do nothing',
+                                  },
                                 ]
                               : // episodes
                                 [
@@ -618,35 +630,65 @@ const AddModal = (props: AddModal) => {
                                     id: 3,
                                     name: 'Unmonitor and keep file',
                                   },
+                                  {
+                                    id: 4,
+                                    name: 'Do nothing',
+                                  },
                                 ]
                         }
                       />
                     </>
                   )}
 
-                  <div
-                    className={`form-row mt-2 items-center ${!tautulliEnabled ? 'mb-2' : ''}`}
-                  >
+                  {arrOption !== undefined && arrOption !== 4 && (
+                    <div className="form-row">
+                      <label
+                        htmlFor="collection_deleteDays"
+                        className="text-label"
+                      >
+                        Take action after days*
+                        <p className="text-xs font-normal">
+                          Duration of days media remains in the collection
+                          before deletion/unmonitor
+                        </p>
+                      </label>
+                      <div className="form-input">
+                        <div className="form-input-field">
+                          <input
+                            type="number"
+                            name="collection_deleteDays"
+                            id="collection_deleteDays"
+                            defaultValue={
+                              collection ? collection.deleteAfterDays : 30
+                            }
+                            ref={deleteAfterRef}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="form-row">
                     <label
-                      htmlFor="collection_deleteDays"
+                      htmlFor="collection_logs_months"
                       className="text-label"
                     >
-                      Take action after days*
+                      Keep logs for months*
                       <p className="text-xs font-normal">
-                        Duration of days media remains in the collection before
-                        deletion/unmonitor
+                        Duration for which collection logs should be retained,
+                        measured in months (0 = forever)
                       </p>
                     </label>
                     <div className="form-input">
                       <div className="form-input-field">
                         <input
                           type="number"
-                          name="collection_deleteDays"
-                          id="collection_deleteDays"
+                          name="collection_logs_months"
+                          id="collection_logs_months"
                           defaultValue={
-                            collection ? collection.deleteAfterDays : 30
+                            collection ? collection.keepLogsForMonths : 6
                           }
-                          ref={deleteAfterRef}
+                          ref={keepLogsForMonthsRef}
                         />
                       </div>
                     </div>

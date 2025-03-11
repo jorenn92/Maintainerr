@@ -381,12 +381,17 @@ export class RuleConstants {
         {
           id: 31,
           name: 'rating_imdb',
+<<<<<<< HEAD
           humanName: 'IMDb rating (scale 1-10)',
+=======
+          humanName: 'IMDB rating (scale 1-10)',
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
           showType: [EPlexDataType.EPISODES, EPlexDataType.SHOWS],
         },
         {
+<<<<<<< HEAD
           id: 35,
           name: 'rating_imdbShow',
           humanName: 'IMDb rating (show) (scale 1-10)',
@@ -398,11 +403,17 @@ export class RuleConstants {
           id: 32,
           name: 'rating_rottenTomatoesCritic',
           humanName: 'Rotten Tomatoes critic rating (scale 1-10)',
+=======
+          id: 32,
+          name: 'rating_rottenTomatoesCritic',
+          humanName: 'RottenTomatoes critic rating (scale 1-10)',
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
           showType: [EPlexDataType.EPISODES, EPlexDataType.SHOWS],
         },
         {
+<<<<<<< HEAD
           id: 36,
           name: 'rating_rottenTomatoesCriticShow',
           humanName: 'Rotten Tomatoes critic rating (show) (scale 1-10)',
@@ -414,11 +425,17 @@ export class RuleConstants {
           id: 33,
           name: 'rating_rottenTomatoesAudience',
           humanName: 'Rotten Tomatoes audience rating (scale 1-10)',
+=======
+          id: 33,
+          name: 'rating_rottenTomatoesAudience',
+          humanName: 'RottenTomatoes audience rating (scale 1-10)',
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
           mediaType: MediaType.BOTH,
           type: RuleType.NUMBER,
           showType: [EPlexDataType.EPISODES, EPlexDataType.SHOWS],
         },
         {
+<<<<<<< HEAD
           id: 37,
           name: 'rating_rottenTomatoesAudienceShow',
           humanName: 'Rotten Tomatoes audience rating (show) (scale 1-10)',
@@ -427,6 +444,8 @@ export class RuleConstants {
           showType: [EPlexDataType.SEASONS, EPlexDataType.EPISODES],
         },
         {
+=======
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
           id: 34,
           name: 'rating_tmdb',
           humanName: 'The Movie Database rating (scale 1-10)',
@@ -434,6 +453,7 @@ export class RuleConstants {
           type: RuleType.NUMBER,
           showType: [EPlexDataType.EPISODES, EPlexDataType.SHOWS],
         },
+<<<<<<< HEAD
         {
           id: 38,
           name: 'rating_tmdbShow',
@@ -480,6 +500,8 @@ export class RuleConstants {
           type: RuleType.TEXT_LIST,
           cacheReset: true,
         },
+=======
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
       ],
     },
     {
@@ -935,8 +957,12 @@ export class RuleConstants {
         {
           id: 0,
           name: 'addUser',
+<<<<<<< HEAD
           humanName:
             'Requested by user (Jellyfin, Emby, Plex or local username)',
+=======
+          humanName: 'Requested by user (Plex or local username)',
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
         }, //  returns username[]

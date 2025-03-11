@@ -1,10 +1,20 @@
 import { NestFactory } from '@nestjs/core';
+<<<<<<< HEAD
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
 import { patchNestJsSwagger } from 'nestjs-zod';
 import path from 'path';
 import { AppModule } from './app/app.module';
 import { MaintainerrLogger } from './modules/logging/logs.service';
+=======
+import { AppModule } from './app/app.module';
+import path from 'path';
+import * as fs from 'fs';
+import { MaintainerrLogger } from './modules/logging/logs.service';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { patchNestJsSwagger } from 'nestjs-zod';
+import metadata from './metadata';
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
 
 const dataDir =
   process.env.NODE_ENV === 'production'
@@ -18,6 +28,11 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+<<<<<<< HEAD
+=======
+  await SwaggerModule.loadPluginMetadata(metadata);
+
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
   const config = new DocumentBuilder().setTitle('Maintainerr').build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/swagger', app, documentFactory);

@@ -56,7 +56,10 @@ interface JellyseerrUser {
   plexToken: string;
   plexId?: number;
   plexUsername: string;
+<<<<<<< HEAD
   jellyfinUsername?: string;
+=======
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
   userType: number;
   permissions: number;
   avatar: string;

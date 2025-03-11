@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## [2.13.1](https://github.com/jorenn92/Maintainerr/compare/v2.13.0...v2.13.1) (2025-04-03)
 
 
@@ -28,6 +29,8 @@
 * Add smart collection filters ([#1630](https://github.com/jorenn92/Maintainerr/issues/1630)) ([8ac61fa](https://github.com/jorenn92/Maintainerr/commit/8ac61facb8f4fd15906bb3a3fdf2c5ea27e9aac7))
 * Retry failed API requests ([35c36d9](https://github.com/jorenn92/Maintainerr/commit/35c36d9ffd2eab695df6795c0a45aa4b121634fe))
 
+=======
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
 # [2.11.0](https://github.com/jorenn92/Maintainerr/compare/v2.10.0...v2.11.0) (2025-03-11)
 
 

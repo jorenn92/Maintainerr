@@ -1,10 +1,18 @@
+<<<<<<< HEAD
 import { ClipboardListIcon, DocumentAddIcon } from '@heroicons/react/solid'
+=======
+import { ClipboardListIcon } from '@heroicons/react/solid'
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
 import { useRef, useState } from 'react'
 import { MediaType } from '../../../../contexts/constants-context'
 import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 import Alert from '../../../Common/Alert'
 import SectionHeading from '../../../Common/SectionHeading'
+<<<<<<< HEAD
 import RuleHelpModal from './RuleInput/RuleHelpModal'
+=======
+import RuleInput from './RuleInput'
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
 
 interface IRulesToCreate {
   id: number
@@ -206,89 +214,60 @@ const RuleCreator = (props: iRuleCreator) => {
     <div className="text-zinc-100">
       {ruleAmountArr[0].map((sid) => {
         return (
-          <div key={`${sid}-${deleted.current}`} className="mb-4">
-            <div className="rounded-lg bg-zinc-700 px-6 py-0.5 shadow-md">
-              <SectionHeading
-                id={sid}
-                name={'Section'}
-                onAdd={RuleAdded}
-                addAvailable={added.current.length <= 0}
-              />
-              <div className="flex flex-col space-y-2">
-                {ruleAmountArr[1][sid - 1].map((id, index) => (
-                  <div
-                    key={`${sid}-${id}`}
-                    className="flex w-full flex-col items-start"
-                  >
-                    <div className="mb-4 w-full">
-                      <RuleInput
-                        id={
-                          ruleAmount[1].length > 1
-                            ? ruleAmount[1].reduce((pv, cv, idx) =>
-                                sid === 1
-                                  ? cv - (cv - id)
-                                  : idx <= sid - 1
-                                    ? idx === sid - 1
-                                      ? cv - (cv - id) + pv
-                                      : cv + pv
-                                    : pv,
-                              )
-                            : ruleAmount[1][0] - (ruleAmount[1][0] - id)
+          <div key={`${sid}-${deleted.current}`}>
+            <SectionHeading
+              id={sid}
+              name={'Section'}
+              onAdd={RuleAdded}
+              addAvailable={added.current.length <= 0}
+            />
+            <div className="ml-5">
+              {ruleAmountArr[1][sid - 1].map((id) => (
+                <RuleInput
+                  key={`${sid}-${id}`}
+                  id={
+                    ruleAmount[1].length > 1
+                      ? ruleAmount[1].reduce((pv, cv, idx) =>
+                          sid === 1
+                            ? cv - (cv - id)
+                            : idx <= sid - 1
+                              ? idx === sid - 1
+                                ? cv - (cv - id) + pv
+                                : cv + pv
+                              : pv,
+                        )
+                      : ruleAmount[1][0] - (ruleAmount[1][0] - id)
+                  }
+                  tagId={id}
+                  editData={
+                    editData
+                      ? {
+                          rule: editData.rules[
+                            (ruleAmount[1].length > 1
+                              ? ruleAmount[1].reduce((pv, cv, idx) =>
+                                  sid === 1
+                                    ? cv - (cv - id)
+                                    : idx <= sid - 1
+                                      ? idx === sid - 1
+                                        ? cv - (cv - id) + pv
+                                        : cv + pv
+                                      : pv,
+                                )
+                              : ruleAmount[1][0] - (ruleAmount[1][0] - id)) - 1
+                          ],
                         }
-                        tagId={id}
-                        editData={
-                          editData
-                            ? {
-                                rule: editData.rules[
-                                  (ruleAmount[1].length > 1
-                                    ? ruleAmount[1].reduce((pv, cv, idx) =>
-                                        sid === 1
-                                          ? cv - (cv - id)
-                                          : idx <= sid - 1
-                                            ? idx === sid - 1
-                                              ? cv - (cv - id) + pv
-                                              : cv + pv
-                                            : pv,
-                                      )
-                                    : ruleAmount[1][0] -
-                                      (ruleAmount[1][0] - id)) - 1
-                                ],
-                              }
-                            : undefined
-                        }
-                        section={sid}
-                        newlyAdded={added.current}
-                        mediaType={props.mediaType}
-                        dataType={props.dataType}
-                        onCommit={ruleCommited}
-                        onIncomplete={ruleOmitted}
-                        onDelete={ruleDeleted}
-                        onOpenHelpModal={openRuleHelpModal}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {ruleHelpModalOpen && (
-                <RuleHelpModal onClose={closeRuleHelpModal} />
-              )}
-
-              {added.current.length <= 0 ? (
-                <div className="mb-2 flex w-full justify-end">
-                  <button
-                    type="button"
-                    className="flex h-8 rounded bg-amber-600 text-zinc-200 shadow-md hover:bg-amber-500"
-                    onClick={() => RuleAdded(sid)}
-                    title={`Add a new rule to Section ${sid}`}
-                  >
-                    <DocumentAddIcon className="m-auto ml-5 h-5" />
-                    <p className="button-text m-auto ml-1 mr-5 text-zinc-200">
-                      Add Rule
-                    </p>
-                  </button>
-                </div>
-              ) : null}
+                      : undefined
+                  }
+                  section={sid}
+                  newlyAdded={added.current}
+                  mediaType={props.mediaType}
+                  dataType={props.dataType}
+                  onCommit={ruleCommited}
+                  onIncomplete={ruleOmitted}
+                  onDelete={ruleDeleted}
+                  allowDelete={ruleAmount[0] > 1 || ruleAmount[1][sid - 1] > 1}
+                />
+              ))}
             </div>
           </div>
         )

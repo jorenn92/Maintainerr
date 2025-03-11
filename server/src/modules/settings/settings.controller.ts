@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  LogLevel,
   Param,
   ParseIntPipe,
   Post,

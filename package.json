@@ -1,6 +1,10 @@
 {
   "name": "maintainerr",
+<<<<<<< HEAD
   "version": "2.13.1",
+=======
+  "version": "2.11.0",
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
   "private": true,
   "packageManager": "yarn@4.5.1",
   "repository": {
@@ -30,10 +34,17 @@
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.0.3",
     "@semantic-release/git": "^10.0.1",
+<<<<<<< HEAD
     "@types/node": "^22.13.14",
     "knip": "^5.46.0",
     "semantic-release": "^24.2.3",
     "turbo": "^2.4.4",
+=======
+    "@types/node": "^22.13.1",
+    "knip": "^5.43.6",
+    "semantic-release": "^24.2.3",
+    "turbo": "^2.4.0",
+>>>>>>> 6546365 (Merge remote-tracking branch 'origin/main' into rule-creation-UI)
     "typescript": "^5.8.2"
   },
   "release": {
