@@ -26,6 +26,7 @@ describe('RuleComparatorService', () => {
       [true, ['abc'], 'ABC'],
       [true, new Date('2022-01-01'), new Date('2022-01-01')],
       [true, 5, 5],
+      [true, [], []],
       [false, 'abc', ''],
       [false, 'abc', undefined],
       [false, 'abc', 'abd'],

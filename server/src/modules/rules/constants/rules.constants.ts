@@ -385,6 +385,44 @@ export class RuleConstants {
           type: RuleType.NUMBER,
           showType: [EPlexDataType.EPISODES, EPlexDataType.SHOWS],
         },
+        {
+          id: 39,
+          name: 'collectionsIncludingSmart',
+          humanName:
+            'Present in amount of other collections (incl. smart collections)',
+          mediaType: MediaType.BOTH,
+          type: RuleType.NUMBER,
+          cacheReset: true,
+        },
+        {
+          id: 40,
+          name: 'sw_collections_including_parent_and_smart',
+          humanName:
+            'Present in amount of other collections (incl. parents and smart collections)',
+          mediaType: MediaType.SHOW,
+          type: RuleType.NUMBER,
+          showType: [EPlexDataType.SEASONS, EPlexDataType.EPISODES],
+          cacheReset: true,
+        },
+        {
+          id: 41,
+          name: 'sw_collection_names_including_parent_and_smart',
+          humanName:
+            '[list] Collections media is present in (titles) (incl. parents and smart collections)',
+          mediaType: MediaType.SHOW,
+          showType: [EPlexDataType.SEASONS, EPlexDataType.EPISODES],
+          cacheReset: true,
+          type: RuleType.TEXT,
+        },
+        {
+          id: 42,
+          name: 'collection_names_including_smart',
+          humanName:
+            '[list] Collections media is present in (titles) (incl. smart collections)',
+          mediaType: MediaType.BOTH,
+          type: RuleType.TEXT,
+          cacheReset: true,
+        },
       ],
     },
     {
