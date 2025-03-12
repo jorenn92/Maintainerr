@@ -1,4 +1,4 @@
-import { TrashIcon } from '@heroicons/react/solid'
+import { TrashIcon, QuestionMarkCircleIcon } from '@heroicons/react/solid'
 import { FormEvent, useContext, useEffect, useState } from 'react'
 import { IRule } from '../'
 import ConstantsContext, {
@@ -51,6 +51,7 @@ interface IRuleInput {
   section?: number
   newlyAdded?: number[]
   editData?: { rule: IRule }
+  onOpenHelpModal: () => void
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
   onDelete: (section: number, id: number) => void
@@ -296,16 +297,19 @@ const RuleInput = (props: IRuleInput) => {
     return prop
   }
   return (
-    <div className="mt-10 h-full w-full" onSubmit={submit}>
-      <div className="section h-full w-full">
-        <h3 className="sm-heading max-width-form flex">
-          <div>
-            {props.tagId
-              ? `Rule #${props.tagId}`
-              : props.id
-                ? `Rule #${props.id}`
-                : `Rule #1`}
-          </div>
+    <div
+      className="w-full rounded-2xl bg-zinc-800 p-4 text-zinc-100 shadow-lg"
+      onSubmit={submit}
+    >
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-amber-600">
+          {props.tagId
+            ? `Rule #${props.tagId}`
+            : props.id
+              ? `Rule #${props.id}`
+              : `Rule #1`}
+        </h3>
 
           {props.allowDelete ? (
             <button
@@ -321,24 +325,17 @@ const RuleInput = (props: IRuleInput) => {
           ) : undefined}
         </h3>
       </div>
+
       {props.id !== 1 ? (
         (props.id && props.id > 0) || (props.section && props.section > 1) ? (
-          <div className="form-row">
-            <label htmlFor="operator" className="text-label">
-              Operator
-              {!props.id ||
-              (props.tagId ? props.tagId === 1 : props.id === 1) ? (
-                <span className="label-tip">
-                  {`Section ${props.section}'s action on all previous section results.`}
-                </span>
-              ) : (
-                <span className="label-tip">
-                  {`Action on the previous rule.`}
-                </span>
-              )}
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
+          <div className="mb-3 mt-2 md:flex md:items-center">
+            {!props.id || (props.tagId ? props.tagId === 1 : props.id === 1) ? (
+              <label htmlFor="operator">Section Operator</label>
+            ) : (
+              <label htmlFor="operator">Operator</label>
+            )}
+            <div className="md:ml-4">
+              <div className="flex w-1/2 md:w-fit">
                 <select
                   name="operator"
                   id="operator"
@@ -358,105 +355,115 @@ const RuleInput = (props: IRuleInput) => {
                     },
                   )}
                 </select>
+                <button
+                  className="ml-1 p-1 text-sm"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    props.onOpenHelpModal()
+                  }}
+                >
+                  {
+                    <QuestionMarkCircleIcon className="h-5 w-5 text-amber-500 hover:text-amber-600" />
+                  }
+                </button>
               </div>
             </div>
           </div>
         ) : undefined
       ) : undefined}
 
-      <div className="form-row">
-        <label htmlFor="first_val" className="text-label">
-          First value
-        </label>
-        <div className="form-input">
-          <div className="form-input-field">
-            <select
-              name="first_val"
-              id="first_val"
-              onChange={updateFirstValue}
-              value={firstval}
-            >
-              <option value={undefined}></option>
-              {ConstantsCtx.constants.applications?.map((app) => {
-                return app.mediaType === MediaType.BOTH ||
-                  props.mediaType === app.mediaType ? (
-                  <optgroup key={app.id} label={app.name}>
-                    {app.props.map((prop) => {
-                      return (prop.mediaType === MediaType.BOTH ||
-                        props.mediaType === prop.mediaType) &&
-                        (props.mediaType === MediaType.MOVIE ||
-                          prop.showType === undefined ||
-                          prop.showType.includes(props.dataType!)) ? (
-                        <option
-                          key={app.id + 10 + prop.id}
-                          value={JSON.stringify([app.id, prop.id])}
-                        >{`${app.name} - ${prop.humanName}`}</option>
-                      ) : undefined
-                    })}
-                  </optgroup>
-                ) : undefined
-              })}
-            </select>
-          </div>
+      {/* First Value Selection */}
+      <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-2">
+        <div>
+          <label htmlFor="first_val" className="block text-sm font-medium">
+            First Value
+          </label>
+          <select
+            name="first_val"
+            id="first_val"
+            onChange={updateFirstValue}
+            value={firstval}
+            className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+          >
+            <option value={undefined}>Select First Value...</option>
+            {ConstantsCtx.constants.applications?.map((app) =>
+              app.mediaType === MediaType.BOTH ||
+              props.mediaType === app.mediaType ? (
+                <optgroup key={app.id} label={app.name}>
+                  {app.props.map((prop) =>
+                    (prop.mediaType === MediaType.BOTH ||
+                      props.mediaType === prop.mediaType) &&
+                    (props.mediaType === MediaType.MOVIE ||
+                      prop.showType === undefined ||
+                      prop.showType.includes(props.dataType!)) ? (
+                      <option
+                        key={`${app.id}-${prop.id}`}
+                        value={JSON.stringify([app.id, prop.id])}
+                      >
+                        {`${app.name} - ${prop.humanName}`}
+                      </option>
+                    ) : null,
+                  )}
+                </optgroup>
+              ) : null,
+            )}
+          </select>
         </div>
-      </div>
 
-      <div className="form-row">
-        <label htmlFor="action" className="text-label">
-          Action
-        </label>
-        <div className="form-input">
-          <div className="form-input-field">
-            <select
-              name="action"
-              id="action"
-              onChange={updateAction}
-              value={action}
-            >
-              <option value={undefined}> </option>
-              {Object.keys(RulePossibility).map(
-                (value: string, key: number) => {
-                  if (!isNaN(+value)) {
-                    if (possibilities.some((el) => +el === +value)) {
-                      return (
-                        <option key={+value} value={+value}>
-                          {Object.values(RulePossibilityTranslations)[+value]}
-                        </option>
-                      )
-                    }
-                  }
-                },
-              )}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div className="form-row">
-        <label htmlFor="second_val" className="text-label">
-          Second value
-        </label>
-        <div className="form-input">
-          <div className="form-input-field">
-            <select
-              name="second_val"
-              id="second_val"
-              onChange={updateSecondValue}
-              value={secondVal}
-            >
-              <option value={undefined}> </option>
-              <optgroup label={`Custom value's`}>
-                {ruleType === RuleType.DATE ? (
-                  <>
-                    <option value={CustomParams.CUSTOM_DAYS}>
-                      Amount of days
+        {/* Action Selection */}
+        <div>
+          <label htmlFor="action" className="mb-1 block text-sm font-medium">
+            Action
+          </label>
+          <select
+            name="action"
+            id="action"
+            onChange={updateAction}
+            value={action}
+            className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+          >
+            <option value={undefined}>Select Action...</option>
+            {Object.keys(RulePossibility).map((value: string, key: number) => {
+              if (!isNaN(+value)) {
+                if (possibilities.includes(+value)) {
+                  return (
+                    <option key={+value} value={+value}>
+                      {Object.values(RulePossibilityTranslations)[+value]}
                     </option>
-                    {action &&
+                  )
+                }
+              }
+            })}
+          </select>
+        </div>
+
+        {/* Second Value Selection */}
+        <div>
+          <label
+            htmlFor="second_val"
+            className="mb-1 block text-sm font-medium"
+          >
+            Second Value
+          </label>
+          <select
+            name="second_val"
+            id="second_val"
+            onChange={updateSecondValue}
+            value={secondVal}
+            className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+          >
+            <option value={undefined}>Select Second Value...</option>
+            <optgroup label="Custom Values">
+              {ruleType === RuleType.DATE && (
+                <>
+                  <option value={CustomParams.CUSTOM_DAYS}>
+                    Amount of Days
+                  </option>
+                  {action &&
                     +action !== +RulePossibility.IN_LAST &&
-                    action &&
-                    +action !== +RulePossibility.IN_NEXT ? (
+                    +action !== +RulePossibility.IN_NEXT && (
                       <option value={CustomParams.CUSTOM_DATE}>
-                        Specific date
+                        Specific Date
                       </option>
                     ) : undefined}
                   </>
@@ -501,66 +508,71 @@ const RuleInput = (props: IRuleInput) => {
         </div>
       </div>
 
-      {customValActive ? (
-        <div className="form-row">
-          <label htmlFor="custom_val" className="text-label">
-            Custom value
-          </label>
-          <div className="form-input">
-            <div className="form-input-field">
-              {customValType === RuleType.TEXT &&
-              secondVal === 'custom_days' ? (
-                <input
-                  type="number"
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal ? +customVal / 86400 : undefined}
-                  placeholder="Amount of days"
-                ></input>
-              ) : customValType === RuleType.TEXT &&
-                secondVal === 'custom_text' ? (
-                <input
-                  type="text"
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal}
-                  placeholder="Text"
-                ></input>
-              ) : customValType === RuleType.DATE ? (
-                <input
-                  type="date"
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal}
-                  placeholder="Date"
-                ></input>
-              ) : customValType === RuleType.BOOL ? (
-                <select
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal}
-                >
-                  <option value={1}>True</option>
-                  <option value={0}>False</option>
-                </select>
-              ) : (
-                <input
-                  type="number"
-                  name="custom_val"
-                  id="custom_val"
-                  onChange={updateCustomValue}
-                  value={customVal}
-                  placeholder="Number"
-                ></input>
-              )}
-            </div>
+        {/* Custom Value Input */}
+        {customValActive && (
+          <div className="mb-2">
+            <label
+              htmlFor="custom_val"
+              className="mb-1 block text-sm font-medium"
+            >
+              Custom Value
+            </label>
+            {customValType === RuleType.TEXT &&
+            secondVal === CustomParams.CUSTOM_DAYS ? (
+              <input
+                type="number"
+                name="custom_val"
+                id="custom_val"
+                onChange={updateCustomValue}
+                value={customVal ? +customVal / 86400 : undefined}
+                placeholder="Amount of Days"
+                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+              />
+            ) : customValType === RuleType.TEXT &&
+              secondVal === CustomParams.CUSTOM_TEXT ? (
+              <input
+                type="text"
+                name="custom_val"
+                id="custom_val"
+                onChange={updateCustomValue}
+                value={customVal}
+                placeholder="Text"
+                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+              />
+            ) : customValType === RuleType.DATE ? (
+              <input
+                type="date"
+                name="custom_val"
+                id="custom_val"
+                onChange={updateCustomValue}
+                value={customVal}
+                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+              />
+            ) : customValType === RuleType.BOOL ? (
+              <select
+                name="custom_val"
+                id="custom_val"
+                onChange={updateCustomValue}
+                value={customVal}
+                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+              >
+                <option value={1}>True</option>
+                <option value={0}>False</option>
+              </select>
+            ) : (
+              <input
+                type="number"
+                name="custom_val"
+                id="custom_val"
+                onChange={updateCustomValue}
+                value={customVal}
+                placeholder="Number"
+                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
+              />
+            )}
           </div>
-        </div>
-      ) : null}
+        )}
+      </div>
     </div>
   )
 }
