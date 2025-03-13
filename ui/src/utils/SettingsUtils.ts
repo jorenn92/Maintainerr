@@ -12,7 +12,7 @@ export function addPortToUrl(url: string, port: number): string {
   }
 
   // Reconstructing URL with the provided port
-  return `${parser.protocol}//${parser.hostname}:${port}${parser.pathname}${parser.search}${parser.hash}`
+  return `${parser.protocol}//${parser.hostname}:${port}${parser.pathname == '/' ? '' : parser.pathname}${parser.search}${parser.hash}`
 }
 
 export function removePortFromUrl(url: string): string | undefined {
