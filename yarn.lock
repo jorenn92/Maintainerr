@@ -2348,7 +2348,7 @@ __metadata:
     react: "npm:18.2.0"
     react-dom: "npm:18.3.1"
     react-hook-form: "npm:^7.54.2"
-    react-markdown: "npm:10.0.0"
+    react-markdown: "npm:10.1.0"
     react-select: "npm:^5.10.0"
     react-toast-notifications: "npm:^2.5.1"
     react-transition-group: "npm:^4.4.5"
@@ -14038,9 +14038,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-markdown@npm:10.0.0":
-  version: 10.0.0
-  resolution: "react-markdown@npm:10.0.0"
+"react-markdown@npm:10.1.0":
+  version: 10.1.0
+  resolution: "react-markdown@npm:10.1.0"
   dependencies:
     "@types/hast": "npm:^3.0.0"
     "@types/mdast": "npm:^4.0.0"
@@ -14056,7 +14056,7 @@ __metadata:
   peerDependencies:
     "@types/react": ">=18"
     react: ">=18"
-  checksum: 10c0/9846efb451f5c9a47371458c81117c03bc75d51e11917a8ae2a43b3902624aa29534124edd635b81f421111ab4c7978a904ad49199d010d2bbd50c42674eeae6
+  checksum: 10c0/4a5dc7d15ca6d05e9ee95318c1904f83b111a76f7588c44f50f1d54d4c97193b84e4f64c4b592057c989228238a2590306cedd0c4d398e75da49262b2b5ae1bf
   languageName: node
   linkType: hard
 
