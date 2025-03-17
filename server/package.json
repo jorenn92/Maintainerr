@@ -47,7 +47,7 @@
     "node-cache": "^5.1.2",
     "read-last-lines": "^1.8.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
+    "rxjs": "^7.8.2",
     "sqlite3": "^5.1.6",
     "typeorm": "^0.3.20",
     "winston": "^3.17.0",
