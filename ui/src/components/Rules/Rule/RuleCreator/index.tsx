@@ -1,10 +1,11 @@
-import { ClipboardListIcon } from '@heroicons/react/solid'
 import { useRef, useState } from 'react'
 import { MediaType } from '../../../../contexts/constants-context'
-import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 import Alert from '../../../Common/Alert'
-import SectionHeading from '../../../Common/SectionHeading'
 import RuleInput from './RuleInput'
+import SectionHeading from '../../../Common/SectionHeading'
+import _ from 'lodash'
+import { ClipboardListIcon } from '@heroicons/react/solid'
+import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 
 interface IRulesToCreate {
   id: number
@@ -199,8 +200,6 @@ const RuleCreator = (props: iRuleCreator) => {
   return (
     <section className="grid grid-cols-2 gap-4">
       {ruleAmountArr[0].map((sid) => {
-        // border: 1px solid hsla(120,0%,50%,0.4);
-        // background-color: hsla(0, 0.00%, 16.90%, 0.60);
         return (
           <div
             className="rounded-lg border border-neutral-700 bg-neutral-800/40 p-4"
