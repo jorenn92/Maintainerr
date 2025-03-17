@@ -16,10 +16,9 @@ const SectionHeading = (props: ISectionHeading) => {
   }
 
   return (
-    <div className="section h-full w-full">
+    <div>
       <h3 className="sm-heading max-width-form-head flex">
         {props.id ? `${props.name} #${props.id}` : `${props.name} #1`}
-
         <div className="ml-auto text-amber-500">
           {props.addAvailable ? (
             <button
