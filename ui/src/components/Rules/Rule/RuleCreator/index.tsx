@@ -198,10 +198,13 @@ const RuleCreator = (props: iRuleCreator) => {
   }
 
   return (
-    <div className="h-full w-full">
+    <section className="grid grid-cols-2 gap-4">
       {ruleAmountArr[0].map((sid) => {
         return (
-          <div key={`${sid}-${deleted.current}`}>
+          <div
+            className="rounded-lg border border-neutral-700 bg-neutral-800/40 p-4"
+            key={`${sid}-${deleted.current}`}
+          >
             <SectionHeading
               id={sid}
               name={'Section'}
@@ -260,7 +263,7 @@ const RuleCreator = (props: iRuleCreator) => {
         )
       })}
       {added.current.length <= 0 ? (
-        <div className="mt-5 flex w-full">
+        <div className="mt-4 flex w-full">
           <div className="m-auto xl:m-0">
             <button
               type="button"
@@ -280,10 +283,10 @@ const RuleCreator = (props: iRuleCreator) => {
       {rulesCreated.current.length !==
       ruleAmount[1].reduce((pv, cv) => pv + cv) ? (
         <div className="max-width-form-head mt-5">
-          <Alert>{`Some incomplete rules won't be saved`} </Alert>
+          <Alert type="warning">{`Some incomplete rules won't be saved`}</Alert>
         </div>
       ) : undefined}
-    </div>
+    </section>
   )
 }
 

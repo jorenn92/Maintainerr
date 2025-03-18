@@ -28,6 +28,14 @@ const Alert: React.FC<AlertProps> = ({ title, children, type }) => {
         svg: <InformationCircleIcon className="h-5 w-5" />,
       }
       break
+    case 'warning':
+      design = {
+        bgColor: 'bg-yellow-400',
+        titleColor: 'text-neutral-700',
+        textColor: 'text-neutral-700',
+        svg: <ExclamationIcon className="h-5 w-5 text-neutral-700" />,
+      }
+      break
     case 'error':
       design = {
         bgColor: 'bg-red-600',
