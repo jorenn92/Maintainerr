@@ -1,11 +1,10 @@
+import { ClipboardListIcon } from '@heroicons/react/solid'
 import { useRef, useState } from 'react'
 import { MediaType } from '../../../../contexts/constants-context'
-import Alert from '../../../Common/Alert'
-import RuleInput from './RuleInput'
-import SectionHeading from '../../../Common/SectionHeading'
-import _ from 'lodash'
-import { ClipboardListIcon } from '@heroicons/react/solid'
 import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
+import Alert from '../../../Common/Alert'
+import SectionHeading from '../../../Common/SectionHeading'
+import RuleInput from './RuleInput'
 
 interface IRulesToCreate {
   id: number
@@ -110,6 +109,12 @@ const RuleCreator = (props: iRuleCreator) => {
     }
   }
 
+  const [ruleHelpModalOpen, setRuleHelpModalOpen] = useState(false)
+  const openRuleHelpModal = () => {
+    setRuleHelpModalOpen(true)
+  }
+  const closeRuleHelpModal = () => setRuleHelpModalOpen(false)
+
   const ruleOmitted = (id: number) => {
     if (rulesCreated) {
       const rules = rulesCreated.current?.filter((el) => el.id !== id)
@@ -198,7 +203,7 @@ const RuleCreator = (props: iRuleCreator) => {
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="text-zinc-100">
       {ruleAmountArr[0].map((sid) => {
         return (
           <div key={`${sid}-${deleted.current}`}>
@@ -260,11 +265,11 @@ const RuleCreator = (props: iRuleCreator) => {
         )
       })}
       {added.current.length <= 0 ? (
-        <div className="mt-5 flex w-full">
+        <div className="mb-3 mt-3 flex w-full">
           <div className="m-auto xl:m-0">
             <button
               type="button"
-              className="ml-auto flex h-8 rounded bg-amber-600 text-zinc-200 shadow-md hover:bg-amber-500"
+              className="flex h-8 rounded bg-amber-600 text-zinc-200 shadow-md hover:bg-amber-500"
               onClick={addSection}
               title={`Add a new section`}
             >
