@@ -4,31 +4,19 @@ import { IRule } from '../'
 import ConstantsContext, {
   IProperty,
   MediaType,
+  RulePossibility,
   RulePossibilityTranslations,
 } from '../../../../../contexts/constants-context'
 import { EPlexDataType } from '../../../../../utils/PlexDataType-enum'
 import _, { first } from 'lodash'
-
-enum RulePossibility {
-  BIGGER,
-  SMALLER,
-  EQUALS,
-  NOT_EQUALS,
-  CONTAINS,
-  BEFORE,
-  AFTER,
-  IN_LAST,
-  IN_NEXT,
-  NOT_CONTAINS,
-  CONTAINS_PARTIAL,
-  NOT_CONTAINS_PARTIAL,
-}
 
 enum RuleType {
   NUMBER,
   DATE,
   TEXT,
   BOOL,
+  NUMBER_LIST,
+  TEXT_LIST,
 }
 enum RuleOperators {
   AND,
@@ -445,7 +433,7 @@ const RuleInput = (props: IRuleInput) => {
               value={secondVal}
             >
               <option value={undefined}> </option>
-              <optgroup label={`Custom value's`}>
+              <optgroup label="Custom values">
                 {ruleType === RuleType.DATE ? (
                   <>
                     <option value={CustomParams.CUSTOM_DAYS}>
@@ -470,6 +458,10 @@ const RuleInput = (props: IRuleInput) => {
                 {ruleType === RuleType.TEXT ? (
                   <option value={CustomParams.CUSTOM_TEXT}>Text</option>
                 ) : undefined}
+                <MaybeNumberOrTextListOptions
+                  ruleType={ruleType}
+                  action={action}
+                />
               </optgroup>
               {ConstantsCtx.constants.applications?.map((app) => {
                 return (app.mediaType === MediaType.BOTH ||
@@ -562,6 +554,36 @@ const RuleInput = (props: IRuleInput) => {
         </div>
       ) : null}
     </div>
+  )
+}
+
+function MaybeNumberOrTextListOptions({
+  ruleType,
+  action,
+}: {
+  ruleType: RuleType
+  action: string | undefined
+}) {
+  if (action == null) {
+    return
+  }
+  if (ruleType !== RuleType.NUMBER_LIST && ruleType !== RuleType.TEXT_LIST) {
+    return
+  }
+  if (
+    [
+      +RulePossibility.COUNT_EQUALS,
+      +RulePossibility.COUNT_NOT_EQUALS,
+      +RulePossibility.COUNT_BIGGER,
+      +RulePossibility.COUNT_SMALLER,
+    ].includes(+action)
+  ) {
+    return <option value={CustomParams.CUSTOM_NUMBER}>Count (number)</option>
+  }
+  return ruleType === RuleType.NUMBER_LIST ? (
+    <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
+  ) : (
+    <option value={CustomParams.CUSTOM_TEXT}>Text</option>
   )
 }
 
