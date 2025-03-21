@@ -532,6 +532,47 @@ export class PlexGetterService {
             )?.value ?? null
           );
         }
+        case 'rating_imdbShow': {
+          const showMetadata =
+            metadata.type === 'season' ? parent : grandparent;
+
+          return (
+            showMetadata.Rating?.find(
+              (x) => x.image.startsWith('imdb') && x.type == 'audience',
+            )?.value ?? null
+          );
+        }
+        case 'rating_rottenTomatoesCriticShow': {
+          const showMetadata =
+            metadata.type === 'season' ? parent : grandparent;
+
+          return (
+            showMetadata.Rating?.find(
+              (x) => x.image.startsWith('rottentomatoes') && x.type == 'critic',
+            )?.value ?? null
+          );
+        }
+        case 'rating_rottenTomatoesAudienceShow': {
+          const showMetadata =
+            metadata.type === 'season' ? parent : grandparent;
+
+          return (
+            showMetadata.Rating?.find(
+              (x) =>
+                x.image.startsWith('rottentomatoes') && x.type == 'audience',
+            )?.value ?? null
+          );
+        }
+        case 'rating_tmdbShow': {
+          const showMetadata =
+            metadata.type === 'season' ? parent : grandparent;
+
+          return (
+            showMetadata.Rating?.find(
+              (x) => x.image.startsWith('themoviedb') && x.type == 'audience',
+            )?.value ?? null
+          );
+        }
         case 'collectionsIncludingSmart': {
           if (
             metadata.type !== 'episode' &&
