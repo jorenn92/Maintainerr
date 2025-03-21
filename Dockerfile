@@ -23,6 +23,9 @@ FROM base AS runner
 
 WORKDIR /opt/app
 
+# copy root node_modules
+COPY --from=builder --chmod=777 --chown=node:node /app/node_modules ./node_modules
+
 # copy standalone UI
 COPY --from=builder --chmod=777 --chown=node:node /app/ui/.next/standalone/ui ./ui
 COPY --from=builder --chmod=777 --chown=node:node /app/ui/.next/static ./ui/.next/static
