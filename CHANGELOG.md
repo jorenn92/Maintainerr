@@ -1,3 +1,17 @@
+# [2.12.0](https://github.com/jorenn92/Maintainerr/compare/v2.11.0...v2.12.0) (2025-03-22)
+
+
+### Bug Fixes
+
+* No driver (HTTP) has been selected ([a984b11](https://github.com/jorenn92/Maintainerr/commit/a984b1158f1dd0f9df50450524145b58018b56e9))
+
+
+### Features
+
+* Add show rating rules to season & episode types ([#1627](https://github.com/jorenn92/Maintainerr/issues/1627)) ([793d046](https://github.com/jorenn92/Maintainerr/commit/793d046ae2380539bbaa56f1d99649145fa83122))
+* Add smart collection filters ([#1630](https://github.com/jorenn92/Maintainerr/issues/1630)) ([8ac61fa](https://github.com/jorenn92/Maintainerr/commit/8ac61facb8f4fd15906bb3a3fdf2c5ea27e9aac7))
+* Retry failed API requests ([35c36d9](https://github.com/jorenn92/Maintainerr/commit/35c36d9ffd2eab695df6795c0a45aa4b121634fe))
+
 # [2.11.0](https://github.com/jorenn92/Maintainerr/compare/v2.10.0...v2.11.0) (2025-03-11)
 
 
