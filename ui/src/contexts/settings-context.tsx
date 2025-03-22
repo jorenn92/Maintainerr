@@ -27,6 +27,9 @@ export interface ISettings {
   overseerr_api_key: string
   tautulli_url: string
   tautulli_api_key: string
+  qbittorrent_url: string
+  qbittorrent_username: string
+  qbittorrent_password: string
   collection_handler_job_cron: string
   rules_handler_job_cron: string
 }

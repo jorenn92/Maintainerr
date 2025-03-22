@@ -24,6 +24,7 @@ import {
   SonarrSettingResponseDto,
 } from "./dto's/sonarr-setting.dto";
 import { JellyfinApiService } from '../api/jellyfin-api/jellyfin-api.service';
+import { QbittorrentApiService } from '../api/qbittorrent-api/qbittorrent-api.service';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -68,6 +69,12 @@ export class SettingsService implements SettingDto {
 
   tautulli_api_key: string;
 
+  qbittorrent_url: string;
+
+  qbittorrent_username: string;
+
+  qbittorrent_password: string;
+
   collection_handler_job_cron: string;
 
   rules_handler_job_cron: string;
@@ -85,6 +92,8 @@ export class SettingsService implements SettingDto {
     private readonly internalApi: InternalApiService,
     @Inject(forwardRef(() => JellyfinApiService))
     private readonly jellyfin: JellyfinApiService,
+    @Inject(forwardRef(() => QbittorrentApiService))
+    private readonly qbittorrent: QbittorrentApiService,
     @InjectRepository(Settings)
     private readonly settingsRepo: Repository<Settings>,
     @InjectRepository(RadarrSettings)
@@ -118,6 +127,9 @@ export class SettingsService implements SettingDto {
       this.overseerr_api_key = settingsDb?.overseerr_api_key;
       this.tautulli_url = settingsDb?.tautulli_url;
       this.tautulli_api_key = settingsDb?.tautulli_api_key;
+      this.qbittorrent_url = settingsDb?.qbittorrent_url;
+      this.qbittorrent_username = settingsDb?.qbittorrent_username;
+      this.qbittorrent_password = settingsDb?.qbittorrent_password;
       this.collection_handler_job_cron =
         settingsDb?.collection_handler_job_cron;
       this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;
@@ -381,6 +393,7 @@ export class SettingsService implements SettingDto {
       settings.overseerr_url = settings.overseerr_url?.toLowerCase();
       settings.tautulli_url = settings.tautulli_url?.toLowerCase();
       settings.jellyfin_url = settings.jellyfin_url?.toLocaleLowerCase();
+      settings.qbittorrent_url = settings.qbittorrent_url?.toLocaleLowerCase();
 
       const settingsDb = await this.settingsRepo.findOne({ where: {} });
       // Plex SSL specifics
@@ -409,6 +422,7 @@ export class SettingsService implements SettingDto {
         this.tautulli.init();
         this.internalApi.init();
         this.jellyfin.initialize();
+        this.qbittorrent.initialize();
 
         // reload Rule handler job if changed
         if (
@@ -541,6 +555,18 @@ export class SettingsService implements SettingDto {
       const resp = await this.jellyfin.getStatus();
       return resp?.Version != null
         ? { status: 'OK', code: 1, message: resp.Version }
+        : { status: 'NOK', code: 0, message: 'Failure' };
+    } catch (e) {
+      this.logger.debug(e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async testQbittorrent(): Promise<any> {
+    try {
+      const resp = await this.qbittorrent.getStatus();
+      return resp != null
+        ? { status: 'OK', code: 1, message: resp }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch (e) {
       this.logger.debug(e);

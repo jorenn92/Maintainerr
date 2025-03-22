@@ -367,6 +367,13 @@ export class RuleConstants {
           mediaType: MediaType.BOTH,
           type: RuleType.DATE,
         },
+        {
+          id: 1,
+          name: 'viewCount',
+          humanName: 'Times viewed',
+          mediaType: MediaType.BOTH,
+          type: RuleType.NUMBER,
+        },
       ],
     },
     {

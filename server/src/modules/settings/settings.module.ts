@@ -11,6 +11,7 @@ import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { RadarrSettings } from './entities/radarr_settings.entities';
 import { SonarrSettings } from './entities/sonarr_settings.entities';
 import { JellyfinApiModule } from '../api/jellyfin-api/jellyfin-api.module';
+import { QbittorrentApiModule } from '../api/qbittorrent-api/qbittorrent-api.module';
 
 @Global()
 @Module({
@@ -21,6 +22,7 @@ import { JellyfinApiModule } from '../api/jellyfin-api/jellyfin-api.module';
     forwardRef(() => TautulliApiModule),
     forwardRef(() => InternalApiModule),
     forwardRef(() => JellyfinApiModule),
+    forwardRef(() => QbittorrentApiModule),
     TypeOrmModule.forFeature([Settings, RadarrSettings]),
     TypeOrmModule.forFeature([Settings, SonarrSettings]),
   ],

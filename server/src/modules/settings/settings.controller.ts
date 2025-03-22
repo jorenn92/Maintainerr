@@ -124,6 +124,10 @@ export class SettingsController {
   testTautulli() {
     return this.settingsService.testTautulli();
   }
+  @Get('/test/qbittorrent')
+  testQbittorrent() {
+    return this.settingsService.testQbittorrent();
+  }
 
   @Get('/plex/devices/servers')
   async getPlexServers() {

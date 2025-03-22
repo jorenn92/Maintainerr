@@ -34,6 +34,16 @@ export class JellyfinGetterService {
               return null;
             });
         }
+        case 'viewCount': {
+          return await this.jellyfinApi
+            .getTimesViewed(libItem.title)
+            .then((count) => {
+              return count;
+            })
+            .catch(() => {
+              return null;
+            });
+        }
       }
     } catch (e) {
       this.logger.warn(`Jellyfin-Getter - Action failed : ${e.message}`);

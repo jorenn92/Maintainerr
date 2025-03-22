@@ -12,7 +12,7 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
 
   const setupDone =
     settingsCtx.settings.plex_auth_token !== null ||
-    settingsCtx.settings.jellyfin_api_key != null;
+    settingsCtx.settings.jellyfin_api_key != null
 
   const settingsRoutes: SettingsRoute[] = [
     {
@@ -55,6 +55,12 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
       text: 'Tautulli',
       route: '/settings/tautulli',
       regex: /^\/settings(\/tautulli)?$/,
+      enable: setupDone,
+    },
+    {
+      text: 'Qbittorrent',
+      route: '/settings/qbittorrent',
+      regex: /^\/settings(\/qbittorrent)?$/,
       enable: setupDone,
     },
     {

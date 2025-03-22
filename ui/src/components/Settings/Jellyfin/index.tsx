@@ -6,12 +6,6 @@ import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import DocsButton from '../../Common/DocsButton'
 import TestButton from '../../Common/TestButton'
-import {
-  addPortToUrl,
-  getPortFromUrl,
-  handleSettingsInputChange,
-  removePortFromUrl,
-} from '../../../utils/SettingsUtils'
 
 const JellyfinSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -19,7 +13,6 @@ const JellyfinSettings = () => {
   const apiKeyRef = useRef<HTMLInputElement>(null)
   const usernameRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
-  const [url, setUrl] = useState<string>()
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
   const [testBanner, setTestbanner] = useState<{
@@ -30,15 +23,6 @@ const JellyfinSettings = () => {
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Jellyfin'
   }, [])
-
-  useEffect(() => {
-    // url
-    setUrl(settingsCtx.settings.jellyfin_url)
-    // @ts-ignore
-    urlRef.current = {
-      value: removePortFromUrl(settingsCtx.settings.jellyfin_url),
-    }
-  }, [settingsCtx])
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -127,10 +111,8 @@ const JellyfinSettings = () => {
                   name="url"
                   id="url"
                   type="text"
-                  defaultValue={url}
+                  defaultValue={settingsCtx.settings.jellyfin_url}
                   ref={urlRef}
-                  value={urlRef.current?.value}
-                  onChange={(e) => handleSettingsInputChange(e, urlRef, setUrl)}
                 ></input>
               </div>
             </div>

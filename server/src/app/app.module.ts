@@ -18,6 +18,8 @@ import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.modu
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
 import { JellyfinApiService } from '../modules/api/jellyfin-api/jellyfin-api.service';
 import { JellyfinApiModule } from '../modules/api/jellyfin-api/jellyfin-api.module';
+import { QbittorrentApiService } from '../modules/api/qbittorrent-api/qbittorrent-api.service';
+import { QbittorrentApiModule } from '../modules/api/qbittorrent-api/qbittorrent-api.module';
 
 @Module({
   imports: [
@@ -30,6 +32,7 @@ import { JellyfinApiModule } from '../modules/api/jellyfin-api/jellyfin-api.modu
     OverseerrApiModule,
     TautulliApiModule,
     JellyfinApiModule,
+    QbittorrentApiModule,
     RulesModule,
     CollectionsModule,
   ],
@@ -43,6 +46,7 @@ export class AppModule implements OnModuleInit {
     private readonly overseerApi: OverseerrApiService,
     private readonly tautulliApi: TautulliApiService,
     private readonly jellyfinApi: JellyfinApiService,
+    private readonly qbittorrentApi: QbittorrentApiService,
   ) {}
   async onModuleInit() {
     // Initialize stuff needing settings here.. Otherwise problems
@@ -51,5 +55,6 @@ export class AppModule implements OnModuleInit {
     await this.overseerApi.init();
     await this.tautulliApi.init();
     await this.jellyfinApi.initialize();
+    await this.qbittorrentApi.initialize();
   }
 }
