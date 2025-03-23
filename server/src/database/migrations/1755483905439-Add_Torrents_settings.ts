@@ -5,23 +5,19 @@ export class AddTorrentsSettings1755483905439 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      'ALTER TABLE settings ADD COLUMN "torrents_service" varchar',
+      'ALTER TABLE settings ADD COLUMN "qbittorrent_url" varchar',
     );
     await queryRunner.query(
-      'ALTER TABLE settings ADD COLUMN "torrents_url" varchar',
+      'ALTER TABLE settings ADD COLUMN "qbittorrent_username" varchar',
     );
     await queryRunner.query(
-      'ALTER TABLE settings ADD COLUMN "torrents_username" varchar',
-    );
-    await queryRunner.query(
-      'ALTER TABLE settings ADD COLUMN "torrents_password" varchar',
+      'ALTER TABLE settings ADD COLUMN "qbittorrent_password" varchar',
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE settings DROP "torrents_service"`);
-    await queryRunner.query(`ALTER TABLE settings DROP "torrents_url"`);
-    await queryRunner.query(`ALTER TABLE settings DROP "torrents_username"`);
-    await queryRunner.query(`ALTER TABLE settings DROP "torrents_password"`);
+    await queryRunner.query(`ALTER TABLE settings DROP "qbittorrent_url"`);
+    await queryRunner.query(`ALTER TABLE settings DROP "qbittorrent_username"`);
+    await queryRunner.query(`ALTER TABLE settings DROP "qbittorrent_password"`);
   }
 }
