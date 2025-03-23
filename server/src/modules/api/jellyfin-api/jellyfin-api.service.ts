@@ -55,12 +55,11 @@ export class JellyfinApiService {
       const response: JellyfinUsageResponse = await this.api.post(
         '/user_usage_stats/submit_custom_query',
         {
-          CustomQueryString: `SELECT DISTINCT ItemName, max(strftime('%s', strftime('%s', DateCreated), 'unixepoch')) lastView FROM PlaybackActivity WHERE ItemName = '${title}' GROUP BY ItemName ORDER BY DateCreated DESC`,
+          CustomQueryString: `SELECT max(strftime('%s', strftime('%s', DateCreated), 'unixepoch')) lastView FROM PlaybackActivity WHERE COALESCE(NULLIF(SUBSTRING(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) = '${title}'`,
         },
       );
-      const result = response.results.find((el) => el[0] == title);
-      if (result) {
-        const lastSeen = +result[1];
+      if (response.results[0] && response.results[0][0]) {
+        const lastSeen = +response.results[0][0];
         return new Date(lastSeen * 1000);
       }
       return null;
@@ -78,12 +77,11 @@ export class JellyfinApiService {
       const response: JellyfinUsageResponse = await this.api.post(
         '/user_usage_stats/submit_custom_query',
         {
-          CustomQueryString: `SELECT COUNT(0) FROM PlaybackActivity WHERE ItemName = '${title}'`,
+          CustomQueryString: `SELECT count(0) FROM PlaybackActivity WHERE COALESCE(NULLIF(SUBSTRING(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) = '${title}'`,
         },
       );
-      const result = response.results.find((el) => el[0] == title);
-      if (result) {
-        return +result[0];
+      if (response.results[0] && response.results[0][0]) {
+        return +response.results[0][0];
       }
       return 0;
     } catch (err) {

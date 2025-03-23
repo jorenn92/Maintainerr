@@ -135,6 +135,10 @@ export interface SonarrSeries {
   ended?: boolean;
 }
 
+export interface SonarrSerieHistory {
+  downloadId: string;
+}
+
 export interface SonarrLanguage {
   id: number;
   name: string | null;

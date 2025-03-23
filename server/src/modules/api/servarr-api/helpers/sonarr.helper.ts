@@ -7,6 +7,7 @@ import {
   SonarrEpisodeFile,
   SonarrInfo,
   SonarrSeason,
+  SonarrSerieHistory,
   SonarrSeries,
 } from '../interfaces/sonarr.interface';
 
@@ -120,6 +121,32 @@ export class SonarrApi extends ServarrApi<{
       this.logger.warn(`Error retrieving show by tvdb ID ${id}. ${e.message}`);
       this.logger.debug(e);
     }
+  }
+
+  public async getSeriesHistory(id: number): Promise<SonarrSerieHistory[]> {
+    try {
+      const response = await this.get<SonarrSerieHistory[]>(
+        `/history/series?seriesId=${id}`,
+      );
+
+      if (!response[0]) {
+        this.logger.warn(
+          `Could not find any download history for series id ${id} in Sonarr`,
+        );
+      }
+
+      return response;
+    } catch (e) {
+      this.logger.warn(
+        `Error retrieving download history for series id ${id} in Sonarr`,
+      );
+      this.logger.debug(e);
+    }
+  }
+
+  public async getSeriesDownloadIds(id: number): Promise<string[]> {
+    const history = await this.getSeriesHistory(id);
+    return [...new Set(history.map((entry) => entry.downloadId))];
   }
 
   public async updateSeries(series: SonarrSeries) {

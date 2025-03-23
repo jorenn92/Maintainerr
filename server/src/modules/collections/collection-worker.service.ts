@@ -15,6 +15,7 @@ import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TaskBase } from '../tasks/task.base';
+import { QbittorrentApiService } from '../api/qbittorrent-api/qbittorrent-api.service';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -32,6 +33,7 @@ export class CollectionWorkerService extends TaskBase {
     private readonly plexApi: PlexApiService,
     private readonly overseerrApi: OverseerrApiService,
     private readonly servarrApi: ServarrService,
+    private readonly qbittorrentApi: QbittorrentApiService,
     private readonly tmdbApi: TmdbApiService,
     protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
@@ -151,6 +153,11 @@ export class CollectionWorkerService extends TaskBase {
       ? await this.servarrApi.getSonarrApiClient(collection.sonarrSettingsId)
       : undefined;
 
+    const qbittorrentStatus = this.qbittorrentApi.getStatus();
+    if (qbittorrentStatus)
+      this.logger.debug(`Qbittorrent initialize, going to delete torrents`);
+    else this.logger.debug(`Qbittorrent not initilized`);
+
     if (plexLibrary.type === 'movie' && radarrApiClient) {
       // find tmdbid
       const tmdbid = media.tmdbId
@@ -164,8 +171,14 @@ export class CollectionWorkerService extends TaskBase {
       if (tmdbid) {
         const radarrMedia = await radarrApiClient.getMovieByTmdbId(tmdbid);
         if (radarrMedia && radarrMedia.id) {
+          const radarrMediaDownloadIds =
+            await radarrApiClient.getMovieDownloadIds(radarrMedia.id);
           switch (collection.arrAction) {
             case ServarrAction.DELETE:
+              if (qbittorrentStatus)
+                for (let i = 0; i < radarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(radarrMediaDownloadIds[i]);
+                }
               await radarrApiClient.deleteMovie(
                 radarrMedia.id,
                 true,
@@ -178,10 +191,18 @@ export class CollectionWorkerService extends TaskBase {
               this.infoLogger('Unmonitored movie in Radarr');
               break;
             case ServarrAction.UNMONITOR_DELETE_ALL:
+              if (qbittorrentStatus)
+                for (let i = 0; i < radarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(radarrMediaDownloadIds[i]);
+                }
               await radarrApiClient.unmonitorMovie(radarrMedia.id, true);
               this.infoLogger('Unmonitored movie in Radarr & removed files');
               break;
             case ServarrAction.UNMONITOR_DELETE_EXISTING:
+              if (qbittorrentStatus)
+                for (let i = 0; i < radarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(radarrMediaDownloadIds[i]);
+                }
               await radarrApiClient.deleteMovie(
                 radarrMedia.id,
                 true,
@@ -254,8 +275,14 @@ export class CollectionWorkerService extends TaskBase {
       if (tvdbId) {
         let sonarrMedia = await sonarrApiClient.getSeriesByTvdbId(tvdbId);
         if (sonarrMedia?.id) {
+          const sonarrMediaDownloadIds =
+            await sonarrApiClient.getSeriesDownloadIds(sonarrMedia.id);
           switch (collection.arrAction) {
             case ServarrAction.DELETE:
+              if (qbittorrentStatus)
+                for (let i = 0; i < sonarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(sonarrMediaDownloadIds[i]);
+                }
               switch (collection.type) {
                 case EPlexDataType.SEASONS:
                   sonarrMedia = await sonarrApiClient.unmonitorSeasons(
@@ -333,6 +360,10 @@ export class CollectionWorkerService extends TaskBase {
               }
               break;
             case ServarrAction.UNMONITOR_DELETE_ALL:
+              if (qbittorrentStatus)
+                for (let i = 0; i < sonarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(sonarrMediaDownloadIds[i]);
+                }
               switch (collection.type) {
                 case EPlexDataType.SEASONS:
                   sonarrMedia = await sonarrApiClient.unmonitorSeasons(
@@ -375,6 +406,10 @@ export class CollectionWorkerService extends TaskBase {
               }
               break;
             case ServarrAction.UNMONITOR_DELETE_EXISTING:
+              if (qbittorrentStatus)
+                for (let i = 0; i < sonarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(sonarrMediaDownloadIds[i]);
+                }
               switch (collection.type) {
                 case EPlexDataType.SEASONS:
                   sonarrMedia = await sonarrApiClient.unmonitorSeasons(
