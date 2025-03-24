@@ -1,22 +1,21 @@
-import { useContext, useEffect, useState } from 'react'
-import SettingsContext from '../../../contexts/settings-context'
-import React from 'react'
-import CreateNotificationModal, {
-  AgentConfiguration,
-} from './CreateNotificationModal'
-import GetApiHandler, {
-  DeleteApiHandler,
-  PostApiHandler,
-} from '../../../utils/ApiHandler'
-import Button from '../../Common/Button'
 import {
   DocumentAddIcon,
   PlusCircleIcon,
   TrashIcon,
 } from '@heroicons/react/solid'
-import ExecuteButton from '../../Common/ExecuteButton'
 import { debounce } from 'lodash'
+import { useContext, useEffect, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
+import SettingsContext from '../../../contexts/settings-context'
+import GetApiHandler, {
+  DeleteApiHandler,
+  PostApiHandler,
+} from '../../../utils/ApiHandler'
+import Button from '../../Common/Button'
+import ExecuteButton from '../../Common/ExecuteButton'
+import CreateNotificationModal, {
+  AgentConfiguration,
+} from './CreateNotificationModal'
 
 const NotificationSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -111,7 +110,9 @@ const NotificationSettings = () => {
                   buttonSize="md"
                   className="h-10 w-1/2"
                   onClick={() => {
-                    config.id ? doEdit(config.id) : undefined
+                    if (config.id) {
+                      doEdit(config.id)
+                    }
                   }}
                 >
                   {<DocumentAddIcon className="m-auto" />}{' '}
@@ -143,9 +144,20 @@ const NotificationSettings = () => {
             setAddModalActive(!addModalActive)
             setEditConfig(undefined)
           }}
-          onSave={() => {
+          onSave={(bool) => {
             setAddModalActive(!addModalActive)
             setEditConfig(undefined)
+            if (bool) {
+              addToast('Successfully saved notification agent', {
+                autoDismiss: true,
+                appearance: 'success',
+              })
+            } else {
+              addToast("Didn't save incomplete notification agent", {
+                autoDismiss: true,
+                appearance: 'error',
+              })
+            }
           }}
           onTest={() => {}}
           {...(editConfig

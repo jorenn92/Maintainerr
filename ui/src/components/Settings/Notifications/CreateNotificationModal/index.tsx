@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import Modal from '../../../Common/Modal'
 import GetApiHandler, { PostApiHandler } from '../../../../utils/ApiHandler'
-import LoadingSpinner from '../../../Common/LoadingSpinner'
 import { camelCaseToPrettyText } from '../../../../utils/SettingsUtils'
+import LoadingSpinner from '../../../Common/LoadingSpinner'
+import Modal from '../../../Common/Modal'
 import ToggleItem from '../../../Common/ToggleButton'
 
 interface agentSpec {
@@ -66,7 +66,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
 
   useEffect(() => {
     GetApiHandler('/notifications/agents').then((agents) => {
-      setAvailableAgents([{ name: 'none', options: [] }, ...agents])
+      setAvailableAgents([{ name: '-', options: [] }, ...agents])
 
       // load selected agents if editing
       if (props.selected && props.selected.agent) {
@@ -206,25 +206,27 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
               </div>
             </div>
 
-            <div className="form-row">
-              <label htmlFor="about-scale" className="text-label">
-                Days for About To Be Handled
-              </label>
-              <div className="form-input">
-                <div className="form-input-field">
-                  <input
-                    type="number"
-                    name="about-scale"
-                    defaultValue={
-                      props.selected?.aboutScale || aboutScaleRef.current
-                    }
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                      (aboutScaleRef.current = +event.target.value)
-                    }
-                  ></input>
+            {/* {targetTypes.find((el) => el.id === 8) && ( // Show only when 'About to be Handled' notification type is selected
+              <div className="form-row">
+                <label htmlFor="about-scale" className="text-label">
+                  Days before Removal
+                </label>
+                <div className="form-input">
+                  <div className="form-input-field">
+                    <input
+                      type="number"
+                      name="about-scale"
+                      defaultValue={
+                        props.selected?.aboutScale || aboutScaleRef.current
+                      }
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                        (aboutScaleRef.current = +event.target.value)
+                      }
+                    ></input>
+                  </div>
                 </div>
               </div>
-            </div>
+            )} */}
 
             <div>
               {/* Load fields */}
@@ -277,18 +279,46 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                 </label>
                 <div className="form-input">
                   {availableTypes.map((n) => (
-                    <ToggleItem
-                      key={n.id}
-                      label={n.title}
-                      toggled={props.selected?.types.includes(n.id)}
-                      onStateChange={(state) => {
-                        state
-                          ? setTargetTypes([...targetTypes, n])
-                          : setTargetTypes([
-                              ...targetTypes.filter((el) => el.id !== n.id),
-                            ])
-                      }}
-                    />
+                    <div key={n.id}>
+                      <ToggleItem
+                        label={n.title}
+                        toggled={props.selected?.types.includes(n.id)}
+                        onStateChange={(state) => {
+                          if (state) {
+                            setTargetTypes([...targetTypes, n])
+                          } else {
+                            setTargetTypes(
+                              targetTypes.filter((el) => el.id !== n.id),
+                            )
+                          }
+                        }}
+                      />
+                      {/* Show only when 'Media About To Be Handled' is selected */}
+                      {targetTypes.find((el) => el.id === 8) && n.id === 8 && (
+                        <div className="form-row mb-0 ml-9 mt-0">
+                          <label htmlFor="about-scale" className="text-label">
+                            Notify x days before removal
+                          </label>
+                          <div className="form-input">
+                            <div className="form-input-field">
+                              <input
+                                type="number"
+                                name="about-scale"
+                                defaultValue={
+                                  props.selected?.aboutScale ||
+                                  aboutScaleRef.current
+                                }
+                                onChange={(
+                                  event: React.ChangeEvent<HTMLInputElement>,
+                                ) =>
+                                  (aboutScaleRef.current = +event.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
