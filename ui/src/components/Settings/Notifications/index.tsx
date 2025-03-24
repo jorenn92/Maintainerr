@@ -76,10 +76,7 @@ const NotificationSettings = () => {
               </div>
 
               <p className="mb-4 space-x-2 truncate text-gray-300">
-                <span className="font-semibold">Agent</span>
-                <a href={config.agent} className="hover:underline">
-                  {config.agent}
-                </a>
+                <span className='font-semibold'>{config.agent}</span>
               </p>
               <div>
                 <Button

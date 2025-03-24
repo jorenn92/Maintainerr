@@ -147,17 +147,12 @@ class SlackAgent implements NotificationAgent {
     const settings = this.getSettings();
 
     if (
-      !payload.notifySystem ||
       !hasNotificationType(type, settings.types ?? [0])
     ) {
       return true;
     }
 
-    this.logger.debug('Sending Slack notification', {
-      label: 'Notifications',
-      type: NotificationType[type],
-      subject: payload.subject,
-    });
+    this.logger.log('Sending Slack notification');
     try {
       await axios.post(
         settings.options.webhookUrl as string,

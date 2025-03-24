@@ -60,7 +60,6 @@ class LunaSeaAgent implements NotificationAgent {
     const settings = this.getSettings();
 
     if (
-      !payload.notifySystem ||
       !hasNotificationType(type, settings.types ?? [0])
     ) {
       return true;

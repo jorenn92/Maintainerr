@@ -551,7 +551,6 @@ export class NotificationService {
   ) {
     const payload: NotificationPayload = {
       subject: '',
-      notifySystem: false,
       message: '',
     };
 

@@ -66,18 +66,14 @@ class PushbulletAgent implements NotificationAgent {
     const endpoint = 'https://api.pushbullet.com/v2/pushes';
     const notificationPayload = this.getNotificationPayload(type, payload);
 
-    // Send system notification
+    // Send notification
     if (
-      payload.notifySystem &&
       hasNotificationType(type, settings.types ?? [0]) &&
       settings.enabled &&
-      settings.options.accessToken
+      settings.options.accessToken &&
+      settings.options.channelTag
     ) {
-      this.logger.debug('Sending Pushbullet notification', {
-        label: 'Notifications',
-        type: NotificationType[type],
-        subject: payload.subject,
-      });
+      this.logger.log('Sending Pushbullet notification');
 
       try {
         await axios.post(
@@ -90,14 +86,23 @@ class PushbulletAgent implements NotificationAgent {
           },
         );
       } catch (e) {
-        this.logger.error('Error sending Pushbullet notification');
+        this.logger.error(
+          `Error sending Pushbullet notification. Details: ${JSON.stringify({
+            type: NotificationType[type],
+            subject: payload.subject,
+            errorMessage: e.message,
+            response: e.response?.data,
+          })}`,
+        );
         this.logger.debug(e);
 
         return false;
       }
-    }
-
-    if (settings.options.accessToken) {
+    } else if (
+      hasNotificationType(type, settings.types ?? [0]) &&
+      settings.enabled &&
+      settings.options.accessToken
+    ) {
       this.logger.log('Sending Pushbullet notification');
 
       try {

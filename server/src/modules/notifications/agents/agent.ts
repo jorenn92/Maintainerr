@@ -8,7 +8,6 @@ import {
 export interface NotificationPayload {
   event?: string;
   subject: string;
-  notifySystem: boolean;
   image?: string;
   message?: string;
   extra?: { name: string; value: string }[];

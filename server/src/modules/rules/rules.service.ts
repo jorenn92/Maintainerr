@@ -273,6 +273,8 @@ export class RulesService {
         params.useRules !== undefined ? params.useRules : true,
         params.isActive !== undefined ? params.isActive : true,
         params.dataType !== undefined ? params.dataType : undefined,
+        undefined,
+        params.notifications,
       );
       // create rules
       if (params.useRules) {
@@ -822,7 +824,7 @@ export class RulesService {
       await connection
         .relation(RuleGroup, 'notifications')
         .of(id)
-        .add(notifications.map((notification) => notification.id));
+        .add(notifications?.map((notification) => notification.id));
 
       return id;
     } catch (e) {
