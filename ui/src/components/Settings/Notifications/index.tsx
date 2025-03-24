@@ -76,7 +76,7 @@ const NotificationSettings = () => {
               </div>
 
               <p className="mb-4 space-x-2 truncate text-gray-300">
-                <span className='font-semibold'>{config.agent}</span>
+                <span className="font-semibold">{config.agent}</span>
               </p>
               <div>
                 <Button

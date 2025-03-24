@@ -59,9 +59,7 @@ class LunaSeaAgent implements NotificationAgent {
   ): Promise<boolean> {
     const settings = this.getSettings();
 
-    if (
-      !hasNotificationType(type, settings.types ?? [0])
-    ) {
+    if (!hasNotificationType(type, settings.types ?? [0])) {
       return true;
     }
 
