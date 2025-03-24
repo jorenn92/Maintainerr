@@ -59,7 +59,8 @@ import { Notification } from '../notifications/entities/notification.entities';
     JellyseerrApiModule,
     TmdbApiModule,
     CollectionsModule,
-    TasksModule  ],
+    TasksModule,
+  ],
   providers: [
     RulesService,
     RuleExecutorService,

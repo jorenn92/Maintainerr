@@ -25,7 +25,7 @@ import { JellyseerrApiModule } from '../api/jellyseerr-api/jellyseerr-api.module
       CollectionMedia,
       CollectionLog,
       RuleGroup,
-      Exclusion
+      Exclusion,
     ]),
     OverseerrApiModule,
     TautulliApiModule,
@@ -37,7 +37,7 @@ import { JellyseerrApiModule } from '../api/jellyseerr-api/jellyseerr-api.module
   providers: [
     CollectionsService,
     CollectionWorkerService,
-    CollectionLogCleanerService
+    CollectionLogCleanerService,
   ],
   controllers: [CollectionsController],
   exports: [CollectionsService],
