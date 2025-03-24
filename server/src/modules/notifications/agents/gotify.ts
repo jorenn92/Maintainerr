@@ -93,7 +93,14 @@ class GotifyAgent implements NotificationAgent {
 
       return true;
     } catch (e) {
-      this.logger.error('Error sending Gotify notification');
+      this.logger.error(
+        `Error sending Gotify notification. Details: ${JSON.stringify({
+          type: NotificationType[type],
+          subject: payload.subject,
+          errorMessage: e.message,
+          response: e.response?.data,
+        })}`
+      );
       this.logger.debug(e);
 
       return false;

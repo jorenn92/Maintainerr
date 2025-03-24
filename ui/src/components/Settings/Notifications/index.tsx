@@ -50,34 +50,11 @@ const NotificationSettings = () => {
     })
   }
 
-  const doTest = () => {
-    PostApiHandler(`/notifications/test`, {}).then(() => {
-      addToast(
-        "Test notification deployed to all agents with the 'Test' type",
-        {
-          autoDismiss: true,
-          appearance: 'success',
-        },
-      )
-    })
-  }
-
   return (
     <div className="h-full w-full">
       <div className="section-settings h-full w-full">
         <h3 className="heading">Notification Settings</h3>
         <p className="description">Notification configuration</p>
-      </div>
-      <div className="m-auto mb-5 flex">
-        <div className="ml-2 mr-auto sm:mr-0">
-          <ExecuteButton
-            onClick={debounce(doTest, 5000, {
-              leading: true,
-              trailing: false,
-            })}
-            text="Test Notifications"
-          />
-        </div>
       </div>
 
       <div>

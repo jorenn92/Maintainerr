@@ -11,11 +11,26 @@ export class NotificationsController {
   ) {}
 
   @Post('/test')
-  public async sendTestNotification() {
+  public async sendTestNotification(
+    @Body()
+    payload: {
+      id?: number;
+      agent: string;
+      name: string;
+      enabled: boolean;
+      types: number[];
+      aboutScale: number;
+      options: object;
+    },
+  ) {
+    const agent = this.notificationService.createDummyTestAgent(payload);
     this.eventEmitter.emit(
       'agents.notify',
       NotificationType.TEST_NOTIFICATION,
-      null,
+      undefined,
+      undefined,
+      0,
+      agent
     );
   }
 

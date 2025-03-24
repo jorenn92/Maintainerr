@@ -26,11 +26,6 @@ export const hasNotificationType = (
   type: NotificationType,
   value: NotificationType[],
 ): boolean => {
-  // If we are not checking any notifications, bail out and return true
-  if (type === 0) {
-    return true;
-  }
-
   return value.includes(type);
 };
 
@@ -79,10 +74,12 @@ export class NotificationService {
     type: NotificationType,
     payload: NotificationPayload,
     agent: NotificationAgent,
-  ): void {
+  ): Promise<boolean> {
     if (agent.shouldSend()) {
-      if (agent.getSettings().types?.includes(type)) agent.send(type, payload);
+      if (agent.getSettings().types?.includes(type))
+        return agent.send(type, payload);
     }
+    return Promise.resolve(false);
   }
 
   async addNotificationConfiguration(payload: {
@@ -216,6 +213,29 @@ export class NotificationService {
     }
   }
 
+  public createDummyTestAgent(payload: {
+    id?: number;
+    agent: string;
+    name: string;
+    enabled: boolean;
+    types: number[];
+    aboutScale: number;
+    options: object;
+  }) {
+    payload.types = [...payload.types, NotificationType.TEST_NOTIFICATION];
+
+    const notification = new Notification();
+    notification.id = -1;
+    notification.agent = payload.agent;
+    notification.enabled = payload.enabled;
+    notification.aboutScale = payload.aboutScale;
+    notification.name = payload.name;
+    notification.options = JSON.stringify(payload.options);
+    notification.types = JSON.stringify(payload.types);
+
+    return this.createAgent(notification);
+  }
+
   public async registerConfiguredAgents(skiplog = false) {
     const configuredAgents = await this.getNotificationConfigurations();
 
@@ -227,102 +247,104 @@ export class NotificationService {
       this.activeAgents = [];
 
       const agents: NotificationAgent[] = configuredAgents?.map(
-        (notification) => {
-          switch (notification.agent) {
-            case NotificationAgentKey.DISCORD:
-              return new DiscordAgent(
-                {
-                  enabled: notification.enabled,
-                  types: JSON.parse(notification.types),
-                  options: JSON.parse(notification.options),
-                },
-                notification,
-              );
-            case NotificationAgentKey.PUSHOVER:
-              return new PushoverAgent(
-                this.settings,
-                {
-                  enabled: notification.enabled,
-                  types: JSON.parse(notification.types),
-                  options: JSON.parse(notification.options),
-                },
-                notification,
-              );
-            case NotificationAgentKey.EMAIL:
-              return new EmailAgent(
-                this.settings,
-                {
-                  enabled: notification.enabled,
-                  types: JSON.parse(notification.types),
-                  options: JSON.parse(notification.options),
-                },
-                notification,
-              );
-            case NotificationAgentKey.GOTIFY:
-              return new GotifyAgent(
-                this.settings,
-                {
-                  enabled: notification.enabled,
-                  types: JSON.parse(notification.types),
-                  options: JSON.parse(notification.options),
-                },
-                notification,
-              );
-            case NotificationAgentKey.LUNASEA:
-              return new LunaSeaAgent(
-                this.settings,
-                {
-                  enabled: notification.enabled,
-                  types: JSON.parse(notification.types),
-                  options: JSON.parse(notification.options),
-                },
-                notification,
-              );
-            case NotificationAgentKey.PUSHBULLET:
-              return new PushbulletAgent(
-                this.settings,
-                {
-                  enabled: notification.enabled,
-                  types: JSON.parse(notification.types),
-                  options: JSON.parse(notification.options),
-                },
-                notification,
-              );
-            case NotificationAgentKey.SLACK:
-              return new SlackAgent(
-                this.settings,
-                {
-                  enabled: notification.enabled,
-                  types: JSON.parse(notification.types),
-                  options: JSON.parse(notification.options),
-                },
-                notification,
-              );
-            case NotificationAgentKey.TELEGRAM:
-              return new TelegramAgent(
-                this.settings,
-                {
-                  enabled: notification.enabled,
-                  types: JSON.parse(notification.types),
-                  options: JSON.parse(notification.options),
-                },
-                notification,
-              );
-            case NotificationAgentKey.WEBHOOK:
-              return new WebhookAgent(
-                this.settings,
-                {
-                  enabled: notification.enabled,
-                  types: JSON.parse(notification.types),
-                  options: JSON.parse(notification.options),
-                },
-                notification,
-              );
-          }
-        },
+        (notification) => this.createAgent(notification),
       );
 
       this.registerAgents(agents, skiplog);
+    }
+  }
+
+  private createAgent(notification: Notification) {
+    switch (notification.agent) {
+      case NotificationAgentKey.DISCORD:
+        return new DiscordAgent(
+          {
+            enabled: notification.enabled,
+            types: JSON.parse(notification.types),
+            options: JSON.parse(notification.options),
+          },
+          notification,
+        );
+      case NotificationAgentKey.PUSHOVER:
+        return new PushoverAgent(
+          this.settings,
+          {
+            enabled: notification.enabled,
+            types: JSON.parse(notification.types),
+            options: JSON.parse(notification.options),
+          },
+          notification,
+        );
+      case NotificationAgentKey.EMAIL:
+        return new EmailAgent(
+          this.settings,
+          {
+            enabled: notification.enabled,
+            types: JSON.parse(notification.types),
+            options: JSON.parse(notification.options),
+          },
+          notification,
+        );
+      case NotificationAgentKey.GOTIFY:
+        return new GotifyAgent(
+          this.settings,
+          {
+            enabled: notification.enabled,
+            types: JSON.parse(notification.types),
+            options: JSON.parse(notification.options),
+          },
+          notification,
+        );
+      case NotificationAgentKey.LUNASEA:
+        return new LunaSeaAgent(
+          this.settings,
+          {
+            enabled: notification.enabled,
+            types: JSON.parse(notification.types),
+            options: JSON.parse(notification.options),
+          },
+          notification,
+        );
+      case NotificationAgentKey.PUSHBULLET:
+        return new PushbulletAgent(
+          this.settings,
+          {
+            enabled: notification.enabled,
+            types: JSON.parse(notification.types),
+            options: JSON.parse(notification.options),
+          },
+          notification,
+        );
+      case NotificationAgentKey.SLACK:
+        return new SlackAgent(
+          this.settings,
+          {
+            enabled: notification.enabled,
+            types: JSON.parse(notification.types),
+            options: JSON.parse(notification.options),
+          },
+          notification,
+        );
+      case NotificationAgentKey.TELEGRAM:
+        return new TelegramAgent(
+          this.settings,
+          {
+            enabled: notification.enabled,
+            types: JSON.parse(notification.types),
+            options: JSON.parse(notification.options),
+          },
+          notification,
+        );
+      case NotificationAgentKey.WEBHOOK:
+        return new WebhookAgent(
+          this.settings,
+          {
+            enabled: notification.enabled,
+            types: JSON.parse(notification.types),
+            options: JSON.parse(notification.options),
+          },
+          notification,
+        );
     }
   }
 
@@ -343,7 +365,11 @@ export class NotificationService {
 
   public getTypes() {
     return Object.keys(NotificationType)
-      .filter((key) => isNaN(Number(key)))
+      .filter(
+        (key) =>
+          isNaN(Number(key)) &&
+          NotificationType[key] !== NotificationType.TEST_NOTIFICATION,
+      )
       .map((key) => ({
         title: this.humanizeTitle(key),
         id: NotificationType[key],
@@ -362,6 +388,7 @@ export class NotificationService {
     return [
       {
         name: 'email',
+        friendlyName: 'Email',
         options: [
           { field: 'emailFrom', type: 'text', required: true, extraInfo: '' },
           { field: 'emailTo', type: 'text', required: true, extraInfo: '' },
@@ -403,6 +430,7 @@ export class NotificationService {
       },
       {
         name: 'discord',
+        friendlyName: 'Discord',
         options: [
           { field: 'webhookUrl', type: 'text', required: true, extraInfo: '' },
           {
@@ -421,6 +449,7 @@ export class NotificationService {
       },
       {
         name: 'lunasea',
+        friendlyName: 'Lunasea',
         options: [
           { field: 'webhookUrl', type: 'text', required: true, extraInfo: '' },
           {
@@ -433,12 +462,14 @@ export class NotificationService {
       },
       {
         name: 'slack',
+        friendlyName: 'Slack',
         options: [
           { field: 'webhookUrl', type: 'text', required: true, extraInfo: '' },
         ],
       },
       {
         name: 'telegram',
+        friendlyName: 'Telegram',
         options: [
           {
             field: 'botAuthToken',
@@ -470,6 +501,7 @@ export class NotificationService {
       },
       {
         name: 'pushbullet',
+        friendlyName: 'Pushbullet',
         options: [
           { field: 'accessToken', type: 'text', required: true, extraInfo: '' },
           { field: 'channelTag', type: 'text', required: false, extraInfo: '' },
@@ -477,6 +509,7 @@ export class NotificationService {
       },
       {
         name: 'pushover',
+        friendlyName: 'Pushover',
         options: [
           { field: 'accessToken', type: 'text', required: true, extraInfo: '' },
           {
@@ -490,6 +523,7 @@ export class NotificationService {
       },
       {
         name: 'webhook',
+        friendlyName: 'Webhook',
         options: [
           { field: 'webhookUrl', type: 'text', required: true, extraInfo: '' },
           { field: 'jsonPayload', type: 'text', required: true, extraInfo: '' },
@@ -498,6 +532,7 @@ export class NotificationService {
       },
       {
         name: 'gotify',
+        friendlyName: 'Gotify',
         options: [
           { field: 'url', type: 'text', required: true, extraInfo: '' },
           { field: 'token', type: 'text', required: true, extraInfo: '' },

@@ -107,7 +107,14 @@ class PushbulletAgent implements NotificationAgent {
           },
         });
       } catch (e) {
-        this.logger.error('Error sending Pushbullet notification');
+        this.logger.error(
+          `Error sending Pushbullet notification. Details: ${JSON.stringify({
+            type: NotificationType[type],
+            subject: payload.subject,
+            errorMessage: e.message,
+            response: e.response?.data,
+          })}`
+        );
         this.logger.debug(e);
 
         return false;

@@ -93,7 +93,6 @@ export enum NotificationAgentKey {
 }
 
 export enum NotificationType {
-  NONE = 0,
   MEDIA_ADDED_TO_COLLECTION = 2,
   MEDIA_REMOVED_FROM_COLLECTION = 4,
   MEDIA_ABOUT_TO_BE_HANDLED = 8,

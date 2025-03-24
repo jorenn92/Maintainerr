@@ -1,12 +1,16 @@
+import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
+import { useToasts } from 'react-toast-notifications'
 import GetApiHandler, { PostApiHandler } from '../../../../utils/ApiHandler'
 import { camelCaseToPrettyText } from '../../../../utils/SettingsUtils'
+import ExecuteButton from '../../../Common/ExecuteButton'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
 import Modal from '../../../Common/Modal'
 import ToggleItem from '../../../Common/ToggleButton'
 
 interface agentSpec {
   name: string
+  friendlyName: string
   options: [
     { field: string; type: string; required: boolean; extraInfo: string },
   ]
@@ -24,7 +28,7 @@ export interface AgentConfiguration {
   enabled: boolean
   types: number[]
   aboutScale: number
-  options: {}
+  options: object
 }
 
 interface CreateNotificationModal {
@@ -44,11 +48,12 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
 
   const [targetAgent, setTargetAgent] = useState<agentSpec>()
   const [targetTypes, setTargetTypes] = useState<typeSpec[]>([])
+  const { addToast } = useToasts()
 
   const handleSubmit = () => {
     const types = targetTypes ? targetTypes.map((t) => t.id) : []
 
-    if (targetAgent && nameRef.current !== null) {
+    if (targetAgent && nameRef.current !== '') {
       const payload: AgentConfiguration = {
         id: props.selected?.id,
         name: nameRef.current,
@@ -61,6 +66,30 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
       postNotificationConfig(payload)
     } else {
       props.onSave(false)
+    }
+  }
+
+  const doTest = () => {
+    if (targetAgent && nameRef.current !== '') {
+      const types = targetTypes ? targetTypes.map((t) => t.id) : []
+
+      PostApiHandler(`/notifications/test`, {
+        id: props.selected?.id,
+        name: nameRef.current,
+        agent: targetAgent.name,
+        enabled: enabledRef.current,
+        types: types,
+        aboutScale: aboutScaleRef.current,
+        options: formValues,
+      }).then(() => {
+        addToast(
+          "Test notification fired! Consult the logs if you didn't receive anything.",
+          {
+            autoDismiss: true,
+            appearance: 'success',
+          },
+        )
+      })
     }
   }
 
@@ -93,7 +122,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
     if (props.selected) {
       nameRef.current = props.selected.name
       enabledRef.current = props.selected.enabled
-      setFormValues(JSON.parse(props.selected.options as string))
+      setFormValues(JSON.parse(props.selected.options as unknown as string))
     }
   }, [])
 
@@ -198,35 +227,13 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                             : false
                         }
                       >
-                        {`${agent.name}`}
+                        {`${agent.friendlyName ? agent.friendlyName : ''}`}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
             </div>
-
-            {/* {targetTypes.find((el) => el.id === 8) && ( // Show only when 'About to be Handled' notification type is selected
-              <div className="form-row">
-                <label htmlFor="about-scale" className="text-label">
-                  Days before Removal
-                </label>
-                <div className="form-input">
-                  <div className="form-input-field">
-                    <input
-                      type="number"
-                      name="about-scale"
-                      defaultValue={
-                        props.selected?.aboutScale || aboutScaleRef.current
-                      }
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                        (aboutScaleRef.current = +event.target.value)
-                      }
-                    ></input>
-                  </div>
-                </div>
-              </div>
-            )} */}
 
             <div>
               {/* Load fields */}
@@ -321,6 +328,18 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+            <div className="m-auto mb-5 flex justify-end">
+              <div className="ml-2 mr-auto sm:mr-0">
+                <ExecuteButton
+                  onClick={debounce(doTest, 5000, {
+                    leading: true,
+                    trailing: false,
+                  })}
+                  text="Test Notification"
+                  timeout={1000}
+                />
               </div>
             </div>
           </form>

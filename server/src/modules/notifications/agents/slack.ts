@@ -166,14 +166,15 @@ class SlackAgent implements NotificationAgent {
 
       return true;
     } catch (e) {
-      this.logger.error('Error sending Slack notification', {
-        label: 'Notifications',
-        type: NotificationType[type],
-        subject: payload.subject,
-        errorMessage: e.message,
-        response: e.response?.data,
-      });
-
+      this.logger.error(
+        `Error sending Slack notification. Details: ${JSON.stringify({
+          type: NotificationType[type],
+          subject: payload.subject,
+          errorMessage: e.message,
+          response: e.response?.data,
+        })}`
+      );
+      this.logger.debug(e);
       return false;
     }
   }
