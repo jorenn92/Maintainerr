@@ -12,9 +12,12 @@ const ExecuteButton = (props: IExecuteButton) => {
   const [clicked, setClicked] = useState(false)
 
   useEffect(() => {
-    setTimeout(() => {
-      setClicked(false)
-    }, props.timeout ? props.timeout: 10000)
+    setTimeout(
+      () => {
+        setClicked(false)
+      },
+      props.timeout ? props.timeout : 10000,
+    )
   }, [clicked])
   const onClick = () => {
     setClicked(true)

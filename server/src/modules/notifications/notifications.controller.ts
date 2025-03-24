@@ -30,7 +30,7 @@ export class NotificationsController {
       undefined,
       undefined,
       0,
-      agent
+      agent,
     );
   }
 

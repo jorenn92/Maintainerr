@@ -167,7 +167,7 @@ class DiscordAgent implements NotificationAgent {
           subject: payload.subject,
           errorMessage: e.message,
           response: e.response?.data,
-        })}`
+        })}`,
       );
       this.logger.debug(e);
 
