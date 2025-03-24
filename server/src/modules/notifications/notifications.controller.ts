@@ -1,14 +1,19 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { NotificationService } from './notifications.service';
 import { NotificationType } from './notifications-interfaces';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller('api/notifications')
 export class NotificationsController {
-  constructor(private readonly notificationService: NotificationService) {}
+  constructor(
+    private readonly notificationService: NotificationService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   @Post('/test')
   public async sendTestNotification() {
-    await this.notificationService.handleNotification(
+    this.eventEmitter.emit(
+      'agents.notify',
       NotificationType.TEST_NOTIFICATION,
       null,
     );

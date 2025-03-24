@@ -15,9 +15,9 @@ import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TaskBase } from '../tasks/task.base';
-import { NotificationService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/notifications-interfaces';
 import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -41,7 +41,7 @@ export class CollectionWorkerService extends TaskBase {
     private readonly settings: SettingsService,
     private readonly tmdbIdService: TmdbIdService,
     private readonly tmdbIdHelper: TmdbIdService,
-    private readonly notificationService: NotificationService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(taskService);
   }
@@ -60,7 +60,6 @@ export class CollectionWorkerService extends TaskBase {
         return;
       }
 
-      await this.notificationService.registerConfiguredAgents(true); // re-register notification agents, to avoid flukes
       await super.execute();
 
       // wait 5 seconds to make sure we're not executing together with the rule handler
@@ -112,7 +111,8 @@ export class CollectionWorkerService extends TaskBase {
 
           // handle notification
           if (handledMediaForNotification.length > 0) {
-            await this.notificationService.handleNotification(
+            this.eventEmitter.emit(
+              'agents.notify',
               NotificationType.MEDIA_HANDLED,
               handledMediaForNotification,
               collection.title,
@@ -167,7 +167,8 @@ export class CollectionWorkerService extends TaskBase {
         );
 
         // notify
-        await this.notificationService.handleNotification(
+        this.eventEmitter.emit(
+          'agents.notify',
           NotificationType.COLLECTION_HANDLING_FAILED,
           undefined,
         );
@@ -178,7 +179,8 @@ export class CollectionWorkerService extends TaskBase {
       this.logger.debug(e);
 
       // notify
-      await this.notificationService.handleNotification(
+      this.eventEmitter.emit(
+        'agents.notify',
         NotificationType.COLLECTION_HANDLING_FAILED,
         undefined,
       );

@@ -4,6 +4,7 @@ import { TasksService } from '../tasks/tasks.service';
 import { NotificationService } from './notifications.service';
 import { NotificationType } from './notifications-interfaces';
 import { CollectionsService } from '../collections/collections.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 // This job sends notifications for the  "About to Be Removed" notificaton type. The job loops through all configured notification providers and sends one notification per provider.
 // Each notification includes all media items from all active child collections that are scheduled for removal within the specified number of days.
@@ -21,6 +22,7 @@ export class NotificationTimerService extends TaskBase {
     protected readonly taskService: TasksService,
     protected readonly collectionService: CollectionsService,
     private readonly notificationService: NotificationService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(taskService);
   }
@@ -28,8 +30,6 @@ export class NotificationTimerService extends TaskBase {
   protected onBootstrapHook(): void {}
 
   public async execute() {
-    await this.notificationService.registerConfiguredAgents(true); // re register notification agents
-
     // helper submethod
     const getDayStart = (date) => new Date(date.setHours(0, 0, 0, 0));
 
@@ -86,7 +86,8 @@ export class NotificationTimerService extends TaskBase {
 
         // send the notification if required
         if (notification.rulegroups && transformedItems.length > 0) {
-          await this.notificationService.handleNotification(
+          this.eventEmitter.emit(
+            'agents.notify',
             this.type,
             transformedItems,
             undefined,

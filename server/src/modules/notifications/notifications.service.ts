@@ -1,25 +1,26 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import type { NotificationAgent, NotificationPayload } from './agents/agent';
 import { Injectable, Logger } from '@nestjs/common';
-import { Notification } from './entities/notification.entities';
+import { OnEvent } from '@nestjs/event-emitter';
+import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { RuleGroup } from '../rules/entities/rule-group.entities';
-import {
-  NotificationAgentKey,
-  NotificationType,
-} from './notifications-interfaces';
-import DiscordAgent from './agents/discord';
-import PushoverAgent from './agents/pushover';
-import { SettingsService } from '../settings/settings.service';
-import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
+import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { RuleGroup } from '../rules/entities/rule-group.entities';
+import { SettingsService } from '../settings/settings.service';
+import type { NotificationAgent, NotificationPayload } from './agents/agent';
+import DiscordAgent from './agents/discord';
 import EmailAgent from './agents/email';
 import GotifyAgent from './agents/gotify';
 import LunaSeaAgent from './agents/lunasea';
 import PushbulletAgent from './agents/pushbullet';
+import PushoverAgent from './agents/pushover';
 import SlackAgent from './agents/slack';
 import TelegramAgent from './agents/telegram';
 import WebhookAgent from './agents/webhook';
+import { Notification } from './entities/notification.entities';
+import {
+  NotificationAgentKey,
+  NotificationType,
+} from './notifications-interfaces';
 
 export const hasNotificationType = (
   type: NotificationType,
@@ -216,106 +217,113 @@ export class NotificationService {
   }
 
   public async registerConfiguredAgents(skiplog = false) {
-    this.activeAgents = [];
     const configuredAgents = await this.getNotificationConfigurations();
 
-    const agents: NotificationAgent[] = configuredAgents?.map(
-      (notification) => {
-        switch (notification.agent) {
-          case NotificationAgentKey.DISCORD:
-            return new DiscordAgent(
-              {
-                enabled: notification.enabled,
-                types: JSON.parse(notification.types),
-                options: JSON.parse(notification.options),
-              },
-              notification,
-            );
-          case NotificationAgentKey.PUSHOVER:
-            return new PushoverAgent(
-              this.settings,
-              {
-                enabled: notification.enabled,
-                types: JSON.parse(notification.types),
-                options: JSON.parse(notification.options),
-              },
-              notification,
-            );
-          case NotificationAgentKey.EMAIL:
-            return new EmailAgent(
-              this.settings,
-              {
-                enabled: notification.enabled,
-                types: JSON.parse(notification.types),
-                options: JSON.parse(notification.options),
-              },
-              notification,
-            );
-          case NotificationAgentKey.GOTIFY:
-            return new GotifyAgent(
-              this.settings,
-              {
-                enabled: notification.enabled,
-                types: JSON.parse(notification.types),
-                options: JSON.parse(notification.options),
-              },
-              notification,
-            );
-          case NotificationAgentKey.LUNASEA:
-            return new LunaSeaAgent(
-              this.settings,
-              {
-                enabled: notification.enabled,
-                types: JSON.parse(notification.types),
-                options: JSON.parse(notification.options),
-              },
-              notification,
-            );
-          case NotificationAgentKey.PUSHBULLET:
-            return new PushbulletAgent(
-              this.settings,
-              {
-                enabled: notification.enabled,
-                types: JSON.parse(notification.types),
-                options: JSON.parse(notification.options),
-              },
-              notification,
-            );
-          case NotificationAgentKey.SLACK:
-            return new SlackAgent(
-              this.settings,
-              {
-                enabled: notification.enabled,
-                types: JSON.parse(notification.types),
-                options: JSON.parse(notification.options),
-              },
-              notification,
-            );
-          case NotificationAgentKey.TELEGRAM:
-            return new TelegramAgent(
-              this.settings,
-              {
-                enabled: notification.enabled,
-                types: JSON.parse(notification.types),
-                options: JSON.parse(notification.options),
-              },
-              notification,
-            );
-          case NotificationAgentKey.WEBHOOK:
-            return new WebhookAgent(
-              this.settings,
-              {
-                enabled: notification.enabled,
-                types: JSON.parse(notification.types),
-                options: JSON.parse(notification.options),
-              },
-              notification,
-            );
-        }
-      },
-    );
+    // Only (re-)register agents when required
+    if (
+      this.activeAgents.length !==
+      configuredAgents.filter((el) => el.enabled).length
+    ) {
+      this.activeAgents = [];
 
-    this.registerAgents(agents, skiplog);
+      const agents: NotificationAgent[] = configuredAgents?.map(
+        (notification) => {
+          switch (notification.agent) {
+            case NotificationAgentKey.DISCORD:
+              return new DiscordAgent(
+                {
+                  enabled: notification.enabled,
+                  types: JSON.parse(notification.types),
+                  options: JSON.parse(notification.options),
+                },
+                notification,
+              );
+            case NotificationAgentKey.PUSHOVER:
+              return new PushoverAgent(
+                this.settings,
+                {
+                  enabled: notification.enabled,
+                  types: JSON.parse(notification.types),
+                  options: JSON.parse(notification.options),
+                },
+                notification,
+              );
+            case NotificationAgentKey.EMAIL:
+              return new EmailAgent(
+                this.settings,
+                {
+                  enabled: notification.enabled,
+                  types: JSON.parse(notification.types),
+                  options: JSON.parse(notification.options),
+                },
+                notification,
+              );
+            case NotificationAgentKey.GOTIFY:
+              return new GotifyAgent(
+                this.settings,
+                {
+                  enabled: notification.enabled,
+                  types: JSON.parse(notification.types),
+                  options: JSON.parse(notification.options),
+                },
+                notification,
+              );
+            case NotificationAgentKey.LUNASEA:
+              return new LunaSeaAgent(
+                this.settings,
+                {
+                  enabled: notification.enabled,
+                  types: JSON.parse(notification.types),
+                  options: JSON.parse(notification.options),
+                },
+                notification,
+              );
+            case NotificationAgentKey.PUSHBULLET:
+              return new PushbulletAgent(
+                this.settings,
+                {
+                  enabled: notification.enabled,
+                  types: JSON.parse(notification.types),
+                  options: JSON.parse(notification.options),
+                },
+                notification,
+              );
+            case NotificationAgentKey.SLACK:
+              return new SlackAgent(
+                this.settings,
+                {
+                  enabled: notification.enabled,
+                  types: JSON.parse(notification.types),
+                  options: JSON.parse(notification.options),
+                },
+                notification,
+              );
+            case NotificationAgentKey.TELEGRAM:
+              return new TelegramAgent(
+                this.settings,
+                {
+                  enabled: notification.enabled,
+                  types: JSON.parse(notification.types),
+                  options: JSON.parse(notification.options),
+                },
+                notification,
+              );
+            case NotificationAgentKey.WEBHOOK:
+              return new WebhookAgent(
+                this.settings,
+                {
+                  enabled: notification.enabled,
+                  types: JSON.parse(notification.types),
+                  options: JSON.parse(notification.options),
+                },
+                notification,
+              );
+          }
+        },
+      );
+
+      this.registerAgents(agents, skiplog);
+    }
   }
 
   async deleteNotificationConfiguration(notificationId: number) {
@@ -498,7 +506,8 @@ export class NotificationService {
     ];
   }
 
-  public async handleNotification(
+  @OnEvent('agents.notify')
+  private async handleNotification(
     type: NotificationType,
     mediaItems: { plexId: number }[],
     collectionName?: string,

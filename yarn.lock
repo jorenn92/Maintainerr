@@ -12358,6 +12358,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "maintainerr@workspace:."
   dependencies:
+    "@nestjs/event-emitter": "npm:^3.0.1"
     "@semantic-release/changelog": "npm:^6.0.3"
     "@semantic-release/commit-analyzer": "npm:^13.0.1"
     "@semantic-release/exec": "npm:^7.0.3"

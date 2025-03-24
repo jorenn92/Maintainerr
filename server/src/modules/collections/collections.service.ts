@@ -25,7 +25,6 @@ import { ICollection } from './interfaces/collection.interface';
 import { Exclusion } from '../rules/entities/exclusion.entities';
 import { CollectionLog } from '../../modules/collections/entities/collection_log.entities';
 import { ECollectionLogType } from '../../modules/collections/entities/collection_log.entities';
-import { NotificationService } from '../notifications/notifications.service';
 
 interface addCollectionDbResponse {
   id: number;
@@ -55,7 +54,6 @@ export class CollectionsService {
     private readonly plexApi: PlexApiService,
     private readonly tmdbApi: TmdbApiService,
     private readonly tmdbIdHelper: TmdbIdService,
-    private readonly notificationService: NotificationService,
   ) {}
 
   async getCollection(id?: number, title?: string) {

@@ -15,8 +15,8 @@ import { RulesDto } from '../dtos/rules.dto';
 import { RuleGroup } from '../entities/rule-group.entities';
 import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
 import { RulesService } from '../rules.service';
-import { NotificationService } from '../../notifications/notifications.service';
 import { NotificationType } from '../../notifications/notifications-interfaces';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 interface PlexData {
   page: number;
@@ -45,8 +45,8 @@ export class RuleExecutorService extends TaskBase {
     private readonly collectionService: CollectionsService,
     protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
-    private readonly notificationService: NotificationService,
     private readonly comparatorFactory: RuleComparatorServiceFactory,
+    private eventEmitter: EventEmitter2,
   ) {
     super(taskService);
     this.ruleConstants = new RuleConstants();
@@ -66,7 +66,6 @@ export class RuleExecutorService extends TaskBase {
       return;
     }
 
-    this.notificationService.registerConfiguredAgents(true); // re-register notification agents, to avoid flukes
     await super.execute();
 
     try {
@@ -127,7 +126,9 @@ export class RuleExecutorService extends TaskBase {
         this.logger.log(
           'Not all applications are reachable.. Skipped rule execution.',
         );
-        await this.notificationService.handleNotification(
+
+        this.eventEmitter.emit(
+          'agents.notify',
           NotificationType.RULE_HANDLING_FAILED,
           undefined,
         );
@@ -136,7 +137,8 @@ export class RuleExecutorService extends TaskBase {
       this.logger.log('Error running rules executor.');
       this.logger.debug(err);
 
-      await this.notificationService.handleNotification(
+      this.eventEmitter.emit(
+        'agents.notify',
         NotificationType.RULE_HANDLING_FAILED,
         undefined,
       );
@@ -288,7 +290,8 @@ export class RuleExecutorService extends TaskBase {
             }'.`,
           );
 
-          await this.notificationService.handleNotification(
+          this.eventEmitter.emit(
+            'agents.notify',
             NotificationType.MEDIA_REMOVED_FROM_COLLECTION,
             dataToRemove,
             collection.title,
@@ -304,7 +307,8 @@ export class RuleExecutorService extends TaskBase {
             }'.`,
           );
 
-          await this.notificationService.handleNotification(
+          this.eventEmitter.emit(
+            'agents.notify',
             NotificationType.MEDIA_ADDED_TO_COLLECTION,
             dataToAdd,
             collection.title,
@@ -331,14 +335,16 @@ export class RuleExecutorService extends TaskBase {
         return collection;
       } else {
         this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
-        await this.notificationService.handleNotification(
+        this.eventEmitter.emit(
+          'agents.notify',
           NotificationType.RULE_HANDLING_FAILED,
           undefined,
         );
       }
     } catch (err) {
       this.logger.error(`Execption occurred while handling rule: `, err);
-      await this.notificationService.handleNotification(
+      this.eventEmitter.emit(
+        'agents.notify',
         NotificationType.RULE_HANDLING_FAILED,
         undefined,
       );
