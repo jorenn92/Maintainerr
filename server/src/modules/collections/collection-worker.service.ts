@@ -79,16 +79,16 @@ export class CollectionWorkerService extends TaskBase {
         const collections = await this.collectionRepo.find({
           where: { isActive: true },
         });
-  
-      for (const collection of collections) {
-          if (collection.arrAction === ServarrAction.DO_NOTHING) {
-          this.infoLogger(
-            `Skipping collection '${collection.title}' as its action is 'Do Nothing'`,
-          );
-          continue;
-        }
 
-        this.infoLogger(`Handling collection '${collection.title}'`);
+        for (const collection of collections) {
+          if (collection.arrAction === ServarrAction.DO_NOTHING) {
+            this.infoLogger(
+              `Skipping collection '${collection.title}' as its action is 'Do Nothing'`,
+            );
+            continue;
+          }
+
+          this.infoLogger(`Handling collection '${collection.title}'`);
 
           const collectionMedia = await this.collectionMediaRepo.find({
             where: {
@@ -131,30 +131,30 @@ export class CollectionWorkerService extends TaskBase {
                   this.infoLogger(
                     `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
                   );
-              })
-              .catch((err) => {
-                this.logger.error(
-                  `Failed to trigger Overseerr's availability-sync: ${err}`,
-                );
-                this.logger.debug(err);
-              });
-          }, 7000);
-        }
+                })
+                .catch((err) => {
+                  this.logger.error(
+                    `Failed to trigger Overseerr's availability-sync: ${err}`,
+                  );
+                  this.logger.debug(err);
+                });
+            }, 7000);
+          }
 
-        if (this.settings.jellyseerrConfigured()) {
-          setTimeout(() => {
-            this.jellyseerrApi.api
-              .post('/settings/jobs/availability-sync/run')
-              .then(() => {
-                this.infoLogger(
-                  `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
-                );
-              })
-              .catch((err) => {
-                this.logger.error(
-                  `Failed to trigger Jellyseerr's availability-sync: ${err}`,
-                );
-                this.logger.debug(err);
+          if (this.settings.jellyseerrConfigured()) {
+            setTimeout(() => {
+              this.jellyseerrApi.api
+                .post('/settings/jobs/availability-sync/run')
+                .then(() => {
+                  this.infoLogger(
+                    `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
+                  );
+                })
+                .catch((err) => {
+                  this.logger.error(
+                    `Failed to trigger Jellyseerr's availability-sync: ${err}`,
+                  );
+                  this.logger.debug(err);
                 });
             }, 7000);
           }

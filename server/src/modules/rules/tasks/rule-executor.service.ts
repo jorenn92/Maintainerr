@@ -128,14 +128,14 @@ export class RuleExecutorService extends TaskBase {
           'Not all applications are reachable.. Skipped rule execution.',
         );
         await this.notificationService.handleNotification(
-        NotificationType.RULE_HANDLING_FAILED,
-        undefined,
-      );
-    }
+          NotificationType.RULE_HANDLING_FAILED,
+          undefined,
+        );
+      }
     } catch (err) {
       this.logger.log('Error running rules executor.');
       this.logger.debug(err);
-      
+
       await this.notificationService.handleNotification(
         NotificationType.RULE_HANDLING_FAILED,
         undefined,

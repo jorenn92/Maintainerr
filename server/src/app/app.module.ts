@@ -68,7 +68,6 @@ export class AppModule implements OnModuleInit {
     await this.tautulliApi.init();
     await this.jellyseerrApi.init();
 
-
     // intialize notification agents
     await this.notificationService.registerConfiguredAgents();
   }
