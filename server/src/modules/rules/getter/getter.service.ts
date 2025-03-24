@@ -8,6 +8,7 @@ import { SonarrGetterService } from './sonarr-getter.service';
 import { RulesDto } from '../dtos/rules.dto';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { TautulliGetterService } from './tautulli-getter.service';
+import { JellyseerrGetterService } from './jellyseerr-getter.service';
 
 @Injectable()
 export class ValueGetterService {
@@ -17,6 +18,7 @@ export class ValueGetterService {
     private readonly sonarrGetter: SonarrGetterService,
     private readonly overseerGetter: OverseerrGetterService,
     private readonly tautulliGetter: TautulliGetterService,
+    private readonly jellyseerrGetter: JellyseerrGetterService,
   ) {}
 
   async get(
@@ -45,6 +47,9 @@ export class ValueGetterService {
           dataType,
           ruleGroup,
         );
+      }
+      case Application.JELLYSEERR: {
+        return await this.jellyseerrGetter.get(val2, libItem, dataType);
       }
       default: {
         return null;

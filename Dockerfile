@@ -23,15 +23,23 @@ FROM base AS runner
 
 WORKDIR /opt/app
 
+# copy root node_modules
+COPY --from=builder --chmod=777 --chown=node:node /app/node_modules ./node_modules
+
 # copy standalone UI
 COPY --from=builder --chmod=777 --chown=node:node /app/ui/.next/standalone/ui ./ui
 COPY --from=builder --chmod=777 --chown=node:node /app/ui/.next/static ./ui/.next/static
 COPY --from=builder --chmod=777 --chown=node:node /app/ui/public ./ui/public
 
 # Copy standalone server
-COPY --from=builder --chmod=777 --chown=node:node /app/server/dist ./server
+COPY --from=builder --chmod=777 --chown=node:node /app/server/dist ./server/dist
 COPY --from=builder --chmod=777 --chown=node:node /app/server/package.json ./server/package.json
 COPY --from=builder --chmod=777 --chown=node:node /app/server/node_modules ./server/node_modules
+
+# Copy packages/contracts
+COPY --from=builder --chmod=777 --chown=node:node /app/packages/contracts/dist ./packages/contracts/dist
+COPY --from=builder --chmod=777 --chown=node:node /app/packages/contracts/package.json ./packages/contracts/package.json
+COPY --from=builder --chmod=777 --chown=node:node /app/packages/contracts/node_modules ./packages/contracts/node_modules
 
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY --chmod=777 --chown=node:node docker/start.sh /opt/app/start.sh

@@ -17,6 +17,7 @@ import { CollectionLogCleanerService } from '../collections/tasks/collection-log
 import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { Notification } from '../notifications/entities/notification.entities';
 import { NotificationService } from '../notifications/notifications.service';
+import { JellyseerrApiModule } from '../api/jellyseerr-api/jellyseerr-api.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { NotificationService } from '../notifications/notifications.service';
     ]),
     OverseerrApiModule,
     TautulliApiModule,
+    JellyseerrApiModule,
     TmdbApiModule,
     ServarrApiModule,
     TasksModule,

@@ -1,3 +1,61 @@
+# [2.12.0](https://github.com/jorenn92/Maintainerr/compare/v2.11.0...v2.12.0) (2025-03-22)
+
+
+### Bug Fixes
+
+* No driver (HTTP) has been selected ([a984b11](https://github.com/jorenn92/Maintainerr/commit/a984b1158f1dd0f9df50450524145b58018b56e9))
+
+
+### Features
+
+* Add show rating rules to season & episode types ([#1627](https://github.com/jorenn92/Maintainerr/issues/1627)) ([793d046](https://github.com/jorenn92/Maintainerr/commit/793d046ae2380539bbaa56f1d99649145fa83122))
+* Add smart collection filters ([#1630](https://github.com/jorenn92/Maintainerr/issues/1630)) ([8ac61fa](https://github.com/jorenn92/Maintainerr/commit/8ac61facb8f4fd15906bb3a3fdf2c5ea27e9aac7))
+* Retry failed API requests ([35c36d9](https://github.com/jorenn92/Maintainerr/commit/35c36d9ffd2eab695df6795c0a45aa4b121634fe))
+
+# [2.11.0](https://github.com/jorenn92/Maintainerr/compare/v2.10.0...v2.11.0) (2025-03-11)
+
+
+### Bug Fixes
+
+* Cannot read properties of undefined (reading 'statistics') ([#1617](https://github.com/jorenn92/Maintainerr/issues/1617)) ([1b7864f](https://github.com/jorenn92/Maintainerr/commit/1b7864f72a315683ac2a5a45a161ebb568142993))
+* Contracts not included in Docker build ([#1612](https://github.com/jorenn92/Maintainerr/issues/1612)) ([0f9917a](https://github.com/jorenn92/Maintainerr/commit/0f9917adc079403d3d1213b909841cd460788a76))
+* Incorrect community rules version comparison ([#1593](https://github.com/jorenn92/Maintainerr/issues/1593)) ([d4bd6e9](https://github.com/jorenn92/Maintainerr/commit/d4bd6e961e216c06cdfbcdcf1029b0d456bfdace))
+* Overseerr/Jellyseerr invalid API key passing test ([#1619](https://github.com/jorenn92/Maintainerr/issues/1619)) ([28f2cb3](https://github.com/jorenn92/Maintainerr/commit/28f2cb372a892d553bde7b5261633568ae498b9d))
+* Prevent invalid state for add buttons ([#1591](https://github.com/jorenn92/Maintainerr/issues/1591)) ([b49e34f](https://github.com/jorenn92/Maintainerr/commit/b49e34fdacf2a511b1dc7db0b184a0bea78abb01))
+* Sonarr returns monitored=true if non-existent ([#1608](https://github.com/jorenn92/Maintainerr/issues/1608)) ([b5a752d](https://github.com/jorenn92/Maintainerr/commit/b5a752d2cd22e30c04ea2c7c8df8b7c931043b24)), closes [/github.com/Sonarr/Sonarr/issues/5761#issuecomment-1607959602](https://github.com//github.com/Sonarr/Sonarr/issues/5761/issues/issuecomment-1607959602)
+* Test media breaking a running rule executor ([#1618](https://github.com/jorenn92/Maintainerr/issues/1618)) ([c749fc5](https://github.com/jorenn92/Maintainerr/commit/c749fc524b32813a831342cef63cdfd8bf0cf62c))
+
+
+### Features
+
+* Add a 'Do nothing' rule action ([#1600](https://github.com/jorenn92/Maintainerr/issues/1600)) ([a292668](https://github.com/jorenn92/Maintainerr/commit/a292668a928456584f151b590a807f3020abce66))
+* Add IMDB, RT and TMDB Plex rating filters ([#1604](https://github.com/jorenn92/Maintainerr/issues/1604)) ([9516e6b](https://github.com/jorenn92/Maintainerr/commit/9516e6b74aacabbf3e319f59c47dd08f5678d3e2))
+* Add Jellyseerr support ([#1606](https://github.com/jorenn92/Maintainerr/issues/1606)) ([1202275](https://github.com/jorenn92/Maintainerr/commit/1202275723209bf1c40d7755ee93eb7d1367c649))
+* Add log settings, view and download ([#1545](https://github.com/jorenn92/Maintainerr/issues/1545)) ([e6f4a4d](https://github.com/jorenn92/Maintainerr/commit/e6f4a4d8da4d2d7e5d8fc2f4160bac2fc2eda44a))
+* allow Section 1 Rule 1 deletion if other rules are present ([#1592](https://github.com/jorenn92/Maintainerr/issues/1592)) ([d3925a0](https://github.com/jorenn92/Maintainerr/commit/d3925a0a6c982963340abd99d4ed6ab99902c49f))
+
+# [2.10.0](https://github.com/jorenn92/Maintainerr/compare/v2.9.0...v2.10.0) (2025-02-19)
+
+
+### Features
+
+* Replace plex-api ([#1561](https://github.com/jorenn92/Maintainerr/issues/1561)) ([e061715](https://github.com/jorenn92/Maintainerr/commit/e061715b96ffe17ebd8283b0dff64f7b753b18c5))
+
+# [2.9.0](https://github.com/jorenn92/Maintainerr/compare/v2.8.0...v2.9.0) (2025-02-05)
+
+
+### Bug Fixes
+
+* Deleting Show via Plex fallback ([#1547](https://github.com/jorenn92/Maintainerr/issues/1547)) ([0025c42](https://github.com/jorenn92/Maintainerr/commit/0025c420efe784bc6f533e0b5cbed41cf68408a9))
+* Media Modal and Remove button clash ([#1544](https://github.com/jorenn92/Maintainerr/issues/1544)) ([0f19906](https://github.com/jorenn92/Maintainerr/commit/0f19906b8f38f11b1861c0503f979299215c8e38))
+* update optional page route param to new syntax ([#1528](https://github.com/jorenn92/Maintainerr/issues/1528)) ([65471de](https://github.com/jorenn92/Maintainerr/commit/65471de5b81622187b954cf2bf2d6f50a33968dd))
+
+
+### Features
+
+* Add media modal to overview & restyle rules ([#1505](https://github.com/jorenn92/Maintainerr/issues/1505)) ([6601709](https://github.com/jorenn92/Maintainerr/commit/6601709ca7fda95a99d5ac3fa3f16045439106bc))
+* Added a boolean check for watchlisted status ([#1506](https://github.com/jorenn92/Maintainerr/issues/1506)) ([41b5c37](https://github.com/jorenn92/Maintainerr/commit/41b5c37cfe89ac6eeab70256b986c1a9222c52d0))
+
 # [2.8.0](https://github.com/jorenn92/Maintainerr/compare/v2.7.0...v2.8.0) (2025-01-14)
 
 

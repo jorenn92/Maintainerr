@@ -1,20 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
+import _ from 'lodash';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
+import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
+import { SonarrSeason } from '../../../modules/api/servarr-api/interfaces/sonarr.interface';
 import { ServarrService } from '../../../modules/api/servarr-api/servarr.service';
+import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
+import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
+import { SonarrApi } from '../../api/servarr-api/helpers/sonarr.helper';
 import {
   Application,
   Property,
   RuleConstants,
 } from '../constants/rules.constants';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
-import { PlexApiService } from '../../api/plex-api/plex-api.service';
-import _ from 'lodash';
-import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
-import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
-import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
-import { SonarrSeason } from '../../../modules/api/servarr-api/interfaces/sonarr.interface';
 import { RulesDto } from '../dtos/rules.dto';
-import { SonarrApi } from '../../api/servarr-api/helpers/sonarr.helper';
 
 @Injectable()
 export class SonarrGetterService {
@@ -71,252 +71,238 @@ export class SonarrGetterService {
 
       if (!tvdbId) {
         this.logger.warn(
-          `[TVDB] Failed to fetch tvdb id for '${libItem.title}'`,
+          `[TVDB] Failed to fetch tvdb id for '${libItem.title}' with id '${libItem.ratingKey}. As a result, no Sonarr query could be made.`,
         );
         return null;
       }
 
-      if (tvdbId) {
-        const sonarrApiClient = await this.servarrService.getSonarrApiClient(
-          ruleGroup.collection.sonarrSettingsId,
-        );
+      const sonarrApiClient = await this.servarrService.getSonarrApiClient(
+        ruleGroup.collection.sonarrSettingsId,
+      );
 
-        const showResponse = await sonarrApiClient.getSeriesByTvdbId(tvdbId);
+      const showResponse = await sonarrApiClient.getSeriesByTvdbId(tvdbId);
 
-        const season = seasonRatingKey
-          ? showResponse.seasons.find(
-              (el) => el.seasonNumber === seasonRatingKey,
-            )
+      if (!showResponse?.id) {
+        return null;
+      }
+
+      const season = seasonRatingKey
+        ? showResponse.seasons.find((el) => el.seasonNumber === seasonRatingKey)
+        : undefined;
+
+      // fetch episode or first episode of the season
+      const episode =
+        [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType) &&
+        showResponse.added !== '0001-01-01T00:00:00Z'
+          ? (showResponse.id
+              ? await sonarrApiClient.getEpisodes(
+                  showResponse.id,
+                  origLibItem.grandparentRatingKey
+                    ? origLibItem.parentIndex
+                    : origLibItem.index,
+                  [origLibItem.grandparentRatingKey ? origLibItem.index : 1],
+                )
+              : [])[0]
           : undefined;
 
-        // fetch episode or first episode of the season
-        const episode =
-          [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType) &&
-          showResponse.added !== '0001-01-01T00:00:00Z'
-            ? (showResponse.id
-                ? await sonarrApiClient.getEpisodes(
-                    showResponse.id,
-                    origLibItem.grandparentRatingKey
-                      ? origLibItem.parentIndex
-                      : origLibItem.index,
-                    [origLibItem.grandparentRatingKey ? origLibItem.index : 1],
-                  )
-                : [])[0]
-            : undefined;
+      const episodeFile =
+        episode && dataType === EPlexDataType.EPISODES
+          ? await sonarrApiClient.getEpisodeFile(episode.episodeFileId)
+          : undefined;
 
-        const episodeFile =
-          episode && dataType === EPlexDataType.EPISODES
-            ? await sonarrApiClient.getEpisodeFile(episode.episodeFileId)
-            : undefined;
-
-        if (tvdbId && showResponse?.id) {
-          switch (prop.name) {
-            case 'addDate': {
-              return showResponse.added &&
-                showResponse.added !== '0001-01-01T00:00:00Z'
-                ? new Date(showResponse.added)
+      switch (prop.name) {
+        case 'addDate': {
+          return showResponse.added &&
+            showResponse.added !== '0001-01-01T00:00:00Z'
+            ? new Date(showResponse.added)
+            : null;
+        }
+        case 'diskSizeEntireShow': {
+          if (
+            [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
+          ) {
+            if (dataType === EPlexDataType.EPISODES) {
+              return episodeFile?.size ? +episodeFile.size / 1048576 : null;
+            } else {
+              return season?.statistics?.sizeOnDisk
+                ? +season.statistics.sizeOnDisk / 1048576
                 : null;
             }
-            case 'diskSizeEntireShow': {
-              if (
-                [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
-                  dataType,
-                )
-              ) {
-                if (dataType === EPlexDataType.EPISODES) {
-                  return episodeFile?.size ? +episodeFile.size / 1048576 : null;
-                } else {
-                  return season?.statistics?.sizeOnDisk
-                    ? +season.statistics.sizeOnDisk / 1048576
-                    : null;
-                }
-              } else {
-                return showResponse.statistics.sizeOnDisk
-                  ? +showResponse.statistics.sizeOnDisk / 1048576
-                  : null;
-              }
-            }
-            case 'filePath': {
-              return showResponse?.path ? showResponse.path : null;
-            }
-            case 'tags': {
-              const tagIds = showResponse.tags;
-              return (await sonarrApiClient.getTags())
-                .filter((el) => tagIds.includes(el.id))
-                .map((el) => el.label);
-            }
-            case 'qualityProfileId': {
-              if ([EPlexDataType.EPISODES].includes(dataType) && episodeFile) {
-                return episodeFile.quality.quality.id;
-              } else {
-                return showResponse.qualityProfileId;
-              }
-            }
-            case 'firstAirDate': {
-              if (
-                [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
-                  dataType,
-                )
-              ) {
-                return episode?.airDate ? new Date(episode.airDate) : null;
-              } else {
-                return showResponse.firstAired
-                  ? new Date(showResponse.firstAired)
-                  : null;
-              }
-            }
-            case 'seasons': {
-              if (
-                [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
-                  dataType,
-                )
-              ) {
-                return season?.statistics?.totalEpisodeCount
-                  ? +season.statistics.totalEpisodeCount
-                  : null;
-              } else {
-                return showResponse.statistics.seasonCount
-                  ? +showResponse.statistics.seasonCount
-                  : null;
-              }
-            }
-            case 'status': {
-              return showResponse.status ? showResponse.status : null;
-            }
-            case 'ended': {
-              return showResponse.ended !== undefined
-                ? showResponse.ended
-                  ? 1
-                  : 0
-                : null;
-            }
-            case 'monitored': {
-              if (dataType === EPlexDataType.SEASONS) {
-                return showResponse.added !== '0001-01-01T00:00:00Z' && season
-                  ? season.monitored
-                    ? 1
-                    : 0
-                  : null;
-              }
-
-              if (dataType === EPlexDataType.EPISODES) {
-                return showResponse.added !== '0001-01-01T00:00:00Z' && episode
-                  ? episode.monitored
-                    ? 1
-                    : 0
-                  : null;
-              }
-
-              return showResponse.added !== '0001-01-01T00:00:00Z'
-                ? showResponse.monitored
-                  ? 1
-                  : 0
-                : null;
-            }
-            case 'unaired_episodes': {
-              // returns true if a season with unaired episodes is found in monitored seasons
-              const data: SonarrSeason[] = [];
-              if (dataType === EPlexDataType.SEASONS) {
-                data.push(season);
-              } else {
-                data.push(...showResponse.seasons.filter((el) => el.monitored));
-              }
-              return (
-                data.filter((el) => el.statistics?.nextAiring !== undefined)
-                  .length > 0
-              );
-            }
-            case 'unaired_episodes_season': {
-              // returns true if the season of an episode has unaired episodes
-              return season?.statistics
-                ? season.statistics.nextAiring !== undefined
-                : false;
-            }
-            case 'seasons_monitored': {
-              // returns the number of monitored seasons / episodes
-              if (
-                [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
-                  dataType,
-                )
-              ) {
-                return season?.statistics?.episodeCount
-                  ? +season.statistics.episodeCount
-                  : null;
-              } else {
-                return showResponse.seasons.filter((el) => el.monitored).length;
-              }
-            }
-            case 'part_of_latest_season': {
-              // returns the true when this is the latest season or the episode is part of the latest season
-              if (
-                [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
-                  dataType,
-                )
-              ) {
-                return season.seasonNumber && showResponse.seasons
-                  ? +season.seasonNumber ===
-                      (
-                        await this.getLastSeason(
-                          showResponse.seasons,
-                          showResponse.id,
-                          sonarrApiClient,
-                        )
-                      )?.seasonNumber
-                  : false;
-              }
-            }
-            case 'originalLanguage': {
-              return showResponse.originalLanguage?.name
-                ? showResponse.originalLanguage.name
-                : null;
-            }
-            case 'seasonFinale': {
-              const episodes = await sonarrApiClient.getEpisodes(
-                showResponse.id,
-                origLibItem.index,
-              );
-
-              if (!episodes) {
-                return null;
-              }
-
-              return episodes.some(
-                (el) => el.finaleType === 'season' && el.hasFile,
-              );
-            }
-            case 'seriesFinale': {
-              const episodes = await sonarrApiClient.getEpisodes(
-                showResponse.id,
-                origLibItem.index,
-              );
-
-              if (!episodes) {
-                return null;
-              }
-
-              return episodes.some(
-                (el) => el.finaleType === 'series' && el.hasFile,
-              );
-            }
-            case 'seasonNumber': {
-              return season.seasonNumber;
-            }
-            case 'rating': {
-              return showResponse.ratings?.value ?? null;
-            }
-            case 'ratingVotes': {
-              return showResponse.ratings?.votes ?? null;
-            }
+          } else {
+            return showResponse.statistics?.sizeOnDisk
+              ? +showResponse.statistics.sizeOnDisk / 1048576
+              : null;
           }
-        } else return null;
-      } else {
-        this.logger.debug(
-          `Couldn't fetch Sonarr metadate for media '${libItem.title}' with id '${libItem.ratingKey}'. As a result, no Sonarr query could be made.`,
-        );
-        return null;
+        }
+        case 'filePath': {
+          return showResponse.path ? showResponse.path : null;
+        }
+        case 'tags': {
+          const tagIds = showResponse.tags;
+          return (await sonarrApiClient.getTags())
+            .filter((el) => tagIds.includes(el.id))
+            .map((el) => el.label);
+        }
+        case 'qualityProfileId': {
+          if ([EPlexDataType.EPISODES].includes(dataType) && episodeFile) {
+            return episodeFile.quality.quality.id;
+          } else {
+            return showResponse.qualityProfileId;
+          }
+        }
+        case 'firstAirDate': {
+          if (
+            [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
+          ) {
+            return episode?.airDate ? new Date(episode.airDate) : null;
+          } else {
+            return showResponse.firstAired
+              ? new Date(showResponse.firstAired)
+              : null;
+          }
+        }
+        case 'seasons': {
+          if (
+            [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
+          ) {
+            return season?.statistics?.totalEpisodeCount
+              ? +season.statistics.totalEpisodeCount
+              : null;
+          } else {
+            return showResponse.statistics?.seasonCount
+              ? +showResponse.statistics.seasonCount
+              : null;
+          }
+        }
+        case 'status': {
+          return showResponse.status ? showResponse.status : null;
+        }
+        case 'ended': {
+          return showResponse.ended !== undefined
+            ? showResponse.ended
+              ? 1
+              : 0
+            : null;
+        }
+        case 'monitored': {
+          if (dataType === EPlexDataType.SEASONS) {
+            return showResponse.added !== '0001-01-01T00:00:00Z' && season
+              ? season.monitored
+                ? 1
+                : 0
+              : null;
+          }
+
+          if (dataType === EPlexDataType.EPISODES) {
+            return showResponse.added !== '0001-01-01T00:00:00Z' && episode
+              ? episode.monitored
+                ? 1
+                : 0
+              : null;
+          }
+
+          return showResponse.added !== '0001-01-01T00:00:00Z'
+            ? showResponse.monitored
+              ? 1
+              : 0
+            : null;
+        }
+        case 'unaired_episodes': {
+          // returns true if a season with unaired episodes is found in monitored seasons
+          const data: SonarrSeason[] = [];
+          if (dataType === EPlexDataType.SEASONS) {
+            data.push(season);
+          } else {
+            data.push(...showResponse.seasons.filter((el) => el.monitored));
+          }
+          return (
+            data.filter((el) => el.statistics?.nextAiring !== undefined)
+              .length > 0
+          );
+        }
+        case 'unaired_episodes_season': {
+          // returns true if the season of an episode has unaired episodes
+          return season?.statistics
+            ? season.statistics.nextAiring !== undefined
+            : false;
+        }
+        case 'seasons_monitored': {
+          // returns the number of monitored seasons / episodes
+          if (
+            [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
+          ) {
+            return season?.statistics?.episodeCount
+              ? +season.statistics.episodeCount
+              : null;
+          } else {
+            return showResponse.seasons.filter((el) => el.monitored).length;
+          }
+        }
+        case 'part_of_latest_season': {
+          // returns the true when this is the latest season or the episode is part of the latest season
+          if (
+            [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
+          ) {
+            return season.seasonNumber && showResponse.seasons
+              ? +season.seasonNumber ===
+                  (
+                    await this.getLastSeason(
+                      showResponse.seasons,
+                      showResponse.id,
+                      sonarrApiClient,
+                    )
+                  )?.seasonNumber
+              : false;
+          }
+        }
+        case 'originalLanguage': {
+          return showResponse.originalLanguage?.name
+            ? showResponse.originalLanguage.name
+            : null;
+        }
+        case 'seasonFinale': {
+          const episodes = await sonarrApiClient.getEpisodes(
+            showResponse.id,
+            origLibItem.index,
+          );
+
+          if (!episodes) {
+            return null;
+          }
+
+          return episodes.some(
+            (el) => el.finaleType === 'season' && el.hasFile,
+          );
+        }
+        case 'seriesFinale': {
+          const episodes = await sonarrApiClient.getEpisodes(
+            showResponse.id,
+            origLibItem.index,
+          );
+
+          if (!episodes) {
+            return null;
+          }
+
+          return episodes.some(
+            (el) => el.finaleType === 'series' && el.hasFile,
+          );
+        }
+        case 'seasonNumber': {
+          return season.seasonNumber;
+        }
+        case 'rating': {
+          return showResponse.ratings?.value ?? null;
+        }
+        case 'ratingVotes': {
+          return showResponse.ratings?.votes ?? null;
+        }
       }
     } catch (e) {
-      this.logger.warn(`Sonarr-Getter - Action failed : ${e.message}`);
+      this.logger.warn(
+        `Sonarr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      );
+      this.logger.debug(e);
       return undefined;
     }
   }
@@ -343,7 +329,7 @@ export class SonarrGetterService {
         epResp[0] && epResp[0].airDate === undefined
           ? false
           : s.statistics?.nextAiring !== undefined
-            ? s.statistics.previousAiring !== undefined
+            ? s.statistics?.previousAiring !== undefined
             : true;
 
       if (resp) return s;

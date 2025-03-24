@@ -2,16 +2,16 @@ import { SaveIcon } from '@heroicons/react/solid'
 import { useContext, useEffect, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
-import Alert from '../../Common/Alert'
-import Button from '../../Common/Button'
-import DocsButton from '../../Common/DocsButton'
-import TestButton from '../../Common/TestButton'
 import {
   addPortToUrl,
   getBaseUrl,
   getHostname,
   getPortFromUrl,
 } from '../../../utils/SettingsUtils'
+import Alert from '../../Common/Alert'
+import Button from '../../Common/Button'
+import DocsButton from '../../Common/DocsButton'
+import TestButton from '../../Common/TestButton'
 
 const TautulliSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -95,8 +95,8 @@ const TautulliSettings = () => {
     }
   }
 
-  const appTest = (result: { status: boolean; version: string }) => {
-    setTestbanner({ status: result.status, version: result.version })
+  const appTest = (result: { status: boolean; message: string }) => {
+    setTestbanner({ status: result.status, version: result.message })
   }
 
   return (

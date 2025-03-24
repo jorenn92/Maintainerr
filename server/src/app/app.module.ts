@@ -1,27 +1,35 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { ExternalApiModule } from '../modules/api/external-api/external-api.module';
-import { TmdbApiModule } from '../modules/api/tmdb-api/tmdb.module';
-import { PlexApiModule } from '../modules/api/plex-api/plex-api.module';
-import { ServarrApiModule } from '../modules/api/servarr-api/servarr-api.module';
-import { RulesModule } from '../modules/rules/rules.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { APP_PIPE } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ZodValidationPipe } from 'nestjs-zod';
+import { ExternalApiModule } from '../modules/api/external-api/external-api.module';
+import { JellyseerrApiModule } from '../modules/api/jellyseerr-api/jellyseerr-api.module';
+import { JellyseerrApiService } from '../modules/api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiModule } from '../modules/api/overseerr-api/overseerr-api.module';
-import { CollectionsModule } from '../modules/collections/collections.module';
-import { SettingsModule } from '../modules/settings/settings.module';
-import { SettingsService } from '../modules/settings/settings.service';
-import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
 import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.service';
-import ormConfig from './config/typeOrmConfig';
+import { PlexApiModule } from '../modules/api/plex-api/plex-api.module';
+import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
+import { ServarrApiModule } from '../modules/api/servarr-api/servarr-api.module';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
+import { TmdbApiModule } from '../modules/api/tmdb-api/tmdb.module';
+import { CollectionsModule } from '../modules/collections/collections.module';
+import { LogsModule } from '../modules/logging/logs.module';
+import { RulesModule } from '../modules/rules/rules.module';
+import { SettingsModule } from '../modules/settings/settings.module';
+import { SettingsService } from '../modules/settings/settings.service';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import ormConfig from './config/typeOrmConfig';
 import { NotificationsModule } from '../modules/notifications/notifications.module';
 import { NotificationService } from '../modules/notifications/notifications.service';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
+    EventEmitterModule.forRoot(),
+    LogsModule,
     SettingsModule,
     PlexApiModule,
     ExternalApiModule,
@@ -29,12 +37,19 @@ import { NotificationService } from '../modules/notifications/notifications.serv
     ServarrApiModule,
     OverseerrApiModule,
     TautulliApiModule,
+    JellyseerrApiModule,
     RulesModule,
     CollectionsModule,
     NotificationsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
+    },
+  ],
 })
 export class AppModule implements OnModuleInit {
   constructor(
@@ -43,6 +58,7 @@ export class AppModule implements OnModuleInit {
     private readonly overseerApi: OverseerrApiService,
     private readonly tautulliApi: TautulliApiService,
     private readonly notificationService: NotificationService,
+    private readonly jellyseerrApi: JellyseerrApiService,
   ) {}
   async onModuleInit() {
     // Initialize modules requiring settings
@@ -50,6 +66,8 @@ export class AppModule implements OnModuleInit {
     await this.plexApi.initialize({});
     await this.overseerApi.init();
     await this.tautulliApi.init();
+    await this.jellyseerrApi.init();
+
 
     // intialize notification agents
     await this.notificationService.registerConfiguredAgents();

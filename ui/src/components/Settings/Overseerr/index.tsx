@@ -2,16 +2,16 @@ import { SaveIcon } from '@heroicons/react/solid'
 import { useContext, useEffect, useRef, useState } from 'react'
 import SettingsContext from '../../../contexts/settings-context'
 import { PostApiHandler } from '../../../utils/ApiHandler'
-import Alert from '../../Common/Alert'
-import Button from '../../Common/Button'
-import DocsButton from '../../Common/DocsButton'
-import TestButton from '../../Common/TestButton'
 import {
   addPortToUrl,
   getPortFromUrl,
   handleSettingsInputChange,
   removePortFromUrl,
 } from '../../../utils/SettingsUtils'
+import Alert from '../../Common/Alert'
+import Button from '../../Common/Button'
+import DocsButton from '../../Common/DocsButton'
+import TestButton from '../../Common/TestButton'
 
 const OverseerrSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -22,10 +22,13 @@ const OverseerrSettings = () => {
   const [port, setPort] = useState<string>()
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
-  const [testBanner, setTestbanner] = useState<{
-    status: boolean
-    version: string
-  }>({ status: false, version: '0' })
+  const [testBanner, setTestbanner] = useState<
+    | {
+        status: boolean
+        message: string
+      }
+    | undefined
+  >()
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Overseerr'
@@ -102,8 +105,8 @@ const OverseerrSettings = () => {
     }
   }
 
-  const appTest = (result: { status: boolean; version: string }) => {
-    setTestbanner({ status: result.status, version: result.version })
+  const appTest = (result: { status: boolean; message: string }) => {
+    setTestbanner({ status: result.status, message: result.message })
   }
 
   return (
@@ -118,19 +121,15 @@ const OverseerrSettings = () => {
         <Alert type="info" title="Settings successfully updated" />
       ) : undefined}
 
-      {testBanner.version !== '0' ? (
-        testBanner.status ? (
+      {testBanner &&
+        (testBanner.status ? (
           <Alert
             type="warning"
-            title={`Successfully connected to Overseerr (${testBanner.version})`}
+            title={`Successfully connected to Overseerr (${testBanner.message})`}
           />
         ) : (
-          <Alert
-            type="error"
-            title="Connection failed! Double check your entries and make sure to Save Changes before you Test."
-          />
-        )
-      ) : undefined}
+          <Alert type="error" title={testBanner.message} />
+        ))}
 
       <div className="section">
         <form onSubmit={submit}>

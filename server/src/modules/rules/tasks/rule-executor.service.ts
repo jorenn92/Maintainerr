@@ -7,14 +7,14 @@ import { SettingsService } from '../../settings/settings.service';
 import { TasksService } from '../../tasks/tasks.service';
 import { RuleConstants } from '../constants/rules.constants';
 
-import { RulesDto } from '../dtos/rules.dto';
-import { RuleGroup } from '../entities/rule-group.entities';
-import { RulesService } from '../rules.service';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import cacheManager from '../../api/lib/cache';
-import { RuleComparatorService } from '../helpers/rule.comparator.service';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { Collection } from '../../collections/entities/collection.entities';
 import { TaskBase } from '../../tasks/task.base';
+import { RulesDto } from '../dtos/rules.dto';
+import { RuleGroup } from '../entities/rule-group.entities';
+import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
+import { RulesService } from '../rules.service';
 import { NotificationService } from '../../notifications/notifications.service';
 import { NotificationType } from '../../notifications/notifications-interfaces';
 
@@ -46,7 +46,7 @@ export class RuleExecutorService extends TaskBase {
     protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
     private readonly notificationService: NotificationService,
-    private readonly comparator: RuleComparatorService,
+    private readonly comparatorFactory: RuleComparatorServiceFactory,
   ) {
     super(taskService);
     this.ruleConstants = new RuleConstants();
@@ -69,64 +69,79 @@ export class RuleExecutorService extends TaskBase {
     this.notificationService.registerConfiguredAgents(true); // re-register notification agents, to avoid flukes
     await super.execute();
 
-    this.logger.log('Starting Execution of all active rules');
-    const appStatus = await this.settings.testConnections();
+    try {
+      this.logger.log('Starting Execution of all active rules');
+      const appStatus = await this.settings.testConnections();
 
-    // reset API caches, make sure latest data is used
-    cacheManager.flushAll();
+      // reset API caches, make sure latest data is used
+      cacheManager.flushAll();
 
-    if (appStatus) {
-      const ruleGroups = await this.getAllActiveRuleGroups();
-      if (ruleGroups) {
-        for (const rulegroup of ruleGroups) {
-          if (rulegroup.useRules) {
-            this.logger.log(`Executing rules for '${rulegroup.name}'`);
-            this.startTime = new Date();
+      if (appStatus) {
+        const ruleGroups = await this.getAllActiveRuleGroups();
+        if (ruleGroups) {
+          const comparator = this.comparatorFactory.create();
 
-            // reset Plex cache if group uses a rule that requires it (collection rules for example)
-            await this.rulesService.resetPlexCacheIfgroupUsesRuleThatRequiresIt(
-              rulegroup,
-            );
+          for (const rulegroup of ruleGroups) {
+            if (rulegroup.useRules) {
+              this.logger.log(`Executing rules for '${rulegroup.name}'`);
+              this.startTime = new Date();
 
-            // prepare
-            this.workerData = [];
-            this.resultData = [];
-            this.plexData = { page: 0, finished: false, data: [] };
-
-            this.plexDataType = rulegroup.dataType
-              ? rulegroup.dataType
-              : undefined;
-
-            // Run rules data shunks of 50
-            while (!this.plexData.finished) {
-              await this.getPlexData(rulegroup.libraryId);
-              const ruleResult = await this.comparator.executeRulesWithData(
+              // reset Plex cache if group uses a rule that requires it (collection rules for example)
+              await this.rulesService.resetPlexCacheIfgroupUsesRuleThatRequiresIt(
                 rulegroup,
-                this.plexData.data,
               );
-              if (ruleResult) {
-                this.resultData.push(...ruleResult?.data);
+
+              // prepare
+              this.workerData = [];
+              this.resultData = [];
+              this.plexData = { page: 0, finished: false, data: [] };
+
+              this.plexDataType = rulegroup.dataType
+                ? rulegroup.dataType
+                : undefined;
+
+              // Run rules data shunks of 50
+              while (!this.plexData.finished) {
+                await this.getPlexData(rulegroup.libraryId);
+                const ruleResult = await comparator.executeRulesWithData(
+                  rulegroup,
+                  this.plexData.data,
+                );
+                if (ruleResult) {
+                  this.resultData.push(...ruleResult?.data);
+                }
               }
+              await this.handleCollection(
+                await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
+              );
+              this.logger.log(
+                `Execution of rules for '${rulegroup.name}' done.`,
+              );
             }
-            await this.handleCollection(
+            await this.syncManualPlexMediaToCollectionDB(
               await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
             );
-            this.logger.log(`Execution of rules for '${rulegroup.name}' done.`);
           }
-          await this.syncManualPlexMediaToCollectionDB(
-            await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
-          );
         }
-      }
-    } else {
-      this.logger.log(
-        'Not all applications are reachable.. Skipped rule execution.',
+      } else {
+        this.logger.log(
+          'Not all applications are reachable.. Skipped rule execution.',
+        );
+        await this.notificationService.handleNotification(
+        NotificationType.RULE_HANDLING_FAILED,
+        undefined,
       );
+    }
+    } catch (err) {
+      this.logger.log('Error running rules executor.');
+      this.logger.debug(err);
+      
       await this.notificationService.handleNotification(
         NotificationType.RULE_HANDLING_FAILED,
         undefined,
       );
     }
+
     // clean up
     await this.finish();
   }

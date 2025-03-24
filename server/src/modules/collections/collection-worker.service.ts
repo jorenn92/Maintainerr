@@ -17,6 +17,7 @@ import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TaskBase } from '../tasks/task.base';
 import { NotificationService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/notifications-interfaces';
+import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -33,6 +34,7 @@ export class CollectionWorkerService extends TaskBase {
     private readonly collectionService: CollectionsService,
     private readonly plexApi: PlexApiService,
     private readonly overseerrApi: OverseerrApiService,
+    private readonly jellyseerrApi: JellyseerrApiService,
     private readonly servarrApi: ServarrService,
     private readonly tmdbApi: TmdbApiService,
     protected readonly taskService: TasksService,
@@ -77,8 +79,16 @@ export class CollectionWorkerService extends TaskBase {
         const collections = await this.collectionRepo.find({
           where: { isActive: true },
         });
-        for (const collection of collections) {
-          this.infoLogger(`Handling collection '${collection.title}'`);
+  
+      for (const collection of collections) {
+          if (collection.arrAction === ServarrAction.DO_NOTHING) {
+          this.infoLogger(
+            `Skipping collection '${collection.title}' as its action is 'Do Nothing'`,
+          );
+          continue;
+        }
+
+        this.infoLogger(`Handling collection '${collection.title}'`);
 
           const collectionMedia = await this.collectionMediaRepo.find({
             where: {
@@ -111,6 +121,7 @@ export class CollectionWorkerService extends TaskBase {
 
           this.infoLogger(`Handling collection '${collection.title}' finished`);
         }
+
         if (handledCollections > 0) {
           if (this.settings.overseerrConfigured()) {
             setTimeout(() => {
@@ -120,6 +131,30 @@ export class CollectionWorkerService extends TaskBase {
                   this.infoLogger(
                     `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
                   );
+              })
+              .catch((err) => {
+                this.logger.error(
+                  `Failed to trigger Overseerr's availability-sync: ${err}`,
+                );
+                this.logger.debug(err);
+              });
+          }, 7000);
+        }
+
+        if (this.settings.jellyseerrConfigured()) {
+          setTimeout(() => {
+            this.jellyseerrApi.api
+              .post('/settings/jobs/availability-sync/run')
+              .then(() => {
+                this.infoLogger(
+                  `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
+                );
+              })
+              .catch((err) => {
+                this.logger.error(
+                  `Failed to trigger Jellyseerr's availability-sync: ${err}`,
+                );
+                this.logger.debug(err);
                 });
             }, 7000);
           }
@@ -151,6 +186,11 @@ export class CollectionWorkerService extends TaskBase {
   }
 
   private async handleMedia(collection: Collection, media: CollectionMedia) {
+    if (collection.arrAction === ServarrAction.DO_NOTHING) {
+      // Sanity check, ideally we shouldn't ever call handleMedia on a collection with servarr
+      // action DO_NOTHING, but if we do, ensure we do nothing.
+      return;
+    }
     let plexData: PlexMetadata = undefined;
 
     const plexLibrary = (await this.plexApi.getLibraries()).find(
@@ -224,10 +264,10 @@ export class CollectionWorkerService extends TaskBase {
           }
         } else {
           if (collection.arrAction !== ServarrAction.UNMONITOR) {
-            this.plexApi.deleteMediaFromDisk(media.plexId.toString());
             this.infoLogger(
-              `Couldn't find movie with tmdb id ${tmdbid} in Radarr, so no Radarr action was taken for movie with Plex ID ${media.plexId}. But the movie was removed from the filesystem`,
+              `Couldn't find movie with tmdb id ${tmdbid} in Radarr, so no Radarr action was taken for movie with Plex ID ${media.plexId}. Attempting to remove from the filesystem via Plex.`,
             );
+            this.plexApi.deleteMediaFromDisk(media.plexId.toString());
           } else {
             this.infoLogger(
               `Radarr unmonitor action was not possible, couldn't find movie with tmdb id ${tmdbid} in Radarr. No action was taken for movie with Plex ID ${media.plexId}`,
@@ -452,10 +492,10 @@ export class CollectionWorkerService extends TaskBase {
           }
         } else {
           if (collection.arrAction !== ServarrAction.UNMONITOR) {
-            this.plexApi.deleteMediaFromDisk(plexData.ratingKey);
             this.infoLogger(
-              `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. But media item was removed through Plex`,
+              `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. Attempting to remove from the filesystem via Plex.`,
             );
+            this.plexApi.deleteMediaFromDisk(media.plexId.toString());
           } else {
             this.infoLogger(
               `Couldn't find correct tvdb id. No unmonitor action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
@@ -470,7 +510,7 @@ export class CollectionWorkerService extends TaskBase {
     } else if (!radarrApiClient && !sonarrApiClient) {
       if (collection.arrAction !== ServarrAction.UNMONITOR) {
         this.infoLogger(
-          `Couldn't utilize *arr to find and remove the media with id ${media.plexId}, so media will be removed from the filesystem through Plex. No unmonitor action was taken.`,
+          `Couldn't utilize *arr to find and remove the media with id ${media.plexId}. Attempting to remove from the filesystem via Plex. No unmonitor action was taken.`,
         );
         await this.plexApi.deleteMediaFromDisk(media.plexId.toString());
       } else {

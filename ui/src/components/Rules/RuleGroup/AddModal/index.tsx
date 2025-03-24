@@ -55,7 +55,7 @@ interface ICreateApiObject {
   collection: {
     visibleOnRecommended: boolean
     visibleOnHome: boolean
-    deleteAfterDays: number
+    deleteAfterDays?: number
     manualCollection?: boolean
     manualCollectionName?: string
     keepLogsForMonths?: number
@@ -332,7 +332,6 @@ const AddModal = (props: AddModal) => {
     if (
       nameRef.current.value &&
       libraryRef.current.value &&
-      deleteAfterRef.current.value &&
       (radarrSettingsId !== undefined || sonarrSettingsId !== undefined) &&
       ((useRules && rules.length > 0) || !useRules)
     ) {
@@ -357,7 +356,10 @@ const AddModal = (props: AddModal) => {
         collection: {
           visibleOnRecommended: showRecommended,
           visibleOnHome: showHome,
-          deleteAfterDays: +deleteAfterRef.current.value,
+          deleteAfterDays:
+            arrOption === undefined || arrOption === 4
+              ? undefined
+              : +deleteAfterRef.current.value,
           manualCollection: manualCollection,
           manualCollectionName: manualCollectionNameRef.current.value,
           keepLogsForMonths: +keepLogsForMonthsRef.current.value,
@@ -522,6 +524,10 @@ const AddModal = (props: AddModal) => {
                     id: 3,
                     name: 'Unmonitor and keep files',
                   },
+                  {
+                    id: 4,
+                    name: 'Do nothing',
+                  },
                 ]}
               />
             )}
@@ -597,6 +603,10 @@ const AddModal = (props: AddModal) => {
                             id: 3,
                             name: 'Unmonitor show and keep files',
                           },
+                          {
+                            id: 4,
+                            name: 'Do nothing',
+                          },
                         ]
                       : +selectedType === EPlexDataType.SEASONS
                         ? [
@@ -612,6 +622,10 @@ const AddModal = (props: AddModal) => {
                               id: 3,
                               name: 'Unmonitor season and keep files',
                             },
+                            {
+                              id: 4,
+                              name: 'Do nothing',
+                            },
                           ]
                         : // episodes
                           [
@@ -623,32 +637,40 @@ const AddModal = (props: AddModal) => {
                               id: 3,
                               name: 'Unmonitor and keep file',
                             },
+                            {
+                              id: 4,
+                              name: 'Do nothing',
+                            },
                           ]
                   }
                 />
               </>
             )}
 
-            <div className="form-row">
-              <label htmlFor="collection_deleteDays" className="text-label">
-                Take action after days*
-                <p className="text-xs font-normal">
-                  Duration of days media remains in the collection before
-                  deletion/unmonitor
-                </p>
-              </label>
-              <div className="form-input">
-                <div className="form-input-field">
-                  <input
-                    type="number"
-                    name="collection_deleteDays"
-                    id="collection_deleteDays"
-                    defaultValue={collection ? collection.deleteAfterDays : 30}
-                    ref={deleteAfterRef}
-                  />
+            {arrOption !== undefined && arrOption !== 4 && (
+              <div className="form-row">
+                <label htmlFor="collection_deleteDays" className="text-label">
+                  Take action after days*
+                  <p className="text-xs font-normal">
+                    Duration of days media remains in the collection before
+                    deletion/unmonitor
+                  </p>
+                </label>
+                <div className="form-input">
+                  <div className="form-input-field">
+                    <input
+                      type="number"
+                      name="collection_deleteDays"
+                      id="collection_deleteDays"
+                      defaultValue={
+                        collection ? collection.deleteAfterDays : 30
+                      }
+                      ref={deleteAfterRef}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="form-row">
               <label htmlFor="collection_logs_months" className="text-label">

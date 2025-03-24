@@ -1,21 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
-import {
-  Application,
-  Property,
-  RuleConstants,
-} from '../constants/rules.constants';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import {
   TautulliApiService,
   TautulliHistoryRequestOptions,
   TautulliMetadata,
 } from '../../api/tautulli-api/tautulli-api.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Collection } from '../../collections/entities/collection.entities';
+import {
+  Application,
+  Property,
+  RuleConstants,
+} from '../constants/rules.constants';
 import { RulesDto } from '../dtos/rules.dto';
-import { PlexApiService } from '../../api/plex-api/plex-api.service';
 
 @Injectable()
 export class TautulliGetterService {
@@ -196,7 +196,10 @@ export class TautulliGetterService {
         }
       }
     } catch (e) {
-      this.logger.warn(`Tautulli-Getter - Action failed : ${e.message}`);
+      this.logger.warn(
+        `Tautulli-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      );
+      this.logger.debug(e);
       return undefined;
     }
   }

@@ -1,11 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
+import _ from 'lodash';
 import { DataSource, Repository } from 'typeorm';
+import cacheManager from '../api/lib/cache';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
+import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
 import { Collection } from '../collections/entities/collection.entities';
+import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
+import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
+import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
+import { Settings } from '../settings/entities/settings.entities';
+import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
 import {
   Application,
   Property,
@@ -21,17 +30,8 @@ import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Exclusion } from './entities/exclusion.entities';
 import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
-import { Settings } from '../settings/entities/settings.entities';
-import _ from 'lodash';
-import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
+import { RuleComparatorServiceFactory } from './helpers/rule.comparator.service';
 import { RuleYamlService } from './helpers/yaml.service';
-import { RuleComparatorService } from './helpers/rule.comparator.service';
-import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
-import { ECollectionLogType } from '../collections/entities/collection_log.entities';
-import cacheManager from '../api/lib/cache';
-import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
-import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 import { Notification } from '../notifications/entities/notification.entities';
 
 export interface ReturnStatus {
@@ -43,9 +43,7 @@ export interface ReturnStatus {
 @Injectable()
 export class RulesService {
   private readonly logger = new Logger(RulesService.name);
-  private readonly communityUrl =
-    'https://jsonbin.maintainerr.info/maintainerr-app/rules';
-  private readonly key = '788bfded-1fd0-46e8-8616-28d76e8a2904';
+  private readonly communityUrl = 'https://community.maintainerr.info';
 
   ruleConstants: RuleConstants;
   constructor(
@@ -69,7 +67,7 @@ export class RulesService {
     private readonly plexApi: PlexApiService,
     private readonly connection: DataSource,
     private readonly ruleYamlService: RuleYamlService,
-    private readonly RuleComparatorService: RuleComparatorService,
+    private readonly ruleComparatorServiceFactory: RuleComparatorServiceFactory,
   ) {
     this.ruleConstants = new RuleConstants();
   }
@@ -105,6 +103,13 @@ export class RulesService {
       if (!settings.tautulli_url || !settings.tautulli_api_key) {
         localConstants.applications = localConstants.applications.filter(
           (el) => el.id !== Application.TAUTULLI,
+        );
+      }
+
+      // remove jellyseerr if not configured
+      if (!settings.jellyseerr_url || !settings.jellyseerr_api_key) {
+        localConstants.applications = localConstants.applications.filter(
+          (el) => el.id !== Application.JELLYSEERR,
         );
       }
     }
@@ -248,7 +253,7 @@ export class RulesService {
           sonarrSettingsId: params.sonarrSettingsId ?? null,
           visibleOnRecommended: params.collection?.visibleOnRecommended,
           visibleOnHome: params.collection?.visibleOnHome,
-          deleteAfterDays: +params.collection?.deleteAfterDays,
+          deleteAfterDays: params.collection?.deleteAfterDays ?? null,
           manualCollection: params.collection?.manualCollection,
           manualCollectionName: params.collection?.manualCollectionName,
           keepLogsForMonths: +params.collection?.keepLogsForMonths,
@@ -377,7 +382,7 @@ export class RulesService {
             sonarrSettingsId: params.sonarrSettingsId ?? null,
             visibleOnRecommended: params.collection.visibleOnRecommended,
             visibleOnHome: params.collection.visibleOnHome,
-            deleteAfterDays: +params.collection.deleteAfterDays,
+            deleteAfterDays: params.collection.deleteAfterDays ?? null,
             manualCollection: params.collection.manualCollection,
             manualCollectionName: params.collection.manualCollectionName,
             keepLogsForMonths: +params.collection.keepLogsForMonths,
@@ -829,31 +834,21 @@ export class RulesService {
 
   async getCommunityRules(): Promise<CommunityRule[] | ReturnStatus> {
     return await axios
-      .get(this.communityUrl, {
-        headers: {
-          Authorization: 'token ' + this.key,
-        },
-      })
+      .get<{ rules: CommunityRule[] }>(this.communityUrl)
       .then((response) => {
-        return response.data as CommunityRule[];
+        return response.data.rules as CommunityRule[];
       })
       .catch((e) => {
-        this.logger.warn(
-          `Rules - Loading community rules failed : ${e.message}`,
-        );
+        this.logger.warn(`Loading community rules failed : ${e.message}`);
         this.logger.debug(e);
         return this.createReturnStatus(false, 'Failed');
       });
   }
 
   public async getCommunityRuleCount(): Promise<number> {
-    const response = await axios.get<CommunityRule[]>(this.communityUrl, {
-      headers: {
-        Authorization: 'token ' + this.key,
-      },
-    });
+    const response = await this.getCommunityRules();
 
-    return response.data.length;
+    return Array.isArray(response) ? response.length : 0;
   }
 
   public async addToCommunityRules(rule: CommunityRule): Promise<ReturnStatus> {
@@ -861,53 +856,40 @@ export class RulesService {
     const appVersion = process.env.npm_package_version
       ? process.env.npm_package_version
       : '0.0.0';
-    if (!('code' in rules)) {
-      // Check if we got a CommunityRule[]
-      if (
-        (rules as CommunityRule[]).find((r) => r.name === rule.name) ===
-        undefined
-      ) {
-        return axios
-          .patch(
-            this.communityUrl,
-            { id: rules.length, karma: 0, appVersion: appVersion, ...rule },
-            {
-              headers: {
-                Authorization: 'token ' + this.key,
-              },
-            },
-          )
-          .then(() => {
-            this.logger.log(`Rules - successfully saved community rule`);
-            return this.createReturnStatus(true, 'Succes');
-          })
-          .catch((e) => {
-            if (e.message.includes('422')) {
-              // Due to a bug in jsonbin, it returns the wrong status code
-              this.logger.log(`Rules - successfully saved community rule`);
-              return this.createReturnStatus(true, 'Succes');
-            } else {
-              this.logger.warn(
-                `Rules - Saving community rule failed : ${e.message}`,
-              );
-              return this.createReturnStatus(
-                false,
-                'Saving community rule failed',
-              );
-            }
-          });
-      } else {
-        this.logger.log(
-          `Rules - Tried to register a community rule with a name that already exists, this is not allowed`,
-        );
-        return this.createReturnStatus(false, 'Name already exists');
-      }
-    } else {
-      this.logger.warn(
-        `Rules - There was a problem fetching the community rules JSON`,
-      );
+
+    if (!Array.isArray(rules)) {
+      this.logger.warn(`Unable to get community rules before adding a new one`);
       return this.createReturnStatus(false, 'Connection failed');
     }
+
+    if (rules.find((r) => r.name === rule.name)) {
+      this.logger.log(`Duplicate rule name detected. This is not allowed.`);
+      return this.createReturnStatus(false, 'Name already exists');
+    }
+    const hasRules = Array.isArray(rule.JsonRules) && rule.JsonRules.length > 0;
+
+    return axios
+      .patch(this.communityUrl, [
+        {
+          op: 'add',
+          path: '/rules/-',
+          value: {
+            id: rules.length,
+            karma: 5,
+            appVersion: appVersion,
+            hasRules,
+            ...rule,
+          },
+        },
+      ])
+      .then(() => {
+        this.logger.log(`Successfully saved community rule`);
+        return this.createReturnStatus(true, 'Success');
+      })
+      .catch((e) => {
+        this.logger.warn(`Saving community rule failed: ${e.message}`);
+        return this.createReturnStatus(false, 'Saving community rule failed');
+      });
   }
 
   public async getCommunityRuleKarmaHistory(): Promise<CommunityRuleKarma[]> {
@@ -919,81 +901,65 @@ export class RulesService {
     karma: number,
   ): Promise<ReturnStatus> {
     const rules = await this.getCommunityRules();
+    if (!Array.isArray(rules)) {
+      this.logger.warn(`Unable to get community rules before adding karma`);
+      return this.createReturnStatus(false, 'Connection failed');
+    }
+
+    const ruleIndex = rules.findIndex((r) => r.id === id);
+    if (ruleIndex === -1) {
+      this.logger.log(`Rule with ID ${id} not found`);
+      return this.createReturnStatus(false, 'Rule not found');
+    }
+
+    // Check karma history to prevent multiple updates
     const history = await this.communityRuleKarmaRepository.find({
-      where: {
-        community_rule_id: id,
-      },
+      where: { community_rule_id: id },
     });
-    if (history.length <= 0) {
-      if (!('code' in rules)) {
-        if (karma <= 990) {
-          if (rules.find((r) => r.id === id) === undefined) {
-            this.logger.log(
-              `Rules - Tried to edit the karma of rule with id ` +
-                id +
-                `, but it doesn't exist`,
-            );
-            return this.createReturnStatus(
-              false,
-              'Rule with given id does not exist',
-            );
-          }
-          rules.map((r) => {
-            if (r.id === id) {
-              r.karma = karma;
-            }
-          });
-          this.communityRuleKarmaRepository.save([
-            {
-              community_rule_id: id,
-            },
-          ]);
-          return axios
-            .post(this.communityUrl, rules, {
-              headers: {
-                Authorization: 'token ' + this.key,
-              },
-            })
-            .then(() => {
-              this.logger.log(
-                `Rules - successfully updated community rule karma `,
-              );
-              return this.createReturnStatus(true, 'Succes');
-            })
-            .catch((e) => {
-              if (e.message.includes('422')) {
-                // Due to a bug in jsonbin, it returns the wrong status code
-                this.logger.log(
-                  `Rules - successfully updated community rule karma`,
-                );
-                return this.createReturnStatus(true, 'Succes');
-              } else {
-                this.logger.warn(
-                  `Rules - Saving community rule failed : ${e.message}`,
-                );
-                return this.createReturnStatus(
-                  false,
-                  'Saving community rule failed',
-                );
-              }
-            });
-        } else {
-          this.logger.log(`Rules - Max Karma reached for rule with id: ` + id);
-          return this.createReturnStatus(true, 'Succes, but Max Karma reached');
-        }
-      } else {
-        this.logger.warn(
-          `Rules - There was a problem fetching the community rules JSON`,
-        );
-        return this.createReturnStatus(false, 'Connection failed');
-      }
-    } else {
-      this.logger.log(`Rules - You can only update Karma of a rule once`);
+
+    if (history.length > 0) {
+      this.logger.log(`You can only update Karma of a rule once`);
       return this.createReturnStatus(
         false,
         'Already updated Karma for this rule',
       );
     }
+
+    // Ensure the karma value doesn't exceed max limit
+    if (karma > 990) {
+      this.logger.log(`Max Karma reached (990) for rule with id: ${id}`);
+      return this.createReturnStatus(
+        true,
+        'Success, but Max Karma reached for this rule.',
+      );
+    }
+
+    // Update the rule's karma
+    return axios
+      .patch(this.communityUrl, [
+        {
+          op: 'replace',
+          id: id,
+          value: { karma },
+        },
+      ])
+      .then(async () => {
+        this.logger.log(`Successfully updated community rule karma`);
+
+        // Save to karma history to prevent multiple updates
+        await this.communityRuleKarmaRepository.save([
+          { community_rule_id: id },
+        ]);
+
+        return this.createReturnStatus(true, 'Success');
+      })
+      .catch((e) => {
+        this.logger.warn(`Updating community rule karma failed: ${e.message}`);
+        return this.createReturnStatus(
+          false,
+          'Updating community rule karma failed',
+        );
+      });
   }
 
   public encodeToYaml(rules: RuleDto[], mediaType: number): ReturnStatus {
@@ -1012,6 +978,7 @@ export class RulesService {
     this.plexApi.resetMetadataCache(mediaId);
     cacheManager.getCache('overseerr').data.flushAll();
     cacheManager.getCache('tautulli').data.flushAll();
+    cacheManager.getCache('jellyseerr').flush();
     cacheManager
       .getCachesByType('radarr')
       .forEach((cache) => cache.data.flushAll());
@@ -1023,7 +990,8 @@ export class RulesService {
     const group = await this.getRuleGroupById(rulegroupId);
     if (group && mediaResp) {
       group.rules = await this.getRules(group.id.toString());
-      const result = await this.RuleComparatorService.executeRulesWithData(
+      const ruleComparator = this.ruleComparatorServiceFactory.create();
+      const result = await ruleComparator.executeRulesWithData(
         group as RulesDto,
         [mediaResp as unknown as PlexLibraryItem],
         true,

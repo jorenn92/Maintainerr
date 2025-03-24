@@ -103,18 +103,13 @@ export class SonarrApi extends ServarrApi<{
 
   public async getSeriesByTvdbId(id: number): Promise<SonarrSeries> {
     try {
-      let response = await this.get<SonarrSeries[]>(`/series?tvdbId=${id}`);
+      const response = await this.get<SonarrSeries[]>(`/series?tvdbId=${id}`);
 
-      if (!response || !response[0]) {
-        response = await this.get<SonarrSeries[]>(
-          `/series/lookup?term=tvdb:${id}`,
-        );
-
-        if (!response || !response[0]) {
-          this.logger.warn(`Could not retrieve show by tvdb ID ${id}`);
-          return undefined;
-        }
+      if (!response?.[0]) {
+        this.logger.warn(`Could not retrieve show by tvdb ID ${id}`);
+        return undefined;
       }
+
       return response[0];
     } catch (e) {
       this.logger.warn(`Error retrieving show by tvdb ID ${id}. ${e.message}`);

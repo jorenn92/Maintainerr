@@ -96,7 +96,7 @@ const RuleCreator = (props: iRuleCreator) => {
   )
   const rulesCreated = useRef<IRulesToCreate[]>([])
   const deleted = useRef<number>(0)
-  const added = useRef<number[]>([])
+  const added = useRef<number[]>(initialSections ? [] : [1])
 
   const ruleCommited = (id: number, rule: IRule) => {
     if (rulesCreated) {
@@ -121,26 +121,37 @@ const RuleCreator = (props: iRuleCreator) => {
   const ruleDeleted = (section = 0, id: number) => {
     if (rulesCreated.current.length > 0) {
       let rules = rulesCreated.current?.filter((el) => el.id !== id)
+      const section1IsEmpty = !rules.some((r) => r.rule.section === 0)
+
       rules = rules.map((e) => {
         e.id = e.id > id ? e.id - 1 : e.id
+
+        if (section1IsEmpty && section === 1 && e.rule.section) {
+          e.rule.section -= 1
+        }
+
         return e
       })
       rulesCreated.current = [...rules]
       props.onUpdate(rulesCreated.current.map((el) => el.rule))
     }
 
-    added.current = added.current.filter((e) => e !== id)
+    added.current = added.current
+      .filter((e) => e !== id)
+      .map((e) => {
+        return (e = e > id ? e - 1 : e)
+      })
+    setEditData({ rules: rulesCreated.current.map((el) => el.rule) })
+
     const rules = [...ruleAmount[1]]
     rules[section - 1] = rules[section - 1] - 1
 
-    if (rulesCreated.current.length > 0) {
-      setEditData({ rules: rulesCreated.current.map((el) => el.rule) })
-    }
-
+    // Find sections that still contain rules
     const nonEmptySections = rules.filter((e) => e > 0)
 
+    // Update the rule count while ensuring at least one section remains
     updateRuleAmount([
-      ruleAmount[0] - rules.filter((e) => e <= 0).length,
+      nonEmptySections.length,
       nonEmptySections.length > 0 ? nonEmptySections : [1],
     ])
 
@@ -241,6 +252,7 @@ const RuleCreator = (props: iRuleCreator) => {
                   onCommit={ruleCommited}
                   onIncomplete={ruleOmitted}
                   onDelete={ruleDeleted}
+                  allowDelete={ruleAmount[0] > 1 || ruleAmount[1][sid - 1] > 1}
                 />
               ))}
             </div>
