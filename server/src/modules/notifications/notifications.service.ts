@@ -526,7 +526,7 @@ export class NotificationService {
         friendlyName: 'Webhook',
         options: [
           { field: 'webhookUrl', type: 'text', required: true, extraInfo: '' },
-          { field: 'jsonPayload', type: 'text', required: true, extraInfo: '' },
+          { field: 'jsonPayload', type: 'json', required: true, extraInfo: '' },
           { field: 'authHeader', type: 'text', required: false, extraInfo: '' },
         ],
       },

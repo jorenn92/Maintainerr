@@ -7,6 +7,7 @@ import ExecuteButton from '../../../Common/ExecuteButton'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
 import Modal from '../../../Common/Modal'
 import ToggleItem from '../../../Common/ToggleButton'
+import { Editor } from '@monaco-editor/react'
 
 interface agentSpec {
   name: string
@@ -250,29 +251,57 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                     </label>
                     <div className="form-input">
                       <div className="form-input-field">
-                        <input
-                          name={option.field}
-                          id={`${targetAgent.name}-${option.field}`}
-                          type={option.type}
-                          required={option.required}
-                          key={`${targetAgent.name}-option-${option.field}`}
-                          defaultValue={
-                            formValues?.[option.field]
-                              ? formValues?.[option.field]
-                              : undefined
-                          }
-                          defaultChecked={
-                            option.type == 'checkbox'
-                              ? formValues?.[option.field]
-                              : false
-                          }
-                          onChange={(e) =>
-                            handleInputChange(
-                              option.field,
-                              e.target.value || e.target.checked,
-                            )
-                          }
-                        ></input>
+                        {option.type === 'json' ? (
+                          <Editor
+                            height="200px"
+                            defaultLanguage="json"
+                            theme="vs-dark"
+                            defaultValue={
+                              formValues?.[option.field]
+                                ? JSON.stringify(
+                                    formValues?.[option.field],
+                                    null,
+                                    2,
+                                  )
+                                : '{}'
+                            }
+                            options={{
+                              minimap: { enabled: false },
+                              formatOnPaste: true,
+                              formatOnType: true,
+                            }}
+                            onChange={(value) =>
+                              handleInputChange(
+                                option.field,
+                                value ? JSON.parse(value) : {},
+                              )
+                            }
+                          />
+                        ) : (
+                          <input
+                            name={option.field}
+                            id={`${targetAgent.name}-${option.field}`}
+                            type={option.type}
+                            required={option.required}
+                            key={`${targetAgent.name}-option-${option.field}`}
+                            defaultValue={
+                              formValues?.[option.field]
+                                ? formValues?.[option.field]
+                                : undefined
+                            }
+                            defaultChecked={
+                              option.type == 'checkbox'
+                                ? formValues?.[option.field]
+                                : false
+                            }
+                            onChange={(e) =>
+                              handleInputChange(
+                                option.field,
+                                e.target.value || e.target.checked,
+                              )
+                            }
+                          ></input>
+                        )}
                       </div>
                     </div>
                   </div>

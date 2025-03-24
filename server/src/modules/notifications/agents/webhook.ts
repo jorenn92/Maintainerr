@@ -76,8 +76,9 @@ class WebhookAgent implements NotificationAgent {
   }
 
   private buildPayload(type: NotificationType, payload: NotificationPayload) {
-    const payloadString = this.getSettings().options.jsonPayload as string;
-    const parsedJSON = JSON.parse(payloadString);
+    const payloadString = this.getSettings().options.jsonPayload;
+    const parsedJSON = JSON.parse(JSON.stringify(payloadString));
+    Object.assign(parsedJSON, payload);
 
     return this.parseKeys(parsedJSON, payload, type);
   }
