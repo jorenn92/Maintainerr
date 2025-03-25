@@ -69,7 +69,10 @@ export class NotificationService {
     this.activeAgents.forEach((agent) => {
       // if rulegroup is supplied, then only send the notification if configured
       if (
-        rulegroup == undefined || (rulegroup?.notifications?.find((n) => n.id === agent.getNotification().id))
+        rulegroup == undefined ||
+        rulegroup?.notifications?.find(
+          (n) => n.id === agent.getNotification().id,
+        )
       )
         this.sendNotificationToAgent(type, payload, agent);
     });
