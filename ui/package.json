@@ -47,7 +47,7 @@
     "@types/react-dom": "^18",
     "@types/react-transition-group": "^4.4.12",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "@typescript-eslint/parser": "^8.22.0",
+    "@typescript-eslint/parser": "^8.28.0",
     "autoprefixer": "10.4.20",
     "eslint": "^9.20.1",
     "eslint-config-next": "15.2.2",
