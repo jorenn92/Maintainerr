@@ -532,6 +532,205 @@ export class PlexGetterService {
             )?.value ?? null
           );
         }
+        case 'rating_imdbShow': {
+          const showMetadata =
+            metadata.type === 'season' ? parent : grandparent;
+
+          return (
+            showMetadata.Rating?.find(
+              (x) => x.image.startsWith('imdb') && x.type == 'audience',
+            )?.value ?? null
+          );
+        }
+        case 'rating_rottenTomatoesCriticShow': {
+          const showMetadata =
+            metadata.type === 'season' ? parent : grandparent;
+
+          return (
+            showMetadata.Rating?.find(
+              (x) => x.image.startsWith('rottentomatoes') && x.type == 'critic',
+            )?.value ?? null
+          );
+        }
+        case 'rating_rottenTomatoesAudienceShow': {
+          const showMetadata =
+            metadata.type === 'season' ? parent : grandparent;
+
+          return (
+            showMetadata.Rating?.find(
+              (x) =>
+                x.image.startsWith('rottentomatoes') && x.type == 'audience',
+            )?.value ?? null
+          );
+        }
+        case 'rating_tmdbShow': {
+          const showMetadata =
+            metadata.type === 'season' ? parent : grandparent;
+
+          return (
+            showMetadata.Rating?.find(
+              (x) => x.image.startsWith('themoviedb') && x.type == 'audience',
+            )?.value ?? null
+          );
+        }
+        case 'collectionsIncludingSmart': {
+          if (
+            metadata.type !== 'episode' &&
+            metadata.type !== 'movie' &&
+            metadata.type !== 'season' &&
+            metadata.type !== 'show'
+          ) {
+            throw new Error(`Unexpected metadata type ${metadata.type}`);
+          }
+
+          const collections = await this.plexApi.getCollections(
+            ruleGroup.libraryId,
+            metadata.type,
+          );
+
+          const smartCollections = collections.filter((x) => x.smart);
+          let smartCollectionCount = 0;
+
+          for (const smartCollection of smartCollections) {
+            const children = await this.plexApi.getCollectionChildren(
+              smartCollection.ratingKey,
+            );
+
+            if (children.some((x) => x.ratingKey === metadata.ratingKey)) {
+              smartCollectionCount++;
+            }
+          }
+
+          const normalCollectionCount = metadata.Collection
+            ? metadata.Collection.filter(
+                (el) =>
+                  el.tag.toLowerCase().trim() !==
+                  (ruleGroup?.collection?.manualCollection &&
+                  ruleGroup?.collection?.manualCollectionName
+                    ? ruleGroup.collection.manualCollectionName
+                    : ruleGroup.name
+                  )
+                    .toLowerCase()
+                    .trim(),
+              ).length
+            : 0;
+
+          return normalCollectionCount + smartCollectionCount;
+        }
+        case 'sw_collections_including_parent_and_smart': {
+          const combinedCollections = [
+            ...(metadata.Collection || []),
+            ...(parent?.Collection || []),
+            ...(grandparent?.Collection || []),
+          ];
+
+          const collections = await this.plexApi.getCollections(
+            ruleGroup.libraryId,
+          );
+
+          const smartCollections = collections.filter((x) => x.smart);
+          let smartCollectionCount = 0;
+
+          for (const smartCollection of smartCollections) {
+            const children = await this.plexApi.getCollectionChildren(
+              smartCollection.ratingKey,
+            );
+
+            const ratingKeys = [
+              metadata.ratingKey,
+              parent?.ratingKey,
+              grandparent?.ratingKey,
+            ].filter((x) => x != null);
+
+            smartCollectionCount += children.filter((x) =>
+              ratingKeys.includes(x.ratingKey),
+            ).length;
+          }
+
+          const normalCollectionCount = combinedCollections
+            ? combinedCollections.filter(
+                (el) =>
+                  el.tag.toLowerCase().trim() !==
+                  (ruleGroup?.collection?.manualCollection &&
+                  ruleGroup?.collection?.manualCollectionName
+                    ? ruleGroup.collection.manualCollectionName
+                    : ruleGroup.name
+                  )
+                    .toLowerCase()
+                    .trim(),
+              ).length
+            : 0;
+
+          return normalCollectionCount + smartCollectionCount;
+        }
+        case 'sw_collection_names_including_parent_and_smart': {
+          const collections = await this.plexApi.getCollections(
+            ruleGroup.libraryId,
+          );
+
+          const smartCollections = collections.filter((x) => x.smart);
+          const smartCollectionNames: string[] = [];
+
+          for (const smartCollection of smartCollections) {
+            const children = await this.plexApi.getCollectionChildren(
+              smartCollection.ratingKey,
+            );
+
+            const ratingKeys = [
+              metadata.ratingKey,
+              parent?.ratingKey,
+              grandparent?.ratingKey,
+            ].filter((x) => x != null);
+
+            if (children.some((x) => ratingKeys.includes(x.ratingKey))) {
+              smartCollectionNames.push(smartCollection.title);
+            }
+          }
+
+          const combinedCollections = new Set([
+            ...(metadata.Collection?.map((x) => x.tag) || []),
+            ...(parent?.Collection?.map((x) => x.tag) || []),
+            ...(grandparent?.Collection?.map((x) => x.tag) || []),
+            ...smartCollectionNames,
+          ]);
+
+          return Array.from(combinedCollections).map((el) => el.trim());
+        }
+        case 'collection_names_including_smart': {
+          if (
+            metadata.type !== 'episode' &&
+            metadata.type !== 'movie' &&
+            metadata.type !== 'season' &&
+            metadata.type !== 'show'
+          ) {
+            throw new Error(`Unexpected metadata type ${metadata.type}`);
+          }
+
+          const collections = await this.plexApi.getCollections(
+            ruleGroup.libraryId,
+            metadata.type,
+          );
+
+          const smartCollections = collections.filter((x) => x.smart);
+          const smartCollectionNames: string[] = [];
+
+          for (const smartCollection of smartCollections) {
+            const children = await this.plexApi.getCollectionChildren(
+              smartCollection.ratingKey,
+            );
+
+            if (children.some((x) => x.ratingKey === metadata.ratingKey)) {
+              smartCollectionNames.push(smartCollection.title);
+            }
+          }
+
+          const combinedCollections = new Set([
+            ...(metadata.Collection?.map((x) => x.tag) || []),
+            ...smartCollectionNames,
+          ]);
+
+          return Array.from(combinedCollections).map((el) => el.trim());
+        }
         default: {
           return null;
         }

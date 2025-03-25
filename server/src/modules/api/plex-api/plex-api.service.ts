@@ -364,10 +364,13 @@ export class PlexApiService {
     }
   }
 
-  public async getCollections(libraryId: string): Promise<PlexCollection[]> {
+  public async getCollections(
+    libraryId: string | number,
+    subType?: 'movie' | 'show' | 'season' | 'episode',
+  ): Promise<PlexCollection[]> {
     try {
       const response = await this.plexClient.queryAll<PlexLibraryResponse>({
-        uri: `/library/sections/${libraryId}/collections?`,
+        uri: `/library/sections/${libraryId}/collections?${subType ? `subtype=${subType}` : ''}`,
       });
       const collection: PlexCollection[] = response.MediaContainer
         .Metadata as PlexCollection[];
@@ -538,6 +541,12 @@ export class PlexApiService {
         await this.plexClient.queryAll<PlexLibraryResponse>({
           uri: `/library/collections/${collectionId}/children`,
         });
+
+      // Empty collections return no Metadata node
+      if (response.MediaContainer.Metadata === undefined) {
+        return [];
+      }
+
       return response.MediaContainer.Metadata as PlexLibraryItem[];
     } catch (err) {
       this.logger.warn(

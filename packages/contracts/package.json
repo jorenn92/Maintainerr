@@ -28,23 +28,20 @@
     "format:check": "prettier --check --ignore-path .gitignore .",
     "check-types": "tsc --noEmit"
   },
-  "installConfig": {
-    "hoistingLimits": "workspaces"
-  },
   "devDependencies": {
-    "@eslint/js": "^9.19.0",
+    "@eslint/js": "^9.23.0",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.1.1",
     "globals": "^15.14.0",
     "prettier": "^3.5.3",
     "tsup": "^8.3.6",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.22.0"
+    "typescript-eslint": "^8.28.0"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.11",
-    "@nestjs/core": "^11.0.11",
-    "@nestjs/swagger": "^11.0.6",
+    "@nestjs/common": "^11.0.12",
+    "@nestjs/core": "^11.0.12",
+    "@nestjs/swagger": "^11.0.7",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "nestjs-zod": "^4.3.1",

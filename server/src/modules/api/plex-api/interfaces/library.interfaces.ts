@@ -42,8 +42,9 @@ export interface PlexLibraryItem {
 
 export interface PlexLibraryResponse {
   MediaContainer: {
-    totalSize: number;
-    Metadata:
+    size: number;
+    totalSize?: number;
+    Metadata?:
       | PlexLibraryItem[]
       | PlexCollection[]
       | PlexCollection
