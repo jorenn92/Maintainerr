@@ -11090,9 +11090,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"knip@npm:^5.43.6":
-  version: 5.43.6
-  resolution: "knip@npm:5.43.6"
+"knip@npm:^5.46.0":
+  version: 5.46.0
+  resolution: "knip@npm:5.46.0"
   dependencies:
     "@nodelib/fs.walk": "npm:3.0.1"
     "@snyk/github-codeowners": "npm:1.1.0"
@@ -11116,7 +11116,7 @@ __metadata:
   bin:
     knip: bin/knip.js
     knip-bun: bin/knip-bun.js
-  checksum: 10c0/fb8d2be32c6ac21997c78b77cbf67c1c9bb8e525f9838811b80e6a32b57723c2a1f7cb8a86621bd81c9e28582839732f79b1005628e3bc8991f5848777075630
+  checksum: 10c0/831fbbdeef768889bb29774892a50f24c8e695c51fd7844f059085c96d8c8d3b7fccfd8077ee83d6134696c7db9fda90862e0a89c8a5d6883ff4f9fe79a6d8c4
   languageName: node
   linkType: hard
 
@@ -11574,7 +11574,7 @@ __metadata:
     "@semantic-release/exec": "npm:^7.0.3"
     "@semantic-release/git": "npm:^10.0.1"
     "@types/node": "npm:^22.13.10"
-    knip: "npm:^5.43.6"
+    knip: "npm:^5.46.0"
     semantic-release: "npm:^24.2.3"
     turbo: "npm:^2.4.4"
     typescript: "npm:^5.8.2"
