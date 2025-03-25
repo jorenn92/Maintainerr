@@ -24,8 +24,8 @@ export class NotificationsController {
     },
   ) {
     const agent = this.notificationService.createDummyTestAgent(payload);
-    this.eventEmitter.emit(
-      'agents.notify',
+    // Don't use events here, wo we can return error messages
+    return await this.notificationService.handleNotification(
       NotificationType.TEST_NOTIFICATION,
       undefined,
       undefined,

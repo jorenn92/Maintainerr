@@ -1,14 +1,14 @@
-import axios from 'axios';
-import { hasNotificationType } from '../notifications.service';
-import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
+import axios from 'axios';
 import { SettingsService } from '../../settings/settings.service';
+import { Notification } from '../entities/notification.entities';
 import {
   NotificationAgentGotify,
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
-import { Notification } from '../entities/notification.entities';
+import { hasNotificationType } from '../notifications.service';
+import type { NotificationAgent, NotificationPayload } from './agent';
 
 interface GotifyPayload {
   title: string;
@@ -74,11 +74,11 @@ class GotifyAgent implements NotificationAgent {
   public async send(
     type: NotificationType,
     payload: NotificationPayload,
-  ): Promise<boolean> {
+  ): Promise<string> {
     const settings = this.getSettings();
 
     if (!hasNotificationType(type, settings.types ?? [0])) {
-      return true;
+      return 'Success';
     }
 
     this.logger.log('Sending Gotify notification');
@@ -88,7 +88,7 @@ class GotifyAgent implements NotificationAgent {
 
       await axios.post(endpoint, notificationPayload);
 
-      return true;
+      return 'Success';
     } catch (e) {
       this.logger.error(
         `Error sending Gotify notification. Details: ${JSON.stringify({
@@ -100,7 +100,7 @@ class GotifyAgent implements NotificationAgent {
       );
       this.logger.debug(e);
 
-      return false;
+      return `Failure: ${e.message}`;
     }
   }
 }

@@ -1,3 +1,4 @@
+import { Editor } from '@monaco-editor/react'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
@@ -7,7 +8,6 @@ import ExecuteButton from '../../../Common/ExecuteButton'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
 import Modal from '../../../Common/Modal'
 import ToggleItem from '../../../Common/ToggleButton'
-import { Editor } from '@monaco-editor/react'
 
 interface agentSpec {
   name: string
@@ -82,14 +82,19 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
         types: types,
         aboutScale: aboutScaleRef.current,
         options: formValues,
-      }).then(() => {
-        addToast(
-          "Test notification fired! Consult the logs if you didn't receive anything.",
-          {
+      }).then((resp) => {
+        if (resp !== 'Success') {
+          addToast(resp, {
+            autoDismiss: true,
+            autoDismissTimeout: 10000,
+            appearance: 'error',
+          })
+        } else {
+          addToast('Successfully fired the notification!', {
             autoDismiss: true,
             appearance: 'success',
-          },
-        )
+          })
+        }
       })
     }
   }

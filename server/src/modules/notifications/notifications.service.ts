@@ -74,12 +74,12 @@ export class NotificationService {
     type: NotificationType,
     payload: NotificationPayload,
     agent: NotificationAgent,
-  ): Promise<boolean> {
+  ): Promise<string> {
     if (agent.shouldSend()) {
       if (agent.getSettings().types?.includes(type))
         return agent.send(type, payload);
     }
-    return Promise.resolve(false);
+    return Promise.resolve('Agent is not allowed to send this message.');
   }
 
   async addNotificationConfiguration(payload: {
@@ -542,7 +542,7 @@ export class NotificationService {
   }
 
   @OnEvent('agents.notify')
-  private async handleNotification(
+  public async handleNotification(
     type: NotificationType,
     mediaItems: { plexId: number }[],
     collectionName?: string,
@@ -562,9 +562,10 @@ export class NotificationService {
     );
 
     if (agent) {
-      this.sendNotificationToAgent(type, payload, agent);
+      return this.sendNotificationToAgent(type, payload, agent);
     } else {
       this.sendNotification(type, payload);
+      return 'Success';
     }
   }
 

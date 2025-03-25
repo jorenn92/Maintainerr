@@ -1,14 +1,14 @@
-import axios from 'axios';
-import { hasNotificationType } from '../notifications.service';
-import type { NotificationAgent, NotificationPayload } from './agent';
 import { Logger } from '@nestjs/common';
+import axios from 'axios';
 import { SettingsService } from '../../settings/settings.service';
+import { Notification } from '../entities/notification.entities';
 import {
   NotificationAgentKey,
   NotificationAgentLunaSea,
   NotificationType,
 } from '../notifications-interfaces';
-import { Notification } from '../entities/notification.entities';
+import { hasNotificationType } from '../notifications.service';
+import type { NotificationAgent, NotificationPayload } from './agent';
 
 class LunaSeaAgent implements NotificationAgent {
   public constructor(
@@ -56,11 +56,11 @@ class LunaSeaAgent implements NotificationAgent {
   public async send(
     type: NotificationType,
     payload: NotificationPayload,
-  ): Promise<boolean> {
+  ): Promise<string> {
     const settings = this.getSettings();
 
     if (!hasNotificationType(type, settings.types ?? [0])) {
-      return true;
+      return 'Success';
     }
 
     this.logger.log('Sending LunaSea notification');
@@ -80,7 +80,7 @@ class LunaSeaAgent implements NotificationAgent {
           : undefined,
       );
 
-      return true;
+      return 'Success';
     } catch (e) {
       this.logger.error(
         `Error sending Lunasea notification. Details: ${JSON.stringify({
@@ -92,7 +92,7 @@ class LunaSeaAgent implements NotificationAgent {
       );
       this.logger.debug(e);
 
-      return false;
+      return `Failure: ${e.message}`;
     }
   }
 }

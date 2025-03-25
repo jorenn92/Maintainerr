@@ -1,15 +1,15 @@
+import { Logger } from '@nestjs/common';
 import type { EmailOptions } from 'email-templates';
 import path from 'path';
-import type { NotificationAgent, NotificationPayload } from './agent';
-import { Logger } from '@nestjs/common';
+import { SettingsService } from '../../settings/settings.service';
 import PreparedEmail from '../email/preparedEmail';
+import { Notification } from '../entities/notification.entities';
 import {
   NotificationAgentEmail,
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
-import { SettingsService } from '../../settings/settings.service';
-import { Notification } from '../entities/notification.entities';
+import type { NotificationAgent, NotificationPayload } from './agent';
 
 class EmailAgent implements NotificationAgent {
   public constructor(
@@ -84,7 +84,7 @@ class EmailAgent implements NotificationAgent {
   public async send(
     type: NotificationType,
     payload: NotificationPayload,
-  ): Promise<boolean> {
+  ): Promise<string> {
     this.logger.log('Sending email notification');
 
     try {
@@ -111,10 +111,10 @@ class EmailAgent implements NotificationAgent {
       );
       this.logger.debug(e);
 
-      return false;
+      return `Failure: ${e.message}`;
     }
 
-    return true;
+    return 'Success';
   }
 }
 

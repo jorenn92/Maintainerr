@@ -1,14 +1,14 @@
-import axios from 'axios';
-import { hasNotificationType } from '../notifications.service';
-import type { NotificationAgent, NotificationPayload } from './agent';
-import { SettingsService } from '../../settings/settings.service';
 import { Logger } from '@nestjs/common';
+import axios from 'axios';
+import { SettingsService } from '../../settings/settings.service';
+import { Notification } from '../entities/notification.entities';
 import {
   NotificationAgentKey,
   NotificationAgentPushbullet,
   NotificationType,
 } from '../notifications-interfaces';
-import { Notification } from '../entities/notification.entities';
+import { hasNotificationType } from '../notifications.service';
+import type { NotificationAgent, NotificationPayload } from './agent';
 
 interface PushbulletPayload {
   type: string;
@@ -61,7 +61,7 @@ class PushbulletAgent implements NotificationAgent {
   public async send(
     type: NotificationType,
     payload: NotificationPayload,
-  ): Promise<boolean> {
+  ): Promise<string> {
     const settings = this.getSettings();
     const endpoint = 'https://api.pushbullet.com/v2/pushes';
     const notificationPayload = this.getNotificationPayload(type, payload);
@@ -96,7 +96,7 @@ class PushbulletAgent implements NotificationAgent {
         );
         this.logger.debug(e);
 
-        return false;
+        return `Failure: ${e.message}`;
       }
     } else if (
       hasNotificationType(type, settings.types ?? [0]) &&
@@ -122,11 +122,11 @@ class PushbulletAgent implements NotificationAgent {
         );
         this.logger.debug(e);
 
-        return false;
+        return `Failure: ${e.message}`;
       }
     }
 
-    return true;
+    return 'Success';
   }
 }
 

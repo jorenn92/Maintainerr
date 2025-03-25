@@ -88,7 +88,7 @@ class TelegramAgent implements NotificationAgent {
   public async send(
     type: NotificationType,
     payload: NotificationPayload,
-  ): Promise<boolean> {
+  ): Promise<string> {
     const settings = this.getSettings();
     const endpoint = `${this.baseUrl}bot${settings.options.botAPI}/${
       payload.image ? 'sendPhoto' : 'sendMessage'
@@ -117,11 +117,11 @@ class TelegramAgent implements NotificationAgent {
           })}`,
         );
         this.logger.debug(e);
-        return false;
+        return `Failure: ${e.message}`;
       }
     }
 
-    return true;
+    return 'Success';
   }
 }
 

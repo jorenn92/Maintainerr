@@ -143,11 +143,11 @@ class SlackAgent implements NotificationAgent {
   public async send(
     type: NotificationType,
     payload: NotificationPayload,
-  ): Promise<boolean> {
+  ): Promise<string> {
     const settings = this.getSettings();
 
     if (!hasNotificationType(type, settings.types ?? [0])) {
-      return true;
+      return 'Success';
     }
 
     this.logger.log('Sending Slack notification');
@@ -157,7 +157,7 @@ class SlackAgent implements NotificationAgent {
         this.buildEmbed(type, payload),
       );
 
-      return true;
+      return 'Success';
     } catch (e) {
       this.logger.error(
         `Error sending Slack notification. Details: ${JSON.stringify({
@@ -168,7 +168,7 @@ class SlackAgent implements NotificationAgent {
         })}`,
       );
       this.logger.debug(e);
-      return false;
+      return `Failure: ${e.message}`;
     }
   }
 }

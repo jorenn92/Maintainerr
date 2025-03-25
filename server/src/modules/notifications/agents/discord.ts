@@ -140,9 +140,9 @@ class DiscordAgent implements NotificationAgent {
   public async send(
     type: NotificationType,
     payload: NotificationPayload,
-  ): Promise<boolean> {
+  ): Promise<string> {
     if (!hasNotificationType(type, this.getSettings().types ?? [0])) {
-      return true;
+      return 'Success';
     }
 
     this.logger.log('Sending Discord notification');
@@ -159,7 +159,7 @@ class DiscordAgent implements NotificationAgent {
         } as DiscordWebhookPayload,
       );
 
-      return true;
+      return 'Success';
     } catch (e) {
       this.logger.error(
         `Error sending Discord notification. Details: ${JSON.stringify({
@@ -171,7 +171,7 @@ class DiscordAgent implements NotificationAgent {
       );
       this.logger.debug(e);
 
-      return false;
+      return `Failure: ${e.message}`;
     }
   }
 }
