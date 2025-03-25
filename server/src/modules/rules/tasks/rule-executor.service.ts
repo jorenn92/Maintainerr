@@ -295,6 +295,9 @@ export class RuleExecutorService extends TaskBase {
             NotificationType.MEDIA_REMOVED_FROM_COLLECTION,
             dataToRemove,
             collection.title,
+            undefined,
+            undefined,
+            { type: 'rulegroup', value: rulegroup.id },
           );
         }
 
@@ -313,6 +316,8 @@ export class RuleExecutorService extends TaskBase {
             dataToAdd,
             collection.title,
             collection.deleteAfterDays,
+            undefined,
+            { type: 'rulegroup', value: rulegroup.id },
           );
         }
 
@@ -339,6 +344,10 @@ export class RuleExecutorService extends TaskBase {
           'agents.notify',
           NotificationType.RULE_HANDLING_FAILED,
           undefined,
+          collection.title,
+          undefined,
+          undefined,
+          { type: 'rulegroup', value: rulegroup.id },
         );
       }
     } catch (err) {
@@ -347,6 +356,10 @@ export class RuleExecutorService extends TaskBase {
         'agents.notify',
         NotificationType.RULE_HANDLING_FAILED,
         undefined,
+        rulegroup.collection?.title,
+        undefined,
+        undefined,
+        { type: 'rulegroup', value: rulegroup.id },
       );
     }
   }

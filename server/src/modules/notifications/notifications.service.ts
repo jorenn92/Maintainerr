@@ -64,9 +64,14 @@ export class NotificationService {
   public sendNotification(
     type: NotificationType,
     payload: NotificationPayload,
+    rulegroup?: RuleGroup,
   ): void {
     this.activeAgents.forEach((agent) => {
-      this.sendNotificationToAgent(type, payload, agent);
+      // if rulegroup is supplied, then only send the notification if configured
+      if (
+        rulegroup == undefined || (rulegroup?.notifications?.find((n) => n.id === agent.getNotification().id))
+      )
+        this.sendNotificationToAgent(type, payload, agent);
     });
   }
 
@@ -548,6 +553,7 @@ export class NotificationService {
     collectionName?: string,
     dayAmount?: number,
     agent?: NotificationAgent,
+    identifier?: { type: string; value: string },
   ) {
     const payload: NotificationPayload = {
       subject: '',
@@ -561,10 +567,41 @@ export class NotificationService {
       dayAmount,
     );
 
+    // add extra fields
+    payload.extra = [];
+    payload.extra.push({ name: 'collectionName', value: collectionName });
+    payload.extra.push({ name: 'dayAmount', value: dayAmount?.toString() });
+    payload.extra.push({
+      name: 'mediaItems',
+      value: JSON.stringify(mediaItems),
+    });
+
+    // get the rulegroup when available
+    let rulegroup = undefined;
+    if (identifier) {
+      switch (identifier.type) {
+        case 'rulegroup':
+          rulegroup = await this.ruleGroupRepo.findOne({
+            where: {
+              id: +identifier.value,
+            },
+          });
+          break;
+        case 'collection':
+          rulegroup = await this.ruleGroupRepo.findOne({
+            where: {
+              collectionId: +identifier.value,
+            },
+          });
+          break;
+      }
+    }
+
+    // notify
     if (agent) {
       return this.sendNotificationToAgent(type, payload, agent);
     } else {
-      this.sendNotification(type, payload);
+      this.sendNotification(type, payload, rulegroup);
       return 'Success';
     }
   }

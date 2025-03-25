@@ -45,11 +45,11 @@ class PushbulletAgent implements NotificationAgent {
     const title = payload.event
       ? `${payload.event} - ${payload.subject}`
       : payload.subject;
-    let body = payload.message ?? '';
+    const body = payload.message ?? '';
 
-    for (const extra of payload.extra ?? []) {
-      body += `\n${extra.name}: ${extra.value}`;
-    }
+    // for (const extra of payload.extra ?? []) {
+    //   body += `\n${extra.name}: ${extra.value}`;
+    // }
 
     return {
       type: 'note',

@@ -116,6 +116,9 @@ export class CollectionWorkerService extends TaskBase {
               NotificationType.MEDIA_HANDLED,
               handledMediaForNotification,
               collection.title,
+              undefined,
+              undefined,
+              { type: 'collection', value: collection.id },
             );
           }
 

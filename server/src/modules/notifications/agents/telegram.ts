@@ -69,9 +69,9 @@ class TelegramAgent implements NotificationAgent {
       message += `\n${this.escapeText(payload.message)}`;
     }
 
-    for (const extra of payload.extra ?? []) {
-      message += `\n\*${extra.name}:\* ${extra.value}`;
-    }
+    // for (const extra of payload.extra ?? []) {
+    //   message += `\n\*${extra.name}:\* ${extra.value}`;
+    // }
 
     return payload.image
       ? {

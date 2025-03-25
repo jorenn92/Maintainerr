@@ -92,9 +92,9 @@ class PushoverAgent implements NotificationAgent {
       message += `<small>${message ? '\n' : ''}${payload.message}</small>`;
     }
 
-    for (const extra of payload.extra ?? []) {
-      message += `<small>\n<b>${extra.name}:</b> ${extra.value}</small>`;
-    }
+    // for (const extra of payload.extra ?? []) {
+    //   message += `<small>\n<b>${extra.name}:</b> ${extra.value}</small>`;
+    // }
 
     let attachment_base64;
     let attachment_type;

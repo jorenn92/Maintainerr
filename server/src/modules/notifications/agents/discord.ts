@@ -105,13 +105,13 @@ class DiscordAgent implements NotificationAgent {
     const color = EmbedColors.DARK_PURPLE;
     const fields: Field[] = [];
 
-    for (const extra of payload.extra ?? []) {
-      fields.push({
-        name: extra.name,
-        value: extra.value,
-        inline: true,
-      });
-    }
+    // for (const extra of payload.extra ?? []) {
+    //   fields.push({
+    //     name: extra.name,
+    //     value: extra.value,
+    //     inline: true,
+    //   });
+    // }
     return {
       title: payload.subject,
       description: payload.message,

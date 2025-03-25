@@ -53,11 +53,11 @@ class GotifyAgent implements NotificationAgent {
     const title = payload.event
       ? `${payload.event} - ${payload.subject}`
       : payload.subject;
-    let message = payload.message ?? '';
+    const message = payload.message ?? '';
 
-    for (const extra of payload.extra ?? []) {
-      message += `\n\n**${extra.name}**\n${extra.value}`;
-    }
+    // for (const extra of payload.extra ?? []) {
+    //   message += `\n\n**${extra.name}**\n${extra.value}`;
+    // }
 
     return {
       extras: {

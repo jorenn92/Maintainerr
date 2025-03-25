@@ -71,12 +71,12 @@ class SlackAgent implements NotificationAgent {
   ): SlackBlockEmbed {
     const fields: EmbedField[] = [];
 
-    for (const extra of payload.extra ?? []) {
-      fields.push({
-        type: 'mrkdwn',
-        text: `*${extra.name}*\n${extra.value}`,
-      });
-    }
+    // for (const extra of payload.extra ?? []) {
+    //   fields.push({
+    //     type: 'mrkdwn',
+    //     text: `*${extra.name}*\n${extra.value}`,
+    //   });
+    // }
 
     const blocks: EmbedBlock[] = [];
 
