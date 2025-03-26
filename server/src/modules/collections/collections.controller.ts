@@ -3,19 +3,21 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
+import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 import { CollectionWorkerService } from './collection-worker.service';
 import { CollectionsService } from './collections.service';
 import {
   AddCollectionMedia,
   IAlterableMediaDto,
 } from './interfaces/collection-media.interface';
-import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 
 @Controller('api/collections')
 export class CollectionsController {
@@ -63,7 +65,14 @@ export class CollectionsController {
   }
 
   @Post('/handle')
-  handleCollection() {
+  async handleCollection() {
+    if (await this.collectionWorkerService.isRunning()) {
+      throw new HttpException(
+        'The collection handler is already running',
+        HttpStatus.CONFLICT,
+      );
+    }
+
     this.collectionWorkerService.execute().catch((e) => console.error(e));
   }
 
