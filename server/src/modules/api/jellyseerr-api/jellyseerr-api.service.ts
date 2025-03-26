@@ -56,6 +56,7 @@ interface JellyseerrUser {
   plexToken: string;
   plexId?: number;
   plexUsername: string;
+  jellyfinUsername?: string;
   userType: number;
   permissions: number;
   avatar: string;
