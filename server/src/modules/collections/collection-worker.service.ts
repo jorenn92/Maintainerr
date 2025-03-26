@@ -1,21 +1,28 @@
+import {
+  CollectionHandlerFinishedEventDto,
+  CollectionHandlerProgressEventDto,
+  CollectionHandlerStartedEventDto,
+  MaintainerrEvent,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
+import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
+import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
 import { SettingsService } from '../settings/settings.service';
+import { TaskBase } from '../tasks/task.base';
 import { TasksService } from '../tasks/tasks.service';
 import { CollectionsService } from './collections.service';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
 import { ServarrAction } from './interfaces/collection.interface';
-import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
-import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
-import { TaskBase } from '../tasks/task.base';
-import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -39,6 +46,7 @@ export class CollectionWorkerService extends TaskBase {
     private readonly settings: SettingsService,
     private readonly tmdbIdService: TmdbIdService,
     private readonly tmdbIdHelper: TmdbIdService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(taskService);
   }
@@ -56,6 +64,13 @@ export class CollectionWorkerService extends TaskBase {
       return;
     }
 
+    this.eventEmitter.emit(
+      MaintainerrEvent.CollectionHandler_Started,
+      new CollectionHandlerStartedEventDto(
+        'Started handling of all collections',
+      ),
+    );
+
     await super.execute();
 
     // wait 5 seconds to make sure we're not executing together with the rule handler
@@ -67,90 +82,150 @@ export class CollectionWorkerService extends TaskBase {
     // Start actual task
     const appStatus = await this.settings.testConnections();
 
-    this.logger.log('Start handling all collections');
-    let handledCollections = 0;
-    if (appStatus) {
-      // loop over all active collections
-      const collections = await this.collectionRepo.find({
-        where: { isActive: true },
-      });
-
-      for (const collection of collections) {
-        if (collection.arrAction === ServarrAction.DO_NOTHING) {
-          this.infoLogger(
-            `Skipping collection '${collection.title}' as its action is 'Do Nothing'`,
-          );
-          continue;
-        }
-
-        this.infoLogger(`Handling collection '${collection.title}'`);
-
-        const collectionMedia = await this.collectionMediaRepo.find({
-          where: {
-            collectionId: collection.id,
-          },
-        });
-
-        const dangerDate = new Date(
-          new Date().getTime() - +collection.deleteAfterDays * 86400000,
-        );
-
-        for (const media of collectionMedia) {
-          // handle media addate <= due date
-          if (new Date(media.addDate) <= dangerDate) {
-            await this.handleMedia(collection, media);
-            handledCollections++;
-          }
-        }
-
-        this.infoLogger(`Handling collection '${collection.title}' finished`);
-      }
-
-      if (handledCollections > 0) {
-        if (this.settings.overseerrConfigured()) {
-          setTimeout(() => {
-            this.overseerrApi.api
-              .post('/settings/jobs/availability-sync/run')
-              .then(() => {
-                this.infoLogger(
-                  `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
-                );
-              })
-              .catch((err) => {
-                this.logger.error(
-                  `Failed to trigger Overseerr's availability-sync: ${err}`,
-                );
-                this.logger.debug(err);
-              });
-          }, 7000);
-        }
-
-        if (this.settings.jellyseerrConfigured()) {
-          setTimeout(() => {
-            this.jellyseerrApi.api
-              .post('/settings/jobs/availability-sync/run')
-              .then(() => {
-                this.infoLogger(
-                  `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
-                );
-              })
-              .catch((err) => {
-                this.logger.error(
-                  `Failed to trigger Jellyseerr's availability-sync: ${err}`,
-                );
-                this.logger.debug(err);
-              });
-          }, 7000);
-        }
-      } else {
-        this.infoLogger(`All collections handled. No data was altered`);
-      }
-    } else {
+    if (!appStatus) {
       this.infoLogger(
         'Not all applications are reachable.. Skipping collection handling',
       );
+      await this.finish();
+      this.eventEmitter.emit(
+        MaintainerrEvent.CollectionHandler_Finished,
+        new CollectionHandlerFinishedEventDto('Finished collection handling'),
+      );
+      return;
     }
+
+    this.logger.log('Started handling of all collections');
+    let handledCollectionMedia = 0;
+
+    // loop over all active collections
+    const collections = await this.collectionRepo.find({
+      where: { isActive: true },
+    });
+
+    const collectionsToHandle = collections.filter((collection) => {
+      if (collection.arrAction === ServarrAction.DO_NOTHING) {
+        this.infoLogger(
+          `Skipping collection '${collection.title}' as its action is 'Do Nothing'`,
+        );
+        return false;
+      }
+
+      return true;
+    });
+
+    const collectionHandleMediaGroup: {
+      collection: Collection;
+      mediaToHandle: CollectionMedia[];
+    }[] = [];
+
+    for (const collection of collectionsToHandle) {
+      const collectionMedia = await this.collectionMediaRepo.find({
+        where: {
+          collectionId: collection.id,
+        },
+      });
+
+      const mediaToHandle = collectionMedia.filter((media) => {
+        const dangerDate = new Date(
+          new Date().getTime() - +collection.deleteAfterDays * 86400000,
+        );
+        return new Date(media.addDate) <= dangerDate;
+      });
+
+      collectionHandleMediaGroup.push({
+        collection,
+        mediaToHandle,
+      });
+    }
+
+    const progressEvent = new CollectionHandlerProgressEventDto();
+    const emitProgressEvent = () => {
+      progressEvent.time = new Date();
+      this.eventEmitter.emit(
+        MaintainerrEvent.CollectionHandler_Progress,
+        progressEvent,
+      );
+    };
+    progressEvent.totalCollections = collectionsToHandle.length;
+    progressEvent.totalMediaToHandle = collectionHandleMediaGroup.reduce(
+      (acc, curr) => acc + curr.mediaToHandle.length,
+      0,
+    );
+    emitProgressEvent();
+
+    for (const collectionGroup of collectionHandleMediaGroup) {
+      const collection = collectionGroup.collection;
+      const collectionMedia = collectionGroup.mediaToHandle;
+
+      progressEvent.processingCollection = {
+        name: collection.title,
+        processedMedias: 0,
+        totalMedias: collectionMedia.length,
+      };
+      emitProgressEvent();
+
+      this.infoLogger(`Handling collection '${collection.title}'`);
+
+      for (const media of collectionMedia) {
+        await this.handleMedia(collection, media);
+        handledCollectionMedia++;
+        progressEvent.processingCollection.processedMedias++;
+        progressEvent.processedMedias++;
+        emitProgressEvent();
+      }
+
+      progressEvent.processedCollections++;
+      emitProgressEvent();
+
+      this.infoLogger(`Handling collection '${collection.title}' finished`);
+    }
+
+    if (handledCollectionMedia > 0) {
+      if (this.settings.overseerrConfigured()) {
+        setTimeout(() => {
+          this.overseerrApi.api
+            .post('/settings/jobs/availability-sync/run')
+            .then(() => {
+              this.infoLogger(
+                `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
+              );
+            })
+            .catch((err) => {
+              this.logger.error(
+                `Failed to trigger Overseerr's availability-sync: ${err}`,
+              );
+              this.logger.debug(err);
+            });
+        }, 7000);
+      }
+
+      if (this.settings.jellyseerrConfigured()) {
+        setTimeout(() => {
+          this.jellyseerrApi.api
+            .post('/settings/jobs/availability-sync/run')
+            .then(() => {
+              this.infoLogger(
+                `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
+              );
+            })
+            .catch((err) => {
+              this.logger.error(
+                `Failed to trigger Jellyseerr's availability-sync: ${err}`,
+              );
+              this.logger.debug(err);
+            });
+        }, 7000);
+      }
+    } else {
+      this.infoLogger(`All collections handled. No data was altered`);
+    }
+
     await this.finish();
+
+    this.eventEmitter.emit(
+      MaintainerrEvent.CollectionHandler_Finished,
+      new CollectionHandlerFinishedEventDto('Finished collection handling'),
+    );
   }
 
   private async handleMedia(collection: Collection, media: CollectionMedia) {

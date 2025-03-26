@@ -1,12 +1,13 @@
-import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
 const apiPort = process.env.API_PORT || 3001
 
 export function middleware(request: NextRequest) {
   if (
     request.nextUrl.pathname.startsWith('/api/') &&
-    !request.nextUrl.pathname.startsWith('/api/logs/stream')
+    !request.nextUrl.pathname.startsWith('/api/logs/stream') &&
+    !request.nextUrl.pathname.startsWith('/api/events/stream')
   ) {
     const url = request.nextUrl.clone()
     const destination = new URL(`http://localhost:${apiPort}`)

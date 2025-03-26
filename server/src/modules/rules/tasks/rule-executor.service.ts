@@ -1,16 +1,22 @@
+import {
+  MaintainerrEvent,
+  RuleHandlerFinishedEventDto,
+  RuleHandlerProgressEventDto,
+  RuleHandlerStartedEventDto,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import cacheManager from '../../api/lib/cache';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { CollectionsService } from '../../collections/collections.service';
+import { Collection } from '../../collections/entities/collection.entities';
 import { AddCollectionMedia } from '../../collections/interfaces/collection-media.interface';
 import { SettingsService } from '../../settings/settings.service';
+import { TaskBase } from '../../tasks/task.base';
 import { TasksService } from '../../tasks/tasks.service';
 import { RuleConstants } from '../constants/rules.constants';
-
-import cacheManager from '../../api/lib/cache';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
-import { Collection } from '../../collections/entities/collection.entities';
-import { TaskBase } from '../../tasks/task.base';
 import { RulesDto } from '../dtos/rules.dto';
 import { RuleGroup } from '../entities/rule-group.entities';
 import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
@@ -44,6 +50,7 @@ export class RuleExecutorService extends TaskBase {
     protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
     private readonly comparatorFactory: RuleComparatorServiceFactory,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(taskService);
     this.ruleConstants = new RuleConstants();
@@ -63,10 +70,15 @@ export class RuleExecutorService extends TaskBase {
       return;
     }
 
+    this.eventEmitter.emit(
+      MaintainerrEvent.RuleHandler_Started,
+      new RuleHandlerStartedEventDto('Started execution of all active rules'),
+    );
+
     await super.execute();
 
     try {
-      this.logger.log('Starting Execution of all active rules');
+      this.logger.log('Starting execution of all active rules');
       const appStatus = await this.settings.testConnections();
 
       // reset API caches, make sure latest data is used
@@ -77,7 +89,41 @@ export class RuleExecutorService extends TaskBase {
         if (ruleGroups) {
           const comparator = this.comparatorFactory.create();
 
+          let totalEvaluations = 0;
+          const ruleGroupTotals: { [key: string]: number } = {};
           for (const rulegroup of ruleGroups) {
+            const mediaItemCount = await this.plexApi.getLibraryContentCount(
+              rulegroup.libraryId,
+              rulegroup.dataType,
+            );
+
+            totalEvaluations += mediaItemCount * rulegroup.rules.length;
+            ruleGroupTotals[rulegroup.id] = mediaItemCount;
+          }
+
+          const progressEvent = new RuleHandlerProgressEventDto();
+          const emitProgressEvent = () => {
+            progressEvent.time = new Date();
+            this.eventEmitter.emit(
+              MaintainerrEvent.CollectionHandler_Progress,
+              progressEvent,
+            );
+          };
+          progressEvent.totalRuleGroups = ruleGroups.length;
+          progressEvent.totalEvaluations = totalEvaluations;
+
+          for (let i = 0; i < ruleGroups.length; i++) {
+            const rulegroup = ruleGroups[i];
+
+            progressEvent.processingRuleGroup = {
+              name: rulegroup.name,
+              number: i + 1,
+              processedEvaluations: 0,
+              totalEvaluations:
+                ruleGroupTotals[rulegroup.id] * rulegroup.rules.length,
+            };
+            emitProgressEvent();
+
             if (rulegroup.useRules) {
               this.logger.log(`Executing rules for '${rulegroup.name}'`);
               this.startTime = new Date();
@@ -96,13 +142,22 @@ export class RuleExecutorService extends TaskBase {
                 ? rulegroup.dataType
                 : undefined;
 
-              // Run rules data shunks of 50
+              // Run rules data chunks of 50
               while (!this.plexData.finished) {
                 await this.getPlexData(rulegroup.libraryId);
                 const ruleResult = await comparator.executeRulesWithData(
                   rulegroup,
                   this.plexData.data,
+                  false,
+                  () => {
+                    progressEvent.processedEvaluations +=
+                      this.plexData.data.length;
+                    progressEvent.processingRuleGroup.processedEvaluations +=
+                      this.plexData.data.length;
+                    emitProgressEvent();
+                  },
                 );
+
                 if (ruleResult) {
                   this.resultData.push(...ruleResult?.data);
                 }
@@ -131,6 +186,11 @@ export class RuleExecutorService extends TaskBase {
 
     // clean up
     await this.finish();
+
+    this.eventEmitter.emit(
+      MaintainerrEvent.RuleHandler_Finished,
+      new RuleHandlerFinishedEventDto('Finished execution of all active rules'),
+    );
   }
 
   private async syncManualPlexMediaToCollectionDB(rulegroup: RuleGroup) {
