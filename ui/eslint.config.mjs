@@ -1,7 +1,8 @@
 import { FlatCompat } from '@eslint/eslintrc'
+import pluginQuery from '@tanstack/eslint-plugin-query'
+import eslintConfigPrettier from 'eslint-config-prettier'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import eslintConfigPrettier from 'eslint-config-prettier'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -22,6 +23,7 @@ const configs = [
       '@typescript-eslint/ban-ts-comment': 'off',
     },
   },
+  ...pluginQuery.configs['flat/recommended'],
   eslintConfigPrettier,
 ]
 

@@ -50,7 +50,7 @@ export class TaskBase implements OnApplicationBootstrap {
     return this.taskService.updateJob(this.name, cron, this.execute.bind(this));
   }
 
-  protected async isRunning() {
+  public async isRunning() {
     return await this.taskService.isRunning(this.name);
   }
 }

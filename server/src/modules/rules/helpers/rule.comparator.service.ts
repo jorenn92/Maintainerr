@@ -76,6 +76,7 @@ export class RuleComparatorService {
     rulegroup: RulesDto,
     plexData: PlexLibraryItem[],
     withStats = false,
+    onRuleProgress?: (processingRule: number) => void,
   ): Promise<IComparatorReturnValue> {
     try {
       // prepare
@@ -94,7 +95,12 @@ export class RuleComparatorService {
       // prepare statistics if needed
       this.prepareStatistics();
 
+      let ruleNumber = 0;
+
       for (const rule of rulegroup.rules) {
+        ruleNumber++;
+        onRuleProgress?.(ruleNumber);
+
         const parsedRule = JSON.parse((rule as RuleDbDto).ruleJson) as RuleDto;
 
         // force operator of very first rule to null, otherwise this might cause corruption
