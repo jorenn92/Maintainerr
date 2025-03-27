@@ -910,7 +910,7 @@ export class RuleConstants {
         {
           id: 0,
           name: 'addUser',
-          humanName: 'Requested by user (Jellyfin, or local username)',
+          humanName: 'Requested by user (Jellyfin, Emby, Plex or local username)',
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
         }, //  returns username[]
