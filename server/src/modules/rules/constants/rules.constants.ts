@@ -218,9 +218,9 @@ export class RuleConstants {
         {
           id: 8,
           name: 'fileVideoResolution',
-          humanName: '[list] Media file resolution (4k, 1080,..)',
+          humanName: 'Media file resolution (4k, 1080,..)',
           mediaType: MediaType.MOVIE,
-          type: RuleType.TEXT_LIST,
+          type: RuleType.TEXT,
         },
         {
           id: 9,
@@ -556,9 +556,9 @@ export class RuleConstants {
         {
           id: 8,
           name: 'fileAudioChannels',
-          humanName: '[list] File - audio channels',
+          humanName: 'File - audio channels',
           mediaType: MediaType.MOVIE,
-          type: RuleType.NUMBER_LIST,
+          type: RuleType.NUMBER,
         },
         {
           id: 9,
