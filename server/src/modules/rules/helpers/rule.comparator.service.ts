@@ -269,9 +269,11 @@ export class RuleComparatorService {
           ? rule.customVal.value.includes('-')
             ? new Date(rule.customVal.value)
             : new Date(+rule.customVal.value * 1000)
-          : rule.customVal.ruleTypeId === +RuleType.TEXT
+          : rule.customVal.ruleTypeId === +RuleType.TEXT ||
+              rule.customVal.ruleTypeId === +RuleType.TEXT_LIST
             ? rule.customVal.value
             : rule.customVal.ruleTypeId === +RuleType.NUMBER ||
+                rule.customVal.ruleTypeId === +RuleType.NUMBER_LIST ||
                 rule.customVal.ruleTypeId === +RuleType.BOOL
               ? +rule.customVal.value
               : null;
@@ -295,8 +297,10 @@ export class RuleComparatorService {
         secondVal = new Date(+secondVal);
       }
       if (
-        // if custom secondval is text, check if it's parsable as an array
-        rule.customVal.ruleTypeId === +RuleType.TEXT &&
+        // if custom secondval is text or text list, check if it's parsable as an array
+        [+RuleType.TEXT, +RuleType.TEXT_LIST].includes(
+          rule.customVal.ruleTypeId,
+        ) &&
         typeof secondVal === 'string' &&
         this.isStringParsableToArray(secondVal)
       ) {

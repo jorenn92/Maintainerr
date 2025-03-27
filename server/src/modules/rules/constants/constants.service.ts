@@ -86,7 +86,7 @@ export class RuleConstanstService {
         break;
       case 4:
         ruleType = RuleType.NUMBER_LIST;
-        value = customValue.value;
+        value = +customValue.value;
         break;
       case 5:
         ruleType = RuleType.TEXT_LIST;
