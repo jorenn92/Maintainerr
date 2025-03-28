@@ -269,6 +269,7 @@ export class RulesService {
         params.libraryId,
         collection.id,
         params.useRules !== undefined ? params.useRules : true,
+        params.deleteTorrents !== undefined ? params.deleteTorrents : true,
         params.isActive !== undefined ? params.isActive : true,
         params.dataType !== undefined ? params.dataType : undefined,
       );
@@ -391,6 +392,7 @@ export class RulesService {
           params.libraryId,
           collection.id,
           params.useRules !== undefined ? params.useRules : true,
+          params.deleteTorrents !== undefined ? params.deleteTorrents : true,
           params.isActive !== undefined ? params.isActive : true,
           params.dataType !== undefined ? params.dataType : undefined,
           group.id,
@@ -767,6 +769,7 @@ export class RulesService {
     libraryId: number,
     collectionId: number,
     useRules = true,
+    deleteTorrents = true,
     isActive = true,
     dataType = undefined,
     id?: number,
@@ -779,6 +782,7 @@ export class RulesService {
         collectionId: +collectionId,
         isActive: isActive,
         useRules: useRules,
+        deleteTorrents: deleteTorrents,
         dataType: dataType,
       };
       const connection = this.connection.createQueryBuilder();

@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddJellyfinSettings1745483905438 implements MigrationInterface {
-  name = 'AddJellyfinSettings1745483905438';
+export class AddJellyfinSettings1755083905438 implements MigrationInterface {
+  name = 'AddJellyfinSettings1755083905438';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(

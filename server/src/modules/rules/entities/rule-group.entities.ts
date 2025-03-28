@@ -1,13 +1,13 @@
-import { Collection } from '../../collections/entities/collection.entities';
-import { ICollection } from '../../collections/interfaces/collection.interface';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
+  Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
-  JoinColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Collection } from '../../collections/entities/collection.entities';
+import { ICollection } from '../../collections/interfaces/collection.interface';
 import { Rules } from './rules.entities';
 
 @Entity()
@@ -32,6 +32,9 @@ export class RuleGroup {
 
   @Column({ nullable: false, default: true })
   useRules: boolean;
+
+  @Column({ nullable: false, default: true })
+  deleteTorrents: boolean;
 
   @Column({ nullable: true })
   dataType: number;

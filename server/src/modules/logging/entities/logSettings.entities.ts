@@ -10,7 +10,7 @@ export class LogSettings implements LogSettingDto {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false, default: DEFAULT_LOG_LEVEL })
+  @Column({ nullable: false, default: DEFAULT_LOG_LEVEL, type: 'varchar' })
   level: LogLevel;
 
   @Column({ nullable: false, default: DEFAULT_LOG_MAX_SIZE })

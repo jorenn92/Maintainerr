@@ -43,11 +43,13 @@ It's a one-stop-shop for handling those outlying shows and movies that take up p
 Currently, <b>Maintainerr</b> supports rule parameters from these apps :
 
 - Plex
+- Jellyfin
 - Overseerr
 - Jellyseerr
 - Radarr
 - Sonarr
 - Tautulli
+- qBittorrent
 
 # Preview
 

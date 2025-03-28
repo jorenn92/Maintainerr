@@ -97,7 +97,7 @@ export class JellyfinApiService {
       // Create an array of promises to fetch the user data in parallel
       const userPromises = usersIds.map(async (userId) => {
         const response: JellyfinUserDataResponse = await this.api.get(`/UserItems/${mediaId}/UserData?userId=${userId}`);
-        if (response.Played) {
+        if (response && response.Played) {
           const userSeen = new Date(response.LastPlayedDate);
           if (!lastSeen || userSeen > lastSeen) {
             lastSeen = userSeen;
@@ -131,7 +131,7 @@ export class JellyfinApiService {
       // Create an array of promises to fetch the user data in parallel
       const userPromises = usersIds.map(async (userId) => {
         const response: JellyfinUserDataResponse = await this.api.get(`/UserItems/${mediaId}/UserData?userId=${userId}`)
-        if (response.Played) {
+        if (response && response.Played) {
           playCount += response.PlayCount;
         }
       });

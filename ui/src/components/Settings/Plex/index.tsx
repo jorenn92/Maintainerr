@@ -301,12 +301,12 @@ const PlexSettings = () => {
         <Alert type="info" title="Settings successfully updated" />
       ) : undefined}
 
-      {tokenValid || settingsCtx.settings.jellyfin_api_key ? (
+      {tokenValid ? (
         ''
       ) : (
         <Alert
           type="info"
-          title="Plex or Jellyfin configuration is required. Other configuration options will become available after configuring Plex or Jellyfin."
+          title="Plex configuration is required. Other configuration options will become available after configuring Plex."
         />
       )}
 

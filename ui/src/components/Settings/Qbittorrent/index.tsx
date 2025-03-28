@@ -14,10 +14,13 @@ const QbittorrentSettings = () => {
   const passwordRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
-  const [testBanner, setTestbanner] = useState<{
-    status: boolean
-    version: string
-  }>({ status: false, version: '0' })
+  const [testBanner, setTestbanner] = useState<
+    | {
+        status: boolean
+        message: string
+      }
+    | undefined
+  >()
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Torrents'
@@ -56,8 +59,8 @@ const QbittorrentSettings = () => {
     }
   }
 
-  const appTest = (result: { status: boolean; version: string }) => {
-    setTestbanner({ status: result.status, version: result.version })
+  const appTest = (result: { status: boolean; message: string }) => {
+    setTestbanner({ status: result.status, message: result.message })
   }
 
   return (
@@ -72,19 +75,15 @@ const QbittorrentSettings = () => {
         <Alert type="info" title="Settings successfully updated" />
       ) : undefined}
 
-      {testBanner.version !== '0' ? (
-        testBanner.status ? (
+      {testBanner &&
+        (testBanner.status ? (
           <Alert
             type="warning"
-            title={`Successfully connected to Qbittorrent`}
+            title={`Successfully connected to Qbittorrent (${testBanner.message})`}
           />
         ) : (
-          <Alert
-            type="error"
-            title="Connection failed! Double check your entries and make sure to Save Changes before you Test."
-          />
-        )
-      ) : undefined}
+          <Alert type="error" title={testBanner.message} />
+        ))}
 
       <div className="section">
         <form onSubmit={submit}>

@@ -13,10 +13,13 @@ const JellyfinSettings = () => {
   const apiKeyRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
-  const [testBanner, setTestbanner] = useState<{
-    status: boolean
-    version: string
-  }>({ status: false, version: '0' })
+  const [testBanner, setTestbanner] = useState<
+    | {
+        status: boolean
+        message: string
+      }
+    | undefined
+  >()
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Jellyfin'
@@ -53,8 +56,8 @@ const JellyfinSettings = () => {
     }
   }
 
-  const appTest = (result: { status: boolean; version: string }) => {
-    setTestbanner({ status: result.status, version: result.version })
+  const appTest = (result: { status: boolean; message: string }) => {
+    setTestbanner({ status: result.status, message: result.message })
   }
 
   return (
@@ -69,29 +72,15 @@ const JellyfinSettings = () => {
         <Alert type="info" title="Settings successfully updated" />
       ) : undefined}
 
-      {settingsCtx.settings.plex_auth_token ||
-      settingsCtx.settings.jellyfin_api_key ? (
-        ''
-      ) : (
-        <Alert
-          type="info"
-          title="Plex or Jellyfin configuration is required. Other configuration options will become available after configuring Plex or Jellyfin."
-        />
-      )}
-
-      {testBanner.version !== '0' ? (
-        testBanner.status ? (
+      {testBanner &&
+        (testBanner.status ? (
           <Alert
             type="warning"
-            title={`Successfully connected to Jellyfin (${testBanner.version})`}
+            title={`Successfully connected to Jellyfin (${testBanner.message})`}
           />
         ) : (
-          <Alert
-            type="error"
-            title="Connection failed! Double check your entries and make sure to Save Changes before you Test."
-          />
-        )
-      ) : undefined}
+          <Alert type="error" title={testBanner.message} />
+        ))}
 
       <div className="section">
         <form onSubmit={submit}>
