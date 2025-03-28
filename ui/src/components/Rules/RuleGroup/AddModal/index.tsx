@@ -32,7 +32,6 @@ import { CloudDownloadIcon } from '@heroicons/react/outline'
 import { useToasts } from 'react-toast-notifications'
 import ConfigureNotificationModal from './ConfigureNotificationModal'
 import { AgentConfiguration } from '../../../Settings/Notifications/CreateNotificationModal'
-import Modal from '../../../Common/Modal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -134,6 +133,8 @@ const AddModal = (props: AddModal) => {
     ConstantsCtx.constants.applications?.some(
       (x) => x.id == Application.OVERSEERR,
     ) ?? false
+
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
   function updateLibraryId(value: string) {
     const lib = LibrariesCtx.libraries.find(
@@ -907,11 +908,18 @@ const AddModal = (props: AddModal) => {
             </div>
 
             <div className="form-row">
-              <label htmlFor="notifications" className="text-label">
+              <label
+                htmlFor="notifications"
+                className="text-label flex items-center gap-2"
+              >
                 Notifications
-                {/* <p className="text-xs font-normal">
-                Configure notifications
-              </p> */}
+                <CachedImage
+                  className="h-[1.8em] w-[3.2em]"
+                  width={'0'}
+                  height={'0'}
+                  src={`${basePath}/beta.svg`}
+                  alt="BETA"
+                />
               </label>
               <div className="form-input">
                 <div className="form-input-field">

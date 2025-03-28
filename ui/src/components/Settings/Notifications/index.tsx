@@ -3,19 +3,15 @@ import {
   PlusCircleIcon,
   TrashIcon,
 } from '@heroicons/react/solid'
-import { debounce } from 'lodash'
 import { useContext, useEffect, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
 import SettingsContext from '../../../contexts/settings-context'
-import GetApiHandler, {
-  DeleteApiHandler,
-  PostApiHandler,
-} from '../../../utils/ApiHandler'
+import GetApiHandler, { DeleteApiHandler } from '../../../utils/ApiHandler'
 import Button from '../../Common/Button'
-import ExecuteButton from '../../Common/ExecuteButton'
 import CreateNotificationModal, {
   AgentConfiguration,
 } from './CreateNotificationModal'
+import CachedImage from '../../Common/CachedImage'
 
 const NotificationSettings = () => {
   const settingsCtx = useContext(SettingsContext)
@@ -23,6 +19,8 @@ const NotificationSettings = () => {
   const [configurations, setConfigurations] = useState<AgentConfiguration[]>()
   const [editConfig, setEditConfig] = useState<AgentConfiguration>()
   const { addToast } = useToasts()
+
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Notifications'
@@ -53,7 +51,16 @@ const NotificationSettings = () => {
   return (
     <div className="h-full w-full">
       <div className="section-settings h-full w-full">
-        <h3 className="heading">Notification Settings</h3>
+        <h3 className="heading flex items-center gap-2">
+          Notification Settings
+          <CachedImage
+            className="h-[1em] w-[2.5em]"
+            width={'0'}
+            height={'0'}
+            src={`${basePath}/beta.svg`}
+            alt="BETA"
+          />
+        </h3>
         <p className="description">Notification configuration</p>
       </div>
 
