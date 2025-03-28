@@ -658,7 +658,7 @@ export class RuleConstants {
           humanName: 'Status (continuing, ended)',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT,
-          showType: [EPlexDataType.SHOWS],
+          showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
         },
         {
           id: 7,
@@ -666,7 +666,7 @@ export class RuleConstants {
           humanName: 'Show ended',
           mediaType: MediaType.SHOW,
           type: RuleType.BOOL,
-          showType: [EPlexDataType.SHOWS],
+          showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
         },
         {
           id: 8,
