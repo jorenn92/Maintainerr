@@ -4,9 +4,8 @@ import { JellyfinApi } from '../lib/jellyfinApi';
 import {
   JellyfinInfoResponse,
   JellyfinItemsResponse,
-  JellyfinUsageResponse,
   JellyfinUserDataResponse,
-  JellyfinUserResponse,
+  JellyfinUserResponse
 } from './interfaces/server.interfaces';
 
 @Injectable()
@@ -18,10 +17,10 @@ export class JellyfinApiService {
     @Inject(forwardRef(() => SettingsService))
     private readonly settings: SettingsService,
   ) {
-    this.initialize();
+    this.init();
   }
 
-  public async initialize() {
+  public async init() {
     try {
       const url = this.settings.jellyfin_url;
       const apiKey = this.settings.jellyfin_api_key;

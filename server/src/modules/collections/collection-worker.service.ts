@@ -1,21 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
+import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { QbittorrentApiService } from '../api/qbittorrent-api/qbittorrent-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
+import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
 import { SettingsService } from '../settings/settings.service';
+import { TaskBase } from '../tasks/task.base';
 import { TasksService } from '../tasks/tasks.service';
 import { CollectionsService } from './collections.service';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
 import { ServarrAction } from './interfaces/collection.interface';
-import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
-import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
-import { TaskBase } from '../tasks/task.base';
-import { QbittorrentApiService } from '../api/qbittorrent-api/qbittorrent-api.service';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -32,6 +33,7 @@ export class CollectionWorkerService extends TaskBase {
     private readonly collectionService: CollectionsService,
     private readonly plexApi: PlexApiService,
     private readonly overseerrApi: OverseerrApiService,
+    private readonly jellyseerrApi: JellyseerrApiService,
     private readonly servarrApi: ServarrService,
     private readonly qbittorrentApi: QbittorrentApiService,
     private readonly tmdbApi: TmdbApiService,
@@ -74,7 +76,15 @@ export class CollectionWorkerService extends TaskBase {
       const collections = await this.collectionRepo.find({
         where: { isActive: true },
       });
+
       for (const collection of collections) {
+        if (collection.arrAction === ServarrAction.DO_NOTHING) {
+          this.infoLogger(
+            `Skipping collection '${collection.title}' as its action is 'Do Nothing'`,
+          );
+          continue;
+        }
+
         this.infoLogger(`Handling collection '${collection.title}'`);
 
         const collectionMedia = await this.collectionMediaRepo.find({
@@ -97,6 +107,7 @@ export class CollectionWorkerService extends TaskBase {
 
         this.infoLogger(`Handling collection '${collection.title}' finished`);
       }
+
       if (handledCollections > 0) {
         if (this.settings.overseerrConfigured()) {
           setTimeout(() => {
@@ -106,6 +117,30 @@ export class CollectionWorkerService extends TaskBase {
                 this.infoLogger(
                   `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
                 );
+              })
+              .catch((err) => {
+                this.logger.error(
+                  `Failed to trigger Overseerr's availability-sync: ${err}`,
+                );
+                this.logger.debug(err);
+              });
+          }, 7000);
+        }
+
+        if (this.settings.jellyseerrConfigured()) {
+          setTimeout(() => {
+            this.jellyseerrApi.api
+              .post('/settings/jobs/availability-sync/run')
+              .then(() => {
+                this.infoLogger(
+                  `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
+                );
+              })
+              .catch((err) => {
+                this.logger.error(
+                  `Failed to trigger Jellyseerr's availability-sync: ${err}`,
+                );
+                this.logger.debug(err);
               });
           }, 7000);
         }
@@ -121,6 +156,11 @@ export class CollectionWorkerService extends TaskBase {
   }
 
   private async handleMedia(collection: Collection, media: CollectionMedia) {
+    if (collection.arrAction === ServarrAction.DO_NOTHING) {
+      // Sanity check, ideally we shouldn't ever call handleMedia on a collection with servarr
+      // action DO_NOTHING, but if we do, ensure we do nothing.
+      return;
+    }
     let plexData: PlexMetadata = undefined;
 
     const plexLibrary = (await this.plexApi.getLibraries()).find(

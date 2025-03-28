@@ -66,6 +66,10 @@ const ArrAction = (props: ArrActionProps) => {
           id: 0,
           name: 'Delete',
         },
+        {
+          id: 4,
+          name: 'Do nothing',
+        },
       ]
     : props.options
 

@@ -22,22 +22,28 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
       enable: setupDone,
     },
     {
-      text: 'Overseerr',
-      route: '/settings/overseerr',
-      regex: /^\/settings(\/overseerr)?$/,
-      enable: setupDone,
-    },
-    {
       text: 'Plex',
       route: '/settings/plex',
       regex: /^\/settings(\/plex)?$/,
       enable: true,
     },
     {
+      text: 'Overseerr',
+      route: '/settings/overseerr',
+      regex: /^\/settings(\/overseerr)?$/,
+      enable: setupDone,
+    },
+    {
+      text: 'Jellyseerr',
+      route: '/settings/jellyseerr',
+      regex: /^\/settings(\/jellyseerr)?$/,
+      enable: setupDone,
+    },
+    {
       text: 'Jellyfin',
       route: '/settings/jellyfin',
       regex: /^\/settings(\/jellyfin)?$/,
-      enable: true,
+      enable: setupDone,
     },
     {
       text: 'Radarr',
@@ -61,6 +67,12 @@ const SettingsWrapper: React.FC<{ children?: ReactNode }> = (props: {
       text: 'Qbittorrent',
       route: '/settings/qbittorrent',
       regex: /^\/settings(\/qbittorrent)?$/,
+      enable: setupDone,
+    },
+    {
+      text: 'Logs',
+      route: '/settings/logs',
+      regex: /^\/settings(\/logs)?$/,
       enable: setupDone,
     },
     {

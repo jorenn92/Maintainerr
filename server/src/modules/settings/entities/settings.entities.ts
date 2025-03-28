@@ -67,6 +67,12 @@ export class Settings implements SettingDto {
 
   @Column({ nullable: true })
   qbittorrent_password: string;
+  
+  @Column({ nullable: true })
+  jellyseerr_url: string;
+
+  @Column({ nullable: true })
+  jellyseerr_api_key: string;
 
   @Column({ nullable: false, default: CronExpression.EVERY_12_HOURS })
   collection_handler_job_cron: string;

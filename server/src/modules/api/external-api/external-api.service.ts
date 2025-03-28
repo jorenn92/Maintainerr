@@ -1,8 +1,9 @@
 import { Logger } from '@nestjs/common';
 import axios, { AxiosError, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import { wrapper } from 'axios-cookiejar-support';
-import { CookieJar } from 'tough-cookie';
+import axiosRetry from 'axios-retry';
 import NodeCache from 'node-cache';
+import { CookieJar } from 'tough-cookie';
 
 // 20 minute default TTL (in seconds)
 const DEFAULT_TTL = 1200;
@@ -41,6 +42,16 @@ export class ExternalApiService {
         jar,
       }),
     );
+    axiosRetry(this.axios, {
+      retries: 3,
+      retryDelay: axiosRetry.exponentialDelay,
+      onRetry: (_, error, requestConfig) => {
+        const url = this.axios.getUri(requestConfig);
+        this.logger.warn(
+          `Retrying ${requestConfig.method.toUpperCase()} ${url}: ${error}`,
+        );
+      },
+    });
     this.baseUrl = baseUrl;
     this.cache = options.nodeCache;
   }
@@ -64,7 +75,7 @@ export class ExternalApiService {
       return response.data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
-      this.logger.debug(`GET request to ${url} failed: ${err}`);
+      this.logger.debug(`GET ${url} failed: ${err}`);
       return undefined;
     }
   }
@@ -77,9 +88,16 @@ export class ExternalApiService {
       return (await this.axios.get<T>(endpoint, config)).data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
-      this.logger.debug(`GET request to ${url} failed: ${err}`);
+      this.logger.debug(`GET ${url} failed: ${err}`);
       return undefined;
     }
+  }
+
+  public async getRawWithoutCache<T>(
+    endpoint: string,
+    config?: RawAxiosRequestConfig,
+  ) {
+    return this.axios.get<T>(endpoint, config);
   }
 
   public async delete<T>(
@@ -91,7 +109,7 @@ export class ExternalApiService {
       return response.data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
-      this.logger.debug(`DELETE request to ${url} failed: ${err}`);
+      this.logger.debug(`DELETE ${url} failed: ${err}`);
       return undefined;
     }
   }
@@ -106,7 +124,7 @@ export class ExternalApiService {
       return response.data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
-      this.logger.debug(`PUT request to ${url} failed: ${err}`);
+      this.logger.debug(`PUT ${url} failed: ${err}`);
       return undefined;
     }
   }
@@ -121,7 +139,7 @@ export class ExternalApiService {
       return response.data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
-      this.logger.debug(`POST request to ${url} failed: ${err}`);
+      this.logger.debug(`POST ${url} failed: ${err}`);
       return undefined;
     }
   }
@@ -159,7 +177,7 @@ export class ExternalApiService {
       return response.data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
-      this.logger.debug(`GET request to ${url} failed: ${err}`);
+      this.logger.debug(`GET ${url} failed: ${err}`);
       return undefined;
     }
   }
@@ -169,7 +187,7 @@ export class ExternalApiService {
     data?: string,
     config?: RawAxiosRequestConfig,
     ttl?: number,
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     const url = this.axios.getUri({ ...config, url: endpoint });
 
     try {
@@ -197,9 +215,7 @@ export class ExternalApiService {
                   `${url} Rate limit hit. Retry after: ${retryAfter} seconds.`,
                 );
               } else {
-                this.logger.warn(
-                  `POST request to ${url} failed: ${err.message}`,
-                );
+                this.logger.warn(`POST ${url} failed: ${err.message}`);
                 this.logger.debug(err);
               }
             });
@@ -216,7 +232,7 @@ export class ExternalApiService {
               `${url} Rate limit hit. Retry after: ${retryAfter} seconds.`,
             );
           } else {
-            this.logger.warn(`POST request to ${url} failed: ${err.message}`);
+            this.logger.warn(`POST ${url} failed: ${err.message}`);
             this.logger.debug(err);
           }
           return undefined;
@@ -228,7 +244,7 @@ export class ExternalApiService {
 
       return response.data;
     } catch (err: any) {
-      this.logger.warn(`POST request to ${url} failed: ${err.message}`);
+      this.logger.warn(`POST ${url} failed: ${err.message}`);
       this.logger.debug(err);
       return undefined;
     }

@@ -11,10 +11,10 @@ export class QbittorrentApiService {
     @Inject(forwardRef(() => SettingsService))
     private readonly settings: SettingsService,
   ) {
-    this.initialize();
+    this.init();
   }
 
-  public async initialize() {
+  public async init() {
     try {
       const url = this.settings.qbittorrent_url;
       if (url) {

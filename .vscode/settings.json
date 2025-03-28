@@ -6,8 +6,13 @@
     "typescript",
     "typescriptreact"
   ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "sqltools.connections": [
     {
       "previewLimit": 50,
@@ -38,5 +43,8 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "files.associations": {
     "globals.css": "tailwindcss"
+  },
+  "search.exclude": {
+    "**/.yarn": true
   }
 }

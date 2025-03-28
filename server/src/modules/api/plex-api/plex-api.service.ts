@@ -1,11 +1,22 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import axios from 'axios';
+import cacheManager from '../../api/lib/cache';
+import PlexCommunityApi, {
+  PlexCommunityErrorResponse,
+  PlexCommunityWatchList,
+  PlexCommunityWatchListResponse,
+} from '../../api/lib/plexCommunityApi';
+import { Settings } from '../../settings/entities/settings.entities';
 import { PlexSettings } from '../../settings/interfaces/plex-settings.interface';
 import { SettingsService } from '../../settings/settings.service';
+import PlexApi from '../lib/plexApi';
+import PlexTvApi, { PlexUser } from '../lib/plextvApi';
 import { BasicResponseDto } from './dto/basic-response.dto';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
+import { EPlexDataType } from './enums/plex-data-type-enum';
 import {
-  PlexCollection,
   CreateUpdateCollection,
+  PlexCollection,
   PlexPlaylist,
 } from './interfaces/collection.interface';
 import {
@@ -28,16 +39,6 @@ import {
   PlexDevice,
   PlexStatusResponse,
 } from './interfaces/server.interface';
-import { EPlexDataType } from './enums/plex-data-type-enum';
-import axios from 'axios';
-import PlexApi from '../lib/plexApi';
-import PlexTvApi, { PlexUser } from '../lib/plextvApi';
-import cacheManager from '../../api/lib/cache';
-import { Settings } from '../../settings/entities/settings.entities';
-import PlexCommunityApi, {
-  PlexCommunityWatchHistory,
-  PlexCommunityWatchList,
-} from '../../api/lib/plexCommunityApi';
 
 @Injectable()
 export class PlexApiService {
@@ -363,10 +364,13 @@ export class PlexApiService {
     }
   }
 
-  public async getCollections(libraryId: string): Promise<PlexCollection[]> {
+  public async getCollections(
+    libraryId: string | number,
+    subType?: 'movie' | 'show' | 'season' | 'episode',
+  ): Promise<PlexCollection[]> {
     try {
       const response = await this.plexClient.queryAll<PlexLibraryResponse>({
-        uri: `/library/sections/${libraryId}/collections?`,
+        uri: `/library/sections/${libraryId}/collections?${subType ? `subtype=${subType}` : ''}`,
       });
       const collection: PlexCollection[] = response.MediaContainer
         .Metadata as PlexCollection[];
@@ -537,6 +541,12 @@ export class PlexApiService {
         await this.plexClient.queryAll<PlexLibraryResponse>({
           uri: `/library/collections/${collectionId}/children`,
         });
+
+      // Empty collections return no Metadata node
+      if (response.MediaContainer.Metadata === undefined) {
+        return [];
+      }
+
       return response.MediaContainer.Metadata as PlexLibraryItem[];
     } catch (err) {
       this.logger.warn(
@@ -670,15 +680,18 @@ export class PlexApiService {
 
   public async getWatchlistIdsForUser(
     userId: string,
+    username: string,
   ): Promise<PlexCommunityWatchList[]> {
     try {
       let result: PlexCommunityWatchList[] = [];
       let next = true;
-      let page = null;
+      let page: string | null = null;
       const size = 100;
 
       while (next) {
-        const resp = await this.plexCommunityClient.query({
+        const resp = await this.plexCommunityClient.query<
+          PlexCommunityWatchListResponse | PlexCommunityErrorResponse
+        >({
           query: `
           query GetWatchlistHub($uuid: ID = "", $first: PaginationInt!, $after: String) {
             user(id: $uuid) {
@@ -704,6 +717,19 @@ export class PlexApiService {
             after: page,
           },
         });
+
+        if (!resp) {
+          this.logger.warn(
+            `Failure while fetching watchlist of user ${userId} (${username})`,
+          );
+          return undefined;
+        } else if (resp.errors) {
+          this.logger.warn(
+            `Failure while fetching watchlist of user ${userId} (${username}): ${resp.errors.map((x) => x.message).join(', ')}`,
+          );
+          return undefined;
+        }
+
         const watchlist = resp.data.user.watchlist;
         result = [...result, ...watchlist.nodes];
 
@@ -716,119 +742,7 @@ export class PlexApiService {
       return result;
     } catch (e) {
       this.logger.warn(
-        `Failure while fetching watchlist of user with ID: ${userId}`,
-      );
-      this.logger.debug(e);
-    }
-  }
-
-  public async getWatchHistoryIdsForUser(
-    userId: string,
-  ): Promise<PlexCommunityWatchHistory[]> {
-    try {
-      let result: PlexCommunityWatchHistory[] = [];
-      let next = true;
-      let page = null;
-      const size = 50;
-
-      while (next) {
-        const resp = await this.plexCommunityClient.query({
-          query: `
-          query GetWatchHistoryHub($uuid: ID = "", $first: PaginationInt!, $after: String, $skipUserState: Boolean = false) {
-            user(id: $uuid) {
-              watchHistory(first: $first, after: $after) {
-                nodes {
-                  metadataItem {
-                    ...itemFields
-                  }
-                  date
-                  id
-                }
-                pageInfo {
-                  hasNextPage
-                  hasPreviousPage
-                  endCursor
-                }
-              }
-            }
-          }
-              
-          fragment itemFields on MetadataItem {
-            id
-            images {
-              coverArt
-              coverPoster
-              thumbnail
-              art
-            }
-            userState @skip(if: $skipUserState) {
-              viewCount
-              viewedLeafCount
-              watchlistedAt
-            }
-            title
-            key
-            type
-            index
-            publicPagesURL
-            parent {
-              ...parentFields
-            }
-            grandparent {
-              ...parentFields
-            }
-            publishedAt
-            leafCount
-            year
-            originallyAvailableAt
-            childCount
-          }
-              
-          fragment parentFields on MetadataItem {
-            index
-            title
-            publishedAt
-            key
-            type
-            images {
-              coverArt
-              coverPoster
-              thumbnail
-              art
-            }
-            userState @skip(if: $skipUserState) {
-              viewCount
-              viewedLeafCount
-              watchlistedAt
-            }
-          }       
-        `,
-          variables: {
-            uuid: userId,
-            first: size,
-            skipUserState: true,
-            after: page,
-          },
-        });
-        const watchHistory = resp?.data?.user?.watchHistory;
-        if (watchHistory) {
-          result = [
-            ...result,
-            ...watchHistory?.nodes?.map((n) => n.metadataItem.key),
-          ];
-        }
-
-        if (!watchHistory.pageInfo?.hasNextPage) {
-          next = false;
-        } else {
-          // await new Promise((resolve) => setTimeout(resolve, 1000));
-          page = watchHistory.pageInfo?.endCursor;
-        }
-      }
-      return result;
-    } catch (e) {
-      this.logger.warn(
-        `Failure while fetching watchHistory of user with ID: ${userId}`,
+        `Failure while fetching watchlist of user ${userId} (${username})`,
       );
       this.logger.debug(e);
     }

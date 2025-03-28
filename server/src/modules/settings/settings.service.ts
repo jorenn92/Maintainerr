@@ -1,30 +1,31 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isValidCron } from 'cron-validator';
 import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
-import { isValidCron } from 'cron-validator';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
+import { InternalApiService } from '../api/internal-api/internal-api.service';
+import { JellyfinApiService } from '../api/jellyfin-api/jellyfin-api.service';
+import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { QbittorrentApiService } from '../api/qbittorrent-api/qbittorrent-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
-import { SettingDto } from "./dto's/setting.dto";
-import { Settings } from './entities/settings.entities';
-import { InternalApiService } from '../api/internal-api/internal-api.service';
 import { TautulliApiService } from '../api/tautulli-api/tautulli-api.service';
-import { RadarrSettings } from './entities/radarr_settings.entities';
 import {
   DeleteRadarrSettingResponseDto,
   RadarrSettingRawDto,
   RadarrSettingResponseDto,
 } from "./dto's/radarr-setting.dto";
-import { SonarrSettings } from './entities/sonarr_settings.entities';
+import { SettingDto } from "./dto's/setting.dto";
 import {
   DeleteSonarrSettingResponseDto,
   SonarrSettingRawDto,
   SonarrSettingResponseDto,
 } from "./dto's/sonarr-setting.dto";
-import { JellyfinApiService } from '../api/jellyfin-api/jellyfin-api.service';
-import { QbittorrentApiService } from '../api/qbittorrent-api/qbittorrent-api.service';
+import { RadarrSettings } from './entities/radarr_settings.entities';
+import { Settings } from './entities/settings.entities';
+import { SonarrSettings } from './entities/sonarr_settings.entities';
 
 @Injectable()
 export class SettingsService implements SettingDto {
@@ -70,6 +71,10 @@ export class SettingsService implements SettingDto {
   qbittorrent_username: string;
 
   qbittorrent_password: string;
+  
+  jellyseerr_url: string;
+
+  jellyseerr_api_key: string;
 
   collection_handler_job_cron: string;
 
@@ -84,6 +89,8 @@ export class SettingsService implements SettingDto {
     private readonly overseerr: OverseerrApiService,
     @Inject(forwardRef(() => TautulliApiService))
     private readonly tautulli: TautulliApiService,
+    @Inject(forwardRef(() => JellyseerrApiService))
+    private readonly jellyseerr: JellyseerrApiService,
     @Inject(forwardRef(() => InternalApiService))
     private readonly internalApi: InternalApiService,
     @Inject(forwardRef(() => JellyfinApiService))
@@ -124,6 +131,8 @@ export class SettingsService implements SettingDto {
       this.qbittorrent_url = settingsDb?.qbittorrent_url;
       this.qbittorrent_username = settingsDb?.qbittorrent_username;
       this.qbittorrent_password = settingsDb?.qbittorrent_password;
+      this.jellyseerr_url = settingsDb?.jellyseerr_url;
+      this.jellyseerr_api_key = settingsDb?.jellyseerr_api_key;
       this.collection_handler_job_cron =
         settingsDb?.collection_handler_job_cron;
       this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;
@@ -415,8 +424,9 @@ export class SettingsService implements SettingDto {
         this.overseerr.init();
         this.tautulli.init();
         this.internalApi.init();
-        this.jellyfin.initialize();
-        this.qbittorrent.initialize();
+        this.jellyfin.init();
+        this.qbittorrent.init();
+        this.jellyseerr.init();
 
         // reload Rule handler job if changed
         if (
@@ -474,10 +484,44 @@ export class SettingsService implements SettingDto {
 
   public async testOverseerr(): Promise<BasicResponseDto> {
     try {
-      const resp = await this.overseerr.status();
-      return resp?.version != null
-        ? { status: 'OK', code: 1, message: resp.version }
-        : { status: 'NOK', code: 0, message: 'Failure' };
+      const validateResponse = await this.overseerr.validateApiConnectivity();
+
+      if (validateResponse.status === 'OK') {
+        const resp = await this.overseerr.status();
+        return resp?.version != null
+          ? { status: 'OK', code: 1, message: resp.version }
+          : {
+              status: 'NOK',
+              code: 0,
+              message:
+                'Connection failed! Double check your entries and make sure to Save Changes before you Test.',
+            };
+      } else {
+        return validateResponse;
+      }
+    } catch (e) {
+      this.logger.debug(e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async testJellyseerr(): Promise<BasicResponseDto> {
+    try {
+      const validateResponse = await this.jellyseerr.validateApiConnectivity();
+
+      if (validateResponse.status === 'OK') {
+        const resp = await this.jellyseerr.status();
+        return resp?.version != null
+          ? { status: 'OK', code: 1, message: resp.version }
+          : {
+              status: 'NOK',
+              code: 0,
+              message:
+                'Connection failed! Double check your entries and make sure to Save Changes before you Test.',
+            };
+      } else {
+        return validateResponse;
+      }
     } catch (e) {
       this.logger.debug(e);
       return { status: 'NOK', code: 0, message: 'Failure' };
@@ -576,6 +620,7 @@ export class SettingsService implements SettingDto {
       let sonarrState = true;
       let overseerrState = true;
       let tautulliState = true;
+      let jellyseerrState = true;
 
       const radarrSettings = await this.radarrSettingsRepo.find();
       for (const radarrSetting of radarrSettings) {
@@ -599,12 +644,17 @@ export class SettingsService implements SettingDto {
         tautulliState = (await this.testTautulli()).status === 'OK';
       }
 
+      if (this.jellyseerrConfigured()) {
+        jellyseerrState = (await this.testJellyseerr()).status === 'OK';
+      }
+
       if (
         plexState &&
         radarrState &&
         sonarrState &&
         overseerrState &&
-        tautulliState
+        tautulliState &&
+        jellyseerrState
       ) {
         return true;
       } else {
@@ -622,6 +672,10 @@ export class SettingsService implements SettingDto {
 
   public tautulliConfigured(): boolean {
     return this.tautulli_url !== null && this.tautulli_api_key !== null;
+  }
+
+  public jellyseerrConfigured(): boolean {
+    return this.jellyseerr_url !== null && this.jellyseerr_api_key !== null;
   }
 
   // Test if all required settings are set.

@@ -40,6 +40,10 @@ export class SettingDto {
   qbittorrent_username: string;
 
   qbittorrent_password: string;
+  
+  jellyseerr_url: string;
+
+  jellyseerr_api_key: string;
 
   collection_handler_job_cron: string;
 

@@ -7,14 +7,14 @@ import { SettingsService } from '../../settings/settings.service';
 import { TasksService } from '../../tasks/tasks.service';
 import { RuleConstants } from '../constants/rules.constants';
 
-import { RulesDto } from '../dtos/rules.dto';
-import { RuleGroup } from '../entities/rule-group.entities';
-import { RulesService } from '../rules.service';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import cacheManager from '../../api/lib/cache';
-import { RuleComparatorService } from '../helpers/rule.comparator.service';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { Collection } from '../../collections/entities/collection.entities';
 import { TaskBase } from '../../tasks/task.base';
+import { RulesDto } from '../dtos/rules.dto';
+import { RuleGroup } from '../entities/rule-group.entities';
+import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
+import { RulesService } from '../rules.service';
 
 interface PlexData {
   page: number;
@@ -43,7 +43,7 @@ export class RuleExecutorService extends TaskBase {
     private readonly collectionService: CollectionsService,
     protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
-    private readonly comparator: RuleComparatorService,
+    private readonly comparatorFactory: RuleComparatorServiceFactory,
   ) {
     super(taskService);
     this.ruleConstants = new RuleConstants();
@@ -75,6 +75,8 @@ export class RuleExecutorService extends TaskBase {
       if (appStatus) {
         const ruleGroups = await this.getAllActiveRuleGroups();
         if (ruleGroups) {
+          const comparator = this.comparatorFactory.create();
+
           for (const rulegroup of ruleGroups) {
             if (rulegroup.useRules) {
               this.logger.log(`Executing rules for '${rulegroup.name}'`);
@@ -97,7 +99,7 @@ export class RuleExecutorService extends TaskBase {
               // Run rules data shunks of 50
               while (!this.plexData.finished) {
                 await this.getPlexData(rulegroup.libraryId);
-                const ruleResult = await this.comparator.executeRulesWithData(
+                const ruleResult = await comparator.executeRulesWithData(
                   rulegroup,
                   this.plexData.data,
                 );

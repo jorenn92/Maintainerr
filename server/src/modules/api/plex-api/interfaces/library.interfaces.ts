@@ -42,8 +42,9 @@ export interface PlexLibraryItem {
 
 export interface PlexLibraryResponse {
   MediaContainer: {
-    totalSize: number;
-    Metadata:
+    size: number;
+    totalSize?: number;
+    Metadata?:
       | PlexLibraryItem[]
       | PlexCollection[]
       | PlexCollection
@@ -62,6 +63,12 @@ export interface PlexActor {
   tag: string; // contains name
   role: string;
   thumb: string;
+}
+
+export interface PlexRating {
+  image: string;
+  value: number;
+  type: 'audience' | 'critic';
 }
 
 export interface PlexLibrary {
