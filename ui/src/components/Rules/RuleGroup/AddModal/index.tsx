@@ -1,19 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import GetApiHandler, {
-  PostApiHandler,
-  PutApiHandler,
-} from '../../../../utils/ApiHandler'
-import RuleCreator, { IRule } from '../../Rule/RuleCreator'
-import ConstantsContext, {
-  Application,
-} from '../../../../contexts/constants-context'
-import LibrariesContext, {
-  ILibrary,
-} from '../../../../contexts/libraries-context'
-import Alert from '../../../Common/Alert'
-import ArrAction from './ArrAction'
-import { IRuleGroup } from '..'
-import { ICollection } from '../../../Collection'
+import { CloudDownloadIcon } from '@heroicons/react/outline'
 import {
   BanIcon,
   DownloadIcon,
@@ -21,17 +6,32 @@ import {
   SaveIcon,
   UploadIcon,
 } from '@heroicons/react/solid'
-import Router from 'next/router'
 import Link from 'next/link'
-import Button from '../../../Common/Button'
-import CommunityRuleModal from '../../../Common/CommunityRuleModal'
-import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
-import CachedImage from '../../../Common/CachedImage'
-import YamlImporterModal from '../../../Common/YamlImporterModal'
-import { CloudDownloadIcon } from '@heroicons/react/outline'
+import Router from 'next/router'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
-import ConfigureNotificationModal from './ConfigureNotificationModal'
+import { IRuleGroup } from '..'
+import ConstantsContext, {
+  Application,
+} from '../../../../contexts/constants-context'
+import LibrariesContext, {
+  ILibrary,
+} from '../../../../contexts/libraries-context'
+import GetApiHandler, {
+  PostApiHandler,
+  PutApiHandler,
+} from '../../../../utils/ApiHandler'
+import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
+import { ICollection } from '../../../Collection'
+import Alert from '../../../Common/Alert'
+import Button from '../../../Common/Button'
+import CachedImage from '../../../Common/CachedImage'
+import CommunityRuleModal from '../../../Common/CommunityRuleModal'
+import YamlImporterModal from '../../../Common/YamlImporterModal'
 import { AgentConfiguration } from '../../../Settings/Notifications/CreateNotificationModal'
+import RuleCreator, { IRule } from '../../Rule/RuleCreator'
+import ArrAction from './ArrAction'
+import ConfigureNotificationModal from './ConfigureNotificationModal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -914,7 +914,7 @@ const AddModal = (props: AddModal) => {
               >
                 Notifications
                 <CachedImage
-                  className="h-[1.8em] w-[3.2em]"
+                  className="h-[1.8em] w-[4em]"
                   width={'0'}
                   height={'0'}
                   src={`${basePath}/beta.svg`}
