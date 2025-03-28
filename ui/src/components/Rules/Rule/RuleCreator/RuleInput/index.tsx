@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import { QuestionMarkCircleIcon, TrashIcon } from '@heroicons/react/solid'
+=======
+import { TrashIcon } from '@heroicons/react/solid'
+import _ from 'lodash'
+>>>>>>> a0e589c (updated rule UI for a cleaner look and easier to understand)
 import { FormEvent, useContext, useEffect, useState } from 'react'
 import { IRule } from '../'
 import ConstantsContext, {
@@ -8,6 +13,24 @@ import ConstantsContext, {
   RulePossibilityTranslations,
 } from '../../../../../contexts/constants-context'
 import { EPlexDataType } from '../../../../../utils/PlexDataType-enum'
+<<<<<<< HEAD
+=======
+
+enum RulePossibility {
+  BIGGER,
+  SMALLER,
+  EQUALS,
+  NOT_EQUALS,
+  CONTAINS,
+  BEFORE,
+  AFTER,
+  IN_LAST,
+  IN_NEXT,
+  NOT_CONTAINS,
+  CONTAINS_PARTIAL,
+  NOT_CONTAINS_PARTIAL,
+}
+>>>>>>> a0e589c (updated rule UI for a cleaner look and easier to understand)
 
 enum RuleType {
   NUMBER,
@@ -38,7 +61,6 @@ interface IRuleInput {
   section?: number
   newlyAdded?: number[]
   editData?: { rule: IRule }
-  onOpenHelpModal: () => void
   onCommit: (id: number, rule: IRule) => void
   onIncomplete: (id: number) => void
   onDelete: (section: number, id: number) => void
@@ -213,9 +235,7 @@ const RuleInput = (props: IRuleInput) => {
           return (
             (prop.mediaType === MediaType.BOTH ||
               props.mediaType === prop.mediaType) &&
-            (props.mediaType === MediaType.MOVIE ||
-              prop.showType === undefined ||
-              prop.showType.includes(props.dataType!))
+            (!prop.showType || prop.showType.includes(props.dataType!))
           )
         })
         return app
@@ -308,19 +328,16 @@ const RuleInput = (props: IRuleInput) => {
               : `Rule #1`}
         </h3>
 
-          {props.allowDelete ? (
-            <button
-              className="ml-auto flex h-8 rounded bg-amber-900 text-zinc-200 shadow-md hover:bg-amber-800"
-              onClick={onDelete}
-              title={`Remove rule ${props.tagId}, section ${props.section}`}
-            >
-              {<TrashIcon className="m-auto ml-5 h-5" />}
-              <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
-                Delete
-              </p>
-            </button>
-          ) : undefined}
-        </h3>
+        {props.allowDelete ? (
+          <button
+            className="flex items-center rounded-lg bg-red-600 px-3 py-1 text-zinc-100 shadow-md hover:bg-red-500"
+            onClick={onDelete}
+            title={`Remove rule ${props.tagId}, section ${props.section}`}
+          >
+            <TrashIcon className="mr-1 h-5 w-5" />
+            Delete
+          </button>
+        ) : null}
       </div>
 
       {props.id !== 1 ? (
@@ -352,17 +369,6 @@ const RuleInput = (props: IRuleInput) => {
                     },
                   )}
                 </select>
-                <button
-                  className="ml-1 p-1 text-sm"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    props.onOpenHelpModal()
-                  }}
-                >
-                  {
-                    <QuestionMarkCircleIcon className="h-5 w-5 text-amber-500 hover:text-amber-600" />
-                  }
-                </button>
               </div>
             </div>
           </div>
@@ -462,48 +468,47 @@ const RuleInput = (props: IRuleInput) => {
                       <option value={CustomParams.CUSTOM_DATE}>
                         Specific Date
                       </option>
-                    ) : undefined}
-                  </>
-                ) : undefined}
-                {ruleType === RuleType.NUMBER ? (
-                  <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
-                ) : undefined}
-                {ruleType === RuleType.BOOL ? (
-                  <option value={CustomParams.CUSTOM_BOOLEAN}>Boolean</option>
-                ) : undefined}
-                {ruleType === RuleType.TEXT ? (
-                  <option value={CustomParams.CUSTOM_TEXT}>Text</option>
-                ) : undefined}
-              </optgroup>
-              {ConstantsCtx.constants.applications?.map((app) => {
-                return (app.mediaType === MediaType.BOTH ||
-                  props.mediaType === app.mediaType) &&
-                  action &&
-                  +action !== +RulePossibility.IN_LAST &&
-                  action &&
-                  +action !== +RulePossibility.IN_NEXT ? (
-                  <optgroup key={app.id} label={app.name}>
-                    {app.props.map((prop) => {
-                      if (+prop.type.key === ruleType) {
-                        return (prop.mediaType === MediaType.BOTH ||
-                          props.mediaType === prop.mediaType) &&
-                          (props.mediaType === MediaType.MOVIE ||
-                            prop.showType === undefined ||
-                            prop.showType.includes(props.dataType!)) ? (
-                          <option
-                            key={app.id + 10 + prop.id}
-                            value={JSON.stringify([app.id, prop.id])}
-                          >{`${app.name} - ${prop.humanName}`}</option>
-                        ) : undefined
-                      }
-                    })}
-                  </optgroup>
-                ) : undefined
-              })}
-            </select>
-          </div>
+                    )}
+                </>
+              )}
+              {ruleType === RuleType.NUMBER && (
+                <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
+              )}
+              {ruleType === RuleType.BOOL && (
+                <option value={CustomParams.CUSTOM_BOOLEAN}>Boolean</option>
+              )}
+              {ruleType === RuleType.TEXT && (
+                <option value={CustomParams.CUSTOM_TEXT}>Text</option>
+              )}
+            </optgroup>
+
+            {/* Existing Properties as Options */}
+            {ConstantsCtx.constants.applications?.map((app) =>
+              (app.mediaType === MediaType.BOTH ||
+                props.mediaType === app.mediaType) &&
+              action &&
+              +action !== +RulePossibility.IN_LAST &&
+              +action !== +RulePossibility.IN_NEXT ? (
+                <optgroup key={app.id} label={app.name}>
+                  {app.props.map((prop) =>
+                    +prop.type.key === ruleType &&
+                    (prop.mediaType === MediaType.BOTH ||
+                      props.mediaType === prop.mediaType) &&
+                    (!prop.showType ||
+                      prop.showType.includes(props.dataType!)) ? (
+                      <option
+                        key={`${app.id}-${prop.id}`}
+                        value={JSON.stringify([app.id, prop.id])}
+                      >
+                        {`${app.name} - ${prop.humanName}`}
+                      </option>
+                    ) : null,
+                  )}
+                </optgroup>
+              ) : null,
+            )}
+          </select>
         </div>
-      </div>
 
         {/* Custom Value Input */}
         {customValActive && (
