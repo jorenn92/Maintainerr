@@ -21,8 +21,6 @@ export interface ISettings {
   plex_auth_token: string | null
   jellyfin_url: string
   jellyfin_api_key: string
-  jellyfin_username: string
-  jellyfin_password: string
   overseerr_url: string
   overseerr_api_key: string
   tautulli_url: string

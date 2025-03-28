@@ -57,10 +57,6 @@ export class SettingsService implements SettingDto {
 
   jellyfin_api_key: string;
 
-  jellyfin_username: string;
-
-  jellyfin_password: string;
-
   overseerr_url: string;
 
   overseerr_api_key: string;
@@ -121,8 +117,6 @@ export class SettingsService implements SettingDto {
       this.plex_auth_token = settingsDb?.plex_auth_token;
       this.jellyfin_url = settingsDb?.jellyfin_url;
       this.jellyfin_api_key = settingsDb?.jellyfin_api_key;
-      this.jellyfin_username = settingsDb?.jellyfin_username;
-      this.jellyfin_password = settingsDb?.jellyfin_password;
       this.overseerr_url = settingsDb?.overseerr_url;
       this.overseerr_api_key = settingsDb?.overseerr_api_key;
       this.tautulli_url = settingsDb?.tautulli_url;

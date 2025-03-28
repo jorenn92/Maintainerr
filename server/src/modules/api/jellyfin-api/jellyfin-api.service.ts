@@ -3,7 +3,10 @@ import { SettingsService } from '../../settings/settings.service';
 import { JellyfinApi } from '../lib/jellyfinApi';
 import {
   JellyfinInfoResponse,
+  JellyfinItemsResponse,
   JellyfinUsageResponse,
+  JellyfinUserDataResponse,
+  JellyfinUserResponse,
 } from './interfaces/server.interfaces';
 
 @Injectable()
@@ -50,17 +53,11 @@ export class JellyfinApiService {
     }
   }
 
-  public async getLastSeen(title: string) {
+  public async getMediaId(title: string) {
     try {
-      const response: JellyfinUsageResponse = await this.api.post(
-        '/user_usage_stats/submit_custom_query',
-        {
-          CustomQueryString: `SELECT max(strftime('%s', strftime('%s', DateCreated), 'unixepoch')) lastView FROM PlaybackActivity WHERE COALESCE(NULLIF(SUBSTRING(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) = '${title}'`,
-        },
-      );
-      if (response.results[0] && response.results[0][0]) {
-        const lastSeen = +response.results[0][0];
-        return new Date(lastSeen * 1000);
+      const response: JellyfinItemsResponse = await this.api.get(`/Items?recursive=true&searchTerm=${title}`);
+      if (response.Items.length > 0) {
+        return response.Items[0].Id;
       }
       return null;
     } catch (err) {
@@ -72,18 +69,77 @@ export class JellyfinApiService {
     }
   }
 
+  public async getUsersIds() {
+    try {
+      const response: JellyfinUserResponse = await this.api.get('/Users');
+      if (response.length > 0) {
+        return response.map((user) => user.Id);
+      }
+      return null;
+    } catch (err) {
+      this.logger.warn(
+        'Jellyfin api communication failure.. Is the application running?',
+      );
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
+  public async getLastSeen(title: string) {
+    try {
+      const mediaId = await this.getMediaId(title);
+      if (!mediaId) {
+        return null;
+      }
+  
+      let lastSeen = null;
+      const usersIds = await this.getUsersIds();
+      
+      // Create an array of promises to fetch the user data in parallel
+      const userPromises = usersIds.map(async (userId) => {
+        const response: JellyfinUserDataResponse = await this.api.get(`/UserItems/${mediaId}/UserData?userId=${userId}`);
+        if (response.Played) {
+          const userSeen = new Date(response.LastPlayedDate);
+          if (!lastSeen || userSeen > lastSeen) {
+            lastSeen = userSeen;
+          }
+        }
+      });
+  
+      // Wait for all the promises to complete
+      await Promise.all(userPromises);
+      return lastSeen;
+    } catch (err) {
+      this.logger.warn(
+        'Jellyfin api communication failure.. Is the application running?',
+      );
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+  
+
   public async getTimesViewed(title: string) {
     try {
-      const response: JellyfinUsageResponse = await this.api.post(
-        '/user_usage_stats/submit_custom_query',
-        {
-          CustomQueryString: `SELECT count(0) FROM PlaybackActivity WHERE COALESCE(NULLIF(SUBSTRING(ItemName, 0, INSTR(ItemName, ' - ')), ''), ItemName) = '${title}'`,
-        },
-      );
-      if (response.results[0] && response.results[0][0]) {
-        return +response.results[0][0];
+      const mediaId = await this.getMediaId(title);
+      if (!mediaId) {
+        return null;
       }
-      return 0;
+
+      let playCount = 0;
+      const usersIds = await this.getUsersIds();
+
+      // Create an array of promises to fetch the user data in parallel
+      const userPromises = usersIds.map(async (userId) => {
+        const response: JellyfinUserDataResponse = await this.api.get(`/UserItems/${mediaId}/UserData?userId=${userId}`)
+        if (response.Played) {
+          playCount += response.PlayCount;
+        }
+      });
+
+      // Wait for all the promises to complete
+      await Promise.all(userPromises);
+      return playCount;
     } catch (err) {
       this.logger.warn(
         'Jellyfin api communication failure.. Is the application running?',

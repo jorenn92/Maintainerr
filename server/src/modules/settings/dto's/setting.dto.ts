@@ -27,10 +27,6 @@ export class SettingDto {
 
   jellyfin_api_key: string;
 
-  jellyfin_username: string;
-
-  jellyfin_password: string;
-
   overseerr_url: string;
 
   overseerr_api_key: string;

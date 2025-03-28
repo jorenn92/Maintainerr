@@ -11,8 +11,6 @@ const JellyfinSettings = () => {
   const settingsCtx = useContext(SettingsContext)
   const urlRef = useRef<HTMLInputElement>(null)
   const apiKeyRef = useRef<HTMLInputElement>(null)
-  const usernameRef = useRef<HTMLInputElement>(null)
-  const passwordRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<boolean>()
   const [changed, setChanged] = useState<boolean>()
   const [testBanner, setTestbanner] = useState<{
@@ -29,15 +27,11 @@ const JellyfinSettings = () => {
 
     if (
       urlRef.current?.value &&
-      apiKeyRef.current?.value &&
-      usernameRef.current?.value &&
-      passwordRef.current?.value
+      apiKeyRef.current?.value
     ) {
       const payload = {
         jellyfin_url: urlRef.current.value,
         jellyfin_api_key: apiKeyRef.current.value,
-        jellyfin_username: usernameRef.current.value,
-        jellyfin_password: passwordRef.current.value,
       }
       const resp: { code: 0 | 1; message: string } = await PostApiHandler(
         '/settings',
@@ -130,40 +124,6 @@ const JellyfinSettings = () => {
                   type="password"
                   ref={apiKeyRef}
                   defaultValue={settingsCtx.settings.jellyfin_api_key}
-                ></input>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="username" className="text-label">
-              Username
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="username"
-                  id="username"
-                  type="text"
-                  ref={usernameRef}
-                  defaultValue={settingsCtx.settings.jellyfin_username}
-                ></input>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <label htmlFor="password" className="text-label">
-              Password
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="password"
-                  id="password"
-                  type="password"
-                  ref={passwordRef}
-                  defaultValue={settingsCtx.settings.jellyfin_password}
                 ></input>
               </div>
             </div>
