@@ -15,6 +15,8 @@ import { RulesDto } from '../dtos/rules.dto';
 import { RuleGroup } from '../entities/rule-group.entities';
 import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
 import { RulesService } from '../rules.service';
+import { NotificationType } from '../../notifications/notifications-interfaces';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 interface PlexData {
   page: number;
@@ -44,6 +46,7 @@ export class RuleExecutorService extends TaskBase {
     protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
     private readonly comparatorFactory: RuleComparatorServiceFactory,
+    private eventEmitter: EventEmitter2,
   ) {
     super(taskService);
     this.ruleConstants = new RuleConstants();
@@ -123,10 +126,22 @@ export class RuleExecutorService extends TaskBase {
         this.logger.log(
           'Not all applications are reachable.. Skipped rule execution.',
         );
+
+        this.eventEmitter.emit(
+          'agents.notify',
+          NotificationType.RULE_HANDLING_FAILED,
+          undefined,
+        );
       }
     } catch (err) {
       this.logger.log('Error running rules executor.');
       this.logger.debug(err);
+
+      this.eventEmitter.emit(
+        'agents.notify',
+        NotificationType.RULE_HANDLING_FAILED,
+        undefined,
+      );
     }
 
     // clean up
@@ -274,6 +289,16 @@ export class RuleExecutorService extends TaskBase {
                 : collection.title
             }'.`,
           );
+
+          this.eventEmitter.emit(
+            'agents.notify',
+            NotificationType.MEDIA_REMOVED_FROM_COLLECTION,
+            dataToRemove,
+            collection.title,
+            undefined,
+            undefined,
+            { type: 'rulegroup', value: rulegroup.id },
+          );
         }
 
         if (dataToAdd.length > 0) {
@@ -283,6 +308,16 @@ export class RuleExecutorService extends TaskBase {
                 ? collection.manualCollectionName
                 : collection.title
             }'.`,
+          );
+
+          this.eventEmitter.emit(
+            'agents.notify',
+            NotificationType.MEDIA_ADDED_TO_COLLECTION,
+            dataToAdd,
+            collection.title,
+            collection.deleteAfterDays,
+            undefined,
+            { type: 'rulegroup', value: rulegroup.id },
           );
         }
 
@@ -305,9 +340,27 @@ export class RuleExecutorService extends TaskBase {
         return collection;
       } else {
         this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
+        this.eventEmitter.emit(
+          'agents.notify',
+          NotificationType.RULE_HANDLING_FAILED,
+          undefined,
+          collection.title,
+          undefined,
+          undefined,
+          { type: 'rulegroup', value: rulegroup.id },
+        );
       }
     } catch (err) {
-      this.logger.warn(`Execption occurred whild handling rule: `, err);
+      this.logger.error(`Execption occurred while handling rule: `, err);
+      this.eventEmitter.emit(
+        'agents.notify',
+        NotificationType.RULE_HANDLING_FAILED,
+        undefined,
+        rulegroup.collection?.title,
+        undefined,
+        undefined,
+        { type: 'rulegroup', value: rulegroup.id },
+      );
     }
   }
 

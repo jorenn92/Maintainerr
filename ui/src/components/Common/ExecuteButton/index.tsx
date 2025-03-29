@@ -5,15 +5,19 @@ import { SmallLoadingSpinner } from '../LoadingSpinner'
 interface IExecuteButton {
   text: string
   onClick: () => void
+  timeout?: number
 }
 
 const ExecuteButton = (props: IExecuteButton) => {
   const [clicked, setClicked] = useState(false)
 
   useEffect(() => {
-    setTimeout(() => {
-      setClicked(false)
-    }, 10000)
+    setTimeout(
+      () => {
+        setClicked(false)
+      },
+      props.timeout ? props.timeout : 10000,
+    )
   }, [clicked])
   const onClick = () => {
     setClicked(true)

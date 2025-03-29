@@ -15,7 +15,9 @@ import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TaskBase } from '../tasks/task.base';
+import { NotificationType } from '../notifications/notifications-interfaces';
 import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -39,6 +41,7 @@ export class CollectionWorkerService extends TaskBase {
     private readonly settings: SettingsService,
     private readonly tmdbIdService: TmdbIdService,
     private readonly tmdbIdHelper: TmdbIdService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(taskService);
   }
@@ -48,109 +51,143 @@ export class CollectionWorkerService extends TaskBase {
   }
 
   public async execute() {
-    // check if another instance of this task is already running
-    if (await this.isRunning()) {
-      this.logger.log(
-        `Another instance of the ${this.name} task is currently running. Skipping this execution`,
-      );
-      return;
-    }
+    try {
+      // check if another instance of this task is already running
+      if (await this.isRunning()) {
+        this.logger.log(
+          `Another instance of the ${this.name} task is currently running. Skipping this execution`,
+        );
+        return;
+      }
 
-    await super.execute();
+      await super.execute();
 
-    // wait 5 seconds to make sure we're not executing together with the rule handler
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+      // wait 5 seconds to make sure we're not executing together with the rule handler
+      await new Promise((resolve) => setTimeout(resolve, 5000));
 
-    // if we are, then wait..
-    await this.taskService.waitUntilTaskIsFinished('Rule Handler', this.name);
+      // if we are, then wait..
+      await this.taskService.waitUntilTaskIsFinished('Rule Handler', this.name);
 
-    // Start actual task
-    const appStatus = await this.settings.testConnections();
+      // Start actual task
+      const appStatus = await this.settings.testConnections();
 
-    this.logger.log('Start handling all collections');
-    let handledCollections = 0;
-    if (appStatus) {
-      // loop over all active collections
-      const collections = await this.collectionRepo.find({
-        where: { isActive: true },
-      });
-
-      for (const collection of collections) {
-        if (collection.arrAction === ServarrAction.DO_NOTHING) {
-          this.infoLogger(
-            `Skipping collection '${collection.title}' as its action is 'Do Nothing'`,
-          );
-          continue;
-        }
-
-        this.infoLogger(`Handling collection '${collection.title}'`);
-
-        const collectionMedia = await this.collectionMediaRepo.find({
-          where: {
-            collectionId: collection.id,
-          },
+      this.logger.log('Start handling all collections');
+      let handledCollections = 0;
+      if (appStatus) {
+        // loop over all active collections
+        const collections = await this.collectionRepo.find({
+          where: { isActive: true },
         });
 
-        const dangerDate = new Date(
-          new Date().getTime() - +collection.deleteAfterDays * 86400000,
-        );
-
-        for (const media of collectionMedia) {
-          // handle media addate <= due date
-          if (new Date(media.addDate) <= dangerDate) {
-            await this.handleMedia(collection, media);
-            handledCollections++;
+        for (const collection of collections) {
+          if (collection.arrAction === ServarrAction.DO_NOTHING) {
+            this.infoLogger(
+              `Skipping collection '${collection.title}' as its action is 'Do Nothing'`,
+            );
+            continue;
           }
+
+          this.infoLogger(`Handling collection '${collection.title}'`);
+
+          const collectionMedia = await this.collectionMediaRepo.find({
+            where: {
+              collectionId: collection.id,
+            },
+          });
+
+          const dangerDate = new Date(
+            new Date().getTime() - +collection.deleteAfterDays * 86400000,
+          );
+
+          const handledMediaForNotification = [];
+          for (const media of collectionMedia) {
+            // handle media addate <= due date
+            if (new Date(media.addDate) <= dangerDate) {
+              await this.handleMedia(collection, media);
+              handledCollections++;
+              handledMediaForNotification.push({ plexId: media.plexId });
+            }
+          }
+
+          // handle notification
+          if (handledMediaForNotification.length > 0) {
+            this.eventEmitter.emit(
+              'agents.notify',
+              NotificationType.MEDIA_HANDLED,
+              handledMediaForNotification,
+              collection.title,
+              undefined,
+              undefined,
+              { type: 'collection', value: collection.id },
+            );
+          }
+
+          this.infoLogger(`Handling collection '${collection.title}' finished`);
         }
 
-        this.infoLogger(`Handling collection '${collection.title}' finished`);
-      }
+        if (handledCollections > 0) {
+          if (this.settings.overseerrConfigured()) {
+            setTimeout(() => {
+              this.overseerrApi.api
+                .post('/settings/jobs/availability-sync/run')
+                .then(() => {
+                  this.infoLogger(
+                    `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
+                  );
+                })
+                .catch((err) => {
+                  this.logger.error(
+                    `Failed to trigger Overseerr's availability-sync: ${err}`,
+                  );
+                  this.logger.debug(err);
+                });
+            }, 7000);
+          }
 
-      if (handledCollections > 0) {
-        if (this.settings.overseerrConfigured()) {
-          setTimeout(() => {
-            this.overseerrApi.api
-              .post('/settings/jobs/availability-sync/run')
-              .then(() => {
-                this.infoLogger(
-                  `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
-                );
-              })
-              .catch((err) => {
-                this.logger.error(
-                  `Failed to trigger Overseerr's availability-sync: ${err}`,
-                );
-                this.logger.debug(err);
-              });
-          }, 7000);
-        }
-
-        if (this.settings.jellyseerrConfigured()) {
-          setTimeout(() => {
-            this.jellyseerrApi.api
-              .post('/settings/jobs/availability-sync/run')
-              .then(() => {
-                this.infoLogger(
-                  `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
-                );
-              })
-              .catch((err) => {
-                this.logger.error(
-                  `Failed to trigger Jellyseerr's availability-sync: ${err}`,
-                );
-                this.logger.debug(err);
-              });
-          }, 7000);
+          if (this.settings.jellyseerrConfigured()) {
+            setTimeout(() => {
+              this.jellyseerrApi.api
+                .post('/settings/jobs/availability-sync/run')
+                .then(() => {
+                  this.infoLogger(
+                    `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
+                  );
+                })
+                .catch((err) => {
+                  this.logger.error(
+                    `Failed to trigger Jellyseerr's availability-sync: ${err}`,
+                  );
+                  this.logger.debug(err);
+                });
+            }, 7000);
+          }
+        } else {
+          this.infoLogger(`All collections handled. No data was altered`);
         }
       } else {
-        this.infoLogger(`All collections handled. No data was altered`);
+        this.infoLogger(
+          'Not all applications are reachable.. Skipping collection handling',
+        );
+
+        // notify
+        this.eventEmitter.emit(
+          'agents.notify',
+          NotificationType.COLLECTION_HANDLING_FAILED,
+          undefined,
+        );
       }
-    } else {
-      this.infoLogger(
-        'Not all applications are reachable.. Skipping collection handling',
+      await this.finish();
+    } catch (e) {
+      this.logger.error('An error occurred where handling collections');
+      this.logger.debug(e);
+
+      // notify
+      this.eventEmitter.emit(
+        'agents.notify',
+        NotificationType.COLLECTION_HANDLING_FAILED,
+        undefined,
       );
     }
-    await this.finish();
   }
 
   private async handleMedia(collection: Collection, media: CollectionMedia) {
