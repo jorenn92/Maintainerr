@@ -196,16 +196,15 @@ export class RuleComparatorService {
       data = _.cloneDeep(this.workerData);
     }
 
-    // loop media items
-    for (let i = data.length - 1; i >= 0; i--) {
+    const rulePromise = data.map(async (oneData, i) => {
       // fetch values
       firstVal = await this.valueGetter.get(
         rule.firstVal,
-        data[i],
+        oneData,
         ruleGroup,
         this.plexDataType,
       );
-      secondVal = await this.getSecondValue(rule, data[i], ruleGroup, firstVal);
+      secondVal = await this.getSecondValue(rule, oneData, ruleGroup, firstVal);
 
       if (
         (firstVal !== undefined || null) &&
@@ -223,7 +222,7 @@ export class RuleComparatorService {
           rule,
           firstVal,
           secondVal,
-          +data[i].ratingKey,
+          +oneData.ratingKey,
           comparisonResult,
         );
 
@@ -232,10 +231,10 @@ export class RuleComparatorService {
           if (comparisonResult) {
             // add to workerdata if not yet available
             if (
-              this.workerData.find((e) => e.ratingKey === data[i].ratingKey) ===
+              this.workerData.find((e) => e.ratingKey === oneData.ratingKey) ===
               undefined
             ) {
-              this.workerData.push(data[i]);
+              this.workerData.push(oneData);
             }
           }
         } else {
@@ -245,7 +244,9 @@ export class RuleComparatorService {
           }
         }
       }
-    }
+    });
+
+    await Promise.all(rulePromise);
   }
 
   private async getSecondValue(

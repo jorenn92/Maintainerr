@@ -94,7 +94,6 @@ export class JellyfinApiService {
 
   public async getLastSeen(tmdbId: number, libItem: PlexLibraryItem) {
     try {
-      const start = new Date().getTime();
       let seenDates: Date[] = [];
       const usersIds = await this.getUsersIds();
       const mediaId = await this.getMediaId(tmdbId, libItem.type);
@@ -127,8 +126,6 @@ export class JellyfinApiService {
   
       // Wait for all the promises to complete
       await Promise.all(userPromises);
-      const elapsed = new Date().getTime() - start;
-      this.logger.warn(`Time elapsed : ${elapsed/1000}s`);
       return new Date(Math.max(...seenDates.map(date => date.getTime())));
     } catch (err) {
       this.logger.warn(
