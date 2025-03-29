@@ -1,12 +1,20 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
 import { JellyfinApi } from '../lib/jellyfinApi';
+import { PlexLibraryItem } from '../plex-api/interfaces/library.interfaces';
 import {
   JellyfinInfoResponse,
   JellyfinItemsResponse,
   JellyfinUserDataResponse,
   JellyfinUserResponse
 } from './interfaces/server.interfaces';
+
+enum itemType {
+  movie = "Movie",
+  show = "Series",
+  season = "Season",
+  episode = "Episode",
+}
 
 @Injectable()
 export class JellyfinApiService {
@@ -52,18 +60,18 @@ export class JellyfinApiService {
     }
   }
 
-  public async getMediaId(title: string) {
+  public async getMediaId(tmdbId: number, type: "movie" | "show" | "season" | "episode" | "collection") {
     try {
-      const response: JellyfinItemsResponse = await this.api.get(`/Items?recursive=true&searchTerm=${title}`);
+      const response: JellyfinItemsResponse = await this.api.get(`/Items?recursive=true&includeItemTypes=${type == "movie" ? itemType.movie : itemType.show}&hasTmdbId=true&fields=ProviderIds`);
       if (response.Items.length > 0) {
-        return response.Items[0].Id;
+        return response.Items.find((jellyfinItem) => +jellyfinItem.ProviderIds.Tmdb == tmdbId).Id;
       }
       return null;
     } catch (err) {
       this.logger.warn(
         'Jellyfin api communication failure.. Is the application running?',
       );
-      this.logger.debug(err);
+      this.logger.warn(err);
       return undefined;
     }
   }
@@ -84,30 +92,44 @@ export class JellyfinApiService {
     }
   }
 
-  public async getLastSeen(title: string) {
+  public async getLastSeen(tmdbId: number, libItem: PlexLibraryItem) {
     try {
-      const mediaId = await this.getMediaId(title);
-      if (!mediaId) {
-        return null;
-      }
-  
-      let lastSeen = null;
+      const start = new Date().getTime();
+      let seenDates: Date[] = [];
       const usersIds = await this.getUsersIds();
+      const mediaId = await this.getMediaId(tmdbId, libItem.type);
       
       // Create an array of promises to fetch the user data in parallel
       const userPromises = usersIds.map(async (userId) => {
-        const response: JellyfinUserDataResponse = await this.api.get(`/UserItems/${mediaId}/UserData?userId=${userId}`);
-        if (response && response.Played) {
-          const userSeen = new Date(response.LastPlayedDate);
-          if (!lastSeen || userSeen > lastSeen) {
-            lastSeen = userSeen;
+        // Get user data for each media id (ex: all episodes of a show)
+        let userDatas: JellyfinUserDataResponse[] = [];
+        switch(libItem.type) {
+          case "movie":
+            const response: JellyfinUserDataResponse = await this.api.get(`/UserItems/${mediaId}/UserData?userId=${userId}`);
+            if (response && response.LastPlayedDate)
+              userDatas = [response]
+            break;
+          default:
+            const episodes = await this.getEpisodesUserData(userId, mediaId, libItem);
+            if (episodes && episodes.length > 0)
+              userDatas = episodes
+            break;
+        }
+        if (userDatas.length > 0) {
+          for (let userData of userDatas) {
+            if (userData.LastPlayedDate) {
+              const userSeen = new Date(userData.LastPlayedDate);
+              seenDates.push(userSeen);
+            }
           }
         }
       });
   
       // Wait for all the promises to complete
       await Promise.all(userPromises);
-      return lastSeen;
+      const elapsed = new Date().getTime() - start;
+      this.logger.warn(`Time elapsed : ${elapsed/1000}s`);
+      return new Date(Math.max(...seenDates.map(date => date.getTime())));
     } catch (err) {
       this.logger.warn(
         'Jellyfin api communication failure.. Is the application running?',
@@ -117,28 +139,55 @@ export class JellyfinApiService {
     }
   }
   
-
-  public async getTimesViewed(title: string) {
+  public async getTimesViewed(tmdbId: number, libItem: PlexLibraryItem) {
     try {
-      const mediaId = await this.getMediaId(title);
-      if (!mediaId) {
-        return null;
-      }
-
       let playCount = 0;
       const usersIds = await this.getUsersIds();
+      const mediaId = await this.getMediaId(tmdbId, libItem.type);
 
       // Create an array of promises to fetch the user data in parallel
       const userPromises = usersIds.map(async (userId) => {
-        const response: JellyfinUserDataResponse = await this.api.get(`/UserItems/${mediaId}/UserData?userId=${userId}`)
-        if (response && response.Played) {
-          playCount += response.PlayCount;
+        switch (libItem.type) {
+          case "movie":
+            const userData: JellyfinUserDataResponse = await this.api.get(`/UserItems/${mediaId}/UserData?userId=${userId}`)
+            if (userData && userData.Played) {
+              playCount += userData.PlayCount;
+            }
+            break;
+          default:
+            const userDatas = await this.getEpisodesUserData(userId, mediaId, libItem);
+            if (userDatas && userDatas.length > 0) {
+              for (let userData of userDatas) {
+                playCount += userData.PlayCount;
+              }
+            }
         }
       });
 
       // Wait for all the promises to complete
       await Promise.all(userPromises);
       return playCount;
+    } catch (err) {
+      this.logger.warn(
+        'Jellyfin api communication failure.. Is the application running?',
+      );
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
+  async getEpisodesUserData(userId: string, showId: string, libItem: PlexLibraryItem) {
+    try {
+      const episodes: JellyfinItemsResponse = await this.api.get(`/Items?recursive=true&userId=${userId}&parentId=${showId}&includeItemTypes=${itemType.episode}&enableUserData=true`);
+      if (episodes) {
+        if (libItem.type == "season") {
+          episodes.Items = episodes.Items.filter((episode) => episode.ParentIndexNumber == libItem.index);
+        } else if (libItem.type == "episode") {
+          episodes.Items = episodes.Items.filter((episode) => episode.ParentIndexNumber == libItem.parentIndex && episode.IndexNumber == libItem.index);
+        }
+        return episodes.Items.map((episode) => episode.UserData);
+      }
+      return null;
     } catch (err) {
       this.logger.warn(
         'Jellyfin api communication failure.. Is the application running?',

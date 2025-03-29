@@ -14,6 +14,12 @@ export interface JellyfinUserResponse extends Array<any> {
 export interface JellyfinItemsResponse {
   Items: Array<{
     Id: string;
+    IndexNumber: number;
+    ParentIndexNumber: number;
+    ProviderIds: {
+      Tmdb?: string;
+    },
+    UserData: JellyfinUserDataResponse
   }>;
 }
 
