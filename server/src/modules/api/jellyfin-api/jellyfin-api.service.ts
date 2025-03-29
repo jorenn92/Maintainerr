@@ -64,7 +64,10 @@ export class JellyfinApiService {
     try {
       const response: JellyfinItemsResponse = await this.api.get(`/Items?recursive=true&includeItemTypes=${type == "movie" ? itemType.movie : itemType.show}&hasTmdbId=true&fields=ProviderIds`);
       if (response.Items.length > 0) {
-        return response.Items.find((jellyfinItem) => +jellyfinItem.ProviderIds.Tmdb == tmdbId).Id;
+        const media = response.Items.find((jellyfinItem) => +jellyfinItem.ProviderIds.Tmdb == tmdbId);
+        if (media)
+          return media.Id
+        return null
       }
       return null;
     } catch (err) {
@@ -97,6 +100,8 @@ export class JellyfinApiService {
       let seenDates: Date[] = [];
       const usersIds = await this.getUsersIds();
       const mediaId = await this.getMediaId(tmdbId, libItem.type);
+      if (!mediaId)
+        return null;
       
       // Create an array of promises to fetch the user data in parallel
       const userPromises = usersIds.map(async (userId) => {
@@ -141,6 +146,8 @@ export class JellyfinApiService {
       let playCount = 0;
       const usersIds = await this.getUsersIds();
       const mediaId = await this.getMediaId(tmdbId, libItem.type);
+      if (!mediaId)
+        return null;
 
       // Create an array of promises to fetch the user data in parallel
       const userPromises = usersIds.map(async (userId) => {
