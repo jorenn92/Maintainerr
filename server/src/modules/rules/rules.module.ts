@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JellyfinApiModule } from '../api/jellyfin-api/jellyfin-api.module';
 import { JellyseerrApiModule } from '../api/jellyseerr-api/jellyseerr-api.module';
 import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { PlexApiModule } from '../api/plex-api/plex-api.module';
@@ -19,6 +20,7 @@ import { Exclusion } from './entities/exclusion.entities';
 import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
 import { ValueGetterService } from './getter/getter.service';
+import { JellyfinGetterService } from './getter/jellyfin-getter.service';
 import { JellyseerrGetterService } from './getter/jellyseerr-getter.service';
 import { OverseerrGetterService } from './getter/overseerr-getter.service';
 import { PlexGetterService } from './getter/plex-getter.service';
@@ -39,6 +41,7 @@ import { RuleMaintenanceService } from './tasks/rule-maintenance.service';
 @Module({
   imports: [
     PlexApiModule,
+    JellyfinApiModule,
     ServarrApiModule,
     TypeOrmModule.forFeature([
       Rules,
@@ -64,6 +67,7 @@ import { RuleMaintenanceService } from './tasks/rule-maintenance.service';
     RuleMaintenanceService,
     ExclusionTypeCorrectorService,
     PlexGetterService,
+    JellyfinGetterService,
     RadarrGetterService,
     SonarrGetterService,
     OverseerrGetterService,

@@ -1,19 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import GetApiHandler, {
-  PostApiHandler,
-  PutApiHandler,
-} from '../../../../utils/ApiHandler'
-import RuleCreator, { IRule } from '../../Rule/RuleCreator'
-import ConstantsContext, {
-  Application,
-} from '../../../../contexts/constants-context'
-import LibrariesContext, {
-  ILibrary,
-} from '../../../../contexts/libraries-context'
-import Alert from '../../../Common/Alert'
-import ArrAction from './ArrAction'
-import { IRuleGroup } from '..'
-import { ICollection } from '../../../Collection'
+import { CloudDownloadIcon } from '@heroicons/react/outline'
 import {
   BanIcon,
   DownloadIcon,
@@ -21,15 +6,30 @@ import {
   SaveIcon,
   UploadIcon,
 } from '@heroicons/react/solid'
-import Router from 'next/router'
 import Link from 'next/link'
-import Button from '../../../Common/Button'
-import CommunityRuleModal from '../../../Common/CommunityRuleModal'
-import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
-import CachedImage from '../../../Common/CachedImage'
-import YamlImporterModal from '../../../Common/YamlImporterModal'
-import { CloudDownloadIcon } from '@heroicons/react/outline'
+import Router from 'next/router'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
+import { IRuleGroup } from '..'
+import ConstantsContext, {
+  Application,
+} from '../../../../contexts/constants-context'
+import LibrariesContext, {
+  ILibrary,
+} from '../../../../contexts/libraries-context'
+import GetApiHandler, {
+  PostApiHandler,
+  PutApiHandler,
+} from '../../../../utils/ApiHandler'
+import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
+import { ICollection } from '../../../Collection'
+import Alert from '../../../Common/Alert'
+import Button from '../../../Common/Button'
+import CachedImage from '../../../Common/CachedImage'
+import CommunityRuleModal from '../../../Common/CommunityRuleModal'
+import YamlImporterModal from '../../../Common/YamlImporterModal'
+import RuleCreator, { IRule } from '../../Rule/RuleCreator'
+import ArrAction from './ArrAction'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -44,6 +44,7 @@ interface ICreateApiObject {
   arrAction: number
   isActive: boolean
   useRules: boolean
+  deleteTorrents: boolean
   listExclusions: boolean
   forceOverseerr: boolean
   tautulliWatchedPercentOverride?: number
@@ -94,6 +95,9 @@ const AddModal = (props: AddModal) => {
 
   const [useRules, setUseRules] = useState<boolean>(
     props.editData ? props.editData.useRules : true,
+  )
+  const [deleteTorrents, setDeleteTorrents] = useState<boolean>(
+    props.editData ? props.editData.deleteTorrents : true,
   )
   const [arrOption, setArrOption] = useState<number>()
   const [radarrSettingsId, setRadarrSettingsId] = useState<
@@ -332,6 +336,7 @@ const AddModal = (props: AddModal) => {
         dataType: +selectedType,
         isActive: active,
         useRules: useRules,
+        deleteTorrents: deleteTorrents,
         listExclusions: listExclusion,
         forceOverseerr: forceOverseerr,
         tautulliWatchedPercentOverride:
@@ -843,6 +848,27 @@ const AddModal = (props: AddModal) => {
                     defaultChecked={useRules}
                     onChange={() => {
                       setUseRules(!useRules)
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <label htmlFor="delete_torrents" className="text-label">
+                Delete torrents
+                <p className="text-xs font-normal">Toggle the torrent deletion</p>
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <input
+                    type="checkbox"
+                    name="delete_torrents"
+                    id="delete_torrents"
+                    className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                    defaultChecked={deleteTorrents}
+                    onChange={() => {
+                      setDeleteTorrents(!deleteTorrents)
                     }}
                   />
                 </div>

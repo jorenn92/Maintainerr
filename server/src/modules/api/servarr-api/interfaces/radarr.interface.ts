@@ -36,6 +36,10 @@ export interface RadarrMovie {
   ratings: RadarrRatings;
 }
 
+export interface RadarrMovieHistory {
+  downloadId: string;
+}
+
 export interface RadarrLanguage {
   id: number;
   name: string | null;

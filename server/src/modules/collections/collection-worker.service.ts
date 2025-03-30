@@ -1,21 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
+import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
+import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { QbittorrentApiService } from '../api/qbittorrent-api/qbittorrent-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
+import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
 import { SettingsService } from '../settings/settings.service';
+import { TaskBase } from '../tasks/task.base';
 import { TasksService } from '../tasks/tasks.service';
 import { CollectionsService } from './collections.service';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
 import { ServarrAction } from './interfaces/collection.interface';
-import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
-import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
-import { TaskBase } from '../tasks/task.base';
-import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -34,6 +35,7 @@ export class CollectionWorkerService extends TaskBase {
     private readonly overseerrApi: OverseerrApiService,
     private readonly jellyseerrApi: JellyseerrApiService,
     private readonly servarrApi: ServarrService,
+    private readonly qbittorrentApi: QbittorrentApiService,
     private readonly tmdbApi: TmdbApiService,
     protected readonly taskService: TasksService,
     private readonly settings: SettingsService,
@@ -191,6 +193,8 @@ export class CollectionWorkerService extends TaskBase {
       ? await this.servarrApi.getSonarrApiClient(collection.sonarrSettingsId)
       : undefined;
 
+    const qbittorrentStatus = collection.ruleGroup.deleteTorrents && this.qbittorrentApi.getStatus();
+
     if (plexLibrary.type === 'movie' && radarrApiClient) {
       // find tmdbid
       const tmdbid = media.tmdbId
@@ -204,8 +208,16 @@ export class CollectionWorkerService extends TaskBase {
       if (tmdbid) {
         const radarrMedia = await radarrApiClient.getMovieByTmdbId(tmdbid);
         if (radarrMedia && radarrMedia.id) {
+          const radarrMediaDownloadIds =
+            await radarrApiClient.getMovieDownloadIds(radarrMedia.id);
           switch (collection.arrAction) {
             case ServarrAction.DELETE:
+              if (qbittorrentStatus) {
+                for (let i = 0; i < radarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(radarrMediaDownloadIds[i]);
+                }
+                this.infoLogger('[qBittorrent] Removed torrents from filesystem & qBittorrent');
+              }
               await radarrApiClient.deleteMovie(
                 radarrMedia.id,
                 true,
@@ -218,10 +230,22 @@ export class CollectionWorkerService extends TaskBase {
               this.infoLogger('Unmonitored movie in Radarr');
               break;
             case ServarrAction.UNMONITOR_DELETE_ALL:
+              if (qbittorrentStatus) {
+                for (let i = 0; i < radarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(radarrMediaDownloadIds[i]);
+                }
+                this.infoLogger('[qBittorrent] Removed torrents from filesystem & qBittorrent');
+              }
               await radarrApiClient.unmonitorMovie(radarrMedia.id, true);
               this.infoLogger('Unmonitored movie in Radarr & removed files');
               break;
             case ServarrAction.UNMONITOR_DELETE_EXISTING:
+              if (qbittorrentStatus) {
+                for (let i = 0; i < radarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(radarrMediaDownloadIds[i]);
+                }
+                this.infoLogger('[qBittorrent] Removed torrents from filesystem & qBittorrent');
+              }
               await radarrApiClient.deleteMovie(
                 radarrMedia.id,
                 true,
@@ -294,8 +318,16 @@ export class CollectionWorkerService extends TaskBase {
       if (tvdbId) {
         let sonarrMedia = await sonarrApiClient.getSeriesByTvdbId(tvdbId);
         if (sonarrMedia?.id) {
+          const sonarrMediaDownloadIds =
+            await sonarrApiClient.getSeriesDownloadIds(sonarrMedia.id);
           switch (collection.arrAction) {
             case ServarrAction.DELETE:
+              if (qbittorrentStatus) {
+                for (let i = 0; i < sonarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(sonarrMediaDownloadIds[i]);
+                }
+                this.infoLogger('[qBittorrent] Removed torrents from filesystem & qBittorrent');
+              }
               switch (collection.type) {
                 case EPlexDataType.SEASONS:
                   sonarrMedia = await sonarrApiClient.unmonitorSeasons(
@@ -373,6 +405,12 @@ export class CollectionWorkerService extends TaskBase {
               }
               break;
             case ServarrAction.UNMONITOR_DELETE_ALL:
+              if (qbittorrentStatus) {
+                for (let i = 0; i < sonarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(sonarrMediaDownloadIds[i]);
+                }
+                this.infoLogger('[qBittorrent] Removed torrents from filesystem & qBittorrent');
+              }
               switch (collection.type) {
                 case EPlexDataType.SEASONS:
                   sonarrMedia = await sonarrApiClient.unmonitorSeasons(
@@ -415,6 +453,12 @@ export class CollectionWorkerService extends TaskBase {
               }
               break;
             case ServarrAction.UNMONITOR_DELETE_EXISTING:
+              if (qbittorrentStatus) {
+                for (let i = 0; i < sonarrMediaDownloadIds.length; i++) {
+                  await this.qbittorrentApi.delete(sonarrMediaDownloadIds[i]);
+                }
+                this.infoLogger('[qBittorrent] Removed torrents from filesystem & qBittorrent');
+              }
               switch (collection.type) {
                 case EPlexDataType.SEASONS:
                   sonarrMedia = await sonarrApiClient.unmonitorSeasons(

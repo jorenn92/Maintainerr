@@ -23,6 +23,10 @@ export class SettingDto {
 
   plex_auth_token: string;
 
+  jellyfin_url: string;
+
+  jellyfin_api_key: string;
+
   overseerr_url: string;
 
   overseerr_api_key: string;
@@ -31,6 +35,12 @@ export class SettingDto {
 
   tautulli_api_key: string;
 
+  qbittorrent_url: string;
+
+  qbittorrent_username: string;
+
+  qbittorrent_password: string;
+  
   jellyseerr_url: string;
 
   jellyseerr_api_key: string;

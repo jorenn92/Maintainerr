@@ -4,12 +4,16 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { ExternalApiModule } from '../modules/api/external-api/external-api.module';
+import { JellyfinApiModule } from '../modules/api/jellyfin-api/jellyfin-api.module';
+import { JellyfinApiService } from '../modules/api/jellyfin-api/jellyfin-api.service';
 import { JellyseerrApiModule } from '../modules/api/jellyseerr-api/jellyseerr-api.module';
 import { JellyseerrApiService } from '../modules/api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiModule } from '../modules/api/overseerr-api/overseerr-api.module';
 import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.service';
 import { PlexApiModule } from '../modules/api/plex-api/plex-api.module';
 import { PlexApiService } from '../modules/api/plex-api/plex-api.service';
+import { QbittorrentApiModule } from '../modules/api/qbittorrent-api/qbittorrent-api.module';
+import { QbittorrentApiService } from '../modules/api/qbittorrent-api/qbittorrent-api.service';
 import { ServarrApiModule } from '../modules/api/servarr-api/servarr-api.module';
 import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.module';
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
@@ -35,6 +39,8 @@ import ormConfig from './config/typeOrmConfig';
     ServarrApiModule,
     OverseerrApiModule,
     TautulliApiModule,
+    JellyfinApiModule,
+    QbittorrentApiModule,
     JellyseerrApiModule,
     RulesModule,
     CollectionsModule,
@@ -54,6 +60,8 @@ export class AppModule implements OnModuleInit {
     private readonly plexApi: PlexApiService,
     private readonly overseerApi: OverseerrApiService,
     private readonly tautulliApi: TautulliApiService,
+    private readonly jellyfinApi: JellyfinApiService,
+    private readonly qbittorrentApi: QbittorrentApiService,
     private readonly jellyseerrApi: JellyseerrApiService,
   ) {}
   async onModuleInit() {
@@ -62,6 +70,8 @@ export class AppModule implements OnModuleInit {
     await this.plexApi.initialize({});
     await this.overseerApi.init();
     await this.tautulliApi.init();
+    await this.jellyfinApi.init();
+    await this.qbittorrentApi.init();
     await this.jellyseerrApi.init();
   }
 }

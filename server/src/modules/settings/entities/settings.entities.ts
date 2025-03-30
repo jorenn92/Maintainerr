@@ -45,6 +45,12 @@ export class Settings implements SettingDto {
   plex_auth_token: string;
 
   @Column({ nullable: true })
+  jellyfin_url: string;
+
+  @Column({ nullable: true })
+  jellyfin_api_key: string;
+
+  @Column({ nullable: true })
   overseerr_api_key: string;
 
   @Column({ nullable: true })
@@ -53,6 +59,15 @@ export class Settings implements SettingDto {
   @Column({ nullable: true })
   tautulli_api_key: string;
 
+  @Column({ nullable: true })
+  qbittorrent_url: string;
+
+  @Column({ nullable: true })
+  qbittorrent_username: string;
+
+  @Column({ nullable: true })
+  qbittorrent_password: string;
+  
   @Column({ nullable: true })
   jellyseerr_url: string;
 

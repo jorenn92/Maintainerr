@@ -1,7 +1,9 @@
 import { Logger } from '@nestjs/common';
 import axios, { AxiosError, AxiosInstance, RawAxiosRequestConfig } from 'axios';
+import { wrapper } from 'axios-cookiejar-support';
 import axiosRetry from 'axios-retry';
 import NodeCache from 'node-cache';
+import { CookieJar } from 'tough-cookie';
 
 // 20 minute default TTL (in seconds)
 const DEFAULT_TTL = 1200;
@@ -23,17 +25,23 @@ export class ExternalApiService {
     baseUrl: string,
     params: Record<string, unknown>,
     options: ExternalAPIOptions = {},
+    withCredentials: boolean = false,
   ) {
-    this.axios = axios.create({
-      baseURL: baseUrl,
-      params,
-      timeout: 10000, // timeout after 10s
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ...options.headers,
-      },
-    });
+    const jar = new CookieJar();
+    this.axios = wrapper(
+      axios.create({
+        baseURL: baseUrl,
+        params,
+        timeout: 10000, // timeout after 10s
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          ...options.headers,
+        },
+        withCredentials,
+        jar,
+      }),
+    );
     axiosRetry(this.axios, {
       retries: 3,
       retryDelay: axiosRetry.exponentialDelay,
@@ -123,7 +131,7 @@ export class ExternalApiService {
 
   public async post<T>(
     endpoint: string,
-    data?: string,
+    data?: any,
     config?: RawAxiosRequestConfig,
   ): Promise<T> {
     try {

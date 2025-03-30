@@ -4,6 +4,7 @@ import {
   RadarrInfo,
   RadarrMovie,
   RadarrMovieFile,
+  RadarrMovieHistory,
 } from '../interfaces/radarr.interface';
 
 export class RadarrApi extends ServarrApi<{ movieId: number }> {
@@ -54,6 +55,32 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
       this.logger.warn(`Error retrieving movie by TMDb ID ${id}`);
       this.logger.debug(e);
     }
+  }
+
+  public async getMovieHistory(id: number): Promise<RadarrMovieHistory[]> {
+    try {
+      const response = await this.get<RadarrMovieHistory[]>(
+        `/history/movie?movieId=${id}`,
+      );
+
+      if (!response[0]) {
+        this.logger.warn(
+          `Could not find any download history for movie id ${id} in Radarr`,
+        );
+      }
+
+      return response;
+    } catch (e) {
+      this.logger.warn(
+        `Error retrieving download history for movie id ${id} in Radarr`,
+      );
+      this.logger.debug(e);
+    }
+  }
+
+  public async getMovieDownloadIds(id: number): Promise<string[]> {
+    const history = await this.getMovieHistory(id);
+    return [...new Set(history.map((entry) => entry.downloadId))];
   }
 
   public async searchMovie(movieId: number): Promise<void> {

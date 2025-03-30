@@ -1,7 +1,7 @@
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { ICollection } from '../../collections/interfaces/collection.interface';
 import { RuleDto } from './rule.dto';
 import { RuleDbDto } from './ruleDb.dto';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 
 export class RulesDto {
   id?: number;
@@ -11,6 +11,7 @@ export class RulesDto {
   isActive?: boolean;
   arrAction?: number;
   useRules?: boolean;
+  deleteTorrents?: boolean;
   collection?: ICollection;
   listExclusions?: boolean;
   forceOverseerr?: boolean;

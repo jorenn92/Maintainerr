@@ -1,10 +1,10 @@
-import EditButton from '../../Common/EditButton'
-import DeleteButton from '../../Common/DeleteButton'
-import { IRuleJson } from '../Rule'
-import { useContext, useState } from 'react'
-import { DeleteApiHandler } from '../../../utils/ApiHandler'
-import LibrariesContext from '../../../contexts/libraries-context'
 import { PencilIcon, TrashIcon } from '@heroicons/react/solid'
+import { useContext, useState } from 'react'
+import LibrariesContext from '../../../contexts/libraries-context'
+import { DeleteApiHandler } from '../../../utils/ApiHandler'
+import DeleteButton from '../../Common/DeleteButton'
+import EditButton from '../../Common/EditButton'
+import { IRuleJson } from '../Rule'
 
 export interface IRuleGroup {
   id: number
@@ -15,6 +15,7 @@ export interface IRuleGroup {
   collectionId: number
   rules: IRuleJson[]
   useRules: boolean
+  deleteTorrents: boolean
   type?: number
   listExclusions?: boolean
 }

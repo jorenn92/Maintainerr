@@ -5,9 +5,11 @@ import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { InternalApiService } from '../api/internal-api/internal-api.service';
+import { JellyfinApiService } from '../api/jellyfin-api/jellyfin-api.service';
 import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { QbittorrentApiService } from '../api/qbittorrent-api/qbittorrent-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { TautulliApiService } from '../api/tautulli-api/tautulli-api.service';
 import {
@@ -52,6 +54,10 @@ export class SettingsService implements SettingDto {
 
   plex_auth_token: string;
 
+  jellyfin_url: string;
+
+  jellyfin_api_key: string;
+
   overseerr_url: string;
 
   overseerr_api_key: string;
@@ -60,6 +66,12 @@ export class SettingsService implements SettingDto {
 
   tautulli_api_key: string;
 
+  qbittorrent_url: string;
+
+  qbittorrent_username: string;
+
+  qbittorrent_password: string;
+  
   jellyseerr_url: string;
 
   jellyseerr_api_key: string;
@@ -81,6 +93,10 @@ export class SettingsService implements SettingDto {
     private readonly jellyseerr: JellyseerrApiService,
     @Inject(forwardRef(() => InternalApiService))
     private readonly internalApi: InternalApiService,
+    @Inject(forwardRef(() => JellyfinApiService))
+    private readonly jellyfin: JellyfinApiService,
+    @Inject(forwardRef(() => QbittorrentApiService))
+    private readonly qbittorrent: QbittorrentApiService,
     @InjectRepository(Settings)
     private readonly settingsRepo: Repository<Settings>,
     @InjectRepository(RadarrSettings)
@@ -106,10 +122,15 @@ export class SettingsService implements SettingDto {
       this.plex_port = settingsDb?.plex_port;
       this.plex_ssl = settingsDb?.plex_ssl;
       this.plex_auth_token = settingsDb?.plex_auth_token;
+      this.jellyfin_url = settingsDb?.jellyfin_url;
+      this.jellyfin_api_key = settingsDb?.jellyfin_api_key;
       this.overseerr_url = settingsDb?.overseerr_url;
       this.overseerr_api_key = settingsDb?.overseerr_api_key;
       this.tautulli_url = settingsDb?.tautulli_url;
       this.tautulli_api_key = settingsDb?.tautulli_api_key;
+      this.qbittorrent_url = settingsDb?.qbittorrent_url;
+      this.qbittorrent_username = settingsDb?.qbittorrent_username;
+      this.qbittorrent_password = settingsDb?.qbittorrent_password;
       this.jellyseerr_url = settingsDb?.jellyseerr_url;
       this.jellyseerr_api_key = settingsDb?.jellyseerr_api_key;
       this.collection_handler_job_cron =
@@ -374,6 +395,8 @@ export class SettingsService implements SettingDto {
       settings.plex_hostname = settings.plex_hostname?.toLowerCase();
       settings.overseerr_url = settings.overseerr_url?.toLowerCase();
       settings.tautulli_url = settings.tautulli_url?.toLowerCase();
+      settings.jellyfin_url = settings.jellyfin_url?.toLocaleLowerCase();
+      settings.qbittorrent_url = settings.qbittorrent_url?.toLocaleLowerCase();
 
       const settingsDb = await this.settingsRepo.findOne({ where: {} });
       // Plex SSL specifics
@@ -401,6 +424,8 @@ export class SettingsService implements SettingDto {
         this.overseerr.init();
         this.tautulli.init();
         this.internalApi.init();
+        this.jellyfin.init();
+        this.qbittorrent.init();
         this.jellyseerr.init();
 
         // reload Rule handler job if changed
@@ -556,6 +581,30 @@ export class SettingsService implements SettingDto {
       const resp = await this.plexApi.getStatus();
       return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
+        : { status: 'NOK', code: 0, message: 'Failure' };
+    } catch (e) {
+      this.logger.debug(e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async testJellyfin(): Promise<any> {
+    try {
+      const resp = await this.jellyfin.getStatus();
+      return resp?.Version != null
+        ? { status: 'OK', code: 1, message: resp.Version }
+        : { status: 'NOK', code: 0, message: 'Failure' };
+    } catch (e) {
+      this.logger.debug(e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async testQbittorrent(): Promise<any> {
+    try {
+      const resp = await this.qbittorrent.getStatus();
+      return resp != null
+        ? { status: 'OK', code: 1, message: resp }
         : { status: 'NOK', code: 0, message: 'Failure' };
     } catch (e) {
       this.logger.debug(e);

@@ -26,6 +26,7 @@ export const enum Application {
   SONARR,
   OVERSEERR,
   TAUTULLI,
+  JELLYFIN,
   JELLYSEERR,
 }
 
@@ -454,6 +455,27 @@ export class RuleConstants {
           mediaType: MediaType.BOTH,
           type: RuleType.TEXT,
           cacheReset: true,
+        },
+      ],
+    },
+    {
+      id: Application.JELLYFIN,
+      name: 'Jellyfin',
+      mediaType: MediaType.BOTH,
+      props: [
+        {
+          id: 0,
+          name: 'lastViewedAt',
+          humanName: 'Last view date',
+          mediaType: MediaType.BOTH,
+          type: RuleType.DATE,
+        },
+        {
+          id: 1,
+          name: 'viewCount',
+          humanName: 'Times viewed',
+          mediaType: MediaType.BOTH,
+          type: RuleType.NUMBER,
         },
       ],
     },

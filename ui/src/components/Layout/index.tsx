@@ -24,11 +24,13 @@ const Layout: React.FC<{ children?: ReactNode }> = (props: {
   }
 
   useEffect(() => {
-    GetApiHandler('/settings/test/setup').then((setupDone) => {
-      if (!setupDone) {
-        router.push('/settings/plex')
-      }
-    })
+    if(!router.pathname.includes("/settings/plex")) {
+      GetApiHandler('/settings/test/setup').then((setupDone) => {
+        if (!setupDone) {
+          router.push('/settings/plex')
+        }
+      })
+    }
   }, [])
 
   return (

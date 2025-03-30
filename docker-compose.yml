@@ -1,0 +1,10 @@
+services:
+  maintainerr:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    container_name: maintainerr
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app:rw,cached

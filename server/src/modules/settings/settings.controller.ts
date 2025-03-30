@@ -121,9 +121,17 @@ export class SettingsController {
   testPlex() {
     return this.settingsService.testPlex();
   }
+  @Get('/test/jellyfin')
+  testJellyfin() {
+    return this.settingsService.testJellyfin();
+  }
   @Get('/test/tautulli')
   testTautulli() {
     return this.settingsService.testTautulli();
+  }
+  @Get('/test/qbittorrent')
+  testQbittorrent() {
+    return this.settingsService.testQbittorrent();
   }
 
   @Get('/plex/devices/servers')
