@@ -1204,6 +1204,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@faker-js/faker@npm:^9.6.0":
+  version: 9.6.0
+  resolution: "@faker-js/faker@npm:9.6.0"
+  checksum: 10c0/57f76aba8744ac5f588bfcf55e61ab6f1b61664f0d1cd6cc9d9ae5bf9376bdb48d867487ace638bee393de126257b7fe6ebd602c9efd3346e7ee10e8643f1cdc
+  languageName: node
+  linkType: hard
+
 "@floating-ui/core@npm:^1.5.3":
   version: 1.5.3
   resolution: "@floating-ui/core@npm:1.5.3"
@@ -2287,6 +2294,7 @@ __metadata:
     "@automock/jest": "npm:^2.1.0"
     "@eslint/eslintrc": "npm:^3.3.1"
     "@eslint/js": "npm:^9.23.0"
+    "@faker-js/faker": "npm:^9.6.0"
     "@maintainerr/contracts": "workspace:^"
     "@nestjs/cli": "npm:^11.0.5"
     "@nestjs/common": "npm:^11.0.12"
@@ -2298,6 +2306,9 @@ __metadata:
     "@nestjs/swagger": "npm:^11.1.0"
     "@nestjs/testing": "npm:^11.0.12"
     "@nestjs/typeorm": "npm:^11.0.0"
+    "@suites/di.nestjs": "npm:^3.0.1"
+    "@suites/doubles.jest": "npm:^3.0.1"
+    "@suites/unit": "npm:^3.0.1"
     "@types/express": "npm:^5.0.1"
     "@types/jest": "npm:^29.5.14"
     "@types/lodash": "npm:^4.17.15"
@@ -3657,6 +3668,78 @@ __metadata:
   version: 0.3.0
   resolution: "@standard-schema/utils@npm:0.3.0"
   checksum: 10c0/6eb74cd13e52d5fc74054df51e37d947ef53f3ab9e02c085665dcca3c38c60ece8d735cebbdf18fbb13c775fbcb9becb3f53109b0e092a63f0f7389ce0993fd0
+  languageName: node
+  linkType: hard
+
+"@suites/core.unit@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@suites/core.unit@npm:3.0.1"
+  dependencies:
+    "@suites/types.common": "npm:^3.0.0"
+    "@suites/types.di": "npm:^3.0.0"
+    lodash.isequal: "npm:^4.5.0"
+  checksum: 10c0/6ae023ede2d396393adbb451164a7eb0898c29e34eb475d7a3bec7cd0f308cf866aff9b90039f7b6ca505ae3240427dcce1a0d1f9205ae7809148893060c060f
+  languageName: node
+  linkType: hard
+
+"@suites/di.nestjs@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@suites/di.nestjs@npm:3.0.1"
+  dependencies:
+    "@suites/types.common": "npm:^3.0.0"
+    "@suites/types.di": "npm:^3.0.0"
+  peerDependencies:
+    "@nestjs/common": ">= 8.0"
+    reflect-metadata: <1.0.0
+  checksum: 10c0/1542fc58fe32cf1f040d6fc9d5b60c1bd7fe794fb8b4aa286b9d64fa7f43cb7b9c7feca422aa131f7ab5ceecae62fc92302dbfca6516649789ce89d87c31b9ee
+  languageName: node
+  linkType: hard
+
+"@suites/doubles.jest@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@suites/doubles.jest@npm:3.0.1"
+  dependencies:
+    "@suites/core.unit": "npm:^3.0.1"
+    "@suites/types.common": "npm:^3.0.0"
+    "@suites/types.doubles": "npm:^3.0.0"
+  peerDependencies:
+    jest: "> 26.0"
+  checksum: 10c0/42e79dc676a155948bd94150d72fadc22a84e727438f86ae3c8f0dacf8f125109f6f03fe4ff2de8ad116f5eeb790a1708916b150879975d0b41575ece23e9236
+  languageName: node
+  linkType: hard
+
+"@suites/types.common@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@suites/types.common@npm:3.0.0"
+  checksum: 10c0/103ea3fef3c8a2502565094b8005cb3a2cd549a5a911a969c5745c89e35b4cf2327667d92daa060c68a4577fad80da1d0939b2dd6c050b0ddbc0368bf5fcf876
+  languageName: node
+  linkType: hard
+
+"@suites/types.di@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@suites/types.di@npm:3.0.0"
+  dependencies:
+    "@suites/types.common": "npm:^3.0.0"
+  checksum: 10c0/447789340dc6a062b82d49512c2e606bdda76a586ae2334a42f3c8f798f60e59e7f0e7b364ab97ff7f1f6fb86c140315bc806c8acafed83449fede5ce1f29718
+  languageName: node
+  linkType: hard
+
+"@suites/types.doubles@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@suites/types.doubles@npm:3.0.0"
+  checksum: 10c0/694b10964daa6820715bd6b614dc581b5727c8ae320fb888eccf6290558a3e3d003c7d6f923ca741720e98276cfeb847ff7b72356441b31955f793cbc96d1116
+  languageName: node
+  linkType: hard
+
+"@suites/unit@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@suites/unit@npm:3.0.1"
+  dependencies:
+    "@suites/core.unit": "npm:^3.0.1"
+    "@suites/types.common": "npm:^3.0.0"
+    "@suites/types.di": "npm:^3.0.0"
+    "@suites/types.doubles": "npm:^3.0.0"
+  checksum: 10c0/e688bce8723929d260c7ab8340c119759dd5b17d1bb7273fa373d19a191284f21b413bfe3ed28e4a2835f943163a34f414ee796177c099b5519a5a0a47931238
   languageName: node
   linkType: hard
 

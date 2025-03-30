@@ -55,9 +55,13 @@
     "@automock/jest": "^2.1.0",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.23.0",
+    "@faker-js/faker": "^9.6.0",
     "@nestjs/cli": "^11.0.5",
     "@nestjs/schematics": "^11.0.2",
     "@nestjs/testing": "^11.0.12",
+    "@suites/di.nestjs": "^3.0.1",
+    "@suites/doubles.jest": "^3.0.1",
+    "@suites/unit": "^3.0.1",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.15",
     "@types/mime-types": "^2",
@@ -89,6 +93,10 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "./coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "preset": "ts-jest",
+    "setupFilesAfterEnv": [
+      "<rootDir>/../test/jest.setup.ts"
+    ]
   }
 }

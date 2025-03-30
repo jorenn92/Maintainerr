@@ -1,4 +1,4 @@
-import { TestBed } from '@automock/jest';
+import { TestBed } from '@suites/unit';
 import { RulePossibility } from '../constants/rules.constants';
 import { ValueGetterService } from '../getter/getter.service';
 import { RuleComparatorService } from '../helpers/rule.comparator.service';
@@ -7,10 +7,9 @@ describe('RuleComparatorService', () => {
   let ruleComparatorService: RuleComparatorService;
 
   beforeEach(async () => {
-    const { unit } = TestBed.create(RuleComparatorService)
-
+    const { unit } = await TestBed.solitary(RuleComparatorService)
       .mock(ValueGetterService)
-      .using({ get: jest.fn() })
+      .final({ get: jest.fn() })
       .compile();
 
     ruleComparatorService = unit;
