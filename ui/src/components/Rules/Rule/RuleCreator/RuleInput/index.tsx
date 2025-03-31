@@ -468,10 +468,7 @@ const RuleInput = (props: IRuleInput) => {
                 {ruleType === RuleType.TEXT ? (
                   <option value={CustomParams.CUSTOM_TEXT}>Text</option>
                 ) : undefined}
-                <MaybeNumberOrTextListOptions
-                  ruleType={ruleType}
-                  action={action}
-                />
+                <MaybeTextListOptions ruleType={ruleType} action={action} />
               </optgroup>
               {ConstantsCtx.constants.applications?.map((app) => {
                 return (app.mediaType === MediaType.BOTH ||
@@ -568,7 +565,7 @@ const RuleInput = (props: IRuleInput) => {
   )
 }
 
-function MaybeNumberOrTextListOptions({
+function MaybeTextListOptions({
   ruleType,
   action,
 }: {
