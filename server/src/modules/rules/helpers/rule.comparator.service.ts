@@ -273,7 +273,6 @@ export class RuleComparatorService {
               rule.customVal.ruleTypeId === +RuleType.TEXT_LIST
             ? rule.customVal.value
             : rule.customVal.ruleTypeId === +RuleType.NUMBER ||
-                rule.customVal.ruleTypeId === +RuleType.NUMBER_LIST ||
                 rule.customVal.ruleTypeId === +RuleType.BOOL
               ? +rule.customVal.value
               : null;

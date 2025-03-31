@@ -85,10 +85,6 @@ export class RuleConstanstService {
         value = customValue.value == '1' ? 'true' : 'false';
         break;
       case 4:
-        ruleType = RuleType.NUMBER_LIST;
-        value = +customValue.value;
-        break;
-      case 5:
         ruleType = RuleType.TEXT_LIST;
         value = customValue.value;
         break;
@@ -107,10 +103,6 @@ export class RuleConstanstService {
     switch (identifier.type.toUpperCase()) {
       case 'NUMBER':
         ruleType = RuleType.NUMBER;
-        value = identifier.value.toString();
-        break;
-      case 'NUMBER_LIST':
-        ruleType = RuleType.NUMBER_LIST;
         value = identifier.value.toString();
         break;
       case 'DATE':

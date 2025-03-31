@@ -84,24 +84,8 @@ export class RuleType {
     [RulePossibility.EQUALS, RulePossibility.NOT_EQUALS],
     'boolean',
   );
-  static readonly NUMBER_LIST = new RuleType(
-    '4',
-    [
-      RulePossibility.EQUALS,
-      RulePossibility.NOT_EQUALS,
-      RulePossibility.CONTAINS,
-      RulePossibility.NOT_CONTAINS,
-      RulePossibility.CONTAINS_PARTIAL,
-      RulePossibility.NOT_CONTAINS_PARTIAL,
-      RulePossibility.COUNT_EQUALS,
-      RulePossibility.COUNT_NOT_EQUALS,
-      RulePossibility.COUNT_BIGGER,
-      RulePossibility.COUNT_SMALLER,
-    ],
-    'number list',
-  );
   static readonly TEXT_LIST = new RuleType(
-    '5',
+    '4',
     [
       RulePossibility.EQUALS,
       RulePossibility.NOT_EQUALS,

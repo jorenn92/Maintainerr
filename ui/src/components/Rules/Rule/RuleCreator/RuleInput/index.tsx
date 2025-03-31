@@ -15,7 +15,6 @@ enum RuleType {
   DATE,
   TEXT,
   BOOL,
-  NUMBER_LIST,
   TEXT_LIST,
 }
 enum RuleOperators {
@@ -25,7 +24,6 @@ enum RuleOperators {
 
 enum CustomParams {
   CUSTOM_NUMBER = 'custom_number',
-  CUSTOM_NUMBER_LIST = 'custom_number_list',
   CUSTOM_DAYS = 'custom_days',
   CUSTOM_DATE = 'custom_date',
   CUSTOM_TEXT = 'custom_text',
@@ -95,10 +93,6 @@ const RuleInput = (props: IRuleInput) => {
             setRuleType(RuleType.BOOL)
             break
           case 4:
-            setSecondVal(CustomParams.CUSTOM_NUMBER_LIST)
-            setRuleType(RuleType.NUMBER_LIST)
-            break
-          case 5:
             setSecondVal(CustomParams.CUSTOM_TEXT_LIST)
             setRuleType(RuleType.TEXT_LIST)
             break
@@ -162,7 +156,6 @@ const RuleInput = (props: IRuleInput) => {
         secondVal !== CustomParams.CUSTOM_DATE &&
         secondVal !== CustomParams.CUSTOM_DAYS &&
         secondVal !== CustomParams.CUSTOM_NUMBER &&
-        secondVal !== CustomParams.CUSTOM_NUMBER_LIST &&
         secondVal !== CustomParams.CUSTOM_TEXT &&
         secondVal !== CustomParams.CUSTOM_TEXT_LIST &&
         secondVal !== CustomParams.CUSTOM_BOOLEAN) ||
@@ -191,9 +184,7 @@ const RuleInput = (props: IRuleInput) => {
                         ? customValType
                         : customValType === RuleType.TEXT_LIST
                           ? customValType
-                          : customValType === RuleType.NUMBER_LIST
-                            ? customValType
-                            : +ruleType
+                          : +ruleType
               : +ruleType,
             value: customVal,
           },
@@ -262,9 +253,6 @@ const RuleInput = (props: IRuleInput) => {
       if (secondVal === CustomParams.CUSTOM_NUMBER) {
         setCustomValActive(true)
         setCustomValType(RuleType.NUMBER)
-      } else if (secondVal === CustomParams.CUSTOM_NUMBER_LIST) {
-        setCustomValActive(true)
-        setCustomValType(RuleType.NUMBER_LIST)
       } else if (secondVal === CustomParams.CUSTOM_DATE) {
         setCustomValActive(true)
         setCustomValType(RuleType.DATE)
@@ -587,12 +575,10 @@ function MaybeNumberOrTextListOptions({
   ruleType: RuleType
   action: string | undefined
 }) {
-  if (action == null) {
+  if (action == null || ruleType !== RuleType.TEXT_LIST) {
     return
   }
-  if (ruleType !== RuleType.NUMBER_LIST && ruleType !== RuleType.TEXT_LIST) {
-    return
-  }
+
   if (
     [
       +RulePossibility.COUNT_EQUALS,
@@ -603,11 +589,8 @@ function MaybeNumberOrTextListOptions({
   ) {
     return <option value={CustomParams.CUSTOM_NUMBER}>Count (number)</option>
   }
-  return ruleType === RuleType.NUMBER_LIST ? (
-    <option value={CustomParams.CUSTOM_NUMBER_LIST}>Number</option>
-  ) : (
-    <option value={CustomParams.CUSTOM_TEXT_LIST}>Text</option>
-  )
+
+  return <option value={CustomParams.CUSTOM_TEXT_LIST}>Text</option>
 }
 
 export default RuleInput
