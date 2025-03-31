@@ -31,7 +31,7 @@
     "@nestjs/event-emitter": "^3.0.1",
     "@nestjs/platform-express": "^11.0.12",
     "@nestjs/schedule": "^5.0.1",
-    "@nestjs/swagger": "^11.0.7",
+    "@nestjs/swagger": "^11.1.0",
     "@nestjs/typeorm": "^11.0.0",
     "@types/express": "^5.0.1",
     "axios": "^1.8.2",
