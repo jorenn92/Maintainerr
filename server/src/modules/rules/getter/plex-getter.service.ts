@@ -11,6 +11,7 @@ import {
   Application,
   Property,
   RuleConstants,
+  RuleValueType,
 } from '../constants/rules.constants';
 import { RulesDto } from '../dtos/rules.dto';
 
@@ -31,7 +32,7 @@ export class PlexGetterService {
     libItem: PlexLibraryItem,
     dataType?: EPlexDataType,
     ruleGroup?: RulesDto,
-  ) {
+  ): Promise<RuleValueType> {
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
 
