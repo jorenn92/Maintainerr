@@ -469,7 +469,7 @@ export class RuleConstants {
           mediaType: MediaType.SHOW,
           showType: [EPlexDataType.SEASONS, EPlexDataType.EPISODES],
           cacheReset: true,
-          type: RuleType.TEXT,
+          type: RuleType.TEXT_LIST,
         },
         {
           id: 42,
@@ -477,7 +477,7 @@ export class RuleConstants {
           humanName:
             '[list] Collections media is present in (titles) (incl. smart collections)',
           mediaType: MediaType.BOTH,
-          type: RuleType.TEXT,
+          type: RuleType.TEXT_LIST,
           cacheReset: true,
         },
       ],
