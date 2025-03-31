@@ -6,7 +6,7 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
 
 ### Tools Required
 
-- HTML/Typescript/Javascript editor
+- HTML/TypeScript/JavaScript editor
 - [VSCode](https://code.visualstudio.com/) is recommended. Upon opening the project, a few extensions will be automatically recommended for install.
 - [NodeJS](https://nodejs.org/en/download/) (Node 20.x or higher)
 - [Git](https://git-scm.com/downloads)
@@ -86,16 +86,18 @@ All help is welcome and greatly appreciated! If you would like to contribute to 
 ### Contributing Code
 
 - If you are taking on an existing bug or feature ticket, please comment on the [issue](https://github.com/jorenn92/Maintainerr/issues) to avoid multiple people working on the same thing.
+- If you have a major change or large feature to contribute, reach out via [Discussions](https://github.com/jorenn92/Maintainerr/discussions) or our [Discord server](https://discord.gg/WP4ZW2QYwk) first to align with us! It'll save us all time, as the review will be quicker, and we will have more context about your change, allowing us to guide you in the right direction.
+  - You can create a "draft" pull request early to get feedback on your work.
+- Large PRs (>500 lines changed, excluding tests) should be split into smaller, manageable parts by stacking your PRs sequentially. This approach makes the review process significantly easier when done in order.
+- Each PR should target one major meaningful change, which allows us to review independent changes separately, rather than having everything blocked on a single review.
 - All commits **must** follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
   - Pull requests with commits not following this standard will **not** be merged.
 - Please make meaningful commits, or squash them prior to opening a pull request.
   - Do not squash commits once people have begun reviewing your changes.
 - Always rebase your commit to the latest `main` branch. Do **not** merge `main` into your branch.
 - It is your responsibility to keep your branch up-to-date. Your work will **not** be merged unless it is rebased off the latest `main` branch.
-- You can create a "draft" pull request early to get feedback on your work.
 - Your code **must** be formatted correctly.
-  - We use Prettier to format our code base. It is recommended to have the Prettier extension installed in your editor and format on save.
-- If you have questions or need help, you can reach out via [Discussions](https://github.com/jorenn92/Maintainerr/discussions) or our [Discord server](https://discord.gg/WP4ZW2QYwk).
+  - We use Prettier to format our code base. It is recommended to have the Prettier extension installed in your editor and to format on save. Alternatively, you can run `yarn format` to format.
 
 ### UI Text Style
 
