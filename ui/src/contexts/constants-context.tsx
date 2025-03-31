@@ -43,6 +43,10 @@ export enum RulePossibility {
   NOT_CONTAINS,
   CONTAINS_PARTIAL,
   NOT_CONTAINS_PARTIAL,
+  COUNT_EQUALS,
+  COUNT_NOT_EQUALS,
+  COUNT_BIGGER,
+  COUNT_SMALLER,
 }
 
 export enum RulePossibilityTranslations {
@@ -58,6 +62,10 @@ export enum RulePossibilityTranslations {
   NOT_CONTAINS = 'Not Contains (Exact list match)',
   CONTAINS_PARTIAL = 'Contains (Partial list match)',
   NOT_CONTAINS_PARTIAL = 'Not Contains (Partial list match)',
+  COUNT_EQUALS = 'Count Equals',
+  COUNT_NOT_EQUALS = 'Count Does Not Equal',
+  COUNT_BIGGER = 'Count Is Bigger Than',
+  COUNT_SMALLER = 'Count Is Smaller Than',
 }
 
 export const enum MediaType {

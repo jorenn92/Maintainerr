@@ -84,6 +84,10 @@ export class RuleConstanstService {
         ruleType = RuleType.BOOL;
         value = customValue.value == '1' ? 'true' : 'false';
         break;
+      case 4:
+        ruleType = RuleType.TEXT_LIST;
+        value = customValue.value;
+        break;
     }
 
     return { type: ruleType.humanName, value: value };
@@ -107,6 +111,10 @@ export class RuleConstanstService {
         break;
       case 'TEXT':
         ruleType = RuleType.TEXT;
+        value = identifier.value.toString();
+        break;
+      case 'TEXT_LIST':
+        ruleType = RuleType.TEXT_LIST;
         value = identifier.value.toString();
         break;
       case 'BOOLEAN':
