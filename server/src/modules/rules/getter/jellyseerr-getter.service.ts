@@ -116,6 +116,11 @@ export class JellyseerrGetterService {
                     if (includesSeason) {
                       if (request.requestedBy?.userType === 2) {
                         userNames.push(request.requestedBy?.username);
+                      } else if (
+                        request.requestedBy?.userType === 3 ||
+                        request.requestedBy?.userType === 4
+                      ) {
+                        userNames.push(request.requestedBy?.jellyfinUsername);
                       } else {
                         const user = plexUsers.find(
                           (u) => u.plexId === request.requestedBy?.plexId,
@@ -130,6 +135,11 @@ export class JellyseerrGetterService {
                     // for shows and movies, add every request user
                     if (request.requestedBy?.userType === 2) {
                       userNames.push(request.requestedBy?.username);
+                    } else if (
+                      request.requestedBy?.userType === 3 ||
+                      request.requestedBy?.userType === 4
+                    ) {
+                      userNames.push(request.requestedBy?.jellyfinUsername);
                     } else {
                       const user = plexUsers.find(
                         (u) => u.plexId === request.requestedBy?.plexId,
