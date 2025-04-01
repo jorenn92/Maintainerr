@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "module": "CommonJS",
     "moduleDetection": "force",
     "declaration": true,

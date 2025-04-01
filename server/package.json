@@ -87,14 +87,13 @@
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.ts$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.ts"
     ],
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
-    "preset": "ts-jest",
     "setupFilesAfterEnv": [
       "<rootDir>/../test/jest.setup.ts"
     ]

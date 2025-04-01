@@ -40,7 +40,7 @@ describe('SonarrActionHandler', () => {
       title: 'EPISODES',
     },
   ])(
-    'should do nothing for $type when Show tmdbid failed lookup',
+    'should do nothing for $title when Show tmdbid failed lookup',
     async ({ type }: { type: EPlexDataType }) => {
       const collection = createCollection({
         arrAction: ServarrAction.DELETE,
