@@ -1,3 +1,12 @@
+# [2.13.0](https://github.com/jorenn92/Maintainerr/compare/v2.12.0...v2.13.0) (2025-04-01)
+
+
+### Features
+
+* allow checking show status when mediaType=season ([#1649](https://github.com/jorenn92/Maintainerr/issues/1649)) ([832c440](https://github.com/jorenn92/Maintainerr/commit/832c440ba1a1e37a2a0b4cf5f40234250cdc624b))
+* allow comparing list sizes against a number ([#1530](https://github.com/jorenn92/Maintainerr/issues/1530)) ([a321cbd](https://github.com/jorenn92/Maintainerr/commit/a321cbdbb3295f4e2b56c1a9d4e3ae15124362b1))
+* Allow Jellyfin & Emby users in Jellyseerr rule ([#1661](https://github.com/jorenn92/Maintainerr/issues/1661)) ([5482b8b](https://github.com/jorenn92/Maintainerr/commit/5482b8bc17e7a415d23aa77fd52414bfbea8afdb))
+
 # [2.12.0](https://github.com/jorenn92/Maintainerr/compare/v2.11.0...v2.12.0) (2025-03-22)
 
 
