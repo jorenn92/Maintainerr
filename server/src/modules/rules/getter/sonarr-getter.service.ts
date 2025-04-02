@@ -137,6 +137,12 @@ export class SonarrGetterService {
         case 'filePath': {
           return showResponse.path ? showResponse.path : null;
         }
+        case 'episodeFilePath': {
+          return episodeFile?.path ? episodeFile.path : null;
+        }
+        case 'episodeNumber': {
+          return episode?.episodeNumber != null ? episode.episodeNumber : null;
+        }
         case 'tags': {
           const tagIds = showResponse.tags;
           return (await sonarrApiClient.getTags())
