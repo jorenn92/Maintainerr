@@ -7,6 +7,9 @@ import tseslint from 'typescript-eslint'
 export default [
   { files: ['**/*.{js,mjs,cjs,ts}'] },
   {
+    ignores: ['**/eslint.config.mjs'],
+  },
+  {
     languageOptions: {
       parserOptions: { projectService: true, tsconfigRootDir: '.' },
       globals: { ...globals.browser, ...globals.node },
