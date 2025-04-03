@@ -1,3 +1,10 @@
+## [2.13.1](https://github.com/jorenn92/Maintainerr/compare/v2.13.0...v2.13.1) (2025-04-03)
+
+
+### Bug Fixes
+
+* list types not showing underlying T type options in ui ([#1682](https://github.com/jorenn92/Maintainerr/issues/1682)) ([658860f](https://github.com/jorenn92/Maintainerr/commit/658860f523782e6d223320557d40ee106e132329))
+
 # [2.13.0](https://github.com/jorenn92/Maintainerr/compare/v2.12.0...v2.13.0) (2025-04-01)
 
 
