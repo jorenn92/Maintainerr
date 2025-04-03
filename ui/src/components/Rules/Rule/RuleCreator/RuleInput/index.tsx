@@ -479,17 +479,23 @@ const RuleInput = (props: IRuleInput) => {
                   +action !== +RulePossibility.IN_NEXT ? (
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
-                      if (+prop.type.key === ruleType) {
-                        return (prop.mediaType === MediaType.BOTH ||
-                          props.mediaType === prop.mediaType) &&
-                          (props.mediaType === MediaType.MOVIE ||
-                            prop.showType === undefined ||
-                            prop.showType.includes(props.dataType!)) ? (
-                          <option
-                            key={app.id + 10 + prop.id}
-                            value={JSON.stringify([app.id, prop.id])}
-                          >{`${app.name} - ${prop.humanName}`}</option>
-                        ) : undefined
+                      // Add valid application-specific second values. Note that the second value
+                      // type may be different to the rule type - e.g. a rule type of "text list"
+                      // may be able to be matched to values of type "text list" as well as "text".
+                      const secondValueTypes = getSecondValueTypes(ruleType)
+                      for (const type of secondValueTypes) {
+                        if (+prop.type.key === type) {
+                          return (prop.mediaType === MediaType.BOTH ||
+                            props.mediaType === prop.mediaType) &&
+                            (props.mediaType === MediaType.MOVIE ||
+                              prop.showType === undefined ||
+                              prop.showType.includes(props.dataType!)) ? (
+                            <option
+                              key={app.id + 10 + prop.id}
+                              value={JSON.stringify([app.id, prop.id])}
+                            >{`${app.name} - ${prop.humanName}`}</option>
+                          ) : undefined
+                        }
                       }
                     })}
                   </optgroup>
@@ -565,6 +571,14 @@ const RuleInput = (props: IRuleInput) => {
   )
 }
 
+/** Returns a list of types that are valid to be matched against a given first value type. */
+function getSecondValueTypes(firstType: RuleType) {
+  if (firstType === RuleType.TEXT_LIST || firstType === RuleType.TEXT) {
+    return [RuleType.TEXT, RuleType.TEXT_LIST]
+  }
+  return [firstType]
+}
+
 function MaybeTextListOptions({
   ruleType,
   action,
@@ -587,7 +601,18 @@ function MaybeTextListOptions({
     return <option value={CustomParams.CUSTOM_NUMBER}>Count (number)</option>
   }
 
-  return <option value={CustomParams.CUSTOM_TEXT_LIST}>Text</option>
+  return (
+    <>
+      <option value={CustomParams.CUSTOM_TEXT}>Text</option>
+      {/* This was accidentally shipped - we keep it as a hidden option so that it still appears in
+          the UI if somebody had already selected it, but we don't want it to be able to be selected
+          in new rules. We should run a migration at some point to update all
+          "customValue { type: 'text list' }" to "customValue { type: text }". */}
+      <option hidden value={CustomParams.CUSTOM_TEXT_LIST}>
+        Text (legacy list option)
+      </option>
+    </>
+  )
 }
 
 export default RuleInput
