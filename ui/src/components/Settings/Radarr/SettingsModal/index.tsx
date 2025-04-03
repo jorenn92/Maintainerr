@@ -1,15 +1,15 @@
 import { useState } from 'react'
+import { IRadarrSetting } from '..'
+import { PostApiHandler, PutApiHandler } from '../../../../utils/ApiHandler'
 import {
   addPortToUrl,
   getBaseUrl,
   getHostname,
   getPortFromUrl,
 } from '../../../../utils/SettingsUtils'
+import Alert from '../../../Common/Alert'
 import DocsButton from '../../../Common/DocsButton'
 import Modal from '../../../Common/Modal'
-import { PostApiHandler, PutApiHandler } from '../../../../utils/ApiHandler'
-import Alert from '../../../Common/Alert'
-import { IRadarrSetting } from '..'
 
 interface IRadarrSettingsModal {
   onUpdate: (setting: IRadarrSetting) => void
