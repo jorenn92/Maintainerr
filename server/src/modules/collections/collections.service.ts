@@ -2,6 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, LessThan, Repository } from 'typeorm';
 
+import {
+  CollectionLog,
+  ECollectionLogType,
+} from '../../modules/collections/entities/collection_log.entities';
 import { BasicResponseDto } from '../api/plex-api/dto/basic-response.dto';
 import {
   CreateUpdateCollection,
@@ -14,17 +18,18 @@ import {
 } from '../api/tmdb-api/interfaces/tmdb.interface';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
+import { Exclusion } from '../rules/entities/exclusion.entities';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { Collection } from './entities/collection.entities';
-import { CollectionMedia } from './entities/collection_media.entities';
+import {
+  CollectionMedia,
+  CollectionMediaWithPlexData,
+} from './entities/collection_media.entities';
 import {
   AddCollectionMedia,
   IAlterableMediaDto,
 } from './interfaces/collection-media.interface';
 import { ICollection } from './interfaces/collection.interface';
-import { Exclusion } from '../rules/entities/exclusion.entities';
-import { CollectionLog } from '../../modules/collections/entities/collection_log.entities';
-import { ECollectionLogType } from '../../modules/collections/entities/collection_log.entities';
 
 interface addCollectionDbResponse {
   id: number;
@@ -93,7 +98,7 @@ export class CollectionsService {
   public async getCollectionMediaWitPlexDataAndhPaging(
     id: number,
     { offset = 0, size = 25 }: { offset?: number; size?: number } = {},
-  ): Promise<{ totalSize: number; items: CollectionMedia[] }> {
+  ): Promise<{ totalSize: number; items: CollectionMediaWithPlexData[] }> {
     try {
       const queryBuilder =
         this.CollectionMediaRepo.createQueryBuilder('collection_media');
@@ -105,29 +110,35 @@ export class CollectionsService {
         .take(size);
 
       const itemCount = await queryBuilder.getCount();
-      let { entities } = await queryBuilder.getRawAndEntities();
+      const { entities } = await queryBuilder.getRawAndEntities();
 
-      entities = (
+      const entitiesWithPlexData: CollectionMediaWithPlexData[] = (
         await Promise.all(
           entities.map(async (el) => {
-            el.plexData = await this.plexApi.getMetadata(el.plexId.toString());
-            if (el.plexData?.grandparentRatingKey) {
-              el.plexData.parentData = await this.plexApi.getMetadata(
-                el.plexData.grandparentRatingKey.toString(),
+            const plexData = await this.plexApi.getMetadata(
+              el.plexId.toString(),
+            );
+
+            if (plexData?.grandparentRatingKey) {
+              plexData.parentData = await this.plexApi.getMetadata(
+                plexData.grandparentRatingKey.toString(),
               );
-            } else if (el.plexData?.parentRatingKey) {
-              el.plexData.parentData = await this.plexApi.getMetadata(
-                el.plexData.parentRatingKey.toString(),
+            } else if (plexData?.parentRatingKey) {
+              plexData.parentData = await this.plexApi.getMetadata(
+                plexData.parentRatingKey.toString(),
               );
             }
-            return el;
+            return {
+              ...el,
+              plexData,
+            };
           }),
         )
       ).filter((el) => el.plexData !== undefined);
 
       return {
         totalSize: itemCount,
-        items: entities ?? [],
+        items: entitiesWithPlexData ?? [],
       };
     } catch (err) {
       this.logger.warn(

@@ -1,8 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { ServarrApi } from '../common/servarr-api.service';
 import {
-  AddSeriesOptions,
-  LanguageProfile,
   SonarrEpisode,
   SonarrEpisodeFile,
   SonarrInfo,
@@ -119,120 +117,6 @@ export class SonarrApi extends ServarrApi<{
 
   public async updateSeries(series: SonarrSeries) {
     await this.axios.put<SonarrSeries>('/series', series);
-  }
-
-  public async addSeries(options: AddSeriesOptions): Promise<SonarrSeries> {
-    try {
-      const series = await this.getSeriesByTvdbId(options.tvdbid);
-
-      // If the series already exists, we will simply just update it
-      if (series.id) {
-        series.tags = options.tags ?? series.tags;
-        series.seasons = this.buildSeasonList(options.seasons, series.seasons);
-
-        const newSeriesResponse = await this.axios.put<SonarrSeries>(
-          '/series',
-          series,
-        );
-
-        if (newSeriesResponse.data.id) {
-          this.logger.log(
-            `Updated existing series in Sonarr with seriesId: ${newSeriesResponse.data.id} an title of ${newSeriesResponse.data.title}`,
-          );
-          this.logger.debug('Sonarr update details', {
-            label: 'Sonarr',
-            movie: newSeriesResponse.data,
-          });
-
-          if (options.searchNow) {
-            this.searchSeries(newSeriesResponse.data.id);
-          }
-
-          return newSeriesResponse.data;
-        } else {
-          this.logger.warn('Failed to update series in Sonarr', {
-            label: 'Sonarr',
-            options,
-          });
-          this.logger.warn(`Failed to update series in Sonarr`);
-        }
-      }
-
-      const createdSeriesResponse = await this.axios.post<SonarrSeries>(
-        '/series',
-        {
-          tvdbId: options.tvdbid,
-          title: options.title,
-          qualityProfileId: options.profileId,
-          languageProfileId: options.languageProfileId,
-          seasons: this.buildSeasonList(
-            options.seasons,
-            series.seasons.map((season) => ({
-              seasonNumber: season.seasonNumber,
-              // We force all seasons to false if its the first request
-              monitored: false,
-            })),
-          ),
-          tags: options.tags,
-          seasonFolder: options.seasonFolder,
-          monitored: options.monitored,
-          rootFolderPath: options.rootFolderPath,
-          seriesType: options.seriesType,
-          addOptions: {
-            ignoreEpisodesWithFiles: true,
-            searchForMissingEpisodes: options.searchNow,
-          },
-        } as Partial<SonarrSeries>,
-      );
-
-      if (createdSeriesResponse.data.id) {
-        this.logger.log('Sonarr accepted request');
-        this.logger.debug('Sonarr add details', {
-          label: 'Sonarr',
-          movie: createdSeriesResponse.data,
-        });
-      } else {
-        this.logger.warn('Failed to add movie to Sonarr', {
-          label: 'Sonarr',
-          options,
-        });
-        this.logger.warn(`Failed to add series to Sonarr`);
-      }
-
-      return createdSeriesResponse.data;
-    } catch (e) {
-      this.logger.warn(
-        'Something went wrong while adding a series to Sonarr.',
-        {
-          label: 'Sonarr API',
-          errorMessage: e.message,
-          options,
-          response: e?.response?.data,
-        },
-      );
-      this.logger.debug(e);
-    }
-  }
-
-  public async getLanguageProfiles(): Promise<LanguageProfile[]> {
-    try {
-      const data = await this.getRolling<LanguageProfile[]>(
-        '/languageprofile',
-        undefined,
-        3600,
-      );
-
-      return data;
-    } catch (e) {
-      this.logger.warn(
-        'Something went wrong while retrieving Sonarr language profiles.',
-        {
-          label: 'Sonarr API',
-          errorMessage: e.message,
-        },
-      );
-      this.logger.debug(e);
-    }
   }
 
   public async searchSeries(seriesId: number): Promise<void> {

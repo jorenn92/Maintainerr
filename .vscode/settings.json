@@ -46,5 +46,12 @@
   },
   "search.exclude": {
     "**/.yarn": true
-  }
+  },
+  "jest.jestCommandLine": "yarn test",
+  "jest.virtualFolders": [
+    {
+      "name": "server",
+      "rootPath": "server"
+    }
+  ]
 }

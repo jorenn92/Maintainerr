@@ -8,6 +8,8 @@ import {
   MessageEvent as NestMessageEvent,
   Param,
   Post,
+  RawBodyRequest,
+  Req,
   Res,
   StreamableFile,
 } from '@nestjs/common';
@@ -15,6 +17,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Response } from 'express';
 import { createReadStream, readdir } from 'fs';
 import { readdir as readdirp, stat } from 'fs/promises';
+import { IncomingMessage } from 'http';
 import mime from 'mime-types';
 import path from 'path';
 import readLastLines from 'read-last-lines';
@@ -24,6 +27,7 @@ import {
   filter,
   from,
   fromEvent,
+  interval,
   map,
   mergeMap,
   Subject,
@@ -54,7 +58,16 @@ export class LogsController {
 
   // Source: https://github.com/nestjs/nest/issues/12670
   @Get('stream')
-  async stream(@Res() response: Response) {
+  async stream(
+    @Res() response: Response,
+    @Req() request: RawBodyRequest<IncomingMessage>,
+  ) {
+    if (request?.socket) {
+      request.socket.setKeepAlive(true);
+      request.socket.setNoDelay(true);
+      request.socket.setTimeout(0);
+    }
+
     const subject = new Subject<NestMessageEvent>();
 
     const observer = {
@@ -79,6 +92,7 @@ export class LogsController {
 
     response.on('close', () => {
       subject.complete();
+      pingSubscription.unsubscribe();
       logEventStreamSubscription.unsubscribe();
       this.connectedClients.delete(clientKey);
       response.end();
@@ -92,6 +106,7 @@ export class LogsController {
     });
 
     response.flushHeaders();
+    response.write('\n');
 
     const currentLogFile = new Promise<string | undefined>(
       (resolve, reject) => {
@@ -204,6 +219,11 @@ export class LogsController {
 
     const logEventStreamSubscription = logEventStream
       .pipe(map((x) => this.sendDataToClient(clientKey, x)))
+      .subscribe();
+
+    // Send data to the client every 30s to keep the connection alive
+    const pingSubscription = interval(30 * 1000)
+      .pipe(map(() => response.write(': ping\n\n')))
       .subscribe();
   }
 

@@ -22,16 +22,15 @@ export interface RadarrMovie {
   titleSlug: string;
   folderName: string;
   path: string;
-  profileId: number;
   qualityProfileId: number;
   added: string;
   downloaded: boolean;
   hasFile: boolean;
   movieFile: RadarrMovieFile;
   sizeOnDisk: number;
-  physicalRelease: string;
-  digitalRelease: string;
-  inCinemas: string;
+  physicalRelease?: string;
+  digitalRelease?: string;
+  inCinemas?: string;
   tags: number[];
   ratings: RadarrRatings;
 }

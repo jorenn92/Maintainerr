@@ -8,9 +8,10 @@ import {
 import Link from 'next/link'
 import { ReactNode, useContext, useEffect, useRef } from 'react'
 import SearchContext from '../../../contexts/search-context'
+import CachedImage from '../../Common/CachedImage'
+import Messages from '../../Messages/Messages'
 import Transition from '../../Transition'
 import VersionStatus from '../../VersionStatus'
-import CachedImage from '../../Common/CachedImage'
 
 interface NavBarLink {
   key: string
@@ -172,7 +173,8 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                       })}
                     </nav>
                   </div>
-                  <span className="mb-4">
+                  <span className="mb-4 flex flex-col gap-y-4">
+                    <Messages />
                     <VersionStatus />
                   </span>
                 </div>
@@ -232,7 +234,10 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                   )
                 })}
               </nav>
-              <VersionStatus />
+              <div className="flex flex-col gap-y-4">
+                <Messages />
+                <VersionStatus />
+              </div>
             </div>
           </div>
         </div>

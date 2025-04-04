@@ -8,6 +8,7 @@ import {
 } from '@maintainerr/contracts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import ReconnectingEventSource from 'reconnecting-eventsource'
 import GetApiHandler, {
   API_BASE_PATH,
   PostApiHandler,
@@ -130,7 +131,7 @@ const Logs = () => {
   const logsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const es = new EventSource('/api/logs/stream')
+    const es = new ReconnectingEventSource('/api/logs/stream')
     es.addEventListener('log', (event) => {
       const message: LogEvent = JSON.parse(event.data)
       setLogLines((prev) => [...prev, message])

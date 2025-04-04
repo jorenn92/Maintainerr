@@ -1,12 +1,12 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
+  Entity,
   Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Collection } from './collection.entities';
 import { PlexMetadata } from '../../api/plex-api/interfaces/media.interface';
+import { Collection } from './collection.entities';
 
 @Entity()
 @Index('idx_collection_media_collection_id', ['collectionId'])
@@ -36,6 +36,8 @@ export class CollectionMedia {
     onDelete: 'CASCADE',
   })
   collection: Collection;
+}
 
-  plexData: PlexMetadata; // this will be added programatically
+export class CollectionMediaWithPlexData extends CollectionMedia {
+  plexData: PlexMetadata;
 }
