@@ -3,9 +3,12 @@ import { warn } from 'console';
 import _ from 'lodash';
 import {
   OverseerrApiService,
-  OverSeerrMediaResponse,
   OverseerrMediaStatus,
-  OverseerrRequest,
+  OverSeerrMovieResponse,
+  OverseerrSeasonRequest,
+  OverSeerrSeasonResponse,
+  OverseerrTVRequest,
+  OverSeerrTVResponse,
 } from '../../api/overseerr-api/overseerr-api.service';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
@@ -38,7 +41,9 @@ export class OverseerrGetterService {
   async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
     try {
       let origLibItem = undefined;
-      let seasonMediaResponse = undefined;
+      let seasonMediaResponse: OverSeerrSeasonResponse = undefined;
+      let tvMediaResponse: OverSeerrTVResponse = undefined;
+      let movieMediaResponse: OverSeerrMovieResponse = undefined;
 
       // get original show in case of season / episode
       if (
@@ -57,17 +62,18 @@ export class OverseerrGetterService {
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
       // const overseerrUsers = await this.overseerrApi.getUsers();
 
-      let mediaResponse: OverSeerrMediaResponse;
       if (tmdb && tmdb.id) {
         if (libItem.type === 'movie') {
-          mediaResponse = await this.overseerrApi.getMovie(tmdb.id.toString());
+          movieMediaResponse = await this.overseerrApi.getMovie(
+            tmdb.id.toString(),
+          );
         } else {
-          mediaResponse = await this.overseerrApi.getShow(tmdb.id.toString());
+          tvMediaResponse = await this.overseerrApi.getShow(tmdb.id.toString());
           if (
             dataType === EPlexDataType.SEASONS ||
             dataType === EPlexDataType.EPISODES
           ) {
-            seasonMediaResponse = await this.overseerrApi.getShow(
+            seasonMediaResponse = await this.overseerrApi.getSeason(
               tmdb.id.toString(),
               dataType === EPlexDataType.SEASONS
                 ? origLibItem.index
@@ -90,25 +96,25 @@ export class OverseerrGetterService {
         );
       }
 
-      if (mediaResponse && mediaResponse.mediaInfo) {
+      const mediaResponse: OverSeerrTVResponse | OverSeerrMovieResponse =
+        tvMediaResponse ?? movieMediaResponse;
+
+      if (mediaResponse?.mediaInfo) {
         switch (prop.name) {
           case 'addUser': {
             try {
               const plexUsers = await this.plexApi.getCorrectedUsers();
               const userNames: string[] = [];
-              if (
-                mediaResponse &&
-                mediaResponse.mediaInfo &&
-                mediaResponse.mediaInfo.requests
-              ) {
+              if (mediaResponse.mediaInfo.requests) {
                 for (const request of mediaResponse.mediaInfo.requests) {
                   // for seasons, only add if user requested the correct season
                   if (
-                    dataType === EPlexDataType.SEASONS ||
-                    dataType === EPlexDataType.EPISODES
+                    (dataType === EPlexDataType.SEASONS ||
+                      dataType === EPlexDataType.EPISODES) &&
+                    request.type === 'tv'
                   ) {
                     const includesSeason = this.includesSeason(
-                      request,
+                      request.seasons,
                       dataType === EPlexDataType.SEASONS
                         ? origLibItem.index
                         : origLibItem.parentIndex,
@@ -153,22 +159,19 @@ export class OverseerrGetterService {
             return [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
               dataType,
             )
-              ? this.getSeasonRequests(origLibItem, mediaResponse).length
+              ? this.getSeasonRequests(origLibItem, tvMediaResponse).length
               : mediaResponse?.mediaInfo.requests.length;
           }
           case 'requestDate': {
             if (
               [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
             ) {
-              return this.getSeasonRequests(origLibItem, mediaResponse)[0]
-                ?.createdAt
-                ? new Date(
-                    this.getSeasonRequests(
-                      origLibItem,
-                      mediaResponse,
-                    )[0]?.createdAt,
-                  )
-                : null;
+              const createdAt = this.getSeasonRequests(
+                origLibItem,
+                tvMediaResponse,
+              )[0]?.createdAt;
+
+              return createdAt ? new Date(createdAt) : null;
             }
             return mediaResponse?.mediaInfo?.requests[0]?.createdAt
               ? new Date(mediaResponse?.mediaInfo?.requests[0]?.createdAt)
@@ -176,28 +179,22 @@ export class OverseerrGetterService {
           }
           case 'releaseDate': {
             if (libItem.type === 'movie') {
-              return mediaResponse?.releaseDate
-                ? new Date(mediaResponse?.releaseDate)
+              return movieMediaResponse?.releaseDate
+                ? new Date(movieMediaResponse?.releaseDate)
                 : null;
             } else {
               if (EPlexDataType.EPISODES === dataType) {
                 const ep = seasonMediaResponse.episodes?.find(
                   (el) => el.episodeNumber === origLibItem.index,
                 );
-                return ep?.airDate
-                  ? new Date(ep.airDate)
-                  : ep?.firstAirDate
-                    ? new Date(ep.firstAirDate)
-                    : null;
+                return ep?.airDate ? new Date(ep.airDate) : null;
               } else if (EPlexDataType.SEASONS === dataType) {
                 return seasonMediaResponse?.airDate
                   ? new Date(seasonMediaResponse.airDate)
-                  : seasonMediaResponse?.firstAirDate
-                    ? new Date(seasonMediaResponse.firstAirDate)
-                    : null;
+                  : null;
               } else {
-                return mediaResponse?.firstAirDate
-                  ? new Date(mediaResponse.firstAirDate)
+                return tvMediaResponse?.firstAirDate
+                  ? new Date(tvMediaResponse.firstAirDate)
                   : null;
               }
             }
@@ -208,7 +205,7 @@ export class OverseerrGetterService {
             ) {
               const season = this.getSeasonRequests(
                 origLibItem,
-                mediaResponse,
+                tvMediaResponse,
               )[0];
               if (season && season.media) {
                 if (
@@ -232,7 +229,7 @@ export class OverseerrGetterService {
             ) {
               const season = this.getSeasonRequests(
                 origLibItem,
-                mediaResponse,
+                tvMediaResponse,
               )[0];
               if (season && season.media) {
                 if (
@@ -257,7 +254,7 @@ export class OverseerrGetterService {
                   dataType,
                 )
               ) {
-                return this.getSeasonRequests(origLibItem, mediaResponse)
+                return this.getSeasonRequests(origLibItem, tvMediaResponse)
                   .length > 0
                   ? 1
                   : 0;
@@ -289,9 +286,9 @@ export class OverseerrGetterService {
 
   private getSeasonRequests(
     libItem: PlexLibraryItem,
-    mediaResponse: OverSeerrMediaResponse,
+    mediaResponse: OverSeerrTVResponse,
   ) {
-    const seasonRequests: OverseerrRequest[] = [];
+    const seasonRequests: OverseerrTVRequest[] = [];
     mediaResponse.mediaInfo?.requests.forEach((el) => {
       const season = el.seasons.find(
         (season) =>
@@ -305,8 +302,11 @@ export class OverseerrGetterService {
     return seasonRequests;
   }
 
-  private includesSeason(request: OverseerrRequest, seasonNumber: number) {
-    const season = request.seasons.find(
+  private includesSeason(
+    seasons: OverseerrSeasonRequest[],
+    seasonNumber: number,
+  ) {
+    const season = seasons.find(
       (season) => season.seasonNumber === seasonNumber,
     );
     return season !== undefined;
