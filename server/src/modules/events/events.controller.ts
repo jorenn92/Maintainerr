@@ -11,11 +11,14 @@ import {
   Controller,
   Get,
   MessageEvent as NestMessageEvent,
+  RawBodyRequest,
+  Req,
   Res,
 } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Response } from 'express';
-import { Subject } from 'rxjs';
+import { IncomingMessage } from 'http';
+import { interval, map, Subject } from 'rxjs';
 
 @Controller('/api/events')
 export class EventsController {
@@ -28,9 +31,17 @@ export class EventsController {
 
   // Source: https://github.com/nestjs/nest/issues/12670
   @Get('stream')
-  async stream(@Res() response: Response) {
-    const subject = new Subject<NestMessageEvent>();
+  async stream(
+    @Res() response: Response,
+    @Req() request: RawBodyRequest<IncomingMessage>,
+  ) {
+    if (request?.socket) {
+      request.socket.setKeepAlive(true);
+      request.socket.setNoDelay(true);
+      request.socket.setTimeout(0);
+    }
 
+    const subject = new Subject<NestMessageEvent>();
     const observer = {
       next: (msg: NestMessageEvent) => {
         if (msg.type) response.write(`event: ${msg.type}\n`);
@@ -53,6 +64,7 @@ export class EventsController {
 
     response.on('close', () => {
       subject.complete();
+      pingSubscription.unsubscribe();
       this.connectedClients.delete(clientKey);
       response.end();
     });
@@ -65,13 +77,24 @@ export class EventsController {
     });
 
     response.flushHeaders();
+    response.write('\n');
+
+    // Send data to the client every 30s to keep the connection alive
+    const pingSubscription = interval(30 * 1000)
+      .pipe(map(() => response.write(': ping\n\n')))
+      .subscribe();
 
     if (this.mostRecentEvent) {
       const eventTime = (this.mostRecentEvent.data as BaseEventDto).time;
       if (eventTime > new Date(Date.now() - 5000)) {
         this.sendDataToClient(clientKey, this.mostRecentEvent);
+        return;
       }
     }
+
+    // TODO Handle the Last-Event-Id header.
+    // We should send all events that are newer than the Last-Event-Id header.
+    // An array with a TTL per event is probably sufficient.
   }
 
   @OnEvent('rule_handler.*')
