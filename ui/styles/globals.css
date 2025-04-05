@@ -471,8 +471,31 @@
     color: #8d4c1c;
   }
 
-  .toast {
-    width: 360px;
+  /* Custom styling for success toasts (dark theme) */
+  .custom-toast--success {
+    background-color: #e08f0d !important;
+    color: orange;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
+  }
+
+  /* Custom styling for error toasts (dark theme) */
+  .custom-toast--error {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
+  }
+
+  /* Custom styling for info toasts (dark theme) */
+  .custom-toast--info {
+    background-color: #17a2b8;
+    color: white;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
   }
 
   .react-select-container {

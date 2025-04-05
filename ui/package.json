@@ -31,7 +31,7 @@
     "react-hook-form": "^7.55.0",
     "react-markdown": "10.1.0",
     "react-select": "^5.10.1",
-    "react-toast-notifications": "^2.5.1",
+    "react-toastify": "^11.0.5",
     "react-transition-group": "^4.4.5",
     "reconnecting-eventsource": "^1.6.4",
     "yaml": "^2.7.0",
