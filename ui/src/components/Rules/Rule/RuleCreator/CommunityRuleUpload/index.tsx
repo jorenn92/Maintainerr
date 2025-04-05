@@ -1,12 +1,13 @@
 import { useRef, useState } from 'react'
 import { IRule } from '..'
 import { PostApiHandler } from '../../../../../utils/ApiHandler'
+import { detectRequiredServices } from '../../../../../utils/CommunityRuleMaps'
 import Alert from '../../../../Common/Alert'
 import Modal from '../../../../Common/Modal'
-
 interface ICommunityRuleUpload {
   rules: IRule[]
   type: 'movie' | 'show'
+  level?: 'show' | 'season' | 'episode'
   onSubmit: () => void
   onCancel: () => void
 }
@@ -20,13 +21,21 @@ const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
 
   const handleUpload = async () => {
     if (nameRef.current.value && descriptionRef.current.value) {
-      await PostApiHandler(`/rules/community`, {
+      const requiredServices = detectRequiredServices(props.rules)
+      const payload: any = {
         name: nameRef.current.value,
         type: props.type,
         description: descriptionRef.current.value,
         JsonRules: props.rules,
         uploadedBy: uploadedByRef.current.value || undefined,
-      })
+        requiredServices,
+      }
+
+      if (props.type === 'show' && props.level) {
+        payload.level = props.level
+      }
+
+      await PostApiHandler(`/rules/community`, payload)
         .then((resp) => {
           if (resp.code === 1) {
             setThanksModal(true)
