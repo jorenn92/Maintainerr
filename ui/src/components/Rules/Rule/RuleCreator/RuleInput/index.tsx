@@ -213,9 +213,7 @@ const RuleInput = (props: IRuleInput) => {
           return (
             (prop.mediaType === MediaType.BOTH ||
               props.mediaType === prop.mediaType) &&
-            (props.mediaType === MediaType.MOVIE ||
-              prop.showType === undefined ||
-              prop.showType.includes(props.dataType!))
+            (!prop.showType || prop.showType.includes(props.dataType!))
           )
         })
         return app
