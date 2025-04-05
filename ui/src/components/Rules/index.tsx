@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
-import { useToasts } from 'react-toast-notifications'
+import { toast } from 'react-toastify'
 import { ConstantsContextProvider } from '../../contexts/constants-context'
 import { useTaskStatusContext } from '../../contexts/taskstatus-context'
 import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
@@ -18,7 +18,6 @@ const Rules = () => {
   const [editData, setEditData] = useState<IRuleGroup>()
   const [selectedLibrary, setSelectedLibrary] = useState<number>(9999)
   const [isLoading, setIsLoading] = useState(true)
-  const { addToast } = useToasts()
   const { ruleHandlerRunning } = useTaskStatusContext()
 
   const fetchData = async () => {
@@ -61,25 +60,16 @@ const Rules = () => {
     try {
       await PostApiHandler(`/rules/execute`, {})
 
-      addToast('Initiated rule execution in the background.', {
-        autoDismiss: true,
-        appearance: 'success',
-      })
+      toast.success('Initiated rule execution in the background.')
     } catch (e) {
       if (e instanceof AxiosError) {
         if (e.response?.status === 409) {
-          addToast('Rule execution is already running.', {
-            autoDismiss: true,
-            appearance: 'error',
-          })
+          toast.error('Rule execution is already running.')
           return
         }
       }
 
-      addToast('Failed to initiate rule execution.', {
-        autoDismiss: true,
-        appearance: 'error',
-      })
+      toast.error('Failed to initiate rule execution.')
     }
   }
 
