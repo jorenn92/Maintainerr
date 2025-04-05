@@ -1024,6 +1024,7 @@ const AddModal = (props: AddModal) => {
                   />
                 ) : undefined}
                 <RuleCreator
+                  key={ruleCreatorVersion.current}
                   mediaType={
                     selectedLibrary
                       ? selectedLibrary.type === 'movie'
