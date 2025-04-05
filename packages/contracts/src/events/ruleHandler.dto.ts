@@ -10,7 +10,7 @@ export class RuleHandlerStartedEventDto extends BaseEventDto {
   }
 }
 
-export class RuleHandlerProgressEventDto extends BaseEventDto {
+export class RuleHandlerProgressedEventDto extends BaseEventDto {
   totalRuleGroups: number
   totalEvaluations: number
   processingRuleGroup:
@@ -24,7 +24,7 @@ export class RuleHandlerProgressEventDto extends BaseEventDto {
   processedEvaluations: number
 
   constructor() {
-    super(MaintainerrEvent.RuleHandler_Progress)
+    super(MaintainerrEvent.RuleHandler_Progressed)
     this.totalRuleGroups = 0
     this.processingRuleGroup = undefined
     this.totalEvaluations = 0

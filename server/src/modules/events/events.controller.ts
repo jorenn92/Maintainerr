@@ -1,10 +1,10 @@
 import {
   BaseEventDto,
   CollectionHandlerFinishedEventDto,
-  CollectionHandlerProgressEventDto,
+  CollectionHandlerProgressedEventDto,
   CollectionHandlerStartedEventDto,
   RuleHandlerFinishedEventDto,
-  RuleHandlerProgressEventDto,
+  RuleHandlerProgressedEventDto,
   RuleHandlerStartedEventDto,
 } from '@maintainerr/contracts';
 import {
@@ -102,10 +102,10 @@ export class EventsController {
   sendEventToClient(
     payload:
       | RuleHandlerStartedEventDto
-      | RuleHandlerProgressEventDto
+      | RuleHandlerProgressedEventDto
       | RuleHandlerFinishedEventDto
       | CollectionHandlerStartedEventDto
-      | CollectionHandlerProgressEventDto
+      | CollectionHandlerProgressedEventDto
       | CollectionHandlerFinishedEventDto,
   ) {
     const eventMessage: NestMessageEvent = {

@@ -1,11 +1,11 @@
 import {
   BaseEventDto,
   CollectionHandlerFinishedEventDto,
-  CollectionHandlerProgressEventDto,
+  CollectionHandlerProgressedEventDto,
   CollectionHandlerStartedEventDto,
   MaintainerrEvent,
   RuleHandlerFinishedEventDto,
-  RuleHandlerProgressEventDto,
+  RuleHandlerProgressedEventDto,
   RuleHandlerStartedEventDto,
 } from '@maintainerr/contracts'
 import { useRef, useState } from 'react'
@@ -28,16 +28,16 @@ const isStartedOrFinishedEvent = (
   )
 }
 
-const isRuleHandlerProgressEvent = (
+const isRuleHandlerProgressedEvent = (
   event: BaseEventDto,
-): event is RuleHandlerProgressEventDto => {
-  return event.type == MaintainerrEvent.RuleHandler_Progress
+): event is RuleHandlerProgressedEventDto => {
+  return event.type == MaintainerrEvent.RuleHandler_Progressed
 }
 
-const isCollectionHandlerProgressEvent = (
+const isCollectionHandlerProgressedEvent = (
   event: BaseEventDto,
-): event is CollectionHandlerProgressEventDto => {
-  return event.type == MaintainerrEvent.CollectionHandler_Progress
+): event is CollectionHandlerProgressedEventDto => {
+  return event.type == MaintainerrEvent.CollectionHandler_Progressed
 }
 
 const Messages = () => {
@@ -55,7 +55,7 @@ const RuleHandlerMessages = () => {
 
   const [event, setEvent] = useState<
     | RuleHandlerStartedEventDto
-    | RuleHandlerProgressEventDto
+    | RuleHandlerProgressedEventDto
     | RuleHandlerFinishedEventDto
   >()
 
@@ -68,8 +68,8 @@ const RuleHandlerMessages = () => {
     },
   )
 
-  useEvent<RuleHandlerProgressEventDto>(
-    MaintainerrEvent.RuleHandler_Progress,
+  useEvent<RuleHandlerProgressedEventDto>(
+    MaintainerrEvent.RuleHandler_Progressed,
     (event) => {
       setEvent(event)
       setShow(true)
@@ -107,12 +107,12 @@ const RuleHandlerMessages = () => {
           </div>
           {event && isStartedOrFinishedEvent(event) && <>{event.message}</>}
           {event &&
-            isRuleHandlerProgressEvent(event) &&
+            isRuleHandlerProgressedEvent(event) &&
             event.processingRuleGroup && (
               <div>Processing: {event.processingRuleGroup.name}</div>
             )}
         </div>
-        {event && isRuleHandlerProgressEvent(event) && (
+        {event && isRuleHandlerProgressedEvent(event) && (
           <div className="ml-8 mt-2 bg-zinc-800">
             {event.totalRuleGroups > 1 && (
               <div
@@ -141,7 +141,7 @@ const CollectionHandlerMessages = () => {
 
   const [event, setEvent] = useState<
     | CollectionHandlerStartedEventDto
-    | CollectionHandlerProgressEventDto
+    | CollectionHandlerProgressedEventDto
     | CollectionHandlerFinishedEventDto
   >()
 
@@ -154,8 +154,8 @@ const CollectionHandlerMessages = () => {
     },
   )
 
-  useEvent<CollectionHandlerProgressEventDto>(
-    MaintainerrEvent.CollectionHandler_Progress,
+  useEvent<CollectionHandlerProgressedEventDto>(
+    MaintainerrEvent.CollectionHandler_Progressed,
     (event) => {
       setEvent(event)
       setShow(true)
@@ -193,12 +193,12 @@ const CollectionHandlerMessages = () => {
           </div>
           {event && isStartedOrFinishedEvent(event) && <>{event.message}</>}
           {event &&
-            isCollectionHandlerProgressEvent(event) &&
+            isCollectionHandlerProgressedEvent(event) &&
             event.processingCollection && (
               <div>Processing: {event.processingCollection.name}</div>
             )}
         </div>
-        {event && isCollectionHandlerProgressEvent(event) && (
+        {event && isCollectionHandlerProgressedEvent(event) && (
           <div className="ml-8 mt-2 bg-zinc-800">
             {event.totalCollections > 1 && (
               <div

@@ -1,6 +1,6 @@
 import {
   CollectionHandlerFinishedEventDto,
-  CollectionHandlerProgressEventDto,
+  CollectionHandlerProgressedEventDto,
   CollectionHandlerStartedEventDto,
   MaintainerrEvent,
 } from '@maintainerr/contracts';
@@ -126,44 +126,44 @@ export class CollectionWorkerService extends TaskBase {
       });
     }
 
-    const progressEvent = new CollectionHandlerProgressEventDto();
-    const emitProgressEvent = () => {
-      progressEvent.time = new Date();
+    const progressedEvent = new CollectionHandlerProgressedEventDto();
+    const emitProgressedEvent = () => {
+      progressedEvent.time = new Date();
       this.eventEmitter.emit(
-        MaintainerrEvent.CollectionHandler_Progress,
-        progressEvent,
+        MaintainerrEvent.CollectionHandler_Progressed,
+        progressedEvent,
       );
     };
-    progressEvent.totalCollections = collectionsToHandle.length;
-    progressEvent.totalMediaToHandle = collectionHandleMediaGroup.reduce(
+    progressedEvent.totalCollections = collectionsToHandle.length;
+    progressedEvent.totalMediaToHandle = collectionHandleMediaGroup.reduce(
       (acc, curr) => acc + curr.mediaToHandle.length,
       0,
     );
-    emitProgressEvent();
+    emitProgressedEvent();
 
     for (const collectionGroup of collectionHandleMediaGroup) {
       const collection = collectionGroup.collection;
       const collectionMedia = collectionGroup.mediaToHandle;
 
-      progressEvent.processingCollection = {
+      progressedEvent.processingCollection = {
         name: collection.title,
         processedMedias: 0,
         totalMedias: collectionMedia.length,
       };
-      emitProgressEvent();
+      emitProgressedEvent();
 
       this.infoLogger(`Handling collection '${collection.title}'`);
 
       for (const media of collectionMedia) {
         await this.collectionHandler.handleMedia(collection, media);
         handledCollectionMedia++;
-        progressEvent.processingCollection.processedMedias++;
-        progressEvent.processedMedias++;
-        emitProgressEvent();
+        progressedEvent.processingCollection.processedMedias++;
+        progressedEvent.processedMedias++;
+        emitProgressedEvent();
       }
 
-      progressEvent.processedCollections++;
-      emitProgressEvent();
+      progressedEvent.processedCollections++;
+      emitProgressedEvent();
 
       this.infoLogger(`Handling collection '${collection.title}' finished`);
     }

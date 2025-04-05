@@ -1,7 +1,7 @@
 import {
   MaintainerrEvent,
   RuleHandlerFinishedEventDto,
-  RuleHandlerProgressEventDto,
+  RuleHandlerProgressedEventDto,
   RuleHandlerStartedEventDto,
 } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
@@ -101,28 +101,28 @@ export class RuleExecutorService extends TaskBase {
             ruleGroupTotals[rulegroup.id] = mediaItemCount;
           }
 
-          const progressEvent = new RuleHandlerProgressEventDto();
-          const emitProgressEvent = () => {
-            progressEvent.time = new Date();
+          const progressedEvent = new RuleHandlerProgressedEventDto();
+          const emitProgressedEvent = () => {
+            progressedEvent.time = new Date();
             this.eventEmitter.emit(
-              MaintainerrEvent.CollectionHandler_Progress,
-              progressEvent,
+              MaintainerrEvent.CollectionHandler_Progressed,
+              progressedEvent,
             );
           };
-          progressEvent.totalRuleGroups = ruleGroups.length;
-          progressEvent.totalEvaluations = totalEvaluations;
+          progressedEvent.totalRuleGroups = ruleGroups.length;
+          progressedEvent.totalEvaluations = totalEvaluations;
 
           for (let i = 0; i < ruleGroups.length; i++) {
             const rulegroup = ruleGroups[i];
 
-            progressEvent.processingRuleGroup = {
+            progressedEvent.processingRuleGroup = {
               name: rulegroup.name,
               number: i + 1,
               processedEvaluations: 0,
               totalEvaluations:
                 ruleGroupTotals[rulegroup.id] * rulegroup.rules.length,
             };
-            emitProgressEvent();
+            emitProgressedEvent();
 
             if (rulegroup.useRules) {
               this.logger.log(`Executing rules for '${rulegroup.name}'`);
@@ -150,11 +150,11 @@ export class RuleExecutorService extends TaskBase {
                   this.plexData.data,
                   false,
                   () => {
-                    progressEvent.processedEvaluations +=
+                    progressedEvent.processedEvaluations +=
                       this.plexData.data.length;
-                    progressEvent.processingRuleGroup.processedEvaluations +=
+                    progressedEvent.processingRuleGroup.processedEvaluations +=
                       this.plexData.data.length;
-                    emitProgressEvent();
+                    emitProgressedEvent();
                   },
                 );
 

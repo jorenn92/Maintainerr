@@ -10,7 +10,7 @@ export class CollectionHandlerStartedEventDto extends BaseEventDto {
   }
 }
 
-export class CollectionHandlerProgressEventDto extends BaseEventDto {
+export class CollectionHandlerProgressedEventDto extends BaseEventDto {
   totalCollections: number
   processingCollection:
     | {
@@ -24,7 +24,7 @@ export class CollectionHandlerProgressEventDto extends BaseEventDto {
   processedCollections: number
 
   constructor() {
-    super(MaintainerrEvent.CollectionHandler_Progress)
+    super(MaintainerrEvent.CollectionHandler_Progressed)
     this.totalCollections = 0
     this.processingCollection = undefined
     this.totalMediaToHandle = 0
