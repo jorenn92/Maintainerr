@@ -4,7 +4,7 @@ import {
   createCollection,
   createCollectionMedia,
   createRadarrMovie,
-} from '../../utils/testing/data';
+} from '../../../test/utils/data';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { RadarrApi } from '../api/servarr-api/helpers/radarr.helper';

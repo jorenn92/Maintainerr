@@ -4,7 +4,7 @@ import {
   createCollection,
   createCollectionMediaWithPlexData,
   createSonarrSeries,
-} from '../../utils/testing/data';
+} from '../../../test/utils/data';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { SonarrApi } from '../api/servarr-api/helpers/sonarr.helper';

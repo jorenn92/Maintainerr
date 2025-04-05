@@ -3,7 +3,7 @@ import {
   createCollection,
   createCollectionMedia,
   createPlexLibraries,
-} from '../../utils/testing/data';
+} from '../../../test/utils/data';
 import { RadarrActionHandler } from '../actions/radarr-action-handler';
 import { SonarrActionHandler } from '../actions/sonarr-action-handler';
 import { PlexApiService } from '../api/plex-api/plex-api.service';

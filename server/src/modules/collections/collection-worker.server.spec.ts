@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import {
   createCollection,
   createCollectionMedia,
-} from '../../utils/testing/data';
+} from '../../../test/utils/data';
 import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { SettingsService } from '../settings/settings.service';

@@ -1,22 +1,22 @@
 import { faker } from '@faker-js/faker';
-import { EPlexDataType } from '../../modules/api/plex-api/enums/plex-data-type-enum';
-import { PlexLibrary } from '../../modules/api/plex-api/interfaces/library.interfaces';
-import { PlexMetadata } from '../../modules/api/plex-api/interfaces/media.interface';
+import { EPlexDataType } from '../../src/modules/api/plex-api/enums/plex-data-type-enum';
+import { PlexLibrary } from '../../src/modules/api/plex-api/interfaces/library.interfaces';
+import { PlexMetadata } from '../../src/modules/api/plex-api/interfaces/media.interface';
 import {
   RadarrMovie,
   RadarrMovieFile,
-} from '../../modules/api/servarr-api/interfaces/radarr.interface';
+} from '../../src/modules/api/servarr-api/interfaces/radarr.interface';
 import {
   SonarrSeries,
   SonarrSeriesStatusTypes,
   SonarrSeriesTypes,
-} from '../../modules/api/servarr-api/interfaces/sonarr.interface';
-import { Collection } from '../../modules/collections/entities/collection.entities';
+} from '../../src/modules/api/servarr-api/interfaces/sonarr.interface';
+import { Collection } from '../../src/modules/collections/entities/collection.entities';
 import {
   CollectionMedia,
   CollectionMediaWithPlexData,
-} from '../../modules/collections/entities/collection_media.entities';
-import { ServarrAction } from '../../modules/collections/interfaces/collection.interface';
+} from '../../src/modules/collections/entities/collection_media.entities';
+import { ServarrAction } from '../../src/modules/collections/interfaces/collection.interface';
 
 export const createCollection = (
   properties: Partial<Collection> = {},
