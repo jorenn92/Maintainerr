@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios'
 import { useContext, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import LibrariesContext, { ILibrary } from '../../contexts/libraries-context'
