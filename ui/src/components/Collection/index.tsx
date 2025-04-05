@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import LibrariesContext, { ILibrary } from '../../contexts/libraries-context'
 import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
+import { EPlexDataType } from '../../utils/PlexDataType-enum'
 import LoadingSpinner from '../Common/LoadingSpinner'
+import { IPlexMetadata } from '../Overview/Content'
 import CollectionDetail from './CollectionDetail'
 import CollectionOverview from './CollectionOverview'
-import { EPlexDataType } from '../../utils/PlexDataType-enum'
-import { IPlexMetadata } from '../Overview/Content'
-import { useToasts } from 'react-toast-notifications'
 
 export interface ICollection {
   id?: number
@@ -56,7 +56,6 @@ const Collection = () => {
   }>({ open: false, collection: undefined })
   const [library, setLibrary] = useState<ILibrary>()
   const [collections, setCollections] = useState<ICollection[]>()
-  const { addToast } = useToasts()
 
   useEffect(() => {
     document.title = 'Maintainerr - Collections'
@@ -84,12 +83,8 @@ const Collection = () => {
 
   const doActions = () => {
     PostApiHandler('/collections/handle', {})
-    addToast(
+    toast.success(
       'Initiated collection handling in the background, consult the logs for status updates.',
-      {
-        autoDismiss: true,
-        appearance: 'success',
-      },
     )
   }
 

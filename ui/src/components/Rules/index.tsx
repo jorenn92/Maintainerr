@@ -1,5 +1,7 @@
 import { debounce } from 'lodash'
 import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
+import { ConstantsContextProvider } from '../../contexts/constants-context'
 import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
 import AddButton from '../Common/AddButton'
 import ExecuteButton from '../Common/ExecuteButton'
@@ -7,8 +9,6 @@ import LibrarySwitcher from '../Common/LibrarySwitcher'
 import LoadingSpinner from '../Common/LoadingSpinner'
 import RuleGroup, { IRuleGroup } from './RuleGroup'
 import AddModal from './RuleGroup/AddModal'
-import { useToasts } from 'react-toast-notifications'
-import { ConstantsContextProvider } from '../../contexts/constants-context'
 
 const Rules: React.FC = () => {
   const [addModalActive, setAddModal] = useState(false)
@@ -17,7 +17,6 @@ const Rules: React.FC = () => {
   const [editData, setEditData] = useState<IRuleGroup>()
   const [selectedLibrary, setSelectedLibrary] = useState<number>(9999)
   const [isLoading, setIsLoading] = useState(true)
-  const { addToast } = useToasts()
 
   const fetchData = async () => {
     if (selectedLibrary === 9999) return await GetApiHandler('/rules')
@@ -57,12 +56,8 @@ const Rules: React.FC = () => {
 
   const sync = () => {
     PostApiHandler(`/rules/execute`, {})
-    addToast(
+    toast.success(
       'Initiated rule execution in the background, consult the logs for status updates.',
-      {
-        autoDismiss: true,
-        appearance: 'success',
-      },
     )
   }
 
