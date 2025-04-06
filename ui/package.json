@@ -52,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.28.0",
     "autoprefixer": "10.4.21",
-    "eslint": "^9.20.1",
+    "eslint": "^9.24.0",
     "eslint-config-next": "15.2.4",
     "eslint-config-prettier": "^10.1.1",
     "monaco-editor": "0.52.2",
