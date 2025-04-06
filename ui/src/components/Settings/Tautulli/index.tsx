@@ -1,16 +1,17 @@
 import { SaveIcon } from '@heroicons/react/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { BasicResponseDto, TautulliSettingDto } from '@maintainerr/contracts'
+import {
+  BasicResponseDto,
+  TautulliSettingDto,
+  tautulliSettingSchema,
+} from '@maintainerr/contracts'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
-import {
-  addPortToUrl,
-  getBaseUrl,
-  getHostname,
-  getPortFromUrl,
-} from '../../../utils/SettingsUtils'
+import GetApiHandler, {
+  DeleteApiHandler,
+  PostApiHandler,
+} from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import DocsButton from '../../Common/DocsButton'
@@ -21,74 +22,28 @@ interface TestStatus {
   message: string
 }
 
-// TODO Make this + transform generic for other setting forms
-const tautulliSplitSettingSchema = z.object({
-  hostname: z.string().trim().min(1),
-  port: z.union([
-    z.literal('').transform((x) => null),
-    z.coerce.number().min(1).max(65535),
-  ]),
-  baseUrl: z.string().trim().startsWith('/').or(z.literal('')),
-  apiKey: z.string().trim().min(1),
+const TautulliSettingDeleteSchema = z.object({
+  url: z.literal(''),
+  api_key: z.literal(''),
 })
 
-const stripLeadingSlash = (url: string) =>
-  url.endsWith('/') ? url.slice(0, -1) : url
+const TautulliSettingFormSchema = z.union([
+  tautulliSettingSchema,
+  TautulliSettingDeleteSchema,
+])
 
-type tautulliSplitSettingInput = z.input<typeof tautulliSplitSettingSchema>
+type TautulliSettingFormResult = z.infer<typeof TautulliSettingFormSchema>
 
-const generateUrlFromParts = (
-  hostname: string,
-  port?: number | null,
-  baseUrl?: string | null,
-) => {
-  let portToUse = port
-
-  // if port not specified, but hostname is. Derive the port
-  if (!portToUse) {
-    const derivedPort = hostname.includes('http://')
-      ? 80
-      : hostname.includes('https://')
-        ? 443
-        : 80
-
-    portToUse = derivedPort
-  }
-
-  const hostnameVal = hostname.includes('http://')
-    ? hostname
-    : hostname.includes('https://')
-      ? hostname
-      : portToUse == 443
-        ? 'https://' + hostname
-        : 'http://' + hostname
-
-  let url = `${addPortToUrl(stripLeadingSlash(hostnameVal), +portToUse)}`
-  url = `${url}${baseUrl ?? ''}`
-
-  return url
-}
-
-const tautulliSplitSettingTransform =
-  tautulliSplitSettingSchema.transform<TautulliSettingDto>(
-    ({ hostname, port, baseUrl, apiKey }) => {
-      const url = generateUrlFromParts(hostname, port, baseUrl)
-
-      return {
-        url,
-        api_key: apiKey,
-      }
-    },
-  )
+const stripLeadingSlashes = (url: string) => url.replace(/\/+$/, '')
 
 const TautulliSettings = () => {
   const [testedSettings, setTestedSettings] = useState<
-    tautulliSplitSettingInput | undefined
+    TautulliSettingDto | undefined
   >()
 
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<TestStatus>()
-  const [saveError, setSaveError] = useState<boolean>(false)
+  const [submitError, setSubmitError] = useState<boolean>(false)
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState<boolean>(false)
 
   useEffect(() => {
@@ -98,97 +53,69 @@ const TautulliSettings = () => {
   const {
     register,
     handleSubmit,
-    setValue,
-    trigger,
     watch,
+    trigger,
     control,
-    formState: { errors, isSubmitting, isLoading },
-  } = useForm<tautulliSplitSettingInput, unknown, TautulliSettingDto>({
-    resolver: zodResolver(tautulliSplitSettingTransform),
+    formState: { errors, isSubmitting, isLoading, defaultValues },
+  } = useForm<TautulliSettingFormResult, any, TautulliSettingFormResult>({
+    resolver: zodResolver(TautulliSettingFormSchema),
     defaultValues: async () => {
       const resp = await GetApiHandler<TautulliSettingDto>('/settings/tautulli')
-      const port = getPortFromUrl(resp.url)
-
-      const settings: tautulliSplitSettingInput = {
-        hostname: getHostname(resp.url) ?? '',
-        port: port ? parseInt(port) : '',
-        baseUrl: getBaseUrl(resp.url) ?? '',
-        apiKey: resp.api_key,
-      }
-
-      setTestedSettings(settings)
-
       return {
-        hostname: getHostname(resp.url) ?? '',
-        port: port ? parseInt(port) : '',
-        baseUrl: getBaseUrl(resp.url) ?? '',
-        apiKey: resp.api_key,
+        url: resp.url ?? '',
+        api_key: resp.api_key ?? '',
       }
     },
   })
 
-  const hostname = watch('hostname')
-  const baseUrl = watch('baseUrl')
-  const port = watch('port')
-  const apiKey = watch('apiKey')
+  const url = watch('url')
+  const api_key = watch('api_key')
 
-  const requiresTestBeforeSave =
-    hostname != testedSettings?.hostname ||
-    baseUrl != testedSettings?.baseUrl ||
-    port != testedSettings?.port ||
-    apiKey != testedSettings?.apiKey ||
-    !testResult?.status
+  const isGoingToRemoveSetting = url === '' && api_key === ''
 
-  const syncGeneratedPortAndHostname = (url: TautulliSettingDto['url']) => {
-    const port = parseInt(getPortFromUrl(url)!)
-    const hostname = getHostname(url)!
-    setValue('port', port)
-    setValue('hostname', hostname)
-  }
+  const enteredSettingsAreSameAsSaved =
+    url === defaultValues?.url && api_key === defaultValues?.api_key
+  const enteredSettingsAreDifferentAndOkTestResult =
+    !enteredSettingsAreSameAsSaved &&
+    (api_key != testedSettings?.api_key || url != testedSettings?.url) &&
+    testResult?.status
+  const canSaveSettings =
+    (enteredSettingsAreSameAsSaved ||
+      enteredSettingsAreDifferentAndOkTestResult ||
+      isGoingToRemoveSetting) &&
+    !isSubmitting &&
+    !isLoading
 
   const onSubmit = async (data: TautulliSettingDto) => {
-    setSaveError(false)
+    setSubmitError(false)
     setIsSubmitSuccessful(false)
-    syncGeneratedPortAndHostname(data.url)
+
+    const removingSetting = data.api_key === '' && data.url === ''
 
     try {
-      const resp = await PostApiHandler<BasicResponseDto>(
-        '/settings/tautulli',
-        data,
-      )
+      const resp = await (removingSetting
+        ? DeleteApiHandler<BasicResponseDto>('/settings/tautulli')
+        : PostApiHandler<BasicResponseDto>('/settings/tautulli', data))
 
-      if (Boolean(resp.code)) {
+      if (resp.code) {
         setIsSubmitSuccessful(true)
       } else {
-        setSaveError(true)
+        setSubmitError(true)
       }
     } catch (err) {
-      setSaveError(true)
+      setSubmitError(true)
     }
   }
 
   const performTest = async () => {
-    if (testing) return
+    if (testing || !(await trigger())) return
 
-    const url = generateUrlFromParts(
-      hostname,
-      port === '' ? null : port,
-      baseUrl,
-    )
-    syncGeneratedPortAndHostname(url)
     setTesting(true)
 
-    const testPayload = tautulliSplitSettingTransform.safeParse({
-      hostname,
-      port,
-      baseUrl,
-      apiKey,
-    })
-
-    await PostApiHandler<BasicResponseDto>(
-      '/settings/test/tautulli',
-      testPayload.data,
-    )
+    await PostApiHandler<BasicResponseDto>('/settings/test/tautulli', {
+      api_key: api_key,
+      url,
+    } satisfies TautulliSettingDto)
       .then((resp) => {
         setTestResult({
           status: resp.code == 1 ? true : false,
@@ -197,10 +124,8 @@ const TautulliSettings = () => {
 
         if (resp.code == 1) {
           setTestedSettings({
-            hostname,
-            baseUrl,
-            port,
-            apiKey,
+            url,
+            api_key,
           })
         }
       })
@@ -221,7 +146,7 @@ const TautulliSettings = () => {
         <h3 className="heading">Tautulli Settings</h3>
         <p className="description">Tautulli configuration</p>
       </div>
-      {saveError ? (
+      {submitError ? (
         <Alert type="warning" title="Something went wrong" />
       ) : isSubmitSuccessful ? (
         <Alert type="info" title="Tautulli settings successfully updated" />
@@ -239,49 +164,32 @@ const TautulliSettings = () => {
 
       <div className="section">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <InputGroup
-            label="Hostname or IP"
-            placeholder="http://localhost"
-            type="text"
-            {...register('hostname')}
-            error={errors.hostname?.message}
-            required
-          />
-
-          <InputGroup
-            label="Port"
-            type="number"
-            placeholder="8181"
-            {...register('port')}
-            error={errors.port?.message}
-            required
-          />
-
           <Controller
-            name={'baseUrl'}
+            name={'url'}
             control={control}
             render={({ field }) => (
               <InputGroup
-                label="Base URL"
+                label="URL"
                 value={field.value}
-                placeholder="/maintainerr"
+                placeholder="http://localhost/maintainerr"
                 onChange={field.onChange}
                 onBlur={(event) =>
-                  field.onChange(stripLeadingSlash(event.target.value))
+                  field.onChange(stripLeadingSlashes(event.target.value))
                 }
                 ref={field.ref}
                 name={field.name}
                 type="text"
-                error={errors.baseUrl?.message}
+                error={errors.url?.message}
+                required
               />
             )}
           />
 
           <InputGroup
-            label="Api key"
+            label="API key"
             type="password"
-            {...register('apiKey')}
-            error={errors.apiKey?.message}
+            {...register('api_key')}
+            error={errors.api_key?.message}
           />
 
           <div className="actions mt-5 w-full">
@@ -294,7 +202,7 @@ const TautulliSettings = () => {
                   buttonType="success"
                   onClick={performTest}
                   className="ml-3"
-                  disabled={testing}
+                  disabled={testing || isGoingToRemoveSetting}
                 >
                   {testing ? 'Testing...' : 'Test'}
                 </Button>
@@ -302,9 +210,7 @@ const TautulliSettings = () => {
                   <Button
                     buttonType="primary"
                     type="submit"
-                    disabled={
-                      isSubmitting || requiresTestBeforeSave || isLoading
-                    }
+                    disabled={!canSaveSettings}
                   >
                     <SaveIcon />
                     <span>Save Changes</span>
