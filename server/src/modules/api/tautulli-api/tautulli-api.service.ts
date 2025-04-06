@@ -1,6 +1,6 @@
 import { BasicResponseDto } from '@maintainerr/contracts';
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { AxiosError } from 'axios';
+import { AxiosError, CanceledError } from 'axios';
 import _ from 'lodash';
 import { SettingsService } from '../../..//modules/settings/settings.service';
 import { TautulliApi } from './helpers/tautulli-api.helper';
@@ -337,7 +337,14 @@ export class TautulliApiService {
         `A failure occurred testing Tautulli connectivity: ${e}`,
       );
 
-      if (e instanceof AxiosError) {
+      if (e instanceof CanceledError) {
+        return {
+          status: 'NOK',
+          code: 0,
+          message:
+            'Failured, connection timed out after 10 seconds with no response.',
+        };
+      } else if (e instanceof AxiosError) {
         if (e.response?.status === 400) {
           const data = e.response.data as Response<unknown>;
 
