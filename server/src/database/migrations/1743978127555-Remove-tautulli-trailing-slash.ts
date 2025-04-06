@@ -11,5 +11,5 @@ export class RemoveTautulliTrailingSlash1743978127555
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(): Promise<void> {}
 }
