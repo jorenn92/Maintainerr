@@ -19,6 +19,10 @@ updates:
         patterns:
           - "next"
           - "eslint-config-next"
+      eslint:
+        patterns:
+          - "@eslint/js"
+          - "eslint"
     ignore:
       - dependency-name: "@heroicons/react"
       - dependency-name: "chalk"
