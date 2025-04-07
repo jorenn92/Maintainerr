@@ -189,7 +189,9 @@ export class PlexApiService {
         uri: '/library/sections',
       });
 
-      return response.MediaContainer.Directory;
+      return response.MediaContainer.Directory.filter(
+        (x) => x.type == 'movie' || x.type == 'show',
+      ) as PlexLibrary[];
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
