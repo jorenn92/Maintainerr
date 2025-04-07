@@ -212,6 +212,7 @@ const RuleCreator = (props: iRuleCreator) => {
                   >
                     <div className="mb-4 w-full">
                       <RuleInput
+                        key={`${sid}-${id}`}
                         id={
                           ruleAmount[1].length > 1
                             ? ruleAmount[1].reduce((pv, cv, idx) =>

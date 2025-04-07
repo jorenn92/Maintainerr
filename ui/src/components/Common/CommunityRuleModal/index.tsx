@@ -17,6 +17,7 @@ interface ICommunityRuleModal {
   onCancel: () => void
   currentRules?: IRule[]
   type: 'movie' | 'show'
+  level?: 'show' | 'season' | 'episode'
 }
 
 interface ICommunityRuleKarmaHistory {
@@ -329,6 +330,9 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
             onSubmit={handleUpload}
             type={props.type}
             rules={props.currentRules ? props.currentRules : []}
+            {...(props.type === 'show' && props.level
+              ? { level: props.level }
+              : {})}
           />
         ) : undefined}
       </Modal>
