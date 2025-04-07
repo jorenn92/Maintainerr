@@ -251,6 +251,32 @@ export class PlexApiService {
     }
   }
 
+  public async searchLibraryContents(
+    id: string,
+    query: string,
+    datatype?: EPlexDataType,
+  ): Promise<PlexLibraryItem[]> {
+    try {
+      const params = new URLSearchParams({
+        includeGuids: '1',
+        title: query,
+        ...(datatype ? { type: datatype.toString() } : {}),
+      });
+
+      const response = await this.plexClient.query<PlexLibraryResponse>({
+        uri: `/library/sections/${id}/all?${params.toString()}`,
+      });
+
+      return response.MediaContainer.Metadata as PlexLibraryItem[];
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
   public async getMetadata(
     key: string,
     options: { includeChildren?: boolean } = {},
