@@ -273,7 +273,6 @@ const PlexSettings = () => {
       }
       toast.success('Plex server list retrieved successfully!')
     } catch (e) {
-      // In case of an error, dismiss the loading toast and show an error toast
       if (toastId) {
         toast.dismiss(toastId)
       }

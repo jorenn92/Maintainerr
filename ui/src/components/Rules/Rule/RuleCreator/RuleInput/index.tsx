@@ -213,7 +213,9 @@ const RuleInput = (props: IRuleInput) => {
           return (
             (prop.mediaType === MediaType.BOTH ||
               props.mediaType === prop.mediaType) &&
-            (!prop.showType || prop.showType.includes(props.dataType!))
+            (props.mediaType === MediaType.MOVIE ||
+              prop.showType === undefined ||
+              prop.showType.includes(props.dataType!))
           )
         })
         return app
@@ -403,18 +405,12 @@ const RuleInput = (props: IRuleInput) => {
             value={action}
             className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
           >
-            <option value={undefined}>Select Action...</option>
-            {Object.keys(RulePossibility).map((value: string, key: number) => {
-              if (!isNaN(+value)) {
-                if (possibilities.includes(+value)) {
-                  return (
-                    <option key={+value} value={+value}>
-                      {Object.values(RulePossibilityTranslations)[+value]}
-                    </option>
-                  )
-                }
-              }
-            })}
+            <option value={undefined}> </option>
+            {possibilities.map((action) => (
+              <option key={action} value={action}>
+                {RulePossibilityTranslations[action]}
+              </option>
+            ))}
           </select>
         </div>
 
