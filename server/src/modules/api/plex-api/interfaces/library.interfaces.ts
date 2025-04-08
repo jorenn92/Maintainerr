@@ -80,6 +80,7 @@ export interface PlexLibrary {
 
 export interface PlexLibrariesResponse {
   MediaContainer: {
+    totalSize: number;
     Directory: PlexLibrary[];
   };
 }
