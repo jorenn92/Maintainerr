@@ -13,8 +13,9 @@ function CoreApp({ Component, pageProps }: AppProps) {
       <SearchContextProvider>
         <LibrariesContextProvider>
           <ToastContainer
+            stacked
             position="top-right"
-            autoClose={5000}
+            autoClose={4500}
             hideProgressBar={false}
             theme="dark"
             closeOnClick

@@ -254,13 +254,10 @@ const PlexSettings = () => {
 
   const refreshPresetServers = async () => {
     setIsRefreshingPresets(true)
-    let toastId: Id | undefined // Change the type to Id | undefined
+    let toastId: Id | undefined
     try {
-      // Show a loading toast and prevent auto-close (it stays indefinitely until dismissed)
-      toastId = toast.info('Retrieving server list from Plex…', {
-        autoClose: false, // Keep the toast visible indefinitely
-        className: 'custom-toast--info',
-        position: 'top-right',
+      toastId = toast.info('Retrieving server list from Plex', {
+        autoClose: false,
       })
 
       // Fetching server data
@@ -276,17 +273,13 @@ const PlexSettings = () => {
       if (toastId) {
         toast.dismiss(toastId)
       }
-      toast.success('Plex server list retrieved successfully!', {
-        className: 'custom-toast--success',
-      })
+      toast.success('Plex server list retrieved successfully!', {})
     } catch (e) {
       // In case of an error, dismiss the loading toast and show an error toast
       if (toastId) {
         toast.dismiss(toastId) // Dismiss the ongoing toast
       }
-      toast.error('Failed to retrieve Plex server list.', {
-        className: 'custom-toast--error',
-      })
+      toast.error('Failed to retrieve Plex server list.', {})
     } finally {
       setIsRefreshingPresets(false)
     }
