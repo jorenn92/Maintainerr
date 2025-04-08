@@ -1,5 +1,5 @@
-import { debounce } from 'lodash'
 import { ICollection } from '..'
+import { useTaskStatusContext } from '../../../contexts/taskstatus-context'
 import ExecuteButton from '../../Common/ExecuteButton'
 import LibrarySwitcher from '../../Common/LibrarySwitcher'
 import CollectionItem from '../CollectionItem'
@@ -12,6 +12,8 @@ interface ICollectionOverview {
 }
 
 const CollectionOverview = (props: ICollectionOverview) => {
+  const { collectionHandlerRunning } = useTaskStatusContext()
+
   return (
     <div>
       <LibrarySwitcher onSwitch={props.onSwitchLibrary} />
@@ -19,11 +21,9 @@ const CollectionOverview = (props: ICollectionOverview) => {
       <div className="m-auto mb-3 flex">
         <div className="m-auto sm:m-0">
           <ExecuteButton
-            onClick={debounce(props.doActions, 5000, {
-              leading: true,
-              trailing: false,
-            })}
+            onClick={props.doActions}
             text="Handle Collections"
+            executing={collectionHandlerRunning}
           />
         </div>
       </div>

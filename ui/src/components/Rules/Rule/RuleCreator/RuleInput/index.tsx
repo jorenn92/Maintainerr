@@ -49,21 +49,21 @@ const RuleInput = (props: IRuleInput) => {
   const ConstantsCtx = useContext(ConstantsContext)
   const [operator, setOperator] = useState<string>()
   const [firstval, setFirstVal] = useState<string>()
-  const [action, setAction] = useState<string>()
+  const [action, setAction] = useState<RulePossibility>()
   const [secondVal, setSecondVal] = useState<string>()
 
-  const [customValType, setCustomValType] = useState<number>()
+  const [customValType, setCustomValType] = useState<RuleType>()
   const [customVal, setCustomVal] = useState<string>()
   const [customValActive, setCustomValActive] = useState<boolean>(true)
 
-  const [possibilities, setPossibilities] = useState<number[]>([])
-  const [ruleType, setRuleType] = useState<number>(0)
+  const [possibilities, setPossibilities] = useState<RulePossibility[]>([])
+  const [ruleType, setRuleType] = useState<RuleType>(RuleType.NUMBER)
 
   useEffect(() => {
     if (props.editData?.rule) {
       setOperator(props.editData.rule.operator?.toString())
       setFirstVal(JSON.stringify(props.editData.rule.firstVal))
-      setAction(props.editData.rule.action.toString())
+      setAction(props.editData.rule.action)
 
       if (props.editData.rule.customVal) {
         switch (props.editData.rule.customVal.ruleTypeId) {
@@ -132,7 +132,7 @@ const RuleInput = (props: IRuleInput) => {
   }
 
   const updateAction = (event: { target: { value: string } }) => {
-    setAction(event.target.value)
+    setAction(+event.target.value)
   }
 
   const updateOperator = (event: { target: { value: string } }) => {
@@ -164,7 +164,7 @@ const RuleInput = (props: IRuleInput) => {
       const ruleValues = {
         operator: operator ? operator : null,
         firstVal: JSON.parse(firstval),
-        action: +action,
+        action,
         section: props.section ? props.section - 1 : 0,
       }
       if (customVal) {
@@ -412,19 +412,11 @@ const RuleInput = (props: IRuleInput) => {
               value={action}
             >
               <option value={undefined}> </option>
-              {Object.keys(RulePossibility).map(
-                (value: string, key: number) => {
-                  if (!isNaN(+value)) {
-                    if (possibilities.some((el) => +el === +value)) {
-                      return (
-                        <option key={+value} value={+value}>
-                          {Object.values(RulePossibilityTranslations)[+value]}
-                        </option>
-                      )
-                    }
-                  }
-                },
-              )}
+              {possibilities.map((action) => (
+                <option key={action} value={action}>
+                  {RulePossibilityTranslations[action]}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -450,9 +442,8 @@ const RuleInput = (props: IRuleInput) => {
                       Amount of days
                     </option>
                     {action &&
-                    +action !== +RulePossibility.IN_LAST &&
-                    action &&
-                    +action !== +RulePossibility.IN_NEXT ? (
+                    action !== RulePossibility.IN_LAST &&
+                    action !== RulePossibility.IN_NEXT ? (
                       <option value={CustomParams.CUSTOM_DATE}>
                         Specific date
                       </option>
@@ -474,22 +465,27 @@ const RuleInput = (props: IRuleInput) => {
                 return (app.mediaType === MediaType.BOTH ||
                   props.mediaType === app.mediaType) &&
                   action &&
-                  +action !== +RulePossibility.IN_LAST &&
-                  action &&
-                  +action !== +RulePossibility.IN_NEXT ? (
+                  action !== RulePossibility.IN_LAST &&
+                  action !== RulePossibility.IN_NEXT ? (
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
-                      if (+prop.type.key === ruleType) {
-                        return (prop.mediaType === MediaType.BOTH ||
-                          props.mediaType === prop.mediaType) &&
-                          (props.mediaType === MediaType.MOVIE ||
-                            prop.showType === undefined ||
-                            prop.showType.includes(props.dataType!)) ? (
-                          <option
-                            key={app.id + 10 + prop.id}
-                            value={JSON.stringify([app.id, prop.id])}
-                          >{`${app.name} - ${prop.humanName}`}</option>
-                        ) : undefined
+                      // Add valid application-specific second values. Note that the second value
+                      // type may be different to the rule type - e.g. a rule type of "text list"
+                      // may be able to be matched to values of type "text list" as well as "text".
+                      const secondValueTypes = getSecondValueTypes(ruleType)
+                      for (const type of secondValueTypes) {
+                        if (+prop.type.key === type) {
+                          return (prop.mediaType === MediaType.BOTH ||
+                            props.mediaType === prop.mediaType) &&
+                            (props.mediaType === MediaType.MOVIE ||
+                              prop.showType === undefined ||
+                              prop.showType.includes(props.dataType!)) ? (
+                            <option
+                              key={app.id + 10 + prop.id}
+                              value={JSON.stringify([app.id, prop.id])}
+                            >{`${app.name} - ${prop.humanName}`}</option>
+                          ) : undefined
+                        }
                       }
                     })}
                   </optgroup>
@@ -565,12 +561,20 @@ const RuleInput = (props: IRuleInput) => {
   )
 }
 
+/** Returns a list of types that are valid to be matched against a given first value type. */
+function getSecondValueTypes(firstType: RuleType) {
+  if (firstType === RuleType.TEXT_LIST || firstType === RuleType.TEXT) {
+    return [RuleType.TEXT, RuleType.TEXT_LIST]
+  }
+  return [firstType]
+}
+
 function MaybeTextListOptions({
   ruleType,
   action,
 }: {
   ruleType: RuleType
-  action: string | undefined
+  action: RulePossibility | undefined
 }) {
   if (action == null || ruleType !== RuleType.TEXT_LIST) {
     return
@@ -578,16 +582,27 @@ function MaybeTextListOptions({
 
   if (
     [
-      +RulePossibility.COUNT_EQUALS,
-      +RulePossibility.COUNT_NOT_EQUALS,
-      +RulePossibility.COUNT_BIGGER,
-      +RulePossibility.COUNT_SMALLER,
-    ].includes(+action)
+      RulePossibility.COUNT_EQUALS,
+      RulePossibility.COUNT_NOT_EQUALS,
+      RulePossibility.COUNT_BIGGER,
+      RulePossibility.COUNT_SMALLER,
+    ].includes(action)
   ) {
     return <option value={CustomParams.CUSTOM_NUMBER}>Count (number)</option>
   }
 
-  return <option value={CustomParams.CUSTOM_TEXT_LIST}>Text</option>
+  return (
+    <>
+      <option value={CustomParams.CUSTOM_TEXT}>Text</option>
+      {/* This was accidentally shipped - we keep it as a hidden option so that it still appears in
+          the UI if somebody had already selected it, but we don't want it to be able to be selected
+          in new rules. We should run a migration at some point to update all
+          "customValue { type: 'text list' }" to "customValue { type: text }". */}
+      <option hidden value={CustomParams.CUSTOM_TEXT_LIST}>
+        Text (legacy list option)
+      </option>
+    </>
+  )
 }
 
 export default RuleInput

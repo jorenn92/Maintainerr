@@ -83,12 +83,22 @@ export interface SonarrEpisodeFile {
   qualityCutoffNotMet: boolean;
 }
 
+export const SonarrSeriesStatusTypes = [
+  'deleted',
+  'ended',
+  'continuing',
+  'upcoming',
+] as const;
+export type SonarrSeriesStatusType = (typeof SonarrSeriesStatusTypes)[number];
+
+export const SonarrSeriesTypes = ['standard', 'daily', 'anime'] as const;
+export type SonarrSeriesType = (typeof SonarrSeriesTypes)[number];
+
 export interface SonarrSeries {
   title: string;
   sortTitle: string;
   originalLanguage: SonarrLanguage;
-  seasonCount: number;
-  status: string;
+  status: SonarrSeriesStatusType | null;
   overview: string;
   network: string;
   airTime: string;
@@ -100,8 +110,6 @@ export interface SonarrSeries {
   seasons: SonarrSeason[];
   year: number;
   path: string;
-  profileId: number;
-  languageProfileId: number;
   seasonFolder: boolean;
   monitored: boolean;
   useSceneNumbering: boolean;
@@ -111,7 +119,7 @@ export interface SonarrSeries {
   tvMazeId: number;
   firstAired: string;
   lastInfoSync?: string;
-  seriesType: 'standard' | 'daily' | 'anime';
+  seriesType: SonarrSeriesType;
   cleanTitle: string;
   imdbId: string;
   titleSlug: string;
@@ -138,25 +146,6 @@ export interface SonarrSeries {
 export interface SonarrLanguage {
   id: number;
   name: string | null;
-}
-
-export interface AddSeriesOptions {
-  tvdbid: number;
-  title: string;
-  profileId: number;
-  languageProfileId?: number;
-  seasons: number[];
-  seasonFolder: boolean;
-  rootFolderPath: string;
-  tags?: number[];
-  seriesType: SonarrSeries['seriesType'];
-  monitored?: boolean;
-  searchNow?: boolean;
-}
-
-export interface LanguageProfile {
-  id: number;
-  name: string;
 }
 
 export interface SonarrStatistics {

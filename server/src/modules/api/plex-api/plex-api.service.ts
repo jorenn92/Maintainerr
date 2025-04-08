@@ -199,6 +199,30 @@ export class PlexApiService {
     }
   }
 
+  public async getLibraryContentCount(
+    id: string | number,
+    datatype?: EPlexDataType,
+  ): Promise<number | undefined> {
+    try {
+      const type = datatype ? '?type=' + datatype : '';
+      const response = await this.plexClient.query<PlexLibrariesResponse>({
+        uri: `/library/sections/${id}/all${type}`,
+        extraHeaders: {
+          'X-Plex-Container-Start': '0',
+          'X-Plex-Container-Size': '0',
+        },
+      });
+
+      return response.MediaContainer.totalSize;
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
   public async getLibraryContents(
     id: string,
     { offset = 0, size = 50 }: { offset?: number; size?: number } = {},

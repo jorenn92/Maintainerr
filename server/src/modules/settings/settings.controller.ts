@@ -3,17 +3,16 @@ import {
   Controller,
   Delete,
   Get,
-  LogLevel,
   Param,
   ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { SettingDto } from "./dto's/setting.dto";
-import { SettingsService } from './settings.service';
 import { CronScheduleDto } from "./dto's/cron.schedule.dto";
 import { RadarrSettingRawDto } from "./dto's/radarr-setting.dto";
+import { SettingDto } from "./dto's/setting.dto";
 import { SonarrSettingRawDto } from "./dto's/sonarr-setting.dto";
+import { SettingsService } from './settings.service';
 
 @Controller('/api/settings')
 export class SettingsController {

@@ -54,5 +54,6 @@ export class RemoveDefaultArrServers1733357722729
         `);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async down(queryRunner: QueryRunner): Promise<void> {}
 }
