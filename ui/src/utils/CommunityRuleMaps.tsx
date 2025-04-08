@@ -16,12 +16,12 @@ export enum TVLevel {
 }
 
 export const applicationNames: Record<number, string> = {
-  [Application.PLEX]: 'PLEX',
-  [Application.RADARR]: 'RADARR',
-  [Application.SONARR]: 'SONARR',
-  [Application.OVERSEERR]: 'OVERSEERR',
-  [Application.TAUTULLI]: 'TAUTULLI',
-  [Application.JELLYSEERR]: 'JELLYSEERR',
+  [Application.PLEX]: 'Plex',
+  [Application.RADARR]: 'Radarr',
+  [Application.SONARR]: 'Sonarr',
+  [Application.OVERSEERR]: 'Overseerr',
+  [Application.TAUTULLI]: 'Tautulli',
+  [Application.JELLYSEERR]: 'Jellyseerr',
 }
 
 export function detectRequiredServices(rules: IRule[]): string[] {
