@@ -213,7 +213,9 @@ const RuleInput = (props: IRuleInput) => {
           return (
             (prop.mediaType === MediaType.BOTH ||
               props.mediaType === prop.mediaType) &&
-            (!prop.showType || prop.showType.includes(props.dataType!))
+            (props.mediaType === MediaType.MOVIE ||
+              prop.showType === undefined ||
+              prop.showType.includes(props.dataType!))
           )
         })
         return app
@@ -403,18 +405,12 @@ const RuleInput = (props: IRuleInput) => {
             value={action}
             className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
           >
-            <option value={undefined}>Select Action...</option>
-            {Object.keys(RulePossibility).map((value: string, key: number) => {
-              if (!isNaN(+value)) {
-                if (possibilities.includes(+value)) {
-                  return (
-                    <option key={+value} value={+value}>
-                      {Object.values(RulePossibilityTranslations)[+value]}
-                    </option>
-                  )
-                }
-              }
-            })}
+            <option value={undefined}> </option>
+            {possibilities.map((action) => (
+              <option key={action} value={action}>
+                {RulePossibilityTranslations[action]}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -433,58 +429,63 @@ const RuleInput = (props: IRuleInput) => {
             value={secondVal}
             className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
           >
-            <option value={undefined}>Select Second Value...</option>
-            <optgroup label="Custom Values">
-              {ruleType === RuleType.DATE && (
+            <option value={undefined}> </option>
+            <optgroup label="Custom values">
+              {ruleType === RuleType.DATE ? (
                 <>
                   <option value={CustomParams.CUSTOM_DAYS}>
-                    Amount of Days
+                    Amount of days
                   </option>
                   {action &&
-                    +action !== +RulePossibility.IN_LAST &&
-                    +action !== +RulePossibility.IN_NEXT && (
-                      <option value={CustomParams.CUSTOM_DATE}>
-                        Specific Date
-                      </option>
-                    )}
+                  action !== RulePossibility.IN_LAST &&
+                  action !== RulePossibility.IN_NEXT ? (
+                    <option value={CustomParams.CUSTOM_DATE}>
+                      Specific date
+                    </option>
+                  ) : undefined}
                 </>
-              )}
-              {ruleType === RuleType.NUMBER && (
+              ) : undefined}
+              {ruleType === RuleType.NUMBER ? (
                 <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
-              )}
-              {ruleType === RuleType.BOOL && (
+              ) : undefined}
+              {ruleType === RuleType.BOOL ? (
                 <option value={CustomParams.CUSTOM_BOOLEAN}>Boolean</option>
-              )}
-              {ruleType === RuleType.TEXT && (
+              ) : undefined}
+              {ruleType === RuleType.TEXT ? (
                 <option value={CustomParams.CUSTOM_TEXT}>Text</option>
-              )}
+              ) : undefined}
+              <MaybeTextListOptions ruleType={ruleType} action={action} />
             </optgroup>
-
-            {/* Existing Properties as Options */}
-            {ConstantsCtx.constants.applications?.map((app) =>
-              (app.mediaType === MediaType.BOTH ||
+            {ConstantsCtx.constants.applications?.map((app) => {
+              return (app.mediaType === MediaType.BOTH ||
                 props.mediaType === app.mediaType) &&
-              action &&
-              +action !== +RulePossibility.IN_LAST &&
-              +action !== +RulePossibility.IN_NEXT ? (
+                action &&
+                action !== RulePossibility.IN_LAST &&
+                action !== RulePossibility.IN_NEXT ? (
                 <optgroup key={app.id} label={app.name}>
-                  {app.props.map((prop) =>
-                    +prop.type.key === ruleType &&
-                    (prop.mediaType === MediaType.BOTH ||
-                      props.mediaType === prop.mediaType) &&
-                    (!prop.showType ||
-                      prop.showType.includes(props.dataType!)) ? (
-                      <option
-                        key={`${app.id}-${prop.id}`}
-                        value={JSON.stringify([app.id, prop.id])}
-                      >
-                        {`${app.name} - ${prop.humanName}`}
-                      </option>
-                    ) : null,
-                  )}
+                  {app.props.map((prop) => {
+                    // Add valid application-specific second values. Note that the second value
+                    // type may be different to the rule type - e.g. a rule type of "text list"
+                    // may be able to be matched to values of type "text list" as well as "text".
+                    const secondValueTypes = getSecondValueTypes(ruleType)
+                    for (const type of secondValueTypes) {
+                      if (+prop.type.key === type) {
+                        return (prop.mediaType === MediaType.BOTH ||
+                          props.mediaType === prop.mediaType) &&
+                          (props.mediaType === MediaType.MOVIE ||
+                            prop.showType === undefined ||
+                            prop.showType.includes(props.dataType!)) ? (
+                          <option
+                            key={app.id + 10 + prop.id}
+                            value={JSON.stringify([app.id, prop.id])}
+                          >{`${app.name} - ${prop.humanName}`}</option>
+                        ) : undefined
+                      }
+                    }
+                  })}
                 </optgroup>
-              ) : null,
-            )}
+              ) : undefined
+            })}
           </select>
         </div>
 
