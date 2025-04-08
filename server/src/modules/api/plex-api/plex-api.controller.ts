@@ -9,14 +9,15 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import {
-  PlexCollection,
-  CreateUpdateCollection,
-} from './interfaces/collection.interface';
-import { PlexApiService } from './plex-api.service';
-import { PlexHub, PlexLibraryItem } from './interfaces/library.interfaces';
-import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
 import { BasicResponseDto } from './dto/basic-response.dto';
+import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
+import { EPlexDataType } from './enums/plex-data-type-enum';
+import {
+  CreateUpdateCollection,
+  PlexCollection,
+} from './interfaces/collection.interface';
+import { PlexHub, PlexLibraryItem } from './interfaces/library.interfaces';
+import { PlexApiService } from './plex-api.service';
 
 @Controller('api/plex')
 export class PlexApiController {
@@ -45,6 +46,14 @@ export class PlexApiController {
       offset: offset,
       size: size,
     });
+  }
+  @Get('library/:id/content/search/:query')
+  searchibraryContent(
+    @Param('id') id: string,
+    @Param('query') query: string,
+    @Query('type') type?: EPlexDataType,
+  ) {
+    return this.plexApiService.searchLibraryContents(id, query, type);
   }
   @Get('meta/:id')
   getMetadata(@Param('id') id: string) {
