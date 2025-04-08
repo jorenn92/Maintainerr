@@ -30,10 +30,6 @@ export class PlexApiController {
   getLibraries() {
     return this.plexApiService.getLibraries();
   }
-  // @Get('libraries/sync')
-  // syncLibraries() {
-  //   return this.plexApiService.syncLibraries();
-  // }
   @Get('library/:id/content{/:page}')
   getLibraryContent(
     @Param('id') id: string,
