@@ -249,7 +249,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
                           <span>Uploaded By</span>
                         </th>
                         <th className="truncate bg-gray-500 px-3 text-center text-xs font-medium uppercase text-gray-200">
-                          <span>Maintainerr Version</span>
+                          <span>Made with Version</span>
                         </th>
                       </tr>
                       {shownRules.map((cr) => {
