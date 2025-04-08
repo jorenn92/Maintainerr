@@ -1,14 +1,14 @@
+import { DocumentAddIcon, DocumentRemoveIcon } from '@heroicons/react/solid'
 import React, { memo, useEffect, useState } from 'react'
 import Spinner from '../../../assets/spinner.svg'
-import Transition from '../Transition'
 import { useIsTouch } from '../../../hooks/useIsTouch'
-import CachedImage from '../CachedImage'
 import GetApiHandler from '../../../utils/ApiHandler'
-import Button from '../Button'
 import AddModal from '../../AddModal'
-import MediaModalContent from './MediaModal'
-import { DocumentAddIcon, DocumentRemoveIcon } from '@heroicons/react/solid'
 import RemoveFromCollectionBtn from '../../Collection/CollectionDetail/RemoveFromCollectionBtn'
+import Button from '../Button'
+import CachedImage from '../CachedImage'
+import Transition from '../Transition'
+import MediaModalContent from './MediaModal'
 
 interface IMediaCard {
   id: number
@@ -291,16 +291,20 @@ const MediaCard: React.FC<IMediaCard> = ({
                     >
                       {title}
                     </h1>
-                    <div
-                      className="whitespace-normal text-xs"
-                      style={{
-                        WebkitLineClamp: 5,
-                        display: '-webkit-box',
-                        overflow: 'hidden',
-                        WebkitBoxOrient: 'vertical',
-                        wordBreak: 'break-word',
-                      }}
-                    ></div>
+                    {mediaType == 'episode' && (
+                      <div
+                        className="whitespace-normal text-xs"
+                        style={{
+                          WebkitLineClamp: 5,
+                          display: '-webkit-box',
+                          overflow: 'hidden',
+                          WebkitBoxOrient: 'vertical',
+                          wordBreak: 'break-word',
+                        }}
+                      >
+                        {summary}
+                      </div>
+                    )}
 
                     {!collectionPage ? (
                       <div>
