@@ -1,5 +1,8 @@
-import { debounce } from 'lodash'
-import React, { useEffect, useState } from 'react'
+import { AxiosError } from 'axios'
+import { useEffect, useState } from 'react'
+import { useToasts } from 'react-toast-notifications'
+import { ConstantsContextProvider } from '../../contexts/constants-context'
+import { useTaskStatusContext } from '../../contexts/taskstatus-context'
 import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
 import AddButton from '../Common/AddButton'
 import ExecuteButton from '../Common/ExecuteButton'
@@ -7,10 +10,8 @@ import LibrarySwitcher from '../Common/LibrarySwitcher'
 import LoadingSpinner from '../Common/LoadingSpinner'
 import RuleGroup, { IRuleGroup } from './RuleGroup'
 import AddModal from './RuleGroup/AddModal'
-import { useToasts } from 'react-toast-notifications'
-import { ConstantsContextProvider } from '../../contexts/constants-context'
 
-const Rules: React.FC = () => {
+const Rules = () => {
   const [addModalActive, setAddModal] = useState(false)
   const [editModalActive, setEditModal] = useState(false)
   const [data, setData] = useState()
@@ -18,6 +19,7 @@ const Rules: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<number>(9999)
   const [isLoading, setIsLoading] = useState(true)
   const { addToast } = useToasts()
+  const { ruleHandlerRunning } = useTaskStatusContext()
 
   const fetchData = async () => {
     if (selectedLibrary === 9999) return await GetApiHandler('/rules')
@@ -55,15 +57,30 @@ const Rules: React.FC = () => {
     setEditModal(true)
   }
 
-  const sync = () => {
-    PostApiHandler(`/rules/execute`, {})
-    addToast(
-      'Initiated rule execution in the background, consult the logs for status updates.',
-      {
+  const sync = async () => {
+    try {
+      await PostApiHandler(`/rules/execute`, {})
+
+      addToast('Initiated rule execution in the background.', {
         autoDismiss: true,
         appearance: 'success',
-      },
-    )
+      })
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        if (e.response?.status === 409) {
+          addToast('Rule execution is already running.', {
+            autoDismiss: true,
+            appearance: 'error',
+          })
+          return
+        }
+      }
+
+      addToast('Failed to initiate rule execution.', {
+        autoDismiss: true,
+        appearance: 'error',
+      })
+    }
   }
 
   if (!data || isLoading) {
@@ -112,11 +129,9 @@ const Rules: React.FC = () => {
           </div>
           <div className="ml-2 mr-auto sm:mr-0">
             <ExecuteButton
-              onClick={debounce(sync, 5000, {
-                leading: true,
-                trailing: false,
-              })}
+              onClick={sync}
               text="Run Rules"
+              executing={ruleHandlerRunning}
             />
           </div>
         </div>
