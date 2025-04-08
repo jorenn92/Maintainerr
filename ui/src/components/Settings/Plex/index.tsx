@@ -137,14 +137,14 @@ const PlexSettings = () => {
         })
         setError(false)
         setChanged(true)
-        toast.success('Settings successfully updated!', { autoClose: 5000 })
+        toast.success('Settings successfully updated!')
       } else {
         setError(true)
-        toast.error('Failed to update settings', { autoClose: 5000 })
+        toast.error('Failed to update settings')
       }
     } else {
       setError(true)
-      toast.error('Please fill in all required fields.', { autoClose: 5000 })
+      toast.error('Please fill in all required fields.')
     }
   }
 
@@ -190,7 +190,7 @@ const PlexSettings = () => {
 
   const authFailed = () => {
     setError(true)
-    toast.error('Authentication failed', { autoClose: 5000 }) // Error toast
+    toast.error('Authentication failed')
   }
 
   const deleteToken = async () => {
@@ -260,7 +260,6 @@ const PlexSettings = () => {
         autoClose: false,
       })
 
-      // Fetching server data
       const response: PlexDevice[] = await GetApiHandler(
         '/settings/plex/devices/servers',
       )
@@ -269,17 +268,15 @@ const PlexSettings = () => {
         setAvailableServers(response)
       }
 
-      // Dismiss the loading toast once the operation is done and show a success toast
       if (toastId) {
         toast.dismiss(toastId)
       }
-      toast.success('Plex server list retrieved successfully!', {})
+      toast.success('Plex server list retrieved successfully!')
     } catch (e) {
-      // In case of an error, dismiss the loading toast and show an error toast
       if (toastId) {
-        toast.dismiss(toastId) // Dismiss the ongoing toast
+        toast.dismiss(toastId)
       }
-      toast.error('Failed to retrieve Plex server list.', {})
+      toast.error('Failed to retrieve Plex server list.')
     } finally {
       setIsRefreshingPresets(false)
     }

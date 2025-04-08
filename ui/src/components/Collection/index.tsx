@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios'
 import { useContext, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import LibrariesContext, { ILibrary } from '../../contexts/libraries-context'
@@ -81,11 +82,21 @@ const Collection = () => {
     setIsLoading(false)
   }
 
-  const doActions = () => {
-    PostApiHandler('/collections/handle', {})
-    toast.success(
-      'Initiated collection handling in the background, consult the logs for status updates.',
-    )
+  const doActions = async () => {
+    try {
+      await PostApiHandler(`/collections/handle`, {})
+
+      toast.success('Initiated collection handling in the background.')
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        if (e.response?.status === 409) {
+          toast.error('Collection handling is already running.')
+          return
+        }
+      }
+
+      toast.error('Failed to initiate collection handling.')
+    }
   }
 
   const openDetail = (collection: ICollection) => {
