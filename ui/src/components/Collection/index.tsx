@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { useContext, useEffect, useState } from 'react'
-import { useToasts } from 'react-toast-notifications'
+import { toast } from 'react-toastify'
 import LibrariesContext, { ILibrary } from '../../contexts/libraries-context'
 import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
 import { EPlexDataType } from '../../utils/PlexDataType-enum'
@@ -57,7 +57,6 @@ const Collection = () => {
   }>({ open: false, collection: undefined })
   const [library, setLibrary] = useState<ILibrary>()
   const [collections, setCollections] = useState<ICollection[]>()
-  const { addToast } = useToasts()
 
   useEffect(() => {
     document.title = 'Maintainerr - Collections'
@@ -87,25 +86,16 @@ const Collection = () => {
     try {
       await PostApiHandler(`/collections/handle`, {})
 
-      addToast('Initiated collection handling in the background.', {
-        autoDismiss: true,
-        appearance: 'success',
-      })
+      toast.success('Initiated collection handling in the background.')
     } catch (e) {
       if (e instanceof AxiosError) {
         if (e.response?.status === 409) {
-          addToast('Collection handling is already running.', {
-            autoDismiss: true,
-            appearance: 'error',
-          })
+          toast.error('Collection handling is already running.')
           return
         }
       }
 
-      addToast('Failed to initiate collection handling.', {
-        autoDismiss: true,
-        appearance: 'error',
-      })
+      toast.error('Failed to initiate collection handling.')
     }
   }
 

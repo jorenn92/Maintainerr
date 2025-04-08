@@ -3,7 +3,7 @@ import { SaveIcon } from '@heroicons/react/solid'
 import axios from 'axios'
 import { orderBy } from 'lodash'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { useToasts } from 'react-toast-notifications'
+import { Id, toast } from 'react-toastify'
 import SettingsContext from '../../../contexts/settings-context'
 import GetApiHandler, {
   DeleteApiHandler,
@@ -86,8 +86,6 @@ const PlexSettings = () => {
     document.title = 'Maintainerr - Settings - Plex'
   }, [])
 
-  const { addToast, removeToast } = useToasts()
-
   const submit = async (
     e: React.FormEvent<HTMLFormElement> | undefined,
     plex_token?: { plex_auth_token: string } | undefined,
@@ -139,9 +137,14 @@ const PlexSettings = () => {
         })
         setError(false)
         setChanged(true)
-      } else setError(true)
+        toast.success('Settings successfully updated!')
+      } else {
+        setError(true)
+        toast.error('Failed to update settings')
+      }
     } else {
       setError(true)
+      toast.error('Please fill in all required fields.')
     }
   }
 
@@ -187,6 +190,7 @@ const PlexSettings = () => {
 
   const authFailed = () => {
     setError(true)
+    toast.error('Authentication failed')
   }
 
   const deleteToken = async () => {
@@ -250,39 +254,29 @@ const PlexSettings = () => {
 
   const refreshPresetServers = async () => {
     setIsRefreshingPresets(true)
-    let toastId: string | undefined
+    let toastId: Id | undefined
     try {
-      addToast(
-        'Retrieving server list from Plex…',
-        {
-          autoDismiss: false,
-          appearance: 'info',
-        },
-        (id) => {
-          toastId = id
-        },
-      )
+      toastId = toast.info('Retrieving server list from Plex', {
+        autoClose: false,
+      })
+
       const response: PlexDevice[] = await GetApiHandler(
         '/settings/plex/devices/servers',
       )
+
       if (response) {
         setAvailableServers(response)
       }
+
       if (toastId) {
-        removeToast(toastId)
+        toast.dismiss(toastId)
       }
-      addToast('Plex server list retrieved successfully!', {
-        autoDismiss: true,
-        appearance: 'success',
-      })
+      toast.success('Plex server list retrieved successfully!')
     } catch (e) {
       if (toastId) {
-        removeToast(toastId)
+        toast.dismiss(toastId)
       }
-      addToast('Failed to retrieve Plex server list.', {
-        autoDismiss: true,
-        appearance: 'error',
-      })
+      toast.error('Failed to retrieve Plex server list.')
     } finally {
       setIsRefreshingPresets(false)
     }

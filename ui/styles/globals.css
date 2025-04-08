@@ -470,11 +470,6 @@
   .prose a:hover {
     color: #8d4c1c;
   }
-
-  .toast {
-    width: 360px;
-  }
-
   .react-select-container {
     @apply w-full;
   }
