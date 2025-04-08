@@ -151,7 +151,7 @@ const RuleInput = (props: IRuleInput) => {
 
     if (
       firstval &&
-      action &&
+      action != null &&
       ((secondVal &&
         secondVal !== CustomParams.CUSTOM_DATE &&
         secondVal !== CustomParams.CUSTOM_DAYS &&
@@ -441,7 +441,7 @@ const RuleInput = (props: IRuleInput) => {
                     <option value={CustomParams.CUSTOM_DAYS}>
                       Amount of days
                     </option>
-                    {action &&
+                    {action != null &&
                     action !== RulePossibility.IN_LAST &&
                     action !== RulePossibility.IN_NEXT ? (
                       <option value={CustomParams.CUSTOM_DATE}>
@@ -464,7 +464,7 @@ const RuleInput = (props: IRuleInput) => {
               {ConstantsCtx.constants.applications?.map((app) => {
                 return (app.mediaType === MediaType.BOTH ||
                   props.mediaType === app.mediaType) &&
-                  action &&
+                  action != null &&
                   action !== RulePossibility.IN_LAST &&
                   action !== RulePossibility.IN_NEXT ? (
                   <optgroup key={app.id} label={app.name}>
