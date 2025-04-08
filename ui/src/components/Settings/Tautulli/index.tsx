@@ -72,16 +72,15 @@ const TautulliSettings = () => {
   const api_key = watch('api_key')
 
   const isGoingToRemoveSetting = url === '' && api_key === ''
-
   const enteredSettingsAreSameAsSaved =
     url === defaultValues?.url && api_key === defaultValues?.api_key
-  const enteredSettingsAreDifferentAndOkTestResult =
-    !enteredSettingsAreSameAsSaved &&
-    (api_key != testedSettings?.api_key || url != testedSettings?.url) &&
+  const enteredSettingsHaveBeenTested =
+    api_key == testedSettings?.api_key &&
+    url == testedSettings?.url &&
     testResult?.status
   const canSaveSettings =
     (enteredSettingsAreSameAsSaved ||
-      enteredSettingsAreDifferentAndOkTestResult ||
+      enteredSettingsHaveBeenTested ||
       isGoingToRemoveSetting) &&
     !isSubmitting &&
     !isLoading
