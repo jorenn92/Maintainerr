@@ -2,6 +2,7 @@ import {
   CollectionDto,
   EPlexDataType,
   IAlterableMediaDto,
+  PlexMetadata,
 } from '@maintainerr/contracts'
 import { useEffect, useMemo, useState } from 'react'
 import GetApiHandler, { PostApiHandler } from '../../utils/ApiHandler'
@@ -126,8 +127,8 @@ const AddModal = (props: IAddModal) => {
 
     if (props.type && props.type === 2) {
       // get seasons
-      GetApiHandler(`/plex/meta/${props.plexId}/children`).then(
-        (resp: [{ ratingKey: number; title: string }]) => {
+      GetApiHandler<PlexMetadata[]>(`/plex/meta/${props.plexId}/children`).then(
+        (resp) => {
           setSeasonOptions([
             {
               id: -1,
@@ -135,7 +136,7 @@ const AddModal = (props: IAddModal) => {
             },
             ...resp.map((el) => {
               return {
-                id: el.ratingKey,
+                id: +el.ratingKey,
                 title: el.title,
               }
             }),
@@ -155,23 +156,23 @@ const AddModal = (props: IAddModal) => {
       setLoading(true)
 
       // get episodes
-      GetApiHandler(`/plex/meta/${selectedSeasons}/children`).then(
-        (resp: [{ ratingKey: number; index: number }]) => {
-          setEpisodeOptions([
-            {
-              id: -1,
-              title: 'All episodes',
-            },
-            ...resp.map((el) => {
-              return {
-                id: el.ratingKey,
-                title: `Episode ${el.index}`,
-              }
-            }),
-          ])
-          setLoading(false)
-        },
-      )
+      GetApiHandler<PlexMetadata[]>(
+        `/plex/meta/${selectedSeasons}/children`,
+      ).then((resp) => {
+        setEpisodeOptions([
+          {
+            id: -1,
+            title: 'All episodes',
+          },
+          ...resp.map((el) => {
+            return {
+              id: +el.ratingKey,
+              title: `Episode ${el.index}`,
+            }
+          }),
+        ])
+        setLoading(false)
+      })
     } else {
       setSelectedEpisodes(-1)
     }
@@ -194,31 +195,41 @@ const AddModal = (props: IAddModal) => {
           setLoading(false)
         })
       } else if (selectedSeasons !== -1) {
-        GetApiHandler(`/collections?typeId=3`).then((resp) => {
+        GetApiHandler<CollectionDto[]>(`/collections?typeId=3`).then((resp) => {
           // get collections for episodes and seasons
-          GetApiHandler(`/collections?typeId=4`).then((resp2) => {
-            setCollectionOptions([...origCollectionOptions, ...resp, ...resp2])
-            setLoading(false)
-          })
-        })
-      } else {
-        GetApiHandler(`/collections?typeId=2`).then((resp) => {
-          // get collections for episodes, seasons and shows
-          GetApiHandler(`/collections?typeId=3`).then((resp2) => {
-            GetApiHandler(`/collections?typeId=4`).then((resp3) => {
+          GetApiHandler<CollectionDto[]>(`/collections?typeId=4`).then(
+            (resp2) => {
               setCollectionOptions([
                 ...origCollectionOptions,
                 ...resp,
                 ...resp2,
-                ...resp3,
               ])
               setLoading(false)
-            })
-          })
+            },
+          )
+        })
+      } else {
+        GetApiHandler<CollectionDto[]>(`/collections?typeId=2`).then((resp) => {
+          // get collections for episodes, seasons and shows
+          GetApiHandler<CollectionDto[]>(`/collections?typeId=3`).then(
+            (resp2) => {
+              GetApiHandler<CollectionDto[]>(`/collections?typeId=4`).then(
+                (resp3) => {
+                  setCollectionOptions([
+                    ...origCollectionOptions,
+                    ...resp,
+                    ...resp2,
+                    ...resp3,
+                  ])
+                  setLoading(false)
+                },
+              )
+            },
+          )
         })
       }
     } else {
-      GetApiHandler(`/collections?typeId=1`).then((resp) => {
+      GetApiHandler<CollectionDto[]>(`/collections?typeId=1`).then((resp) => {
         // get collections for movies
         setCollectionOptions([...origCollectionOptions, ...resp])
         setLoading(false)

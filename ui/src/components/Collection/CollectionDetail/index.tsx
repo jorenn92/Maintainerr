@@ -84,10 +84,12 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
       loadingExtraRef.current = true
     }
     // setLoading(true)
-    const resp: { totalSize: number; items: CollectionMediaWithPlexDataDto[] } =
-      await GetApiHandler(
-        `/collections/media/${props.collection.id}/content/${pageData.current}?size=${fetchAmount}`,
-      )
+    const resp = await GetApiHandler<{
+      totalSize: number
+      items: CollectionMediaWithPlexDataDto[]
+    }>(
+      `/collections/media/${props.collection.id}/content/${pageData.current}?size=${fetchAmount}`,
+    )
 
     setTotalSize(resp.totalSize)
     // pageData.current = pageData.current + 1

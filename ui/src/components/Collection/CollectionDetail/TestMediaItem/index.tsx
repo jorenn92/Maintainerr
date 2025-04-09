@@ -1,4 +1,4 @@
-import { EPlexDataType } from '@maintainerr/contracts'
+import { EPlexDataType, PlexMetadata } from '@maintainerr/contracts'
 import { Editor } from '@monaco-editor/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import YAML from 'yaml'
@@ -83,13 +83,13 @@ const TestMediaItem = (props: ITestMediaItem) => {
 
     if (item?.type == EPlexDataType.SHOWS) {
       // get seasons
-      GetApiHandler(`/plex/meta/${item.id}/children`).then(
-        (resp: [{ ratingKey: number; title: string }]) => {
+      GetApiHandler<PlexMetadata[]>(`/plex/meta/${item.id}/children`).then(
+        (resp) => {
           setSeasonOptions([
             emptyOption,
             ...resp.map((el) => {
               return {
-                id: el.ratingKey,
+                id: +el.ratingKey,
                 title: el.title,
               }
             }),
@@ -106,13 +106,13 @@ const TestMediaItem = (props: ITestMediaItem) => {
 
     if (seasons !== -1) {
       // get episodes
-      GetApiHandler(`/plex/meta/${seasons}/children`).then(
-        (resp: [{ ratingKey: number; index: number }]) => {
+      GetApiHandler<PlexMetadata[]>(`/plex/meta/${seasons}/children`).then(
+        (resp) => {
           setEpisodeOptions([
             emptyOption,
             ...resp.map((el) => {
               return {
-                id: el.ratingKey,
+                id: +el.ratingKey,
                 title: `Episode ${el.index}`,
               }
             }),
