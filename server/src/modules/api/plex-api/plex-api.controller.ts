@@ -1,4 +1,4 @@
-import { EPlexDataType } from '@maintainerr/contracts';
+import { EPlexDataType, PlexMetadata } from '@maintainerr/contracts';
 import {
   Body,
   Controller,
@@ -52,7 +52,7 @@ export class PlexApiController {
     return this.plexApiService.searchLibraryContents(id, query, type);
   }
   @Get('meta/:id')
-  getMetadata(@Param('id') id: string) {
+  getMetadata(@Param('id') id: string): Promise<PlexMetadata> {
     return this.plexApiService.getMetadata(id);
   }
   @Get('meta/:id/seen')

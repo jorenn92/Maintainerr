@@ -14,43 +14,137 @@ export const PlexDataTypeStrings: string[] = [
   'EPISODES',
 ]
 
-export interface PlexMetadata {
+type BasePlexMetadata = {
   ratingKey: string
-  parentRatingKey?: string
   guid: string
   type: 'movie' | 'show' | 'season' | 'episode' | 'collection'
   title: string
   Guid: {
     id: string
   }[]
+  index: number
+  addedAt: number
+  updatedAt: number
+  summary: string
+  Collection?: { tag: string }[]
+  Label?: { tag: string }[]
+}
+
+export interface PlexPlaylist {
+  ratingKey: string
+  key: string
+  guid: string
+  type: string
+  title: string
+  summary: string
+  smart: boolean
+  playlistType: string
+  composite: string
+  viewCount: number
+  lastViewedAt: number
+  duration: number
+  leafCount: number
+  addedAt: number
+  updatedAt: number
+  itemCount: number
+}
+
+type Alias<t> = t & { _?: never }
+
+export type PlexMedia = Alias<
+  PlexMovie | PlexShow | PlexSeason | PlexEpisode
+  // | PlexLibraryCollection
+  // | PlexMusicArtist
+  // | PlexMusicAlbum
+  // | PlexMusicTrack
+  // | PlexPlaylist
+>
+
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+export function isPlexMediaType<T extends PlexMedia>(discrim: string) {
+  return (media: PlexMedia | undefined): media is T => {
+    return media?.type === discrim
+  }
+}
+
+export const isPlexMovie = isPlexMediaType<PlexMovie>('movie')
+export const isPlexShow = isPlexMediaType<PlexShow>('show')
+export const isPlexSeason = isPlexMediaType<PlexSeason>('season')
+export const isPlexEpisode = isPlexMediaType<PlexEpisode>('episode')
+// export const isPlexCollection =
+//   isPlexMediaType<PlexLibraryCollection>('collection');
+
+export type PlexMetadata = PlexShow | PlexMovie | PlexSeason | PlexEpisode
+
+// TODO Validate audienceRating, userRating, other ratings does not exist for season and update the constant
+
+export type PlexMovie = BasePlexMetadata & {
+  type: 'movie'
+  originallyAvailableAt?: string
+  contentRating?: string
+  rating?: number
+  audienceRating?: number
+  userRating?: number
+  year?: number
+  Genre?: PlexGenre[]
+  Media?: Media[]
+  Role?: PlexActor[]
+  Rating?: PlexRating[]
+}
+
+export type PlexShow = BasePlexMetadata & {
+  type: 'show'
+  leafCount: number
+  viewedLeafCount: number
+  originallyAvailableAt: string
+  rating?: number
+  contentRating: string
+  audienceRating?: number
+  userRating?: number
+  year?: number
+  Role?: PlexActor[]
   Children?: {
     size: 12
     Metadata: PlexMetadata[]
   }
-  index: number
-  parentIndex?: number
-  Collection?: { tag: string }[]
+  Genre: PlexGenre[]
+  Rating?: PlexRating[]
+}
+
+export type PlexSeason = BasePlexMetadata & {
+  type: 'season'
   leafCount: number
-  grandparentRatingKey?: string
   viewedLeafCount: number
-  addedAt: number
-  updatedAt: number
-  media?: Media[]
+  parentRatingKey?: string
+  parentIndex?: number
   parentData?: PlexMetadata
-  Label?: { tag: string }[]
-  rating?: number
-  audienceRating?: number
-  userRating?: number
-  Role?: PlexActor[]
-  originallyAvailableAt?: string
-  Media?: Media[]
-  Genre?: PlexGenre[]
+  parentYear?: number
+  parentTitle?: string
+  Children?: {
+    size: 12
+    Metadata: PlexMetadata[]
+  }
+}
+
+export type PlexEpisode = BasePlexMetadata & {
+  type: 'episode'
+  parentRatingKey?: string
+  parentIndex?: number
+  parentData?: PlexMetadata
+  parentYear?: number
   parentTitle?: string
   grandparentTitle?: string
-  Rating?: PlexRating[]
-  summary: string
-  parentYear?: number
+  grandparentRatingKey?: string
+  originallyAvailableAt?: string
+  rating?: number
+  contentRating?: string
+  audienceRating?: number
+  userRating?: number
   year?: number
+  Genre?: PlexGenre[]
+  Media?: Media[]
+  Role?: PlexActor[]
+  Rating?: PlexRating[]
 }
 
 export interface Media {

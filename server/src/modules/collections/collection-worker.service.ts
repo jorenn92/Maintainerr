@@ -169,7 +169,8 @@ export class CollectionWorkerService extends TaskBase {
     }
 
     if (handledCollectionMedia > 0) {
-      const promises = [];
+      const promises: Promise<void>[] = [];
+
       if (this.settings.overseerrConfigured()) {
         promises.push(
           delay(7000, async () => {

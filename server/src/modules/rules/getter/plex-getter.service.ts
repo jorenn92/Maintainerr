@@ -1,6 +1,7 @@
 import {
   Application,
   EPlexDataType,
+  isPlexMovie,
   PlexMetadata,
   RuleGroupDto,
 } from '@maintainerr/contracts';
@@ -42,13 +43,18 @@ export class PlexGetterService {
       const metadata: PlexMetadata = await this.plexApi.getMetadata(
         libItem.ratingKey,
       );
-      const parent = metadata?.parentRatingKey
-        ? await this.plexApi.getMetadata(metadata.parentRatingKey)
-        : undefined;
+      const parent =
+        metadata?.type == 'season' || metadata?.type == 'episode'
+          ? await this.plexApi.getMetadata(metadata.parentRatingKey)
+          : undefined;
 
-      const grandparent = metadata?.grandparentRatingKey
-        ? await this.plexApi.getMetadata(metadata.grandparentRatingKey)
-        : undefined;
+      const grandparent =
+        metadata?.type == 'episode'
+          ? await this.plexApi.getMetadata(
+              'episode',
+              metadata.grandparentRatingKey,
+            )
+          : undefined;
 
       switch (prop.name) {
         case 'addDate': {
@@ -72,17 +78,25 @@ export class PlexGetterService {
           }
         }
         case 'releaseDate': {
+          if (metadata.type === 'season') return null;
+
           return new Date(metadata.originallyAvailableAt)
             ? new Date(metadata.originallyAvailableAt)
             : null;
         }
         case 'rating_critics': {
+          if (metadata.type === 'season') return null;
+
           return metadata.rating ? +metadata.rating : 0;
         }
         case 'rating_audience': {
+          if (metadata.type === 'season') return null;
+
           return metadata.audienceRating ? +metadata.audienceRating : 0;
         }
         case 'rating_user': {
+          if (metadata.type === 'season') return null;
+
           return metadata.userRating ? +metadata.userRating : 0;
         }
         case 'people': {
@@ -95,13 +109,9 @@ export class PlexGetterService {
         case 'labels': {
           const item =
             metadata.type === 'episode'
-              ? ((await this.plexApi.getMetadata(
-                  metadata.grandparentRatingKey,
-                )) as unknown as PlexLibraryItem)
+              ? grandparent
               : metadata.type === 'season'
-                ? ((await this.plexApi.getMetadata(
-                    metadata.parentRatingKey,
-                  )) as unknown as PlexLibraryItem)
+                ? parent
                 : metadata;
 
           return item.Label ? item.Label.map((l) => l.tag) : [];
@@ -244,14 +254,20 @@ export class PlexGetterService {
             });
         }
         case 'fileVideoResolution': {
+          if (!isPlexMovie(metadata)) return null;
+
           return metadata.Media[0].videoResolution
             ? metadata.Media[0].videoResolution
             : null;
         }
         case 'fileBitrate': {
+          if (!isPlexMovie(metadata)) return null;
+
           return metadata.Media[0].bitrate ? metadata.Media[0].bitrate : 0;
         }
         case 'fileVideoCodec': {
+          if (!isPlexMovie(metadata)) return null;
+
           return metadata.Media[0].videoCodec
             ? metadata.Media[0].videoCodec
             : null;
@@ -332,6 +348,9 @@ export class PlexGetterService {
           return [];
         }
         case 'sw_lastWatched': {
+          if (metadata.type !== 'season' && metadata.type !== 'show')
+            return null;
+
           let watchHistory = await this.plexApi.getWatchHistory(
             metadata.ratingKey,
           );

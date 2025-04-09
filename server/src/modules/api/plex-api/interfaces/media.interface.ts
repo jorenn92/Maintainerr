@@ -1,7 +1,7 @@
 import { PlexMetadata } from '@maintainerr/contracts';
 
-export interface PlexMetadataResponse {
+export interface PlexMetadataResponse<T extends PlexMetadata = PlexMetadata> {
   MediaContainer: {
-    Metadata: PlexMetadata[];
+    Metadata: T[];
   };
 }

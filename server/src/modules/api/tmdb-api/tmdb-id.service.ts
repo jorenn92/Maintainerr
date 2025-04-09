@@ -1,9 +1,12 @@
-import { PlexMetadata } from '@maintainerr/contracts';
+import {
+  isPlexEpisode,
+  isPlexSeason,
+  PlexMetadata,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { warn } from 'console';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
-import { PlexLibraryItem } from '../plex-api/interfaces/library.interfaces';
 
 @Injectable()
 export class TmdbIdService {
@@ -18,11 +21,11 @@ export class TmdbIdService {
       let libItem: PlexMetadata = await this.plexApi.getMetadata(ratingKey);
       if (libItem) {
         // fetch show in case of season / episode
-        libItem = libItem.grandparentRatingKey
+        libItem = isPlexEpisode(libItem)
           ? await this.plexApi.getMetadata(
               libItem.grandparentRatingKey.toString(),
             )
-          : libItem.parentRatingKey
+          : isPlexSeason(libItem)
             ? await this.plexApi.getMetadata(libItem.parentRatingKey.toString())
             : libItem;
 
@@ -40,7 +43,7 @@ export class TmdbIdService {
   }
 
   async getTmdbIdFromPlexData(
-    libItem: PlexMetadata | PlexLibraryItem,
+    libItem: PlexMetadata,
   ): Promise<{ type: 'movie' | 'tv'; id: number | undefined }> {
     try {
       let id: number = undefined;

@@ -33,7 +33,7 @@ describe('CollectionHandler', () => {
     const collection = createCollection({
       arrAction: ServarrAction.DELETE,
     });
-    const collectionMedia = createCollectionMedia(collection, 'show');
+    const collectionMedia = createCollectionMedia(collection);
 
     plexApi.getLibraries.mockResolvedValue(
       createPlexLibraries({
@@ -52,7 +52,7 @@ describe('CollectionHandler', () => {
       arrAction: ServarrAction.DELETE,
       radarrSettingsId: 1,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie');
+    const collectionMedia = createCollectionMedia(collection);
 
     plexApi.getLibraries.mockResolvedValue(
       createPlexLibraries({
@@ -72,7 +72,7 @@ describe('CollectionHandler', () => {
       arrAction: ServarrAction.DELETE,
       sonarrSettingsId: 1,
     });
-    const collectionMedia = createCollectionMedia(collection, 'show');
+    const collectionMedia = createCollectionMedia(collection);
 
     plexApi.getLibraries.mockResolvedValue(
       createPlexLibraries({

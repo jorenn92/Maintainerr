@@ -1,51 +1,12 @@
-import { Media, PlexActor, PlexGenre } from '@maintainerr/contracts';
-import { PlexCollection, PlexPlaylist } from './collection.interface';
-
-export interface PlexLibraryItem {
-  ratingKey: string;
-  parentRatingKey?: string;
-  grandparentRatingKey?: string;
-  title: string;
-  parentTitle?: string;
-  guid: string;
-  parentGuid?: string;
-  grandparentGuid?: string;
-  addedAt: number;
-  updatedAt: number;
-  Guid?: {
-    id: string;
-  }[];
-  type: 'movie' | 'show' | 'season' | 'episode' | 'collection';
-  Media: Media[];
-  librarySectionTitle: string;
-  librarySectionID: number;
-  librarySectionKey: string;
-  summary: string;
-  viewCount: number;
-  skipCount: number;
-  lastViewedAt: number;
-  year: number;
-  duration: number;
-  originallyAvailableAt: string;
-  rating?: number;
-  audienceRating?: number;
-  userRating?: number;
-  Genre?: PlexGenre[];
-  Role?: PlexActor[];
-  leafCount?: number;
-  viewedLeafCount?: number;
-  index?: number;
-  parentIndex?: number;
-  Collection?: { tag: string }[];
-  Label?: { tag: string }[];
-}
+import { PlexMetadata, PlexPlaylist } from '@maintainerr/contracts';
+import { PlexCollection } from './collection.interface';
 
 export interface PlexLibraryResponse {
   MediaContainer: {
     size: number;
     totalSize?: number;
     Metadata?:
-      | PlexLibraryItem[]
+      | PlexMetadata[]
       | PlexCollection[]
       | PlexCollection
       | PlexPlaylist[];
@@ -103,7 +64,7 @@ export interface PlexUserAccount {
   thumb: string;
 }
 
-export interface PlexSeenBy extends PlexLibraryItem {
+export interface PlexSeenBy {
   historyKey: string;
   key: string;
   ratingKey: string;
@@ -113,4 +74,11 @@ export interface PlexSeenBy extends PlexLibraryItem {
   viewedAt: number;
   accountID: number;
   deviceID: number;
+  parentRatingKey?: string;
+  grandparentRatingKey?: string;
+  parentTitle?: string;
+  type: 'movie' | 'episode';
+  librarySectionID: number;
+  index?: number;
+  parentIndex?: number;
 }

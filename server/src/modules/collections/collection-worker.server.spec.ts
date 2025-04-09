@@ -88,7 +88,7 @@ describe('CollectionWorkerService', () => {
     const collection = createCollection({
       arrAction: ServarrAction.DELETE,
     });
-    const collectionMedia = createCollectionMedia(collection, 'show');
+    const collectionMedia = createCollectionMedia(collection);
 
     collectionRepository.find.mockResolvedValue([collection]);
     collectionMediaRepository.find.mockResolvedValue([collectionMedia]);
