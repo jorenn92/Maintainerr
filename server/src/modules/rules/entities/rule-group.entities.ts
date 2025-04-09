@@ -1,13 +1,12 @@
-import { Collection } from '../../collections/entities/collection.entities';
-import { ICollection } from '../../collections/interfaces/collection.interface';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
+  Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
-  JoinColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Collection } from '../../collections/entities/collection.entities';
 import { Rules } from './rules.entities';
 
 @Entity()
@@ -46,5 +45,5 @@ export class RuleGroup {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  collection: ICollection;
+  collection: Collection;
 }

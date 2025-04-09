@@ -1,7 +1,8 @@
 import { UploadIcon } from '@heroicons/react/solid'
+import { RuleDefinitionDto } from '@maintainerr/contracts'
+import { compareVersions } from 'compare-versions'
 import { useEffect, useRef, useState } from 'react'
 import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
-import { IRule } from '../../Rules/Rule/RuleCreator'
 import CommunityRuleUpload from '../../Rules/Rule/RuleCreator/CommunityRuleUpload'
 import Alert from '../Alert'
 import CommunityRuleTableRow from '../CommunityRowTableRow'
@@ -10,12 +11,11 @@ import LoadingSpinner from '../LoadingSpinner'
 import Modal from '../Modal'
 import Pagination from '../Pagination'
 import SearchBar from '../SearchBar'
-import { compareVersions } from 'compare-versions'
 
 interface ICommunityRuleModal {
-  onUpdate: (rules: IRule[]) => void
+  onUpdate: (rules: RuleDefinitionDto[]) => void
   onCancel: () => void
-  currentRules?: IRule[]
+  currentRules?: RuleDefinitionDto[]
   type: 'movie' | 'show'
 }
 
@@ -33,7 +33,7 @@ export interface ICommunityRule {
   description: string
   hasRules: boolean
   uploadedBy: string
-  JsonRules: IRule[]
+  JsonRules: RuleDefinitionDto[]
 }
 
 const CommunityRuleModal = (props: ICommunityRuleModal) => {

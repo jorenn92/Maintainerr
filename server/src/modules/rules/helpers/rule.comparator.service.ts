@@ -1,17 +1,15 @@
+import {
+  EPlexDataType,
+  RuleDefinitionDto,
+  RuleGroupDto,
+  RuleOperator,
+  RulePossibility,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import _ from 'lodash';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { RuleConstanstService } from '../constants/constants.service';
-import {
-  RuleOperators,
-  RulePossibility,
-  RuleType,
-  RuleValueType,
-} from '../constants/rules.constants';
-import { RuleDto } from '../dtos/rule.dto';
-import { RuleDbDto } from '../dtos/ruleDb.dto';
-import { RulesDto } from '../dtos/rules.dto';
+import { RuleType, RuleValueType } from '../constants/rules.constants';
 import { ValueGetterService } from '../getter/getter.service';
 
 interface IComparisonStatistics {
@@ -74,7 +72,7 @@ export class RuleComparatorService {
   ) {}
 
   public async executeRulesWithData(
-    rulegroup: RulesDto,
+    rulegroup: RuleGroupDto,
     plexData: PlexLibraryItem[],
     withStats = false,
     onRuleProgress?: (processingRule: number) => void,
@@ -102,17 +100,17 @@ export class RuleComparatorService {
         ruleNumber++;
         onRuleProgress?.(ruleNumber);
 
-        const parsedRule = JSON.parse((rule as RuleDbDto).ruleJson) as RuleDto;
+        const ruleDefinition = rule.rule;
 
         // force operator of very first rule to null, otherwise this might cause corruption
-        if ((rule as RuleDbDto)?.id === (rulegroup.rules[0] as RuleDbDto)?.id) {
-          parsedRule.operator = null;
+        if (rule.id === rulegroup.rules[0]?.id) {
+          ruleDefinition.operator = null;
         }
 
-        if (currentSection === (rule as RuleDbDto).section) {
+        if (currentSection === rule.section) {
           // if section didn't change
           // execute and store in work array
-          await this.executeRule(parsedRule, rulegroup);
+          await this.executeRule(ruleDefinition, rulegroup);
         } else {
           // set the stat results of the completed section, if needed
           this.setStatisticSectionResults();
@@ -121,17 +119,14 @@ export class RuleComparatorService {
           this.handleSectionAction(sectionActionAnd);
 
           // save new section action
-          sectionActionAnd = +parsedRule.operator === 0;
+          sectionActionAnd = +ruleDefinition.operator === 0;
           // reset first operator of new section
-          parsedRule.operator = null;
+          ruleDefinition.operator = null;
           // add new section to stats
-          this.addSectionToStatistics(
-            (rule as RuleDbDto).section,
-            sectionActionAnd,
-          );
+          this.addSectionToStatistics(rule.section, sectionActionAnd);
           // Execute the rule and set the new section
-          await this.executeRule(parsedRule, rulegroup);
-          currentSection = (rule as RuleDbDto).section;
+          await this.executeRule(ruleDefinition, rulegroup);
+          currentSection = rule.section;
         }
       }
       // set the stat results of the last section, if needed
@@ -192,12 +187,12 @@ export class RuleComparatorService {
     }
   }
 
-  private async executeRule(rule: RuleDto, ruleGroup: RulesDto) {
+  private async executeRule(rule: RuleDefinitionDto, ruleGroup: RuleGroupDto) {
     let data: PlexLibraryItem[];
     let firstVal: RuleValueType;
     let secondVal: RuleValueType;
 
-    if (rule.operator === null || +rule.operator === +RuleOperators.OR) {
+    if (rule.operator === null || +rule.operator === +RuleOperator.OR) {
       data = _.cloneDeep(this.plexData);
     } else {
       data = _.cloneDeep(this.workerData);
@@ -235,7 +230,7 @@ export class RuleComparatorService {
         );
 
         // alter workerData
-        if (rule.operator === null || +rule.operator === +RuleOperators.OR) {
+        if (rule.operator === null || +rule.operator === +RuleOperator.OR) {
           if (comparisonResult) {
             // add to workerdata if not yet available
             if (
@@ -256,9 +251,9 @@ export class RuleComparatorService {
   }
 
   private async getSecondValue(
-    rule: RuleDto,
+    rule: RuleDefinitionDto,
     data: PlexLibraryItem,
-    rulegroup: RulesDto,
+    rulegroup: RuleGroupDto,
     firstVal: RuleValueType,
   ): Promise<RuleValueType> {
     let secondVal: RuleValueType;
@@ -334,7 +329,7 @@ export class RuleComparatorService {
   }
 
   private addStatistictoParent(
-    rule: RuleDto,
+    rule: RuleDefinitionDto,
     firstVal: RuleValueType,
     secondVal: RuleValueType,
     plexId: number,
@@ -348,8 +343,8 @@ export class RuleComparatorService {
       this.statistics[index].sectionResults[sectionIndex].ruleResults.push({
         operator:
           rule.operator === null || rule.operator === undefined
-            ? RuleOperators[1]
-            : RuleOperators[rule.operator],
+            ? RuleOperator[1]
+            : RuleOperator[rule.operator],
         action: RulePossibility[rule.action].toLowerCase(),
         firstValueName: this.ruleConstanstService.getValueHumanName(
           rule.firstVal,
@@ -371,8 +366,8 @@ export class RuleComparatorService {
       ) {
         this.statistics[index].sectionResults[sectionIndex].operator =
           rule.operator === null || rule.operator === undefined
-            ? RuleOperators[1]
-            : RuleOperators[rule.operator];
+            ? RuleOperator[1]
+            : RuleOperator[rule.operator];
       }
     }
   }

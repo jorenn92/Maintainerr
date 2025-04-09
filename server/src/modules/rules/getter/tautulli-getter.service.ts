@@ -1,8 +1,12 @@
+import {
+  Application,
+  EPlexDataType,
+  RuleGroupDto,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import {
   TautulliApiService,
@@ -10,12 +14,7 @@ import {
   TautulliMetadata,
 } from '../../api/tautulli-api/tautulli-api.service';
 import { Collection } from '../../collections/entities/collection.entities';
-import {
-  Application,
-  Property,
-  RuleConstants,
-} from '../constants/rules.constants';
-import { RulesDto } from '../dtos/rules.dto';
+import { Property, RuleConstants } from '../constants/rules.constants';
 
 @Injectable()
 export class TautulliGetterService {
@@ -38,7 +37,7 @@ export class TautulliGetterService {
     id: number,
     libItem: PlexLibraryItem,
     dataType?: EPlexDataType,
-    ruleGroup?: RulesDto,
+    ruleGroup?: RuleGroupDto,
   ) {
     try {
       const prop = this.appProperties.find((el) => el.id === id);

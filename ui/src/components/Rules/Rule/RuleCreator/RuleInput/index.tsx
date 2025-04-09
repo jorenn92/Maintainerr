@@ -1,14 +1,17 @@
 import { TrashIcon } from '@heroicons/react/solid'
+import {
+  EPlexDataType,
+  MediaType,
+  RuleDefinitionDto,
+  RuleOperator,
+  RulePossibility,
+} from '@maintainerr/contracts'
 import _ from 'lodash'
 import { FormEvent, useContext, useEffect, useState } from 'react'
-import { IRule } from '../'
 import ConstantsContext, {
   IProperty,
-  MediaType,
-  RulePossibility,
   RulePossibilityTranslations,
 } from '../../../../../contexts/constants-context'
-import { EPlexDataType } from '../../../../../utils/PlexDataType-enum'
 
 enum RuleType {
   NUMBER,
@@ -16,10 +19,6 @@ enum RuleType {
   TEXT,
   BOOL,
   TEXT_LIST,
-}
-enum RuleOperators {
-  AND,
-  OR,
 }
 
 enum CustomParams {
@@ -38,8 +37,8 @@ interface IRuleInput {
   dataType?: EPlexDataType
   section?: number
   newlyAdded?: number[]
-  editData?: { rule: IRule }
-  onCommit: (id: number, rule: IRule) => void
+  editData?: { rule: RuleDefinitionDto }
+  onCommit: (id: number, rule: RuleDefinitionDto) => void
   onIncomplete: (id: number) => void
   onDelete: (section: number, id: number) => void
   allowDelete?: boolean
@@ -47,7 +46,7 @@ interface IRuleInput {
 
 const RuleInput = (props: IRuleInput) => {
   const ConstantsCtx = useContext(ConstantsContext)
-  const [operator, setOperator] = useState<string>()
+  const [operator, setOperator] = useState<RuleOperator>()
   const [firstval, setFirstVal] = useState<string>()
   const [action, setAction] = useState<RulePossibility>()
   const [secondVal, setSecondVal] = useState<string>()
@@ -61,18 +60,16 @@ const RuleInput = (props: IRuleInput) => {
 
   useEffect(() => {
     if (props.editData?.rule) {
-      setOperator(props.editData.rule.operator?.toString())
+      setOperator(props.editData.rule.operator ?? undefined)
       setFirstVal(JSON.stringify(props.editData.rule.firstVal))
       setAction(props.editData.rule.action)
 
       if (props.editData.rule.customVal) {
         switch (props.editData.rule.customVal.ruleTypeId) {
           case 0:
+            const value = parseInt(props.editData.rule.customVal.value)
             // TODO: improve this.. Currently this is a hack to determine if param is amount of days or really a number
-            if (
-              (props.editData.rule.customVal.value as number) % 86400 === 0 &&
-              (props.editData.rule.customVal.value as number) != 0
-            ) {
+            if (value % 86400 === 0 && value != 0) {
               setSecondVal(CustomParams.CUSTOM_DAYS)
               setRuleType(RuleType.NUMBER)
             } else {
@@ -136,7 +133,7 @@ const RuleInput = (props: IRuleInput) => {
   }
 
   const updateOperator = (event: { target: { value: string } }) => {
-    setOperator(event.target.value)
+    setOperator(+event.target.value)
   }
 
   const onDelete = (e: FormEvent | null) => {
@@ -344,12 +341,12 @@ const RuleInput = (props: IRuleInput) => {
                   value={operator}
                 >
                   <option value={undefined}> </option>
-                  {Object.keys(RuleOperators).map(
+                  {Object.keys(RuleOperator).map(
                     (value: string, key: number) => {
                       if (!isNaN(+value)) {
                         return (
                           <option key={key} value={key}>
-                            {RuleOperators[key]}
+                            {RuleOperator[key]}
                           </option>
                         )
                       }

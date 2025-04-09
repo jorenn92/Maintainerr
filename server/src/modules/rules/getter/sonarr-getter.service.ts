@@ -1,20 +1,19 @@
+import {
+  Application,
+  EPlexDataType,
+  PlexMetadata,
+  RuleGroupDto,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import _ from 'lodash';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
-import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
 import { SonarrSeason } from '../../../modules/api/servarr-api/interfaces/sonarr.interface';
 import { ServarrService } from '../../../modules/api/servarr-api/servarr.service';
 import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { SonarrApi } from '../../api/servarr-api/helpers/sonarr.helper';
-import {
-  Application,
-  Property,
-  RuleConstants,
-} from '../constants/rules.constants';
-import { RulesDto } from '../dtos/rules.dto';
+import { Property, RuleConstants } from '../constants/rules.constants';
 
 @Injectable()
 export class SonarrGetterService {
@@ -36,7 +35,7 @@ export class SonarrGetterService {
     id: number,
     libItem: PlexLibraryItem,
     dataType?: EPlexDataType,
-    ruleGroup?: RulesDto,
+    ruleGroup?: RuleGroupDto,
   ) {
     if (!ruleGroup.collection?.sonarrSettingsId) {
       this.logger.error(

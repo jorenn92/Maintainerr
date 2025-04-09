@@ -1,10 +1,18 @@
+import {
+  Application,
+  EPlexDataType,
+  RuleDefinitionDto,
+  RuleDto,
+  RuleGroupDto,
+  RuleGroupUpdateDto,
+  RulePossibility,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import _ from 'lodash';
 import { DataSource, Repository } from 'typeorm';
 import cacheManager from '../api/lib/cache';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
@@ -15,18 +23,9 @@ import { AddCollectionMedia } from '../collections/interfaces/collection-media.i
 import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 import { Settings } from '../settings/entities/settings.entities';
 import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
-import {
-  Application,
-  Property,
-  RuleConstants,
-  RulePossibility,
-  RuleType,
-} from './constants/rules.constants';
+import { Property, RuleConstants, RuleType } from './constants/rules.constants';
 import { CommunityRule } from './dtos/communityRule.dto';
 import { ExclusionContextDto } from './dtos/exclusion.dto';
-import { RuleDto } from './dtos/rule.dto';
-import { RuleDbDto } from './dtos/ruleDb.dto';
-import { RulesDto } from './dtos/rules.dto';
 import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
 import { Exclusion } from './entities/exclusion.entities';
 import { RuleGroup } from './entities/rule-group.entities';
@@ -118,27 +117,41 @@ export class RulesService {
 
     return localConstants;
   }
-  async getRules(ruleGroupId: string): Promise<Rules[]> {
+  async getRules(ruleGroupId: string): Promise<RuleDto[]> {
     try {
-      return await this.connection
+      const rules = await this.connection
         .getRepository(Rules)
         .createQueryBuilder('rules')
         .where('ruleGroupId = :id', { id: ruleGroupId })
         .getMany();
+
+      const mappedRules = rules.map((rule) => {
+        return {
+          id: rule.id,
+          isActive: rule.isActive,
+          rule: JSON.parse(rule.ruleJson),
+          ruleGroupId: rule.ruleGroupId,
+          section: rule.section,
+        } satisfies RuleDto;
+      });
+
+      return mappedRules;
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       this.logger.debug(e);
       return undefined;
     }
   }
+
   async getRuleGroups(
     activeOnly = false,
     libraryId?: number,
     typeId?: number,
-  ): Promise<RulesDto[]> {
+  ): Promise<RuleGroupDto[]> {
     try {
       const rulegroups = await this.connection
-        .createQueryBuilder('rule_group', 'rg')
+        .getRepository(RuleGroup)
+        .createQueryBuilder('rg')
         .innerJoinAndSelect('rg.rules', 'r')
         .orderBy('r.id')
         .innerJoinAndSelect('rg.collection', 'c')
@@ -154,7 +167,31 @@ export class RulesService {
         )
         // .where(typeId !== undefined ? `c.type = ${typeId}` : '')
         .getMany();
-      return rulegroups as RulesDto[];
+
+      return rulegroups.map((rulegroup) => {
+        const rules = rulegroup.rules.map((rule) => {
+          return {
+            id: rule.id,
+            isActive: rule.isActive,
+            rule: JSON.parse(rule.ruleJson),
+            ruleGroupId: rule.ruleGroupId,
+            section: rule.section,
+          } satisfies RuleDto;
+        });
+
+        return {
+          id: rulegroup.id,
+          name: rulegroup.name,
+          description: rulegroup.description,
+          libraryId: rulegroup.libraryId,
+          collectionId: rulegroup.collectionId,
+          collection: rulegroup.collection,
+          isActive: rulegroup.isActive,
+          useRules: rulegroup.useRules,
+          dataType: rulegroup.dataType,
+          rules: rules,
+        } satisfies RuleGroupDto;
+      });
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       this.logger.debug(e);
@@ -166,11 +203,24 @@ export class RulesService {
     return this.ruleGroupRepository.count();
   }
 
-  async getRuleGroupById(ruleGroupId: number): Promise<RuleGroup> {
+  async getRuleGroupById(ruleGroupId: number): Promise<RuleGroupDto> {
     try {
-      return await this.ruleGroupRepository.findOne({
+      const data = await this.ruleGroupRepository.findOne({
         where: { id: ruleGroupId },
       });
+
+      return {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        libraryId: data.libraryId,
+        isActive: data.isActive,
+        useRules: data.useRules,
+        dataType: data.dataType,
+        collectionId: data.collectionId,
+        collection: data.collection,
+        rules: [], // TODO These aren't fetched right? So we should provide a type that does not have these available?
+      } satisfies RuleGroupDto;
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       this.logger.debug(e);
@@ -214,7 +264,7 @@ export class RulesService {
     }
   }
 
-  async setRules(params: RulesDto) {
+  async setRules(params: RuleGroupUpdateDto) {
     try {
       let state: ReturnStatus = this.createReturnStatus(true, 'Success');
       params.rules.forEach((rule) => {
@@ -242,20 +292,26 @@ export class RulesService {
                 : EPlexDataType.SHOWS,
           title: params.name,
           description: params.description,
-          arrAction: params.arrAction ? params.arrAction : 0,
+          arrAction: params.collection.arrAction
+            ? params.collection.arrAction
+            : 0,
           isActive: params.isActive,
-          listExclusions: params.listExclusions ? params.listExclusions : false,
-          forceOverseerr: params.forceOverseerr ? params.forceOverseerr : false,
+          listExclusions: params.collection.listExclusions
+            ? params.collection.listExclusions
+            : false,
+          forceOverseerr: params.collection.forceOverseerr
+            ? params.collection.forceOverseerr
+            : false,
           tautulliWatchedPercentOverride:
-            params.tautulliWatchedPercentOverride ?? null,
-          radarrSettingsId: params.radarrSettingsId ?? null,
-          sonarrSettingsId: params.sonarrSettingsId ?? null,
-          visibleOnRecommended: params.collection?.visibleOnRecommended,
-          visibleOnHome: params.collection?.visibleOnHome,
-          deleteAfterDays: params.collection?.deleteAfterDays ?? null,
-          manualCollection: params.collection?.manualCollection,
-          manualCollectionName: params.collection?.manualCollectionName,
-          keepLogsForMonths: +params.collection?.keepLogsForMonths,
+            params.collection.tautulliWatchedPercentOverride ?? null,
+          radarrSettingsId: params.collection.radarrSettingsId ?? null,
+          sonarrSettingsId: params.collection.sonarrSettingsId ?? null,
+          visibleOnRecommended: params.collection.visibleOnRecommended,
+          visibleOnHome: params.collection.visibleOnHome,
+          deleteAfterDays: params.collection.deleteAfterDays ?? null,
+          manualCollection: params.collection.manualCollection,
+          manualCollectionName: params.collection.manualCollectionName,
+          keepLogsForMonths: +params.collection.keepLogsForMonths,
         })
       )?.dbCollection;
 
@@ -281,7 +337,7 @@ export class RulesService {
             {
               ruleJson: ruleJson,
               ruleGroupId: groupId,
-              section: (rule as RuleDbDto).section,
+              section: rule.section,
             },
           ]);
         }
@@ -303,7 +359,7 @@ export class RulesService {
     }
   }
 
-  async updateRules(params: RulesDto) {
+  async updateRules(params: RuleGroupUpdateDto) {
     try {
       let state: ReturnStatus = this.createReturnStatus(true, 'Success');
       params.rules.forEach((rule) => {
@@ -364,18 +420,20 @@ export class RulesService {
                   : EPlexDataType.SHOWS,
             title: params.name,
             description: params.description,
-            arrAction: params.arrAction ? params.arrAction : 0,
+            arrAction: params.collection.arrAction
+              ? params.collection.arrAction
+              : 0,
             isActive: params.isActive,
-            listExclusions: params.listExclusions
-              ? params.listExclusions
+            listExclusions: params.collection.listExclusions
+              ? params.collection.listExclusions
               : false,
-            forceOverseerr: params.forceOverseerr
-              ? params.forceOverseerr
+            forceOverseerr: params.collection.forceOverseerr
+              ? params.collection.forceOverseerr
               : false,
             tautulliWatchedPercentOverride:
-              params.tautulliWatchedPercentOverride ?? null,
-            radarrSettingsId: params.radarrSettingsId ?? null,
-            sonarrSettingsId: params.sonarrSettingsId ?? null,
+              params.collection.tautulliWatchedPercentOverride ?? null,
+            radarrSettingsId: params.collection.radarrSettingsId ?? null,
+            sonarrSettingsId: params.collection.sonarrSettingsId ?? null,
             visibleOnRecommended: params.collection.visibleOnRecommended,
             visibleOnHome: params.collection.visibleOnHome,
             deleteAfterDays: params.collection.deleteAfterDays ?? null,
@@ -383,7 +441,7 @@ export class RulesService {
             manualCollectionName: params.collection.manualCollectionName,
             keepLogsForMonths: +params.collection.keepLogsForMonths,
           })
-        ).dbCollection;
+        ).collection;
 
         // update or create group
         const groupId = await this.createOrUpdateGroup(
@@ -410,7 +468,7 @@ export class RulesService {
               {
                 ruleJson: ruleJson,
                 ruleGroupId: groupId,
-                section: (rule as RuleDbDto).section,
+                section: rule.section,
               },
             ]);
           }
@@ -708,7 +766,8 @@ export class RulesService {
     }
   }
 
-  private validateRule(rule: RuleDto): ReturnStatus {
+  // TODO Move this validation to Zod
+  private validateRule(rule: RuleDefinitionDto): ReturnStatus {
     try {
       const val1: Property = this.ruleConstants.applications
         .find((el) => el.id === rule.firstVal[0])
@@ -944,7 +1003,10 @@ export class RulesService {
       });
   }
 
-  public encodeToYaml(rules: RuleDto[], mediaType: number): ReturnStatus {
+  public encodeToYaml(
+    rules: RuleDefinitionDto[],
+    mediaType: number,
+  ): ReturnStatus {
     return this.ruleYamlService.encode(rules, mediaType);
   }
 
@@ -974,7 +1036,7 @@ export class RulesService {
       group.rules = await this.getRules(group.id.toString());
       const ruleComparator = this.ruleComparatorServiceFactory.create();
       const result = await ruleComparator.executeRulesWithData(
-        group as RulesDto,
+        group as RuleGroupDto,
         [mediaResp as unknown as PlexLibraryItem],
         true,
       );
@@ -992,11 +1054,11 @@ export class RulesService {
   /**
    * Reset the Plex cache if any rule in the rule group requires it.
    *
-   * @param {RulesDto} rulegroup - The rule group to check for cache reset requirement.
+   * @param {RuleGroupDto} rulegroup - The rule group to check for cache reset requirement.
    * @return {Promise<boolean>} Whether the Plex cache was reset.
    */
   public async resetPlexCacheIfgroupUsesRuleThatRequiresIt(
-    rulegroup: RulesDto,
+    rulegroup: RuleGroupDto,
   ): Promise<boolean> {
     try {
       let result = false;
@@ -1004,26 +1066,28 @@ export class RulesService {
 
       // for all rules in group
       for (const rule of rulegroup.rules) {
-        const parsedRule = JSON.parse((rule as RuleDbDto).ruleJson) as RuleDto;
+        const ruleDefinition = rule.rule;
 
         const firstValApplication = constant.applications.find(
-          (x) => x.id === parsedRule.firstVal[0],
+          (x) => x.id === ruleDefinition.firstVal[0],
         );
 
         //test first value
         const first = firstValApplication.props.find(
-          (x) => x.id == parsedRule.firstVal[1],
+          (x) => x.id == ruleDefinition.firstVal[1],
         );
 
         result = first.cacheReset ? true : result;
 
-        const secondValApplication = parsedRule.lastVal
-          ? constant.applications.find((x) => x.id === parsedRule.lastVal[0])
+        const secondValApplication = ruleDefinition.lastVal
+          ? constant.applications.find(
+              (x) => x.id === ruleDefinition.lastVal[0],
+            )
           : undefined;
 
         // test second value
         const second = secondValApplication?.props.find(
-          (x) => x.id == parsedRule.lastVal[1],
+          (x) => x.id == ruleDefinition.lastVal[1],
         );
 
         result = second?.cacheReset ? true : result;

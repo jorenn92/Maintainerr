@@ -1,19 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import GetApiHandler, {
-  PostApiHandler,
-  PutApiHandler,
-} from '../../../../utils/ApiHandler'
-import RuleCreator, { IRule } from '../../Rule/RuleCreator'
-import ConstantsContext, {
-  Application,
-} from '../../../../contexts/constants-context'
-import LibrariesContext, {
-  ILibrary,
-} from '../../../../contexts/libraries-context'
-import Alert from '../../../Common/Alert'
-import ArrAction from './ArrAction'
-import { IRuleGroup } from '..'
-import { ICollection } from '../../../Collection'
+import { CloudDownloadIcon } from '@heroicons/react/outline'
 import {
   BanIcon,
   DownloadIcon,
@@ -21,44 +6,38 @@ import {
   SaveIcon,
   UploadIcon,
 } from '@heroicons/react/solid'
-import Router from 'next/router'
+import {
+  Application,
+  CollectionDto,
+  EPlexDataType,
+  RuleDefinitionDto,
+  RuleGroupDto,
+  RuleGroupUpdateDto,
+} from '@maintainerr/contracts'
 import Link from 'next/link'
-import Button from '../../../Common/Button'
-import CommunityRuleModal from '../../../Common/CommunityRuleModal'
-import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
-import CachedImage from '../../../Common/CachedImage'
-import YamlImporterModal from '../../../Common/YamlImporterModal'
-import { CloudDownloadIcon } from '@heroicons/react/outline'
+import Router from 'next/router'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
+import ConstantsContext from '../../../../contexts/constants-context'
+import LibrariesContext, {
+  ILibrary,
+} from '../../../../contexts/libraries-context'
+import GetApiHandler, {
+  PostApiHandler,
+  PutApiHandler,
+} from '../../../../utils/ApiHandler'
+import Alert from '../../../Common/Alert'
+import Button from '../../../Common/Button'
+import CachedImage from '../../../Common/CachedImage'
+import CommunityRuleModal from '../../../Common/CommunityRuleModal'
+import YamlImporterModal from '../../../Common/YamlImporterModal'
+import RuleCreator from '../../Rule/RuleCreator'
+import ArrAction from './ArrAction'
 
 interface AddModal {
-  editData?: IRuleGroup
+  editData?: RuleGroupDto
   onCancel: () => void
   onSuccess: () => void
-}
-
-interface ICreateApiObject {
-  name: string
-  description: string
-  libraryId: number
-  arrAction: number
-  isActive: boolean
-  useRules: boolean
-  listExclusions: boolean
-  forceOverseerr: boolean
-  tautulliWatchedPercentOverride?: number
-  radarrSettingsId?: number
-  sonarrSettingsId?: number
-  collection: {
-    visibleOnRecommended: boolean
-    visibleOnHome: boolean
-    deleteAfterDays?: number
-    manualCollection?: boolean
-    manualCollectionName?: string
-    keepLogsForMonths?: number
-  }
-  rules: IRule[]
-  dataType: EPlexDataType
 }
 
 const AddModal = (props: AddModal) => {
@@ -66,10 +45,10 @@ const AddModal = (props: AddModal) => {
     props.editData ? props.editData.libraryId.toString() : '',
   )
   const [selectedType, setSelectedType] = useState<string>(
-    props.editData?.type ? props.editData.type.toString() : '',
+    props.editData?.dataType ? props.editData.dataType.toString() : '',
   )
   const [selectedLibrary, setSelectedLibrary] = useState<ILibrary>()
-  const [collection, setCollection] = useState<ICollection>()
+  const [collection, setCollection] = useState<CollectionDto>()
   const [isLoading, setIsLoading] = useState(true)
   const [CommunityModal, setCommunityModal] = useState(false)
   const [yamlImporterModal, setYamlImporterModal] = useState(false)
@@ -105,10 +84,8 @@ const AddModal = (props: AddModal) => {
   const [active, setActive] = useState<boolean>(
     props.editData ? props.editData.isActive : true,
   )
-  const [rules, setRules] = useState<IRule[]>(
-    props.editData
-      ? props.editData.rules.map((r) => JSON.parse(r.ruleJson) as IRule)
-      : [],
+  const [rules, setRules] = useState<RuleDefinitionDto[]>(
+    props.editData ? props.editData.rules.map((x) => x.rule) : [],
   )
   const [error, setError] = useState<boolean>(false)
   const [formIncomplete, setFormIncomplete] = useState<boolean>(false)
@@ -175,7 +152,7 @@ const AddModal = (props: AddModal) => {
     }
   }
 
-  function updateRules(rules: IRule[]) {
+  function updateRules(rules: RuleDefinitionDto[]) {
     setRules(rules)
   }
 
@@ -224,9 +201,8 @@ const AddModal = (props: AddModal) => {
     })
 
     if (response && response.code === 1) {
-      const result: { mediaType: string; rules: IRule[] } = JSON.parse(
-        response.result,
-      )
+      const result: { mediaType: string; rules: RuleDefinitionDto[] } =
+        JSON.parse(response.result)
       handleLoadRules(result.rules)
       addToast('Successfully imported rules from Yaml.', {
         autoDismiss: true,
@@ -240,7 +216,7 @@ const AddModal = (props: AddModal) => {
     }
   }
 
-  const handleLoadRules = (rules: IRule[]) => {
+  const handleLoadRules = (rules: RuleDefinitionDto[]) => {
     updateRules(rules)
     ruleCreatorVersion.current = ruleCreatorVersion.current + 1
     setCommunityModal(false)
@@ -259,7 +235,7 @@ const AddModal = (props: AddModal) => {
         LibrariesCtx.libraries.length <= 0
           ? GetApiHandler('/plex/libraries/')
           : Promise.resolve(null)
-      const collectionPromise: Promise<ICollection | null> = props.editData
+      const collectionPromise: Promise<CollectionDto | null> = props.editData
         ? GetApiHandler(
             `/collections/collection/${props.editData.collectionId}`,
           )
@@ -324,24 +300,23 @@ const AddModal = (props: AddModal) => {
       ((useRules && rules.length > 0) || !useRules)
     ) {
       setFormIncomplete(false)
-      const creationObj: ICreateApiObject = {
+      const creationObj = {
         name: nameRef.current.value,
         description: descriptionRef.current.value,
         libraryId: +libraryRef.current.value,
-        arrAction: arrOption ? arrOption : 0,
         dataType: +selectedType,
         isActive: active,
         useRules: useRules,
-        listExclusions: listExclusion,
-        forceOverseerr: forceOverseerr,
-        tautulliWatchedPercentOverride:
-          tautulliWatchedPercentOverrideRef.current &&
-          tautulliWatchedPercentOverrideRef.current.value != ''
-            ? +tautulliWatchedPercentOverrideRef.current.value
-            : undefined,
-        radarrSettingsId: radarrSettingsId ?? undefined,
-        sonarrSettingsId: sonarrSettingsId ?? undefined,
         collection: {
+          arrAction: arrOption ? arrOption : 0,
+          forceOverseerr: forceOverseerr,
+          tautulliWatchedPercentOverride:
+            tautulliWatchedPercentOverrideRef.current &&
+            tautulliWatchedPercentOverrideRef.current.value != ''
+              ? +tautulliWatchedPercentOverrideRef.current.value
+              : undefined,
+          radarrSettingsId: radarrSettingsId ?? undefined,
+          sonarrSettingsId: sonarrSettingsId ?? undefined,
           visibleOnRecommended: showRecommended,
           visibleOnHome: showHome,
           deleteAfterDays:
@@ -351,9 +326,10 @@ const AddModal = (props: AddModal) => {
           manualCollection: manualCollection,
           manualCollectionName: manualCollectionNameRef.current.value,
           keepLogsForMonths: +keepLogsForMonthsRef.current.value,
+          listExclusions: listExclusion,
         },
         rules: useRules ? rules : [],
-      }
+      } satisfies RuleGroupUpdateDto
 
       if (!props.editData) {
         PostApiHandler('/rules', creationObj)
@@ -650,7 +626,9 @@ const AddModal = (props: AddModal) => {
                       name="collection_deleteDays"
                       id="collection_deleteDays"
                       defaultValue={
-                        collection ? collection.deleteAfterDays : 30
+                        collection
+                          ? (collection.deleteAfterDays ?? undefined)
+                          : 30
                       }
                       ref={deleteAfterRef}
                     />
@@ -701,7 +679,7 @@ const AddModal = (props: AddModal) => {
                       name="tautulli_watched_percent_override"
                       id="tautulli_watched_percent_override"
                       defaultValue={
-                        collection
+                        collection?.tautulliWatchedPercentOverride
                           ? collection.tautulliWatchedPercentOverride
                           : ''
                       }
@@ -886,7 +864,7 @@ const AddModal = (props: AddModal) => {
                     type="text"
                     name="manual_collection_name"
                     id="manual_collection_name"
-                    defaultValue={collection?.manualCollectionName}
+                    defaultValue={collection?.manualCollectionName ?? undefined}
                     ref={manualCollectionNameRef}
                   />
                 </div>

@@ -1,50 +1,9 @@
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
-
-export enum RulePossibility {
-  BIGGER,
-  SMALLER,
-  EQUALS,
-  NOT_EQUALS,
-  CONTAINS,
-  BEFORE,
-  AFTER,
-  IN_LAST,
-  IN_NEXT,
-  NOT_CONTAINS,
-  CONTAINS_PARTIAL,
-  NOT_CONTAINS_PARTIAL,
-  COUNT_EQUALS,
-  COUNT_NOT_EQUALS,
-  COUNT_BIGGER,
-  COUNT_SMALLER,
-}
-
-export enum RuleOperators {
-  AND,
-  OR,
-}
-
-export const enum Application {
-  PLEX,
-  RADARR,
-  SONARR,
-  OVERSEERR,
-  TAUTULLI,
-  JELLYSEERR,
-}
-
-export const enum ArrAction {
-  DELETE,
-  UNMONITOR, // this also deletes
-  SW_UNMONITOR_EXISTING_SEASONS,
-  UNMONITOR_NO_DELETE,
-}
-
-export const enum MediaType {
-  BOTH,
-  MOVIE,
-  SHOW,
-}
+import {
+  Application,
+  EPlexDataType,
+  MediaType,
+  RulePossibility,
+} from '@maintainerr/contracts';
 
 export class RuleType {
   static readonly NUMBER = new RuleType(

@@ -1,6 +1,6 @@
+import { PlexMetadata } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { warn } from 'console';
-import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
 import { PlexLibraryItem } from '../plex-api/interfaces/library.interfaces';

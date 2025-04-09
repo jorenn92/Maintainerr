@@ -1,5 +1,7 @@
 import {
+  EPlexDataType,
   MaintainerrEvent,
+  RuleGroupDto,
   RuleHandlerFinishedEventDto,
   RuleHandlerProgressedEventDto,
   RuleHandlerStartedEventDto,
@@ -7,7 +9,6 @@ import {
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import cacheManager from '../../api/lib/cache';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { CollectionsService } from '../../collections/collections.service';
@@ -17,8 +18,6 @@ import { SettingsService } from '../../settings/settings.service';
 import { TaskBase } from '../../tasks/task.base';
 import { TasksService } from '../../tasks/tasks.service';
 import { RuleConstants } from '../constants/rules.constants';
-import { RulesDto } from '../dtos/rules.dto';
-import { RuleGroup } from '../entities/rule-group.entities';
 import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
 import { RulesService } from '../rules.service';
 
@@ -193,7 +192,7 @@ export class RuleExecutorService extends TaskBase {
     );
   }
 
-  private async syncManualPlexMediaToCollectionDB(rulegroup: RuleGroup) {
+  private async syncManualPlexMediaToCollectionDB(rulegroup: RuleGroupDto) {
     if (rulegroup && rulegroup.collectionId) {
       let collection = await this.collectionService.getCollection(
         rulegroup.collectionId,
@@ -257,7 +256,7 @@ export class RuleExecutorService extends TaskBase {
     }
   }
 
-  private async handleCollection(rulegroup: RuleGroup) {
+  private async handleCollection(rulegroup: RuleGroupDto) {
     try {
       let collection = await this.collectionService.getCollection(
         rulegroup?.collectionId,
@@ -371,7 +370,7 @@ export class RuleExecutorService extends TaskBase {
     }
   }
 
-  private async getAllActiveRuleGroups(): Promise<RulesDto[]> {
+  private async getAllActiveRuleGroups(): Promise<RuleGroupDto[]> {
     return await this.rulesService.getRuleGroups(true);
   }
 

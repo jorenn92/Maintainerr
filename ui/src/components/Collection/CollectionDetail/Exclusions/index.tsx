@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import OverviewContent, { IPlexMetadata } from '../../../Overview/Content'
+import { CollectionDto } from '@maintainerr/contracts'
 import _ from 'lodash'
-import { ICollection } from '../..'
+import { useEffect, useRef, useState } from 'react'
 import GetApiHandler from '../../../../utils/ApiHandler'
+import OverviewContent, { IPlexMetadata } from '../../../Overview/Content'
 
 interface ICollectionExclusions {
-  collection: ICollection
+  collection: CollectionDto
   libraryId: number
 }
 

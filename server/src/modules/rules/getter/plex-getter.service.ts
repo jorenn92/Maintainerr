@@ -1,3 +1,9 @@
+import {
+  Application,
+  EPlexDataType,
+  PlexMetadata,
+  RuleGroupDto,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import {
   PlexLibraryItem,
@@ -5,15 +11,11 @@ import {
   SimplePlexUser,
 } from '../../..//modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
-import { PlexMetadata } from '../../api/plex-api/interfaces/media.interface';
 import {
-  Application,
   Property,
   RuleConstants,
   RuleValueType,
 } from '../constants/rules.constants';
-import { RulesDto } from '../dtos/rules.dto';
 
 @Injectable()
 export class PlexGetterService {
@@ -31,7 +33,7 @@ export class PlexGetterService {
     id: number,
     libItem: PlexLibraryItem,
     dataType?: EPlexDataType,
-    ruleGroup?: RulesDto,
+    ruleGroup?: RuleGroupDto,
   ): Promise<RuleValueType> {
     try {
       const prop = this.plexProperties.find((el) => el.id === id);
