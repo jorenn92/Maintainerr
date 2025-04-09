@@ -29,8 +29,6 @@ export class CollectionHandler {
       return;
     }
 
-    const plexData: PlexMetadata = undefined;
-
     const plexLibrary = (await this.plexApi.getLibraries()).find(
       (e) => +e.key === +collection.libraryId,
     );
@@ -77,21 +75,30 @@ export class CollectionHandler {
       if (this.settings.overseerrConfigured() && collection.forceOverseerr) {
         switch (collection.type) {
           case EPlexDataType.SEASONS:
+            const plexDataSeason: PlexMetadata = await this.plexApi.getMetadata(
+              media.plexId.toString(),
+            );
+
             await this.overseerrApi.removeSeasonRequest(
               media.tmdbId,
-              plexData.index,
+              plexDataSeason.index,
             );
+
             this.logger.log(
-              `[Overseerr] Removed request of season ${plexData.index} from show with tmdbid '${media.tmdbId}'`,
+              `[Overseerr] Removed request of season ${plexDataSeason.index} from show with tmdbid '${media.tmdbId}'`,
             );
             break;
           case EPlexDataType.EPISODES:
+            const plexDataEpisode: PlexMetadata =
+              await this.plexApi.getMetadata(media.plexId.toString());
+
             await this.overseerrApi.removeSeasonRequest(
               media.tmdbId,
-              plexData.parentIndex,
+              plexDataEpisode.parentIndex,
             );
+
             this.logger.log(
-              `[Overseerr] Removed request of season ${plexData.parentIndex} from show with tmdbid '${media.tmdbId}'. Because episode ${plexData.index} was removed.'`,
+              `[Overseerr] Removed request of season ${plexDataEpisode.parentIndex} from show with tmdbid '${media.tmdbId}'. Because episode ${plexDataEpisode.index} was removed.'`,
             );
             break;
           default:
