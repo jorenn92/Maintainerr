@@ -108,7 +108,7 @@ class PlexOAuth {
   private async pinPoll(): Promise<string> {
     const executePoll = async (
       resolve: (authToken: string) => void,
-      reject: (e: Error) => void,
+      reject: (e: unknown) => void,
     ) => {
       try {
         if (!this.pin) {
