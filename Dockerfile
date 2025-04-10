@@ -34,7 +34,6 @@ COPY --from=builder --chmod=777 --chown=node:node /app/ui/public ./ui/public
 # Copy standalone server
 COPY --from=builder --chmod=777 --chown=node:node /app/server/dist ./server/dist
 COPY --from=builder --chmod=777 --chown=node:node /app/server/package.json ./server/package.json
-COPY --from=builder --chmod=777 --chown=node:node /app/server/node_modules ./server/node_modules
 
 # Copy packages/contracts
 COPY --from=builder --chmod=777 --chown=node:node /app/packages/contracts/dist ./packages/contracts/dist
