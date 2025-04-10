@@ -49,31 +49,32 @@ const ConfigureNotificationModal = (props: ConfigureNotificationModal) => {
             </label>
             <div className="form-input">
               <div className="form-input-field flex flex-col gap-2">
-                {!isLoading
-                  ? notifications!.map((n) => (
-                      <ToggleItem
-                        key={n.id}
-                        label={`${n.name} - ${n.agent} ${!n.enabled ? ' (disabled)' : ''}`}
-                        toggled={
-                          activatedNotifications.find((an) => an.id === n.id)
-                            ? true
-                            : false
+                {!isLoading &&
+                  notifications!.map((n) => (
+                    <ToggleItem
+                      key={n.id}
+                      label={`${n.name} - ${n.agent} ${!n.enabled ? ' (disabled)' : ''}`}
+                      toggled={
+                        activatedNotifications.find((an) => an.id === n.id)
+                          ? true
+                          : false
+                      }
+                      onStateChange={(state) => {
+                        if (state) {
+                          setActivatedNotifications([
+                            ...activatedNotifications,
+                            n,
+                          ])
+                        } else {
+                          setActivatedNotifications([
+                            ...activatedNotifications.filter(
+                              (el) => el.id !== n.id,
+                            ),
+                          ])
                         }
-                        onStateChange={(state) => {
-                          state
-                            ? setActivatedNotifications([
-                                ...activatedNotifications,
-                                n,
-                              ])
-                            : setActivatedNotifications([
-                                ...activatedNotifications.filter(
-                                  (el) => el.id !== n.id,
-                                ),
-                              ])
-                        }}
-                      />
-                    ))
-                  : undefined}
+                      }}
+                    />
+                  ))}
               </div>
             </div>
           </div>

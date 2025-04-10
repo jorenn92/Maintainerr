@@ -25,7 +25,6 @@ import { RadarrSettings } from './entities/radarr_settings.entities';
 import { Settings } from './entities/settings.entities';
 import { SonarrSettings } from './entities/sonarr_settings.entities';
 import { NotificationSettings } from './interfaces/notifications-settings.interface';
-import { NotificationService } from '../notifications/notifications.service';
 
 @Injectable()
 export class SettingsService implements SettingDto {

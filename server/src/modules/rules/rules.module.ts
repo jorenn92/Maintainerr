@@ -35,9 +35,6 @@ import { RulesService } from './rules.service';
 import { ExclusionTypeCorrectorService } from './tasks/exclusion-corrector.service';
 import { RuleExecutorService } from './tasks/rule-executor.service';
 import { RuleMaintenanceService } from './tasks/rule-maintenance.service';
-import { NotificationService } from '../notifications/notifications.service';
-import { NotificationsModule } from '../notifications/notifications.module';
-import { Notification } from '../notifications/entities/notification.entities';
 
 @Module({
   imports: [
