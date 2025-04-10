@@ -49,23 +49,23 @@ export enum RulePossibility {
   COUNT_SMALLER,
 }
 
-export enum RulePossibilityTranslations {
-  BIGGER = 'Bigger',
-  SMALLER = 'Smaller',
-  EQUALS = 'Equals',
-  NOT_EQUALS = 'Not Equals',
-  CONTAINS = 'Contains (Exact list match)',
-  BEFORE = 'Before',
-  AFTER = 'After',
-  IN_LAST = 'In Last',
-  IN_NEXT = 'In Next',
-  NOT_CONTAINS = 'Not Contains (Exact list match)',
-  CONTAINS_PARTIAL = 'Contains (Partial list match)',
-  NOT_CONTAINS_PARTIAL = 'Not Contains (Partial list match)',
-  COUNT_EQUALS = 'Count Equals',
-  COUNT_NOT_EQUALS = 'Count Does Not Equal',
-  COUNT_BIGGER = 'Count Is Bigger Than',
-  COUNT_SMALLER = 'Count Is Smaller Than',
+export const RulePossibilityTranslations = {
+  [RulePossibility.BIGGER]: 'Bigger',
+  [RulePossibility.SMALLER]: 'Smaller',
+  [RulePossibility.EQUALS]: 'Equals',
+  [RulePossibility.NOT_EQUALS]: 'Not Equals',
+  [RulePossibility.CONTAINS]: 'Contains (Exact list match)',
+  [RulePossibility.BEFORE]: 'Before',
+  [RulePossibility.AFTER]: 'After',
+  [RulePossibility.IN_LAST]: 'In Last',
+  [RulePossibility.IN_NEXT]: 'In Next',
+  [RulePossibility.NOT_CONTAINS]: 'Not Contains (Exact list match)',
+  [RulePossibility.CONTAINS_PARTIAL]: 'Contains (Partial list match)',
+  [RulePossibility.NOT_CONTAINS_PARTIAL]: 'Not Contains (Partial list match)',
+  [RulePossibility.COUNT_EQUALS]: 'Count Equals',
+  [RulePossibility.COUNT_NOT_EQUALS]: 'Count Does Not Equal',
+  [RulePossibility.COUNT_BIGGER]: 'Count Is Bigger Than',
+  [RulePossibility.COUNT_SMALLER]: 'Count Is Smaller Than',
 }
 
 export const enum MediaType {

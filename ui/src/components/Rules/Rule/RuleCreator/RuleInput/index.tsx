@@ -49,21 +49,21 @@ const RuleInput = (props: IRuleInput) => {
   const ConstantsCtx = useContext(ConstantsContext)
   const [operator, setOperator] = useState<string>()
   const [firstval, setFirstVal] = useState<string>()
-  const [action, setAction] = useState<string>()
+  const [action, setAction] = useState<RulePossibility>()
   const [secondVal, setSecondVal] = useState<string>()
 
-  const [customValType, setCustomValType] = useState<number>()
+  const [customValType, setCustomValType] = useState<RuleType>()
   const [customVal, setCustomVal] = useState<string>()
   const [customValActive, setCustomValActive] = useState<boolean>(true)
 
-  const [possibilities, setPossibilities] = useState<number[]>([])
-  const [ruleType, setRuleType] = useState<number>(0)
+  const [possibilities, setPossibilities] = useState<RulePossibility[]>([])
+  const [ruleType, setRuleType] = useState<RuleType>(RuleType.NUMBER)
 
   useEffect(() => {
     if (props.editData?.rule) {
       setOperator(props.editData.rule.operator?.toString())
       setFirstVal(JSON.stringify(props.editData.rule.firstVal))
-      setAction(props.editData.rule.action.toString())
+      setAction(props.editData.rule.action)
 
       if (props.editData.rule.customVal) {
         switch (props.editData.rule.customVal.ruleTypeId) {
@@ -132,7 +132,7 @@ const RuleInput = (props: IRuleInput) => {
   }
 
   const updateAction = (event: { target: { value: string } }) => {
-    setAction(event.target.value)
+    setAction(+event.target.value)
   }
 
   const updateOperator = (event: { target: { value: string } }) => {
@@ -151,7 +151,7 @@ const RuleInput = (props: IRuleInput) => {
 
     if (
       firstval &&
-      action &&
+      action != null &&
       ((secondVal &&
         secondVal !== CustomParams.CUSTOM_DATE &&
         secondVal !== CustomParams.CUSTOM_DAYS &&
@@ -164,7 +164,7 @@ const RuleInput = (props: IRuleInput) => {
       const ruleValues = {
         operator: operator ? operator : null,
         firstVal: JSON.parse(firstval),
-        action: +action,
+        action,
         section: props.section ? props.section - 1 : 0,
       }
       if (customVal) {
@@ -412,19 +412,11 @@ const RuleInput = (props: IRuleInput) => {
               value={action}
             >
               <option value={undefined}> </option>
-              {Object.keys(RulePossibility).map(
-                (value: string, key: number) => {
-                  if (!isNaN(+value)) {
-                    if (possibilities.some((el) => +el === +value)) {
-                      return (
-                        <option key={+value} value={+value}>
-                          {Object.values(RulePossibilityTranslations)[+value]}
-                        </option>
-                      )
-                    }
-                  }
-                },
-              )}
+              {possibilities.map((action) => (
+                <option key={action} value={action}>
+                  {RulePossibilityTranslations[action]}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -449,10 +441,9 @@ const RuleInput = (props: IRuleInput) => {
                     <option value={CustomParams.CUSTOM_DAYS}>
                       Amount of days
                     </option>
-                    {action &&
-                    +action !== +RulePossibility.IN_LAST &&
-                    action &&
-                    +action !== +RulePossibility.IN_NEXT ? (
+                    {action != null &&
+                    action !== RulePossibility.IN_LAST &&
+                    action !== RulePossibility.IN_NEXT ? (
                       <option value={CustomParams.CUSTOM_DATE}>
                         Specific date
                       </option>
@@ -473,10 +464,9 @@ const RuleInput = (props: IRuleInput) => {
               {ConstantsCtx.constants.applications?.map((app) => {
                 return (app.mediaType === MediaType.BOTH ||
                   props.mediaType === app.mediaType) &&
-                  action &&
-                  +action !== +RulePossibility.IN_LAST &&
-                  action &&
-                  +action !== +RulePossibility.IN_NEXT ? (
+                  action != null &&
+                  action !== RulePossibility.IN_LAST &&
+                  action !== RulePossibility.IN_NEXT ? (
                   <optgroup key={app.id} label={app.name}>
                     {app.props.map((prop) => {
                       // Add valid application-specific second values. Note that the second value
@@ -584,7 +574,7 @@ function MaybeTextListOptions({
   action,
 }: {
   ruleType: RuleType
-  action: string | undefined
+  action: RulePossibility | undefined
 }) {
   if (action == null || ruleType !== RuleType.TEXT_LIST) {
     return
@@ -592,11 +582,11 @@ function MaybeTextListOptions({
 
   if (
     [
-      +RulePossibility.COUNT_EQUALS,
-      +RulePossibility.COUNT_NOT_EQUALS,
-      +RulePossibility.COUNT_BIGGER,
-      +RulePossibility.COUNT_SMALLER,
-    ].includes(+action)
+      RulePossibility.COUNT_EQUALS,
+      RulePossibility.COUNT_NOT_EQUALS,
+      RulePossibility.COUNT_BIGGER,
+      RulePossibility.COUNT_SMALLER,
+    ].includes(action)
   ) {
     return <option value={CustomParams.CUSTOM_NUMBER}>Count (number)</option>
   }

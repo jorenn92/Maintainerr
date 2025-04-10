@@ -1,9 +1,8 @@
-import React from 'react'
+import { SingleValue } from 'react-select'
 import AsyncSelect from 'react-select/async'
 import GetApiHandler from '../../../utils/ApiHandler'
-import { IPlexMetadata } from '../../Overview/Content'
 import { EPlexDataType } from '../../../utils/PlexDataType-enum'
-import { SingleValue } from 'react-select'
+import { IPlexMetadata } from '../../Overview/Content'
 
 export interface IMediaOptions {
   id: string
@@ -14,28 +13,24 @@ export interface IMediaOptions {
 interface ISearchMediaITem {
   onChange: (item: SingleValue<IMediaOptions>) => void
   mediatype?: EPlexDataType
+  libraryId?: number
 }
 
 const SearchMediaItem = (props: ISearchMediaITem) => {
   const loadData = async (query: string): Promise<IMediaOptions[]> => {
     // load your data using query
-    const resp: IPlexMetadata[] = await GetApiHandler(`/plex//search/${query}`)
+
+    const resp: IPlexMetadata[] = await GetApiHandler(
+      `/plex/library/${props.libraryId}/content/search/${query}?type=${props.mediatype == EPlexDataType.MOVIES ? EPlexDataType.MOVIES : EPlexDataType.SHOWS}`,
+    )
+    //const resp: IPlexMetadata[] = await GetApiHandler(`/plex//search/${query}`)
     const output = resp.map((el) => {
       return {
         id: el.ratingKey,
         name: el.title,
-        type: el.type === 'movie' ? 1 : 2,
+        type: el.type == 'movie' ? EPlexDataType.MOVIES : EPlexDataType.SHOWS,
       } as unknown as IMediaOptions
     })
-
-    if (props.mediatype) {
-      const type =
-        props.mediatype !== EPlexDataType.MOVIES &&
-        props.mediatype !== EPlexDataType.SHOWS
-          ? 2
-          : props.mediatype
-      return output.filter((el) => el.type === type)
-    }
 
     return output
   }

@@ -189,7 +189,33 @@ export class PlexApiService {
         uri: '/library/sections',
       });
 
-      return response.MediaContainer.Directory;
+      return response.MediaContainer.Directory.filter(
+        (x) => x.type == 'movie' || x.type == 'show',
+      ) as PlexLibrary[];
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
+  public async getLibraryContentCount(
+    id: string | number,
+    datatype?: EPlexDataType,
+  ): Promise<number | undefined> {
+    try {
+      const type = datatype ? '?type=' + datatype : '';
+      const response = await this.plexClient.query<PlexLibrariesResponse>({
+        uri: `/library/sections/${id}/all${type}`,
+        extraHeaders: {
+          'X-Plex-Container-Start': '0',
+          'X-Plex-Container-Size': '0',
+        },
+      });
+
+      return response.MediaContainer.totalSize;
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
@@ -218,6 +244,32 @@ export class PlexApiService {
         totalSize: response.MediaContainer.totalSize,
         items: (response.MediaContainer.Metadata as PlexLibraryItem[]) ?? [],
       };
+    } catch (err) {
+      this.logger.warn(
+        'Plex api communication failure.. Is the application running?',
+      );
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
+  public async searchLibraryContents(
+    id: string,
+    query: string,
+    datatype?: EPlexDataType,
+  ): Promise<PlexLibraryItem[]> {
+    try {
+      const params = new URLSearchParams({
+        includeGuids: '1',
+        title: query,
+        ...(datatype ? { type: datatype.toString() } : {}),
+      });
+
+      const response = await this.plexClient.query<PlexLibraryResponse>({
+        uri: `/library/sections/${id}/all?${params.toString()}`,
+      });
+
+      return response.MediaContainer.Metadata as PlexLibraryItem[];
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',

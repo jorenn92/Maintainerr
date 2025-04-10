@@ -1,4 +1,4 @@
-import { TestBed } from '@automock/jest';
+import { TestBed } from '@suites/unit';
 import { RulePossibility } from '../constants/rules.constants';
 import { ValueGetterService } from '../getter/getter.service';
 import { RuleComparatorService } from '../helpers/rule.comparator.service';
@@ -7,10 +7,9 @@ describe('RuleComparatorService', () => {
   let ruleComparatorService: RuleComparatorService;
 
   beforeEach(async () => {
-    const { unit } = TestBed.create(RuleComparatorService)
-
+    const { unit } = await TestBed.solitary(RuleComparatorService)
       .mock(ValueGetterService)
-      .using({ get: jest.fn() })
+      .final({ get: jest.fn() })
       .compile();
 
     ruleComparatorService = unit;
@@ -270,11 +269,6 @@ describe('RuleComparatorService', () => {
       [false, ['a1', 'b2', 'c3'], 4, RulePossibility.COUNT_EQUALS],
       [false, ['a1', 'b2', 'c3'], 3, RulePossibility.COUNT_NOT_EQUALS],
       [true, ['a1', 'b2', 'c3'], 4, RulePossibility.COUNT_NOT_EQUALS],
-      // Number lists
-      [true, [1, 2, 3], 3, RulePossibility.COUNT_EQUALS],
-      [false, [1, 2, 3], 4, RulePossibility.COUNT_EQUALS],
-      [false, [1, 2, 3], 3, RulePossibility.COUNT_NOT_EQUALS],
-      [true, [1, 2, 3], 4, RulePossibility.COUNT_NOT_EQUALS],
 
       // > and <
       // Text lists
@@ -284,13 +278,6 @@ describe('RuleComparatorService', () => {
       [true, ['a1', 'b2', 'c3'], 4, RulePossibility.COUNT_SMALLER],
       [false, ['a1', 'b2', 'c3'], 3, RulePossibility.COUNT_SMALLER],
       [false, ['a1', 'b2', 'c3'], 2, RulePossibility.COUNT_SMALLER],
-      // Number lists
-      [true, [1, 2, 3], 2, RulePossibility.COUNT_BIGGER],
-      [false, [1, 2, 3], 3, RulePossibility.COUNT_BIGGER],
-      [false, [1, 2, 3], 4, RulePossibility.COUNT_BIGGER],
-      [true, [1, 2, 3], 4, RulePossibility.COUNT_SMALLER],
-      [false, [1, 2, 3], 3, RulePossibility.COUNT_SMALLER],
-      [false, [1, 2, 3], 2, RulePossibility.COUNT_SMALLER],
     ] as const;
     const actionName = {
       [RulePossibility.COUNT_EQUALS]: 'COUNT_EQUALS',

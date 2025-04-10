@@ -72,7 +72,7 @@ export interface PlexRating {
 }
 
 export interface PlexLibrary {
-  type: 'show' | 'movie';
+  type: 'show' | 'movie' | 'artist';
   key: string;
   title: string;
   agent: string;
@@ -80,6 +80,7 @@ export interface PlexLibrary {
 
 export interface PlexLibrariesResponse {
   MediaContainer: {
+    totalSize: number;
     Directory: PlexLibrary[];
   };
 }
