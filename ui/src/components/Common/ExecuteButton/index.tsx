@@ -20,7 +20,7 @@ const ExecuteButton = (props: IExecuteButton) => {
       props.timeout ? props.timeout : 10000,
     )
   }, [clicked])
-  
+
   const onClick = () => {
     setClicked(true)
     props.onClick()
