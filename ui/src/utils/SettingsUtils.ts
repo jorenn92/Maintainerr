@@ -21,7 +21,7 @@ export function removePortFromUrl(url: string): string | undefined {
     urlObject.port = ''
     return urlObject.toString()
   } catch (error) {
-    console.error('Invalid URL:', error.message)
+    console.error('Invalid URL:', error)
     return undefined
   }
 }
@@ -47,7 +47,7 @@ export function getHostname(url: string): string | undefined {
     const baseUrl = urlObject.protocol + '//' + urlObject.hostname
     return baseUrl
   } catch (error) {
-    console.error('Invalid URL:', error.message)
+    console.error('Invalid URL:', error)
     return undefined
   }
 }
@@ -59,7 +59,7 @@ export function getBaseUrl(url: string): string | undefined {
     baseUrl = baseUrl.startsWith('/') ? baseUrl.substring(1) : baseUrl
     return baseUrl
   } catch (error) {
-    console.error('Invalid URL:', error.message)
+    console.error('Invalid URL:', error)
     return undefined
   }
 }
