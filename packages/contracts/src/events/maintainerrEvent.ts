@@ -5,4 +5,5 @@ export enum MaintainerrEvent {
   CollectionHandler_Started = 'collection_handler.started',
   CollectionHandler_Progressed = 'collection_handler.progressed',
   CollectionHandler_Finished = 'collection_handler.finished',
+  Notifications_Fire = 'agents.notify',
 }

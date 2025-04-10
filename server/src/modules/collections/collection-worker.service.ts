@@ -18,6 +18,7 @@ import { CollectionHandler } from './collection-handler';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
 import { ServarrAction } from './interfaces/collection.interface';
+import { NotificationType } from '../notifications/notifications-interfaces';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
@@ -80,6 +81,12 @@ export class CollectionWorkerService extends TaskBase {
       this.eventEmitter.emit(
         MaintainerrEvent.CollectionHandler_Finished,
         new CollectionHandlerFinishedEventDto('Finished collection handling'),
+      );
+
+      this.eventEmitter.emit(
+        MaintainerrEvent.Notifications_Fire,
+        NotificationType.COLLECTION_HANDLING_FAILED,
+        undefined,
       );
       return;
     }
@@ -153,13 +160,28 @@ export class CollectionWorkerService extends TaskBase {
       emitProgressedEvent();
 
       this.infoLogger(`Handling collection '${collection.title}'`);
+      const handledMediaForNotification = [];
 
       for (const media of collectionMedia) {
         await this.collectionHandler.handleMedia(collection, media);
         handledCollectionMedia++;
         progressedEvent.processingCollection.processedMedias++;
         progressedEvent.processedMedias++;
+        handledMediaForNotification.push({ plexId: media.plexId });
         emitProgressedEvent();
+      }
+
+      // handle notification
+      if (handledMediaForNotification.length > 0) {
+        this.eventEmitter.emit(
+          MaintainerrEvent.Notifications_Fire,
+          NotificationType.MEDIA_HANDLED,
+          handledMediaForNotification,
+          collection.title,
+          undefined,
+          undefined,
+          { type: 'collection', value: collection.id },
+        );
       }
 
       progressedEvent.processedCollections++;
