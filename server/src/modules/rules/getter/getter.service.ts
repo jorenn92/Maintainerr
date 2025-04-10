@@ -2,10 +2,10 @@ import {
   Application,
   EPlexDataType,
   RuleGroupDto,
+  RuleValueType,
 } from '@maintainerr/contracts';
 import { Injectable } from '@nestjs/common';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
-import { RuleValueType } from '../constants/rules.constants';
 import { JellyseerrGetterService } from './jellyseerr-getter.service';
 import { OverseerrGetterService } from './overseerr-getter.service';
 import { PlexGetterService } from './plex-getter.service';

@@ -5,6 +5,7 @@ import {
   RuleDefinitionDto,
   RuleOperator,
   RulePossibility,
+  RuleTypes,
 } from '@maintainerr/contracts'
 import _ from 'lodash'
 import { FormEvent, useContext, useEffect, useState } from 'react'
@@ -12,14 +13,6 @@ import ConstantsContext, {
   IProperty,
   RulePossibilityTranslations,
 } from '../../../../../contexts/constants-context'
-
-enum RuleType {
-  NUMBER,
-  DATE,
-  TEXT,
-  BOOL,
-  TEXT_LIST,
-}
 
 enum CustomParams {
   CUSTOM_NUMBER = 'custom_number',
@@ -51,12 +44,12 @@ const RuleInput = (props: IRuleInput) => {
   const [action, setAction] = useState<RulePossibility>()
   const [secondVal, setSecondVal] = useState<string>()
 
-  const [customValType, setCustomValType] = useState<RuleType>()
+  const [customValType, setCustomValType] = useState<RuleTypes>()
   const [customVal, setCustomVal] = useState<string>()
   const [customValActive, setCustomValActive] = useState<boolean>(true)
 
   const [possibilities, setPossibilities] = useState<RulePossibility[]>([])
-  const [ruleType, setRuleType] = useState<RuleType>(RuleType.NUMBER)
+  const [ruleType, setRuleType] = useState<RuleTypes>(RuleTypes.NUMBER)
 
   useEffect(() => {
     if (props.editData?.rule) {
@@ -71,27 +64,27 @@ const RuleInput = (props: IRuleInput) => {
             // TODO: improve this.. Currently this is a hack to determine if param is amount of days or really a number
             if (value % 86400 === 0 && value != 0) {
               setSecondVal(CustomParams.CUSTOM_DAYS)
-              setRuleType(RuleType.NUMBER)
+              setRuleType(RuleTypes.NUMBER)
             } else {
               setSecondVal(CustomParams.CUSTOM_NUMBER)
-              setRuleType(RuleType.NUMBER)
+              setRuleType(RuleTypes.NUMBER)
             }
             break
           case 1:
             setSecondVal(CustomParams.CUSTOM_DATE)
-            setRuleType(RuleType.DATE)
+            setRuleType(RuleTypes.DATE)
             break
           case 2:
             setSecondVal(CustomParams.CUSTOM_TEXT)
-            setRuleType(RuleType.TEXT)
+            setRuleType(RuleTypes.TEXT)
             break
           case 3:
             setSecondVal(CustomParams.CUSTOM_BOOLEAN)
-            setRuleType(RuleType.BOOL)
+            setRuleType(RuleTypes.BOOL)
             break
           case 4:
             setSecondVal(CustomParams.CUSTOM_TEXT_LIST)
-            setRuleType(RuleType.TEXT_LIST)
+            setRuleType(RuleTypes.TEXT_LIST)
             break
         }
         setCustomVal(props.editData.rule.customVal.value.toString())
@@ -168,18 +161,18 @@ const RuleInput = (props: IRuleInput) => {
         props.onCommit(props.id ? props.id : 0, {
           customVal: {
             ruleTypeId: customValActive
-              ? customValType === RuleType.DATE
+              ? customValType === RuleTypes.DATE
                 ? customValType
-                : customValType === RuleType.NUMBER
+                : customValType === RuleTypes.NUMBER
                   ? customValType
-                  : customValType === RuleType.TEXT &&
+                  : customValType === RuleTypes.TEXT &&
                       secondVal === CustomParams.CUSTOM_DAYS
-                    ? RuleType.NUMBER
-                    : customValType === RuleType.TEXT
+                    ? RuleTypes.NUMBER
+                    : customValType === RuleTypes.TEXT
                       ? customValType
-                      : customValType === RuleType.BOOL
+                      : customValType === RuleTypes.BOOL
                         ? customValType
-                        : customValType === RuleType.TEXT_LIST
+                        : customValType === RuleTypes.TEXT_LIST
                           ? customValType
                           : +ruleType
               : +ruleType,
@@ -249,22 +242,22 @@ const RuleInput = (props: IRuleInput) => {
     if (secondVal) {
       if (secondVal === CustomParams.CUSTOM_NUMBER) {
         setCustomValActive(true)
-        setCustomValType(RuleType.NUMBER)
+        setCustomValType(RuleTypes.NUMBER)
       } else if (secondVal === CustomParams.CUSTOM_DATE) {
         setCustomValActive(true)
-        setCustomValType(RuleType.DATE)
+        setCustomValType(RuleTypes.DATE)
       } else if (secondVal === CustomParams.CUSTOM_DAYS) {
         setCustomValActive(true)
-        setCustomValType(RuleType.TEXT)
+        setCustomValType(RuleTypes.TEXT)
       } else if (secondVal === CustomParams.CUSTOM_TEXT) {
         setCustomValActive(true)
-        setCustomValType(RuleType.TEXT)
+        setCustomValType(RuleTypes.TEXT)
       } else if (secondVal === CustomParams.CUSTOM_TEXT_LIST) {
         setCustomValActive(true)
-        setCustomValType(RuleType.TEXT_LIST)
+        setCustomValType(RuleTypes.TEXT_LIST)
       } else if (secondVal === CustomParams.CUSTOM_BOOLEAN) {
         setCustomValActive(true)
-        setCustomValType(RuleType.BOOL)
+        setCustomValType(RuleTypes.BOOL)
         if (customVal !== '0') {
           setCustomVal('1')
         }
@@ -433,7 +426,7 @@ const RuleInput = (props: IRuleInput) => {
             >
               <option value={undefined}> </option>
               <optgroup label="Custom values">
-                {ruleType === RuleType.DATE ? (
+                {ruleType === RuleTypes.DATE ? (
                   <>
                     <option value={CustomParams.CUSTOM_DAYS}>
                       Amount of days
@@ -447,13 +440,13 @@ const RuleInput = (props: IRuleInput) => {
                     ) : undefined}
                   </>
                 ) : undefined}
-                {ruleType === RuleType.NUMBER ? (
+                {ruleType === RuleTypes.NUMBER ? (
                   <option value={CustomParams.CUSTOM_NUMBER}>Number</option>
                 ) : undefined}
-                {ruleType === RuleType.BOOL ? (
+                {ruleType === RuleTypes.BOOL ? (
                   <option value={CustomParams.CUSTOM_BOOLEAN}>Boolean</option>
                 ) : undefined}
-                {ruleType === RuleType.TEXT ? (
+                {ruleType === RuleTypes.TEXT ? (
                   <option value={CustomParams.CUSTOM_TEXT}>Text</option>
                 ) : undefined}
                 <MaybeTextListOptions ruleType={ruleType} action={action} />
@@ -500,7 +493,7 @@ const RuleInput = (props: IRuleInput) => {
           </label>
           <div className="form-input">
             <div className="form-input-field">
-              {customValType === RuleType.TEXT &&
+              {customValType === RuleTypes.TEXT &&
               secondVal === CustomParams.CUSTOM_DAYS ? (
                 <input
                   type="number"
@@ -510,9 +503,9 @@ const RuleInput = (props: IRuleInput) => {
                   value={customVal ? +customVal / 86400 : undefined}
                   placeholder="Amount of days"
                 ></input>
-              ) : (customValType === RuleType.TEXT &&
+              ) : (customValType === RuleTypes.TEXT &&
                   secondVal === CustomParams.CUSTOM_TEXT) ||
-                customValType === RuleType.TEXT_LIST ? (
+                customValType === RuleTypes.TEXT_LIST ? (
                 <input
                   type="text"
                   name="custom_val"
@@ -521,7 +514,7 @@ const RuleInput = (props: IRuleInput) => {
                   value={customVal}
                   placeholder="Text"
                 ></input>
-              ) : customValType === RuleType.DATE ? (
+              ) : customValType === RuleTypes.DATE ? (
                 <input
                   type="date"
                   name="custom_val"
@@ -530,7 +523,7 @@ const RuleInput = (props: IRuleInput) => {
                   value={customVal}
                   placeholder="Date"
                 ></input>
-              ) : customValType === RuleType.BOOL ? (
+              ) : customValType === RuleTypes.BOOL ? (
                 <select
                   name="custom_val"
                   id="custom_val"
@@ -559,9 +552,9 @@ const RuleInput = (props: IRuleInput) => {
 }
 
 /** Returns a list of types that are valid to be matched against a given first value type. */
-function getSecondValueTypes(firstType: RuleType) {
-  if (firstType === RuleType.TEXT_LIST || firstType === RuleType.TEXT) {
-    return [RuleType.TEXT, RuleType.TEXT_LIST]
+function getSecondValueTypes(firstType: RuleTypes) {
+  if (firstType === RuleTypes.TEXT_LIST || firstType === RuleTypes.TEXT) {
+    return [RuleTypes.TEXT, RuleTypes.TEXT_LIST]
   }
   return [firstType]
 }
@@ -570,10 +563,10 @@ function MaybeTextListOptions({
   ruleType,
   action,
 }: {
-  ruleType: RuleType
+  ruleType: RuleTypes
   action: RulePossibility | undefined
 }) {
-  if (action == null || ruleType !== RuleType.TEXT_LIST) {
+  if (action == null || ruleType !== RuleTypes.TEXT_LIST) {
     return
   }
 

@@ -2,7 +2,10 @@ import {
   Application,
   EPlexDataType,
   PlexMetadata,
+  Property,
+  RuleConstants,
   RuleGroupDto,
+  RuleValueType,
 } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import {
@@ -11,11 +14,6 @@ import {
   SimplePlexUser,
 } from '../../..//modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
-import {
-  Property,
-  RuleConstants,
-  RuleValueType,
-} from '../constants/rules.constants';
 
 @Injectable()
 export class PlexGetterService {

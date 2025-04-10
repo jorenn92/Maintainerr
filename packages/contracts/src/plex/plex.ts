@@ -51,6 +51,7 @@ export interface PlexMetadata {
   summary: string
   parentYear?: number
   year?: number
+  contentRating?: string
 }
 
 export interface Media {

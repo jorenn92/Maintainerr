@@ -4,12 +4,13 @@ import {
   RuleGroupDto,
   RuleOperator,
   RulePossibility,
+  RuleType,
+  RuleValueType,
 } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import _ from 'lodash';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { RuleConstanstService } from '../constants/constants.service';
-import { RuleType, RuleValueType } from '../constants/rules.constants';
 import { ValueGetterService } from '../getter/getter.service';
 
 interface IComparisonStatistics {

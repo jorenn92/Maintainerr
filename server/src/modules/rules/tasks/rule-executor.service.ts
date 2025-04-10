@@ -1,6 +1,7 @@
 import {
   EPlexDataType,
   MaintainerrEvent,
+  RuleConstants,
   RuleGroupDto,
   RuleHandlerFinishedEventDto,
   RuleHandlerProgressedEventDto,
@@ -17,7 +18,6 @@ import { AddCollectionMedia } from '../../collections/interfaces/collection-medi
 import { SettingsService } from '../../settings/settings.service';
 import { TaskBase } from '../../tasks/task.base';
 import { TasksService } from '../../tasks/tasks.service';
-import { RuleConstants } from '../constants/rules.constants';
 import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
 import { RulesService } from '../rules.service';
 

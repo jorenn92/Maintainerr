@@ -1,6 +1,8 @@
 import {
   Application,
   EPlexDataType,
+  Property,
+  RuleConstants,
   RuleGroupDto,
 } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
@@ -14,7 +16,6 @@ import {
   TautulliMetadata,
 } from '../../api/tautulli-api/tautulli-api.service';
 import { Collection } from '../../collections/entities/collection.entities';
-import { Property, RuleConstants } from '../constants/rules.constants';
 
 @Injectable()
 export class TautulliGetterService {

@@ -2,6 +2,8 @@ import {
   Application,
   EPlexDataType,
   PlexMetadata,
+  Property,
+  RuleConstants,
   RuleGroupDto,
 } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
@@ -13,7 +15,6 @@ import { TmdbIdService } from '../../../modules/api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { SonarrApi } from '../../api/servarr-api/helpers/sonarr.helper';
-import { Property, RuleConstants } from '../constants/rules.constants';
 
 @Injectable()
 export class SonarrGetterService {

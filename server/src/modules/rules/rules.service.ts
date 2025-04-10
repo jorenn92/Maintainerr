@@ -1,11 +1,11 @@
 import {
   Application,
   EPlexDataType,
+  RuleConstants,
   RuleDefinitionDto,
   RuleDto,
   RuleGroupDto,
   RuleGroupUpdateDto,
-  RulePossibility,
 } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,7 +23,6 @@ import { AddCollectionMedia } from '../collections/interfaces/collection-media.i
 import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 import { Settings } from '../settings/entities/settings.entities';
 import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
-import { Property, RuleConstants, RuleType } from './constants/rules.constants';
 import { CommunityRule } from './dtos/communityRule.dto';
 import { ExclusionContextDto } from './dtos/exclusion.dto';
 import { CommunityRuleKarma } from './entities/community-rule-karma.entities';
@@ -266,16 +265,7 @@ export class RulesService {
 
   async setRules(params: RuleGroupUpdateDto) {
     try {
-      let state: ReturnStatus = this.createReturnStatus(true, 'Success');
-      params.rules.forEach((rule) => {
-        if (state.code === 1) {
-          state = this.validateRule(rule);
-        }
-      }, this);
-
-      if (state.code !== 1) {
-        return state;
-      }
+      const state: ReturnStatus = this.createReturnStatus(true, 'Success');
 
       // create the collection
       const lib = (await this.plexApi.getLibraries()).find(
@@ -361,132 +351,122 @@ export class RulesService {
 
   async updateRules(params: RuleGroupUpdateDto) {
     try {
-      let state: ReturnStatus = this.createReturnStatus(true, 'Success');
-      params.rules.forEach((rule) => {
-        if (state.code === 1) {
-          state = this.validateRule(rule);
-        }
-      }, this);
+      const state: ReturnStatus = this.createReturnStatus(true, 'Success');
 
-      if (state.code === 1) {
-        // get current group
-        const group = await this.ruleGroupRepository.findOne({
-          where: { id: params.id },
+      // get current group
+      const group = await this.ruleGroupRepository.findOne({
+        where: { id: params.id },
+      });
+
+      const dbCollection = await this.collectionService.getCollection(
+        group.collectionId,
+      );
+
+      // if datatype or manual collection settings changed then remove the collection media and specific exclusions. The Plex collection will be removed later by updateCollection()
+      if (
+        group.dataType !== params.dataType ||
+        params.collection.manualCollection !== dbCollection.manualCollection ||
+        params.collection.manualCollectionName !==
+          dbCollection.manualCollectionName ||
+        params.libraryId !== dbCollection.libraryId
+      ) {
+        this.logger.log(
+          `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media & specific exclusions`,
+        );
+        await this.collectionMediaRepository.delete({
+          collectionId: group.collectionId,
         });
 
-        const dbCollection = await this.collectionService.getCollection(
-          group.collectionId,
+        await this.collectionService.addLogRecord(
+          { id: group.collectionId } as Collection,
+          'A crucial setting of the collection was updated. As a result all media and specific exclusions were removed',
+          ECollectionLogType.COLLECTION,
         );
 
-        // if datatype or manual collection settings changed then remove the collection media and specific exclusions. The Plex collection will be removed later by updateCollection()
-        if (
-          group.dataType !== params.dataType ||
-          params.collection.manualCollection !==
-            dbCollection.manualCollection ||
-          params.collection.manualCollectionName !==
-            dbCollection.manualCollectionName ||
-          params.libraryId !== dbCollection.libraryId
-        ) {
-          this.logger.log(
-            `A crucial setting of Rulegroup '${params.name}' was changed. Removed all media & specific exclusions`,
-          );
-          await this.collectionMediaRepository.delete({
-            collectionId: group.collectionId,
-          });
+        await this.exclusionRepo.delete({ ruleGroupId: params.id });
+      }
 
-          await this.collectionService.addLogRecord(
-            { id: group.collectionId } as Collection,
-            'A crucial setting of the collection was updated. As a result all media and specific exclusions were removed',
-            ECollectionLogType.COLLECTION,
-          );
+      // update the collection
+      const lib = (await this.plexApi.getLibraries()).find(
+        (el) => +el.key === +params.libraryId,
+      );
 
-          await this.exclusionRepo.delete({ ruleGroupId: params.id });
-        }
+      const collection = (
+        await this.collectionService.updateCollection({
+          id: group.collectionId ? group.collectionId : undefined,
+          libraryId: +params.libraryId,
+          type:
+            lib.type === 'movie'
+              ? EPlexDataType.MOVIES
+              : params.dataType !== undefined
+                ? params.dataType
+                : EPlexDataType.SHOWS,
+          title: params.name,
+          description: params.description,
+          arrAction: params.collection.arrAction
+            ? params.collection.arrAction
+            : 0,
+          isActive: params.isActive,
+          listExclusions: params.collection.listExclusions
+            ? params.collection.listExclusions
+            : false,
+          forceOverseerr: params.collection.forceOverseerr
+            ? params.collection.forceOverseerr
+            : false,
+          tautulliWatchedPercentOverride:
+            params.collection.tautulliWatchedPercentOverride ?? null,
+          radarrSettingsId: params.collection.radarrSettingsId ?? null,
+          sonarrSettingsId: params.collection.sonarrSettingsId ?? null,
+          visibleOnRecommended: params.collection.visibleOnRecommended,
+          visibleOnHome: params.collection.visibleOnHome,
+          deleteAfterDays: params.collection.deleteAfterDays ?? null,
+          manualCollection: params.collection.manualCollection,
+          manualCollectionName: params.collection.manualCollectionName,
+          keepLogsForMonths: +params.collection.keepLogsForMonths,
+        })
+      ).collection;
 
-        // update the collection
-        const lib = (await this.plexApi.getLibraries()).find(
-          (el) => +el.key === +params.libraryId,
-        );
+      // update or create group
+      const groupId = await this.createOrUpdateGroup(
+        params.name,
+        params.description,
+        params.libraryId,
+        collection.id,
+        params.useRules !== undefined ? params.useRules : true,
+        params.isActive !== undefined ? params.isActive : true,
+        params.dataType !== undefined ? params.dataType : undefined,
+        group.id,
+      );
 
-        const collection = (
-          await this.collectionService.updateCollection({
-            id: group.collectionId ? group.collectionId : undefined,
-            libraryId: +params.libraryId,
-            type:
-              lib.type === 'movie'
-                ? EPlexDataType.MOVIES
-                : params.dataType !== undefined
-                  ? params.dataType
-                  : EPlexDataType.SHOWS,
-            title: params.name,
-            description: params.description,
-            arrAction: params.collection.arrAction
-              ? params.collection.arrAction
-              : 0,
-            isActive: params.isActive,
-            listExclusions: params.collection.listExclusions
-              ? params.collection.listExclusions
-              : false,
-            forceOverseerr: params.collection.forceOverseerr
-              ? params.collection.forceOverseerr
-              : false,
-            tautulliWatchedPercentOverride:
-              params.collection.tautulliWatchedPercentOverride ?? null,
-            radarrSettingsId: params.collection.radarrSettingsId ?? null,
-            sonarrSettingsId: params.collection.sonarrSettingsId ?? null,
-            visibleOnRecommended: params.collection.visibleOnRecommended,
-            visibleOnHome: params.collection.visibleOnHome,
-            deleteAfterDays: params.collection.deleteAfterDays ?? null,
-            manualCollection: params.collection.manualCollection,
-            manualCollectionName: params.collection.manualCollectionName,
-            keepLogsForMonths: +params.collection.keepLogsForMonths,
-          })
-        ).collection;
+      // remove previous rules
+      this.rulesRepository.delete({
+        ruleGroupId: groupId,
+      });
 
-        // update or create group
-        const groupId = await this.createOrUpdateGroup(
-          params.name,
-          params.description,
-          params.libraryId,
-          collection.id,
-          params.useRules !== undefined ? params.useRules : true,
-          params.isActive !== undefined ? params.isActive : true,
-          params.dataType !== undefined ? params.dataType : undefined,
-          group.id,
-        );
-
-        // remove previous rules
-        this.rulesRepository.delete({
-          ruleGroupId: groupId,
-        });
-
-        // create rules
-        if (params.useRules) {
-          for (const rule of params.rules) {
-            const ruleJson = JSON.stringify(rule);
-            await this.rulesRepository.save([
-              {
-                ruleJson: ruleJson,
-                ruleGroupId: groupId,
-                section: rule.section,
-              },
-            ]);
-          }
-        } else {
-          // empty rule if not using rules
+      // create rules
+      if (params.useRules) {
+        for (const rule of params.rules) {
+          const ruleJson = JSON.stringify(rule);
           await this.rulesRepository.save([
             {
-              ruleJson: JSON.stringify(''),
+              ruleJson: ruleJson,
               ruleGroupId: groupId,
-              section: 0,
+              section: rule.section,
             },
           ]);
         }
-        this.logger.log(`Successfully updated rulegroup '${params.name}'.`);
-        return state;
       } else {
-        return state;
+        // empty rule if not using rules
+        await this.rulesRepository.save([
+          {
+            ruleJson: JSON.stringify(''),
+            ruleGroupId: groupId,
+            section: 0,
+          },
+        ]);
       }
+      this.logger.log(`Successfully updated rulegroup '${params.name}'.`);
+      return state;
     } catch (e) {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       this.logger.debug(e);
@@ -763,65 +743,6 @@ export class RulesService {
       this.logger.warn(`Rules - Action failed : ${e.message}`);
       this.logger.debug(e);
       return [];
-    }
-  }
-
-  // TODO Move this validation to Zod
-  private validateRule(rule: RuleDefinitionDto): ReturnStatus {
-    try {
-      const val1: Property = this.ruleConstants.applications
-        .find((el) => el.id === rule.firstVal[0])
-        .props.find((el) => el.id === rule.firstVal[1]);
-      if (rule.lastVal) {
-        const val2: Property = this.ruleConstants.applications
-          .find((el) => el.id === rule.lastVal[0])
-          .props.find((el) => el.id === rule.lastVal[1]);
-        if (
-          val1.type === val2.type ||
-          ([RuleType.TEXT_LIST, RuleType.TEXT].includes(val1.type) &&
-            [RuleType.TEXT_LIST, RuleType.TEXT].includes(val2.type))
-        ) {
-          if (val1.type.possibilities.includes(+rule.action)) {
-            return this.createReturnStatus(true, 'Success');
-          } else {
-            return this.createReturnStatus(
-              false,
-              'Action is not supported on type',
-            );
-          }
-        } else {
-          return this.createReturnStatus(false, "Types don't match");
-        }
-      } else if (rule.customVal) {
-        if (
-          val1.type.toString() === rule.customVal.ruleTypeId.toString() ||
-          (val1.type == RuleType.TEXT_LIST &&
-            rule.customVal.ruleTypeId.toString() == RuleType.TEXT.toString())
-        ) {
-          if (val1.type.possibilities.includes(+rule.action)) {
-            return this.createReturnStatus(true, 'Success');
-          } else {
-            return this.createReturnStatus(
-              false,
-              'Action is not supported on type',
-            );
-          }
-        }
-        if (
-          (rule.action === RulePossibility.IN_LAST ||
-            RulePossibility.IN_NEXT) &&
-          rule.customVal.ruleTypeId === 0
-        ) {
-          return this.createReturnStatus(true, 'Success');
-        } else {
-          return this.createReturnStatus(false, 'Validation failed');
-        }
-      } else {
-        return this.createReturnStatus(false, 'No second value found');
-      }
-    } catch (e) {
-      this.logger.debug(e);
-      return this.createReturnStatus(false, 'Unexpected error occurred');
     }
   }
 
