@@ -39,7 +39,6 @@ COPY --from=builder --chmod=777 --chown=node:node /app/server/node_modules ./ser
 # Copy packages/contracts
 COPY --from=builder --chmod=777 --chown=node:node /app/packages/contracts/dist ./packages/contracts/dist
 COPY --from=builder --chmod=777 --chown=node:node /app/packages/contracts/package.json ./packages/contracts/package.json
-COPY --from=builder --chmod=777 --chown=node:node /app/packages/contracts/node_modules ./packages/contracts/node_modules
 
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY --chmod=777 --chown=node:node docker/start.sh /opt/app/start.sh
