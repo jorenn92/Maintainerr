@@ -1,7 +1,12 @@
+import {
+  CollectionDto,
+  CollectionMediaWithPlexDataDto,
+  CollectionWithMediaDto,
+  IAlterableMediaDto,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, LessThan, Repository } from 'typeorm';
-
 import {
   CollectionLog,
   ECollectionLogType,
@@ -21,15 +26,8 @@ import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
 import { Exclusion } from '../rules/entities/exclusion.entities';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { Collection } from './entities/collection.entities';
-import {
-  CollectionMedia,
-  CollectionMediaWithPlexData,
-} from './entities/collection_media.entities';
-import {
-  AddCollectionMedia,
-  IAlterableMediaDto,
-} from './interfaces/collection-media.interface';
-import { ICollection } from './interfaces/collection.interface';
+import { CollectionMedia } from './entities/collection_media.entities';
+import { AddCollectionMedia } from './interfaces/collection-media.interface';
 
 interface addCollectionDbResponse {
   id: number;
@@ -39,6 +37,17 @@ interface addCollectionDbResponse {
   deleteAfterDays: number;
   manualCollection: boolean;
 }
+
+type CreateCollection = Omit<UpdateCollection, 'id'>;
+
+type UpdateCollection = Omit<
+  CollectionDto,
+  | 'media'
+  | 'plexId'
+  | 'addDate'
+  | 'handledMediaAmount'
+  | 'lastDurationInSeconds'
+>;
 
 @Injectable()
 export class CollectionsService {
@@ -98,7 +107,7 @@ export class CollectionsService {
   public async getCollectionMediaWitPlexDataAndhPaging(
     id: number,
     { offset = 0, size = 25 }: { offset?: number; size?: number } = {},
-  ): Promise<{ totalSize: number; items: CollectionMediaWithPlexData[] }> {
+  ): Promise<{ totalSize: number; items: CollectionMediaWithPlexDataDto[] }> {
     try {
       const queryBuilder =
         this.CollectionMediaRepo.createQueryBuilder('collection_media');
@@ -112,7 +121,7 @@ export class CollectionsService {
       const itemCount = await queryBuilder.getCount();
       const { entities } = await queryBuilder.getRawAndEntities();
 
-      const entitiesWithPlexData: CollectionMediaWithPlexData[] = (
+      const entitiesWithPlexData: CollectionMediaWithPlexDataDto[] = (
         await Promise.all(
           entities.map(async (el) => {
             const plexData = await this.plexApi.getMetadata(
@@ -204,7 +213,10 @@ export class CollectionsService {
     }
   }
 
-  async getCollections(libraryId?: number, typeId?: 1 | 2 | 3 | 4) {
+  async getCollections(
+    libraryId?: number,
+    typeId?: 1 | 2 | 3 | 4,
+  ): Promise<CollectionWithMediaDto[]> {
     try {
       const collections = await this.collectionRepo.find(
         libraryId
@@ -225,7 +237,7 @@ export class CollectionsService {
             ...col,
             media: colls,
           };
-        }),
+        }) satisfies Promise<CollectionWithMediaDto>[],
       );
     } catch (err) {
       this.logger.warn(
@@ -247,7 +259,7 @@ export class CollectionsService {
   }
 
   async createCollection(
-    collection: ICollection,
+    collection: CreateCollection,
     empty = true,
   ): Promise<{
     plexCollection?: PlexCollection;
@@ -275,6 +287,8 @@ export class CollectionsService {
           sharedHome: collection.visibleOnHome,
         });
       }
+
+      let plexId: number = undefined;
       // in case of manual, just fetch the collection plex ID
       if (collection.manualCollection) {
         plexCollection = await this.findPlexCollection(
@@ -290,7 +304,7 @@ export class CollectionsService {
             sharedHome: collection.visibleOnHome,
           });
 
-          collection.plexId = +plexCollection.ratingKey;
+          plexId = +plexCollection.ratingKey;
         } else {
           this.logger.error(
             `Manual Plex collection not found.. Is the spelling correct? `,
@@ -298,12 +312,10 @@ export class CollectionsService {
           return undefined;
         }
       }
+
       // create collection in db
       const collectionDb: addCollectionDbResponse =
-        await this.addCollectionToDB(
-          collection,
-          collection.plexId ? collection.plexId : undefined,
-        );
+        await this.addCollectionToDB(collection, plexId);
       if (empty && !collection.manualCollection)
         return { dbCollection: collectionDb };
       else
@@ -318,7 +330,7 @@ export class CollectionsService {
   }
 
   async createCollectionWithChildren(
-    collection: ICollection,
+    collection: CollectionDto,
     media?: AddCollectionMedia[],
   ): Promise<{
     plexCollection: PlexCollection;
@@ -348,9 +360,9 @@ export class CollectionsService {
     }
   }
 
-  async updateCollection(collection: ICollection): Promise<{
+  async updateCollection(collection: UpdateCollection): Promise<{
     plexCollection?: PlexCollection;
-    dbCollection?: ICollection;
+    collection?: CollectionDto;
   }> {
     try {
       const dbCollection = await this.collectionRepo.findOne({
@@ -399,7 +411,7 @@ export class CollectionsService {
         }
       }
 
-      const dbResp: ICollection = await this.collectionRepo.save({
+      const dbResp = await this.collectionRepo.save({
         ...dbCollection,
         ...collection,
       });
@@ -410,7 +422,7 @@ export class CollectionsService {
         ECollectionLogType.COLLECTION,
       );
 
-      return { plexCollection: plexColl, dbCollection: dbResp };
+      return { plexCollection: plexColl, collection: dbResp };
     } catch (err) {
       this.logger.warn(
         'An error occurred while performing collection actions.',
@@ -916,7 +928,7 @@ export class CollectionsService {
   }
 
   private async addCollectionToDB(
-    collection: ICollection,
+    collection: CreateCollection,
     plexId?: number,
   ): Promise<addCollectionDbResponse> {
     try {
@@ -982,7 +994,7 @@ export class CollectionsService {
   }
 
   private async RemoveCollectionFromDB(
-    collection: ICollection,
+    collection: CollectionDto,
   ): Promise<BasicResponseDto> {
     try {
       this.infoLogger(`Removing collection from Database..`);

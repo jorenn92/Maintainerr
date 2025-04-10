@@ -1,11 +1,11 @@
+import { CollectionWithMediaDto } from '@maintainerr/contracts'
 import { useContext } from 'react'
-import { ICollection } from '..'
 import LibrariesContext from '../../../contexts/libraries-context'
 import CachedImage from '../../Common/CachedImage'
 
 interface ICollectionItem {
-  collection: ICollection
-  onClick?: (collection: ICollection) => void
+  collection: CollectionWithMediaDto
+  onClick?: (collection: CollectionWithMediaDto) => void
 }
 
 const CollectionItem = (props: ICollectionItem) => {

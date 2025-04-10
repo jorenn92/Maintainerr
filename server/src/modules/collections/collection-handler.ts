@@ -1,15 +1,17 @@
+import {
+  EPlexDataType,
+  PlexMetadata,
+  ServarrAction,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { RadarrActionHandler } from '../actions/radarr-action-handler';
 import { SonarrActionHandler } from '../actions/sonarr-action-handler';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
-import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { SettingsService } from '../settings/settings.service';
 import { CollectionsService } from './collections.service';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
-import { ServarrAction } from './interfaces/collection.interface';
 
 @Injectable()
 export class CollectionHandler {

@@ -1,3 +1,9 @@
+import {
+  Application,
+  EPlexDataType,
+  Property,
+  RuleConstants,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { warn } from 'console';
 import _ from 'lodash';
@@ -10,16 +16,9 @@ import {
   OverseerrTVRequest,
   OverSeerrTVResponse,
 } from '../../api/overseerr-api/overseerr-api.service';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { TmdbIdService } from '../../api/tmdb-api/tmdb-id.service';
-import { TmdbApiService } from '../../api/tmdb-api/tmdb.service';
-import {
-  Application,
-  Property,
-  RuleConstants,
-} from '../constants/rules.constants';
 
 @Injectable()
 export class OverseerrGetterService {
@@ -28,7 +27,6 @@ export class OverseerrGetterService {
 
   constructor(
     private readonly overseerrApi: OverseerrApiService,
-    private readonly tmdbApi: TmdbApiService,
     private readonly plexApi: PlexApiService,
     private readonly tmdbIdHelper: TmdbIdService,
   ) {

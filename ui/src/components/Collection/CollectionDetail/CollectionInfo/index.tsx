@@ -1,22 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
-import { ICollection } from '../..'
-import LoadingSpinner, {
-  SmallLoadingSpinner,
-} from '../../../Common/LoadingSpinner'
-import Table from '../../../Common/Table'
-import GetApiHandler from '../../../../utils/ApiHandler'
-import useDebouncedState from '../../../..//hooks/useDebouncedState'
 import {
   FilterIcon,
   SearchIcon,
   SortAscendingIcon,
   SortDescendingIcon,
 } from '@heroicons/react/outline'
-import Badge from '../../../Common/Badge'
+import { CollectionDto } from '@maintainerr/contracts'
 import _ from 'lodash'
+import { useEffect, useRef, useState } from 'react'
+import useDebouncedState from '../../../..//hooks/useDebouncedState'
+import GetApiHandler from '../../../../utils/ApiHandler'
+import Badge from '../../../Common/Badge'
+import LoadingSpinner, {
+  SmallLoadingSpinner,
+} from '../../../Common/LoadingSpinner'
+import Table from '../../../Common/Table'
 
 interface ICollectionInfo {
-  collection: ICollection
+  collection: CollectionDto
 }
 
 interface ICollectionInfoLog {

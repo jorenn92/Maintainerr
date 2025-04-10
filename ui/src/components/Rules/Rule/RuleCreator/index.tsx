@@ -1,41 +1,34 @@
-import { useRef, useState } from 'react'
-import { MediaType } from '../../../../contexts/constants-context'
-import Alert from '../../../Common/Alert'
-import RuleInput from './RuleInput'
-import SectionHeading from '../../../Common/SectionHeading'
-import _ from 'lodash'
 import { ClipboardListIcon } from '@heroicons/react/solid'
-import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
+import {
+  EPlexDataType,
+  MediaType,
+  RuleDefinitionDto,
+} from '@maintainerr/contracts'
+import { useRef, useState } from 'react'
+import Alert from '../../../Common/Alert'
+import SectionHeading from '../../../Common/SectionHeading'
+import RuleInput from './RuleInput'
 
 interface IRulesToCreate {
   id: number
-  rule: IRule
-}
-
-export interface IRule {
-  operator: string | null
-  firstVal: [string, string]
-  lastVal?: [string, string]
-  section?: number
-  customVal?: { ruleTypeId: number; value: string | number }
-  action: number
+  rule: RuleDefinitionDto
 }
 
 export interface ILoadedRule {
   uniqueID: number
-  rules: IRule[]
+  rules: RuleDefinitionDto[]
 }
 
 interface iRuleCreator {
   mediaType?: MediaType
   dataType?: EPlexDataType
-  editData?: { rules: IRule[] }
-  onUpdate: (rules: IRule[]) => void
+  editData?: { rules: RuleDefinitionDto[] }
+  onUpdate: (rules: RuleDefinitionDto[]) => void
   onCancel: () => void
 }
 
 const calculateRuleAmount = (
-  data: { rules: IRule[] } | undefined,
+  data: { rules: RuleDefinitionDto[] } | undefined,
   sections: number,
 ): [number, number[]] => {
   const sectionAmounts = [] as number[]
@@ -88,9 +81,9 @@ const RuleCreator = (props: iRuleCreator) => {
 
   const [ruleAmount, setRuleAmount] =
     useState<[number, number[]]>(initialRuleAmount)
-  const [editData, setEditData] = useState<{ rules: IRule[] } | undefined>(
-    props.editData,
-  )
+  const [editData, setEditData] = useState<
+    { rules: RuleDefinitionDto[] } | undefined
+  >(props.editData)
   const [ruleAmountArr, setRuleAmountArr] = useState<[number[], [number[]]]>(
     calculateRuleAmountArr(initialRuleAmount),
   )
@@ -98,7 +91,7 @@ const RuleCreator = (props: iRuleCreator) => {
   const deleted = useRef<number>(0)
   const added = useRef<number[]>(initialSections ? [] : [1])
 
-  const ruleCommited = (id: number, rule: IRule) => {
+  const ruleCommited = (id: number, rule: RuleDefinitionDto) => {
     if (rulesCreated) {
       const rules = rulesCreated.current.filter((el) => el.id !== id)
       const toCommit = [...rules, { id: id, rule: rule }].sort(

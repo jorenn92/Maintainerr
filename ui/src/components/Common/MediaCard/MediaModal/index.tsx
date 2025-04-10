@@ -1,6 +1,7 @@
-import React, { memo, useEffect, useState, useMemo } from 'react'
-import GetApiHandler from '../../../../utils/ApiHandler'
+import { PlexMetadata } from '@maintainerr/contracts'
 import Image from 'next/image'
+import React, { memo, useEffect, useMemo, useState } from 'react'
+import GetApiHandler from '../../../../utils/ApiHandler'
 
 interface ModalContentProps {
   onClose: () => void
@@ -24,14 +25,6 @@ interface ModalContentProps {
   isManual?: boolean
 }
 
-interface Metadata {
-  contentRating: string
-  audienceRating: string
-  Genre: { tag: string }[]
-  Rating: { image: string; value: number; type: string }[]
-  Guid: { id: string }[]
-}
-
 const iconMap: Record<string, Record<string, string>> = {
   imdb: {
     audience: '/icons_logos/imdb_icon.svg',
@@ -53,7 +46,7 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
     const [tautulliModalUrl, setTautulliModalUrl] = useState<string | null>(
       null,
     )
-    const [metadata, setMetadata] = useState<Metadata | null>(null)
+    const [metadata, setMetadata] = useState<PlexMetadata | null>(null)
 
     const mediaTypeOf = useMemo(
       () =>
@@ -68,7 +61,7 @@ const MediaModalContent: React.FC<ModalContentProps> = memo(
       GetApiHandler('/settings').then((resp) =>
         setTautulliModalUrl(resp?.tautulli_url || null),
       )
-      GetApiHandler<Metadata>(`/plex/meta/${id}`).then((data) => {
+      GetApiHandler<PlexMetadata>(`/plex/meta/${id}`).then((data) => {
         setMetadata(data)
         setLoading(false)
       })

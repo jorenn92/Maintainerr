@@ -1,28 +1,15 @@
-import EditButton from '../../Common/EditButton'
-import DeleteButton from '../../Common/DeleteButton'
-import { IRuleJson } from '../Rule'
-import { useContext, useState } from 'react'
-import { DeleteApiHandler } from '../../../utils/ApiHandler'
-import LibrariesContext from '../../../contexts/libraries-context'
 import { PencilIcon, TrashIcon } from '@heroicons/react/solid'
-
-export interface IRuleGroup {
-  id: number
-  name: string
-  description: string
-  libraryId: number
-  isActive: boolean
-  collectionId: number
-  rules: IRuleJson[]
-  useRules: boolean
-  type?: number
-  listExclusions?: boolean
-}
+import { RuleGroupDto } from '@maintainerr/contracts'
+import { useContext, useState } from 'react'
+import LibrariesContext from '../../../contexts/libraries-context'
+import { DeleteApiHandler } from '../../../utils/ApiHandler'
+import DeleteButton from '../../Common/DeleteButton'
+import EditButton from '../../Common/EditButton'
 
 const RuleGroup = (props: {
-  group: IRuleGroup
+  group: RuleGroupDto
   onDelete: () => void
-  onEdit: (group: IRuleGroup) => void
+  onEdit: (group: RuleGroupDto) => void
 }) => {
   const [showsureDelete, setShowSureDelete] = useState<boolean>(false)
   const LibrariesCtx = useContext(LibrariesContext)

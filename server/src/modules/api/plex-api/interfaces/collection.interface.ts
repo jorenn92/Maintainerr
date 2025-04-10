@@ -1,4 +1,4 @@
-import { EPlexDataType } from '../enums/plex-data-type-enum';
+import { EPlexDataType } from '@maintainerr/contracts';
 
 export class PlexCollection {
   ratingKey: string;

@@ -1,3 +1,4 @@
+import { EPlexDataType } from '@maintainerr/contracts';
 import {
   Body,
   Controller,
@@ -11,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { BasicResponseDto } from './dto/basic-response.dto';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
-import { EPlexDataType } from './enums/plex-data-type-enum';
 import {
   CreateUpdateCollection,
   PlexCollection,

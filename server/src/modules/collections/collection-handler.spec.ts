@@ -1,3 +1,4 @@
+import { ServarrAction } from '@maintainerr/contracts';
 import { Mocked, TestBed } from '@suites/unit';
 import {
   createCollection,
@@ -9,7 +10,6 @@ import { SonarrActionHandler } from '../actions/sonarr-action-handler';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionHandler } from './collection-handler';
 import { CollectionsService } from './collections.service';
-import { ServarrAction } from './interfaces/collection.interface';
 
 describe('CollectionHandler', () => {
   let collectionHandler: CollectionHandler;

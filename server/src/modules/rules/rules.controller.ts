@@ -1,3 +1,4 @@
+import { RuleDto, RuleGroupUpdateDto } from '@maintainerr/contracts';
 import {
   Body,
   Controller,
@@ -12,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { CommunityRule } from './dtos/communityRule.dto';
 import { ExclusionAction, ExclusionContextDto } from './dtos/exclusion.dto';
-import { RulesDto } from './dtos/rules.dto';
 import { ReturnStatus, RulesService } from './rules.service';
 import { RuleExecutorService } from './tasks/rule-executor.service';
 
@@ -58,7 +58,7 @@ export class RulesController {
   }
 
   @Get('/:id')
-  getRules(@Param('id') id: string) {
+  getRules(@Param('id') id: string): Promise<RuleDto[]> {
     return this.rulesService.getRules(id);
   }
 
@@ -98,7 +98,7 @@ export class RulesController {
     this.ruleExecutorService.execute().catch((e) => console.error(e));
   }
   @Post()
-  async setRules(@Body() body: RulesDto): Promise<ReturnStatus> {
+  async setRules(@Body() body: RuleGroupUpdateDto): Promise<ReturnStatus> {
     return await this.rulesService.setRules(body);
   }
   @Post('/exclusion')
@@ -120,7 +120,7 @@ export class RulesController {
     return await this.rulesService.removeAllExclusion(+plexId);
   }
   @Put()
-  async updateRule(@Body() body: RulesDto): Promise<ReturnStatus> {
+  async updateRule(@Body() body: RuleGroupUpdateDto): Promise<ReturnStatus> {
     return await this.rulesService.updateRules(body);
   }
   @Post()
@@ -165,7 +165,7 @@ export class RulesController {
    */
   @Post('/yaml/encode')
   async yamlEncode(
-    @Body() body: { rules: string; mediaType: number },
+    @Body() body: { rules: string; mediaType: number }, // TODO Create Zod schema to validate this
   ): Promise<ReturnStatus> {
     try {
       return this.rulesService.encodeToYaml(
