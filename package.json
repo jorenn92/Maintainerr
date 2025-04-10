@@ -2,7 +2,7 @@
   "name": "maintainerr",
   "version": "2.13.1",
   "private": true,
-  "packageManager": "yarn@4.9.0",
+  "packageManager": "yarn@4.5.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/jorenn92/Maintainerr.git"
