@@ -1,4 +1,4 @@
-import { TestBed } from '@automock/jest';
+import { TestBed } from '@suites/unit';
 import { RulePossibility } from '../constants/rules.constants';
 import { ValueGetterService } from '../getter/getter.service';
 import { RuleComparatorService } from '../helpers/rule.comparator.service';
@@ -7,10 +7,9 @@ describe('RuleComparatorService', () => {
   let ruleComparatorService: RuleComparatorService;
 
   beforeEach(async () => {
-    const { unit } = TestBed.create(RuleComparatorService)
-
+    const { unit } = await TestBed.solitary(RuleComparatorService)
       .mock(ValueGetterService)
-      .using({ get: jest.fn() })
+      .final({ get: jest.fn() })
       .compile();
 
     ruleComparatorService = unit;
@@ -262,5 +261,42 @@ describe('RuleComparatorService', () => {
       const result = ruleComparatorService['doRuleAction'](val1, val2, action);
       expect(result).toBe(false);
     });
+
+    const listCountData = [
+      // Equality
+      // Text lists
+      [true, ['a1', 'b2', 'c3'], 3, RulePossibility.COUNT_EQUALS],
+      [false, ['a1', 'b2', 'c3'], 4, RulePossibility.COUNT_EQUALS],
+      [false, ['a1', 'b2', 'c3'], 3, RulePossibility.COUNT_NOT_EQUALS],
+      [true, ['a1', 'b2', 'c3'], 4, RulePossibility.COUNT_NOT_EQUALS],
+
+      // > and <
+      // Text lists
+      [true, ['a1', 'b2', 'c3'], 2, RulePossibility.COUNT_BIGGER],
+      [false, ['a1', 'b2', 'c3'], 3, RulePossibility.COUNT_BIGGER],
+      [false, ['a1', 'b2', 'c3'], 4, RulePossibility.COUNT_BIGGER],
+      [true, ['a1', 'b2', 'c3'], 4, RulePossibility.COUNT_SMALLER],
+      [false, ['a1', 'b2', 'c3'], 3, RulePossibility.COUNT_SMALLER],
+      [false, ['a1', 'b2', 'c3'], 2, RulePossibility.COUNT_SMALLER],
+    ] as const;
+    const actionName = {
+      [RulePossibility.COUNT_EQUALS]: 'COUNT_EQUALS',
+      [RulePossibility.COUNT_NOT_EQUALS]: 'COUNT_NOT_EQUALS',
+      [RulePossibility.COUNT_BIGGER]: 'COUNT_BIGGER',
+      [RulePossibility.COUNT_SMALLER]: 'COUNT_SMALLER',
+    };
+    listCountData.forEach(([expected, val1, val2, action]) => {
+      it(`should return ${expected} when val1 is ${JSON.stringify(val1)} and val2 is ${val2} with action ${actionName[action]}`, () => {
+        expect(
+          ruleComparatorService['doRuleAction'](
+            val1 as Writeable<typeof val1>,
+            val2,
+            action,
+          ),
+        ).toBe(expected);
+      });
+    });
   });
 });
+
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };

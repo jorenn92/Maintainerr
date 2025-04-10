@@ -20,6 +20,7 @@ import {
   Property,
   RuleConstants,
   RulePossibility,
+  RuleType,
 } from './constants/rules.constants';
 import { CommunityRule } from './dtos/communityRule.dto';
 import { ExclusionContextDto } from './dtos/exclusion.dto';
@@ -725,7 +726,11 @@ export class RulesService {
         const val2: Property = this.ruleConstants.applications
           .find((el) => el.id === rule.lastVal[0])
           .props.find((el) => el.id === rule.lastVal[1]);
-        if (val1.type === val2.type) {
+        if (
+          val1.type === val2.type ||
+          ([RuleType.TEXT_LIST, RuleType.TEXT].includes(val1.type) &&
+            [RuleType.TEXT_LIST, RuleType.TEXT].includes(val2.type))
+        ) {
           if (val1.type.possibilities.includes(+rule.action)) {
             return this.createReturnStatus(true, 'Success');
           } else {
@@ -738,7 +743,11 @@ export class RulesService {
           return this.createReturnStatus(false, "Types don't match");
         }
       } else if (rule.customVal) {
-        if (val1.type.toString() === rule.customVal.ruleTypeId.toString()) {
+        if (
+          val1.type.toString() === rule.customVal.ruleTypeId.toString() ||
+          (val1.type == RuleType.TEXT_LIST &&
+            rule.customVal.ruleTypeId.toString() == RuleType.TEXT.toString())
+        ) {
           if (val1.type.possibilities.includes(+rule.action)) {
             return this.createReturnStatus(true, 'Success');
           } else {

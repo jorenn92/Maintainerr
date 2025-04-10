@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
-import { Application } from '../constants/rules.constants';
+import { Application, RuleValueType } from '../constants/rules.constants';
 import { OverseerrGetterService } from './overseerr-getter.service';
 import { PlexGetterService } from './plex-getter.service';
 import { RadarrGetterService } from './radarr-getter.service';
@@ -26,7 +26,7 @@ export class ValueGetterService {
     libItem: PlexLibraryItem,
     ruleGroup?: RulesDto,
     dataType?: EPlexDataType,
-  ) {
+  ): Promise<RuleValueType> {
     switch (val1) {
       case Application.PLEX: {
         return await this.plexGetter.get(val2, libItem, dataType, ruleGroup);

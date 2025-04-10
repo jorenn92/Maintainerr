@@ -15,6 +15,7 @@ import { TautulliApiModule } from '../modules/api/tautulli-api/tautulli-api.modu
 import { TautulliApiService } from '../modules/api/tautulli-api/tautulli-api.service';
 import { TmdbApiModule } from '../modules/api/tmdb-api/tmdb.module';
 import { CollectionsModule } from '../modules/collections/collections.module';
+import { EventsModule } from '../modules/events/events.module';
 import { LogsModule } from '../modules/logging/logs.module';
 import { RulesModule } from '../modules/rules/rules.module';
 import { SettingsModule } from '../modules/settings/settings.module';
@@ -28,7 +29,9 @@ import { NotificationService } from '../modules/notifications/notifications.serv
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
-    EventEmitterModule.forRoot(),
+    EventEmitterModule.forRoot({
+      wildcard: true,
+    }),
     LogsModule,
     SettingsModule,
     PlexApiModule,
@@ -41,6 +44,7 @@ import { NotificationService } from '../modules/notifications/notifications.serv
     RulesModule,
     CollectionsModule,
     NotificationsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+import { InjectRepository } from '@nestjs/typeorm';
 import { CronJob } from 'cron';
+import { Repository } from 'typeorm';
+import { TaskRunning } from '../tasks/entities/task_running.entities';
 import { Status } from './interfaces/status.interface';
 import { TaskScheduler } from './interfaces/task-scheduler.interface';
 import { StatusService } from './status.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { TaskRunning } from '../tasks/entities/task_running.entities';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class TasksService implements TaskScheduler {
@@ -136,6 +136,11 @@ export class TasksService implements TaskScheduler {
         },
       );
     }
+  }
+
+  public async getRunningSince(name: string) {
+    const resp = await this.taskRunningRepo.findOne({ where: { name } });
+    return resp.runningSince;
   }
 
   public async waitUntilTaskIsFinished(

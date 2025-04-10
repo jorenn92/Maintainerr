@@ -4,23 +4,6 @@ import { SettingsService } from '../../settings/settings.service';
 import { BasicResponseDto } from '../external-api/dto/basic-response.dto';
 import { JellyseerrApi } from './helpers/jellyseerr-api.helper';
 
-export interface JellyseerrMediaResponse {
-  id: number;
-  imdbid: string;
-  collection: JellyseerrCollection;
-  mediaInfo: JellyseerrMediaInfo;
-  releaseDate?: Date;
-  firstAirDate?: Date;
-}
-interface JellyseerrCollection {
-  id: number;
-  name: string;
-  posterPath: string;
-  backdropPath: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface JellyseerrMediaInfo {
   id: number;
   tmdbId: number;
@@ -30,14 +13,50 @@ interface JellyseerrMediaInfo {
   mediaAddedAt: string;
   externalServiceId: number;
   externalServiceId4k: number;
-  requests?: JellyseerrRequest[];
-  seasons?: JellyseerrSeason[];
 }
 
-export interface JellyseerrRequest {
+export interface JellyseerrMovieResponse {
+  id: number;
+  mediaInfo?: JellyseerrMovieInfo;
+  releaseDate?: Date;
+}
+
+interface JellyseerrMovieInfo extends JellyseerrMediaInfo {
+  mediaType: 'movie';
+  requests?: JellyseerrMovieRequest[];
+}
+
+export interface JellyseerrTVResponse {
+  id: number;
+  mediaInfo?: JellyseerrTVInfo;
+  firstAirDate?: Date;
+}
+
+interface JellyseerrTVInfo extends JellyseerrMediaInfo {
+  mediaType: 'tv';
+  requests?: JellyseerrTVRequest[];
+  seasons?: JellyseerrSeasonResponse[];
+}
+
+export interface JellyseerrSeasonResponse {
+  id: number;
+  name: string;
+  airDate?: string;
+  seasonNumber: number;
+  episodes: JellyseerrEpisode[];
+}
+
+interface JellyseerrEpisode {
+  id: number;
+  name: string;
+  airDate?: string;
+  seasonNumber: number;
+  episodeNumber: number;
+}
+
+export type JellyseerrBaseRequest = {
   id: number;
   status: number;
-  media: JellyseerrMedia;
   createdAt: string;
   updatedAt: string;
   requestedBy: JellyseerrUser;
@@ -46,8 +65,20 @@ export interface JellyseerrRequest {
   serverId: number;
   profileId: number;
   rootFolder: string;
-  seasons: JellyseerrSeason[];
-}
+};
+
+export type JellyseerrTVRequest = JellyseerrBaseRequest & {
+  type: 'tv';
+  media: JellyseerrTVInfo;
+  seasons: JellyseerrSeasonRequest[];
+};
+
+export type JellyseerrMovieRequest = JellyseerrBaseRequest & {
+  type: 'movie';
+  media: JellyseerrMovieInfo;
+};
+
+export type JellyseerrRequest = JellyseerrMovieRequest | JellyseerrTVRequest;
 
 interface JellyseerrUser {
   id: number;
@@ -56,6 +87,7 @@ interface JellyseerrUser {
   plexToken: string;
   plexId?: number;
   plexUsername: string;
+  jellyfinUsername?: string;
   userType: number;
   permissions: number;
   avatar: string;
@@ -64,12 +96,10 @@ interface JellyseerrUser {
   requestCount: number;
 }
 
-export interface JellyseerrSeason {
+export interface JellyseerrSeasonRequest {
   id: number;
   name: string;
   seasonNumber: number;
-  requestedBy: JellyseerrUser;
-  // episodes: JellyseerrEpisode[];
 }
 
 interface JellyseerrStatus {
@@ -90,33 +120,6 @@ export enum JellyseerrMediaStatus {
 export interface JellyseerrBasicApiResponse {
   code: string;
   description: string;
-}
-
-interface JellyseerrMedia {
-  downloadStatus: [];
-  downloadStatus4k: [];
-  id: number;
-  mediaType: 'movie' | 'tv';
-  tmdbId: number;
-  tvdbId: number;
-  imdbId: number;
-  status: number;
-  status4k: number;
-  createdAt: string;
-  updatedAt: string;
-  lastSeasonChange: string;
-  mediaAddedAt: string;
-  serviceId: number;
-  serviceId4k: number;
-  externalServiceId: number;
-  externalServiceId4k: number;
-  externalServiceSlug: string;
-  externalServiceSlug4k: number;
-  ratingKey: string;
-  ratingKey4k: number;
-  seasons: [];
-  plexUrl: string;
-  serviceUrl: string;
 }
 
 interface JellyseerrUserResponse {
@@ -161,9 +164,9 @@ export class JellyseerrApiService {
     });
   }
 
-  public async getMovie(id: string | number): Promise<JellyseerrMediaResponse> {
+  public async getMovie(id: string | number): Promise<JellyseerrMovieResponse> {
     try {
-      const response: JellyseerrMediaResponse = await this.api.get(
+      const response: JellyseerrMovieResponse = await this.api.get(
         `/movie/${id}`,
       );
       return response;
@@ -176,15 +179,33 @@ export class JellyseerrApiService {
     }
   }
 
-  public async getShow(
-    showId: string | number,
-    season?: string,
-  ): Promise<JellyseerrMediaResponse> {
+  public async getShow(showId: string | number): Promise<JellyseerrTVResponse> {
     try {
       if (showId) {
-        const response: JellyseerrMediaResponse = season
-          ? await this.api.get(`/tv/${showId}/season/${season}`)
-          : await this.api.get(`/tv/${showId}`);
+        const response: JellyseerrTVResponse = await this.api.get(
+          `/tv/${showId}`,
+        );
+        return response;
+      }
+      return undefined;
+    } catch (err) {
+      this.logger.warn(
+        'Jellyseerr communication failed. Is the application running?',
+      );
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
+  public async getSeason(
+    showId: string | number,
+    season: string,
+  ): Promise<JellyseerrSeasonResponse> {
+    try {
+      if (showId) {
+        const response: JellyseerrSeasonResponse = await this.api.get(
+          `/tv/${showId}/season/${season}`,
+        );
         return response;
       }
       return undefined;
@@ -303,27 +324,25 @@ export class JellyseerrApiService {
 
   public async removeMediaByTmdbId(id: string | number, type: 'movie' | 'tv') {
     try {
-      let media: JellyseerrMediaResponse;
+      let media: JellyseerrMovieResponse | JellyseerrTVResponse;
       if (type === 'movie') {
         media = await this.getMovie(id);
       } else {
         media = await this.getShow(id);
       }
-      if (media && media.mediaInfo) {
-        try {
-          if (media.mediaInfo.id) {
-            this.deleteMediaItem(media.mediaInfo.id.toString());
-          }
-        } catch (e) {
-          this.logger.log(
-            "Couldn't delete media. Does it exist in Jellyseerr?",
-            {
-              label: 'Jellyseerr API',
-              errorMessage: e.message,
-              id,
-            },
-          );
-        }
+
+      if (!media.mediaInfo?.id) {
+        return undefined;
+      }
+
+      try {
+        this.deleteMediaItem(media.mediaInfo.id.toString());
+      } catch (e) {
+        this.logger.log("Couldn't delete media. Does it exist in Jellyseerr?", {
+          label: 'Jellyseerr API',
+          errorMessage: e.message,
+          id,
+        });
       }
     } catch (err) {
       this.logger.warn(

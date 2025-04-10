@@ -4,23 +4,6 @@ import { SettingsService } from '../../../modules/settings/settings.service';
 import { BasicResponseDto } from '../external-api/dto/basic-response.dto';
 import { OverseerrApi } from './helpers/overseerr-api.helper';
 
-export interface OverSeerrMediaResponse {
-  id: number;
-  imdbid: string;
-  collection: OverseerCollection;
-  mediaInfo: OverseerrMediaInfo;
-  releaseDate?: Date;
-  firstAirDate?: Date;
-}
-interface OverseerCollection {
-  id: number;
-  name: string;
-  posterPath: string;
-  backdropPath: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface OverseerrMediaInfo {
   id: number;
   tmdbId: number;
@@ -30,14 +13,50 @@ interface OverseerrMediaInfo {
   mediaAddedAt: string;
   externalServiceId: number;
   externalServiceId4k: number;
-  requests?: OverseerrRequest[];
-  seasons?: OverseerrSeason[];
 }
 
-export interface OverseerrRequest {
+export interface OverSeerrMovieResponse {
+  id: number;
+  mediaInfo?: OverseerrMovieInfo;
+  releaseDate?: Date;
+}
+
+interface OverseerrMovieInfo extends OverseerrMediaInfo {
+  mediaType: 'movie';
+  requests?: OverseerrMovieRequest[];
+}
+
+export interface OverSeerrTVResponse {
+  id: number;
+  mediaInfo?: OverseerrTVInfo;
+  firstAirDate?: Date;
+}
+
+interface OverseerrTVInfo extends OverseerrMediaInfo {
+  mediaType: 'tv';
+  requests?: OverseerrTVRequest[];
+  seasons?: OverSeerrSeasonResponse[];
+}
+
+export interface OverSeerrSeasonResponse {
+  id: number;
+  name: string;
+  airDate?: string;
+  seasonNumber: number;
+  episodes: OverseerrEpisode[];
+}
+
+interface OverseerrEpisode {
+  id: number;
+  name: string;
+  airDate?: string;
+  seasonNumber: number;
+  episodeNumber: number;
+}
+
+export type OverseerrBaseRequest = {
   id: number;
   status: number;
-  media: OverseerMedia;
   createdAt: string;
   updatedAt: string;
   requestedBy: OverseerrUser;
@@ -46,8 +65,20 @@ export interface OverseerrRequest {
   serverId: number;
   profileId: number;
   rootFolder: string;
-  seasons: OverseerrSeason[];
-}
+};
+
+export type OverseerrTVRequest = OverseerrBaseRequest & {
+  type: 'tv';
+  media: OverseerrTVInfo;
+  seasons: OverseerrSeasonRequest[];
+};
+
+export type OverseerrMovieRequest = OverseerrBaseRequest & {
+  type: 'movie';
+  media: OverseerrMovieInfo;
+};
+
+export type OverseerrRequest = OverseerrMovieRequest | OverseerrTVRequest;
 
 interface OverseerrUser {
   id: number;
@@ -64,12 +95,10 @@ interface OverseerrUser {
   requestCount: number;
 }
 
-export interface OverseerrSeason {
+export interface OverseerrSeasonRequest {
   id: number;
   name: string;
   seasonNumber: number;
-  requestedBy: OverseerrUser;
-  // episodes: OverseerrEpisode[];
 }
 
 interface OverseerrStatus {
@@ -90,33 +119,6 @@ export enum OverseerrMediaStatus {
 export interface OverseerBasicApiResponse {
   code: string;
   description: string;
-}
-
-interface OverseerMedia {
-  downloadStatus: [];
-  downloadStatus4k: [];
-  id: number;
-  mediaType: 'movie' | 'tv';
-  tmdbId: number;
-  tvdbId: number;
-  imdbId: number;
-  status: number;
-  status4k: number;
-  createdAt: string;
-  updatedAt: string;
-  lastSeasonChange: string;
-  mediaAddedAt: string;
-  serviceId: number;
-  serviceId4k: number;
-  externalServiceId: number;
-  externalServiceId4k: number;
-  externalServiceSlug: string;
-  externalServiceSlug4k: number;
-  ratingKey: string;
-  ratingKey4k: number;
-  seasons: [];
-  plexUrl: string;
-  serviceUrl: string;
 }
 
 interface OverseerrUserResponse {
@@ -161,9 +163,9 @@ export class OverseerrApiService {
     });
   }
 
-  public async getMovie(id: string | number): Promise<OverSeerrMediaResponse> {
+  public async getMovie(id: string | number): Promise<OverSeerrMovieResponse> {
     try {
-      const response: OverSeerrMediaResponse = await this.api.get(
+      const response: OverSeerrMovieResponse = await this.api.get(
         `/movie/${id}`,
       );
       return response;
@@ -176,15 +178,33 @@ export class OverseerrApiService {
     }
   }
 
-  public async getShow(
-    showId: string | number,
-    season?: string,
-  ): Promise<OverSeerrMediaResponse> {
+  public async getShow(showId: string | number): Promise<OverSeerrTVResponse> {
     try {
       if (showId) {
-        const response: OverSeerrMediaResponse = season
-          ? await this.api.get(`/tv/${showId}/season/${season}`)
-          : await this.api.get(`/tv/${showId}`);
+        const response: OverSeerrTVResponse = await this.api.get(
+          `/tv/${showId}`,
+        );
+        return response;
+      }
+      return undefined;
+    } catch (err) {
+      this.logger.warn(
+        'Overseerr communication failed. Is the application running?',
+      );
+      this.logger.debug(err);
+      return undefined;
+    }
+  }
+
+  public async getSeason(
+    showId: string | number,
+    season: string,
+  ): Promise<OverSeerrSeasonResponse> {
+    try {
+      if (showId) {
+        const response: OverSeerrSeasonResponse = await this.api.get(
+          `/tv/${showId}/season/${season}`,
+        );
         return response;
       }
       return undefined;
@@ -303,27 +323,25 @@ export class OverseerrApiService {
 
   public async removeMediaByTmdbId(id: string | number, type: 'movie' | 'tv') {
     try {
-      let media: OverSeerrMediaResponse;
+      let media: OverSeerrMovieResponse | OverSeerrTVResponse;
       if (type === 'movie') {
         media = await this.getMovie(id);
       } else {
         media = await this.getShow(id);
       }
-      if (media && media.mediaInfo) {
-        try {
-          if (media.mediaInfo.id) {
-            this.deleteMediaItem(media.mediaInfo.id.toString());
-          }
-        } catch (e) {
-          this.logger.log(
-            "Couldn't delete media. Does it exist in Overseerr?",
-            {
-              label: 'Overseerr API',
-              errorMessage: e.message,
-              id,
-            },
-          );
-        }
+
+      if (!media.mediaInfo?.id) {
+        return undefined;
+      }
+
+      try {
+        this.deleteMediaItem(media.mediaInfo.id.toString());
+      } catch (e) {
+        this.logger.log("Couldn't delete media. Does it exist in Overseerr?", {
+          label: 'Overseerr API',
+          errorMessage: e.message,
+          id,
+        });
       }
     } catch (err) {
       this.logger.warn(

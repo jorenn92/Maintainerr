@@ -1,14 +1,14 @@
 import { PlayIcon } from '@heroicons/react/solid'
+import _ from 'lodash'
 import Router from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { ICollection, ICollectionMedia } from '..'
 import GetApiHandler from '../../../utils/ApiHandler'
-import OverviewContent, { IPlexMetadata } from '../../Overview/Content'
-import _ from 'lodash'
-import TestMediaItem from './TestMediaItem'
 import TabbedLinks, { TabbedRoute } from '../../Common/TabbedLinks'
-import CollectionExcludions from './Exclusions'
+import OverviewContent, { IPlexMetadata } from '../../Overview/Content'
 import CollectionInfo from './CollectionInfo'
+import CollectionExcludions from './Exclusions'
+import TestMediaItem from './TestMediaItem'
 
 interface ICollectionDetail {
   libraryId: number
@@ -219,6 +219,8 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
       {mediaTestModalOpen && props.collection?.id ? (
         <TestMediaItem
           collectionId={+props.collection.id}
+          libraryId={props.libraryId}
+          dataType={props.collection.type}
           onCancel={() => {
             setMediaTestModalOpen(false)
           }}

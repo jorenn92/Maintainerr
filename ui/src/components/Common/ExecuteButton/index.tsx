@@ -6,6 +6,7 @@ interface IExecuteButton {
   text: string
   onClick: () => void
   timeout?: number
+  executing?: boolean
 }
 
 const ExecuteButton = (props: IExecuteButton) => {
@@ -19,6 +20,7 @@ const ExecuteButton = (props: IExecuteButton) => {
       props.timeout ? props.timeout : 10000,
     )
   }, [clicked])
+  
   const onClick = () => {
     setClicked(true)
     props.onClick()
@@ -27,10 +29,10 @@ const ExecuteButton = (props: IExecuteButton) => {
   return (
     <button
       className="edit-button m-auto flex h-9 rounded text-zinc-200 shadow-md"
-      disabled={clicked}
-      onClick={onClick}
+      onClick={props.onClick}
+      disabled={props.executing}
     >
-      {clicked ? (
+      {props.executing ? (
         <SmallLoadingSpinner className="m-auto ml-2 h-5" />
       ) : (
         <PlayIcon className="m-auto ml-4 h-5" />

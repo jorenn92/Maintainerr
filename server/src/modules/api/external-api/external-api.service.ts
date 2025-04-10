@@ -39,7 +39,7 @@ export class ExternalApiService {
       retryDelay: axiosRetry.exponentialDelay,
       onRetry: (_, error, requestConfig) => {
         const url = this.axios.getUri(requestConfig);
-        this.logger.warn(
+        this.logger.debug(
           `Retrying ${requestConfig.method.toUpperCase()} ${url}: ${error}`,
         );
       },

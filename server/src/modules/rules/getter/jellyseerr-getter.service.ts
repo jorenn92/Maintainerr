@@ -3,9 +3,12 @@ import { warn } from 'console';
 import _ from 'lodash';
 import {
   JellyseerrApiService,
-  JellyseerrMediaResponse,
   JellyseerrMediaStatus,
-  JellyseerrRequest,
+  JellyseerrMovieResponse,
+  JellyseerrSeasonRequest,
+  JellyseerrSeasonResponse,
+  JellyseerrTVRequest,
+  JellyseerrTVResponse,
 } from '../../api/jellyseerr-api/jellyseerr-api.service';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
@@ -38,7 +41,9 @@ export class JellyseerrGetterService {
   async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
     try {
       let origLibItem = undefined;
-      let seasonMediaResponse = undefined;
+      let seasonMediaResponse: JellyseerrSeasonResponse = undefined;
+      let tvMediaResponse: JellyseerrTVResponse = undefined;
+      let movieMediaResponse: JellyseerrMovieResponse = undefined;
 
       // get original show in case of season / episode
       if (
@@ -57,17 +62,20 @@ export class JellyseerrGetterService {
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
       // const jellyseerrUsers = await this.jellyseerrApi.getUsers();
 
-      let mediaResponse: JellyseerrMediaResponse;
       if (tmdb && tmdb.id) {
         if (libItem.type === 'movie') {
-          mediaResponse = await this.jellyseerrApi.getMovie(tmdb.id.toString());
+          movieMediaResponse = await this.jellyseerrApi.getMovie(
+            tmdb.id.toString(),
+          );
         } else {
-          mediaResponse = await this.jellyseerrApi.getShow(tmdb.id.toString());
+          tvMediaResponse = await this.jellyseerrApi.getShow(
+            tmdb.id.toString(),
+          );
           if (
             dataType === EPlexDataType.SEASONS ||
             dataType === EPlexDataType.EPISODES
           ) {
-            seasonMediaResponse = await this.jellyseerrApi.getShow(
+            seasonMediaResponse = await this.jellyseerrApi.getSeason(
               tmdb.id.toString(),
               dataType === EPlexDataType.SEASONS
                 ? origLibItem.index
@@ -90,25 +98,25 @@ export class JellyseerrGetterService {
         );
       }
 
-      if (mediaResponse && mediaResponse.mediaInfo) {
+      const mediaResponse: JellyseerrTVResponse | JellyseerrMovieResponse =
+        tvMediaResponse ?? movieMediaResponse;
+
+      if (mediaResponse?.mediaInfo) {
         switch (prop.name) {
           case 'addUser': {
             try {
               const plexUsers = await this.plexApi.getCorrectedUsers();
               const userNames: string[] = [];
-              if (
-                mediaResponse &&
-                mediaResponse.mediaInfo &&
-                mediaResponse.mediaInfo.requests
-              ) {
+              if (mediaResponse.mediaInfo.requests) {
                 for (const request of mediaResponse.mediaInfo.requests) {
                   // for seasons, only add if user requested the correct season
                   if (
-                    dataType === EPlexDataType.SEASONS ||
-                    dataType === EPlexDataType.EPISODES
+                    (dataType === EPlexDataType.SEASONS ||
+                      dataType === EPlexDataType.EPISODES) &&
+                    request.type === 'tv'
                   ) {
                     const includesSeason = this.includesSeason(
-                      request,
+                      request.seasons,
                       dataType === EPlexDataType.SEASONS
                         ? origLibItem.index
                         : origLibItem.parentIndex,
@@ -116,6 +124,11 @@ export class JellyseerrGetterService {
                     if (includesSeason) {
                       if (request.requestedBy?.userType === 2) {
                         userNames.push(request.requestedBy?.username);
+                      } else if (
+                        request.requestedBy?.userType === 3 ||
+                        request.requestedBy?.userType === 4
+                      ) {
+                        userNames.push(request.requestedBy?.jellyfinUsername);
                       } else {
                         const user = plexUsers.find(
                           (u) => u.plexId === request.requestedBy?.plexId,
@@ -130,6 +143,11 @@ export class JellyseerrGetterService {
                     // for shows and movies, add every request user
                     if (request.requestedBy?.userType === 2) {
                       userNames.push(request.requestedBy?.username);
+                    } else if (
+                      request.requestedBy?.userType === 3 ||
+                      request.requestedBy?.userType === 4
+                    ) {
+                      userNames.push(request.requestedBy?.jellyfinUsername);
                     } else {
                       const user = plexUsers.find(
                         (u) => u.plexId === request.requestedBy?.plexId,
@@ -153,22 +171,19 @@ export class JellyseerrGetterService {
             return [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(
               dataType,
             )
-              ? this.getSeasonRequests(origLibItem, mediaResponse).length
+              ? this.getSeasonRequests(origLibItem, tvMediaResponse).length
               : mediaResponse?.mediaInfo.requests.length;
           }
           case 'requestDate': {
             if (
               [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)
             ) {
-              return this.getSeasonRequests(origLibItem, mediaResponse)[0]
-                ?.createdAt
-                ? new Date(
-                    this.getSeasonRequests(
-                      origLibItem,
-                      mediaResponse,
-                    )[0]?.createdAt,
-                  )
-                : null;
+              const createdAt = this.getSeasonRequests(
+                origLibItem,
+                tvMediaResponse,
+              )[0]?.createdAt;
+
+              return createdAt ? new Date(createdAt) : null;
             }
             return mediaResponse?.mediaInfo?.requests[0]?.createdAt
               ? new Date(mediaResponse?.mediaInfo?.requests[0]?.createdAt)
@@ -176,28 +191,22 @@ export class JellyseerrGetterService {
           }
           case 'releaseDate': {
             if (libItem.type === 'movie') {
-              return mediaResponse?.releaseDate
-                ? new Date(mediaResponse?.releaseDate)
+              return movieMediaResponse?.releaseDate
+                ? new Date(movieMediaResponse?.releaseDate)
                 : null;
             } else {
               if (EPlexDataType.EPISODES === dataType) {
                 const ep = seasonMediaResponse.episodes?.find(
                   (el) => el.episodeNumber === origLibItem.index,
                 );
-                return ep?.airDate
-                  ? new Date(ep.airDate)
-                  : ep?.firstAirDate
-                    ? new Date(ep.firstAirDate)
-                    : null;
+                return ep?.airDate ? new Date(ep.airDate) : null;
               } else if (EPlexDataType.SEASONS === dataType) {
                 return seasonMediaResponse?.airDate
                   ? new Date(seasonMediaResponse.airDate)
-                  : seasonMediaResponse?.firstAirDate
-                    ? new Date(seasonMediaResponse.firstAirDate)
-                    : null;
+                  : null;
               } else {
-                return mediaResponse?.firstAirDate
-                  ? new Date(mediaResponse.firstAirDate)
+                return tvMediaResponse?.firstAirDate
+                  ? new Date(tvMediaResponse.firstAirDate)
                   : null;
               }
             }
@@ -208,7 +217,7 @@ export class JellyseerrGetterService {
             ) {
               const season = this.getSeasonRequests(
                 origLibItem,
-                mediaResponse,
+                tvMediaResponse,
               )[0];
               if (season && season.media) {
                 if (
@@ -232,7 +241,7 @@ export class JellyseerrGetterService {
             ) {
               const season = this.getSeasonRequests(
                 origLibItem,
-                mediaResponse,
+                tvMediaResponse,
               )[0];
               if (season && season.media) {
                 if (
@@ -257,7 +266,7 @@ export class JellyseerrGetterService {
                   dataType,
                 )
               ) {
-                return this.getSeasonRequests(origLibItem, mediaResponse)
+                return this.getSeasonRequests(origLibItem, tvMediaResponse)
                   .length > 0
                   ? 1
                   : 0;
@@ -289,9 +298,9 @@ export class JellyseerrGetterService {
 
   private getSeasonRequests(
     libItem: PlexLibraryItem,
-    mediaResponse: JellyseerrMediaResponse,
+    mediaResponse: JellyseerrTVResponse,
   ) {
-    const seasonRequests: JellyseerrRequest[] = [];
+    const seasonRequests: JellyseerrTVRequest[] = [];
     mediaResponse.mediaInfo?.requests.forEach((el) => {
       const season = el.seasons.find(
         (season) =>
@@ -305,8 +314,11 @@ export class JellyseerrGetterService {
     return seasonRequests;
   }
 
-  private includesSeason(request: JellyseerrRequest, seasonNumber: number) {
-    const season = request.seasons.find(
+  private includesSeason(
+    seasons: JellyseerrSeasonRequest[],
+    seasonNumber: number,
+  ) {
+    const season = seasons.find(
       (season) => season.seasonNumber === seasonNumber,
     );
     return season !== undefined;

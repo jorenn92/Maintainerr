@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -11,8 +13,8 @@ import {
 import { CommunityRule } from './dtos/communityRule.dto';
 import { ExclusionAction, ExclusionContextDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
-import { RuleExecutorService } from './tasks/rule-executor.service';
 import { ReturnStatus, RulesService } from './rules.service';
+import { RuleExecutorService } from './tasks/rule-executor.service';
 
 @Controller('api/rules')
 export class RulesController {
@@ -85,7 +87,14 @@ export class RulesController {
     return this.rulesService.deleteRuleGroup(+id);
   }
   @Post('/execute')
-  executeRules() {
+  async executeRules() {
+    if (await this.ruleExecutorService.isRunning()) {
+      throw new HttpException(
+        'The rule executor is already running',
+        HttpStatus.CONFLICT,
+      );
+    }
+
     this.ruleExecutorService.execute().catch((e) => console.error(e));
   }
   @Post()
