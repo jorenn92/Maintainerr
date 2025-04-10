@@ -9,6 +9,10 @@ updates:
       nestjs:
         patterns:
           - "@nestjs/*"
+      eslint:
+        patterns:
+          - "@eslint/js"
+          - "eslint"
     ignore:
       - dependency-name: "@heroicons/react"
       - dependency-name: "chalk"

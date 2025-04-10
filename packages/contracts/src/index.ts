@@ -1,4 +1,5 @@
 export * from './app'
 export * from './events'
 export * from './settings/logs'
+export * from './settings/tautulli'
 export * from './tasks'
