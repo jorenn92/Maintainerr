@@ -8,8 +8,8 @@ export class Settings implements SettingDto {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true, default: randomUUID() })
-  clientId: string;
+  @Column({ type: String, nullable: true, default: randomUUID() })
+  clientId: string | null;
 
   @Column({ nullable: false, default: 'Maintainerr' })
   applicationTitle: string;
@@ -17,11 +17,11 @@ export class Settings implements SettingDto {
   @Column({ nullable: false, default: 'localhost' })
   applicationUrl: string;
 
-  @Column({ nullable: true })
-  apikey: string;
+  @Column({ type: String, nullable: true })
+  apikey: string | null;
 
-  @Column({ nullable: true })
-  overseerr_url: string;
+  @Column({ type: String, nullable: true })
+  overseerr_url: string | null;
 
   @Column({ nullable: false, default: 'en' })
   locale: string;
@@ -29,35 +29,35 @@ export class Settings implements SettingDto {
   @Column({ nullable: false, default: true })
   cacheImages: number;
 
-  @Column({ nullable: true })
-  plex_name: string;
+  @Column({ type: String, nullable: true })
+  plex_name: string | null;
 
-  @Column({ nullable: true })
-  plex_hostname: string;
+  @Column({ type: String, nullable: true })
+  plex_hostname: string | null;
 
-  @Column({ nullable: true, default: 32400 })
-  plex_port: number;
+  @Column({ type: Number, nullable: true, default: 32400 })
+  plex_port: number | null;
 
-  @Column({ nullable: true })
-  plex_ssl: number;
+  @Column({ type: Number, nullable: true })
+  plex_ssl: number | null;
 
-  @Column({ nullable: true })
-  plex_auth_token: string;
+  @Column({ type: String, nullable: true })
+  plex_auth_token: string | null;
 
-  @Column({ nullable: true })
-  overseerr_api_key: string;
+  @Column({ type: String, nullable: true })
+  overseerr_api_key: string | null;
 
-  @Column({ nullable: true })
-  tautulli_url: string;
+  @Column({ type: String, nullable: true })
+  tautulli_url: string | null;
 
-  @Column({ nullable: true })
-  tautulli_api_key: string;
+  @Column({ type: String, nullable: true })
+  tautulli_api_key: string | null;
 
-  @Column({ nullable: true })
-  jellyseerr_url: string;
+  @Column({ type: String, nullable: true })
+  jellyseerr_url: string | null;
 
-  @Column({ nullable: true })
-  jellyseerr_api_key: string;
+  @Column({ type: String, nullable: true })
+  jellyseerr_api_key: string | null;
 
   @Column({ nullable: false, default: CronExpression.EVERY_12_HOURS })
   collection_handler_job_cron: string;

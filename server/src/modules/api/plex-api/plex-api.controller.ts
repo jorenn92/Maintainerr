@@ -13,8 +13,9 @@ import { BasicResponseDto } from './dto/basic-response.dto';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
 import { EPlexDataType } from './enums/plex-data-type-enum';
 import {
-  CreateUpdateCollection,
+  CreateCollection,
   PlexCollection,
+  UpdateCollection,
 } from './interfaces/collection.interface';
 import { PlexHub, PlexLibraryItem } from './interfaces/library.interfaces';
 import { PlexApiService } from './plex-api.service';
@@ -123,14 +124,14 @@ export class PlexApiController {
     return collection;
   }
   @Put('library/collection/update')
-  async updateCollection(@Body() body: CreateUpdateCollection) {
+  async updateCollection(@Body() body: UpdateCollection) {
     const collection: PlexCollection =
       await this.plexApiService.updateCollection(body);
     return collection;
   }
 
   @Post('library/collection/create')
-  async createCollection(@Body() body: CreateUpdateCollection) {
+  async createCollection(@Body() body: CreateCollection) {
     const collection: PlexCollection =
       await this.plexApiService.createCollection(body);
     return collection;

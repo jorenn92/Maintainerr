@@ -1,9 +1,8 @@
 import { Logger } from '@nestjs/common';
+import xml2js, { parseStringPromise } from 'xml2js';
+import { PlexDevice } from '../../api/plex-api/interfaces/server.interface';
 import { ExternalApiService } from '../external-api/external-api.service';
 import cacheManager from './cache';
-import { parseStringPromise } from 'xml2js';
-import { PlexDevice } from '../../api/plex-api/interfaces/server.interface';
-import xml2js from 'xml2js';
 
 interface PlexAccountResponse {
   user: PlexUser;
@@ -82,7 +81,7 @@ interface ServerResponse {
   };
 }
 
-interface UsersResponse {
+export interface UsersResponse {
   MediaContainer: {
     User: {
       $: {
@@ -97,39 +96,7 @@ interface UsersResponse {
   };
 }
 
-interface WatchlistResponse {
-  MediaContainer: {
-    totalSize: number;
-    Metadata?: {
-      ratingKey: string;
-    }[];
-  };
-}
-
-interface MetadataResponse {
-  MediaContainer: {
-    Metadata: {
-      ratingKey: string;
-      type: 'movie' | 'show';
-      title: string;
-      Guid: {
-        id: `imdb://tt${number}` | `tmdb://${number}` | `tvdb://${number}`;
-      }[];
-    }[];
-  };
-}
-
-export interface PlexWatchlistItem {
-  ratingKey: string;
-  tmdbId: number;
-  tvdbId?: number;
-  type: 'movie' | 'show';
-  title: string;
-}
-
 export class PlexTvApi extends ExternalApiService {
-  private authToken: string;
-
   constructor(authToken: string) {
     super(
       'https://plex.tv',
@@ -143,17 +110,16 @@ export class PlexTvApi extends ExternalApiService {
         nodeCache: cacheManager.getCache('plextv').data,
       },
     );
-    this.authToken = authToken;
     this.logger = new Logger(PlexTvApi.name);
   }
 
-  public async getUser(): Promise<PlexUser> {
+  public async getUser(): Promise<PlexUser | undefined> {
     try {
       const account = await this.get<PlexAccountResponse>(
         '/users/account.json',
       );
 
-      return account.user;
+      return account?.user;
     } catch (e) {
       this.logger.error(
         `Something went wrong while getting the account from plex.tv: ${e.message}`,
@@ -164,88 +130,17 @@ export class PlexTvApi extends ExternalApiService {
   }
 
   public async getUsers(): Promise<UsersResponse> {
-    const response = await this.get('/api/users', {
+    const response = await this.get<UsersResponse>('/api/users', {
       transformResponse: [],
       responseType: 'text',
     });
 
+    if (!response) {
+      throw new Error('Failed to retrieve users from plex.tv');
+    }
+
     const parsedXml = (await parseStringPromise(response)) as UsersResponse;
     return parsedXml;
-  }
-
-  public async getWatchlist({
-    offset = 0,
-    size = 20,
-  }: { offset?: number; size?: number } = {}): Promise<{
-    offset: number;
-    size: number;
-    totalSize: number;
-    items: PlexWatchlistItem[];
-  }> {
-    try {
-      const response = await this.get<WatchlistResponse>(
-        '/library/sections/watchlist/all',
-        {
-          params: {
-            'X-Plex-Container-Start': offset,
-            'X-Plex-Container-Size': size,
-          },
-          baseURL: 'https://metadata.provider.plex.tv',
-        },
-      );
-
-      const watchlistDetails = await Promise.all(
-        (response.MediaContainer.Metadata ?? []).map(async (watchlistItem) => {
-          const detailedResponse = await this.getRolling<MetadataResponse>(
-            `/library/metadata/${watchlistItem.ratingKey}`,
-            {
-              baseURL: 'https://metadata.provider.plex.tv',
-            },
-          );
-
-          const metadata = detailedResponse.MediaContainer.Metadata[0];
-
-          const tmdbString = metadata.Guid.find((guid) =>
-            guid.id.startsWith('tmdb'),
-          );
-          const tvdbString = metadata.Guid.find((guid) =>
-            guid.id.startsWith('tvdb'),
-          );
-
-          return {
-            ratingKey: metadata.ratingKey,
-            // This should always be set? But I guess it also cannot be?
-            // We will filter out the 0's afterwards
-            tmdbId: tmdbString ? Number(tmdbString.id.split('//')[1]) : 0,
-            tvdbId: tvdbString
-              ? Number(tvdbString.id.split('//')[1])
-              : undefined,
-            title: metadata.title,
-            type: metadata.type,
-          };
-        }),
-      );
-
-      const filteredList = watchlistDetails.filter((detail) => detail.tmdbId);
-
-      return {
-        offset,
-        size,
-        totalSize: response.MediaContainer.totalSize,
-        items: filteredList,
-      };
-    } catch (e) {
-      this.logger.error('Failed to retrieve watchlist items', {
-        label: 'Plex.TV Metadata API',
-        errorMessage: e.message,
-      });
-      return {
-        offset,
-        size,
-        totalSize: 0,
-        items: [],
-      };
-    }
   }
 
   public async getDevices(): Promise<PlexDevice[]> {

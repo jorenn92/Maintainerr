@@ -43,7 +43,7 @@ export interface PlexLibraryItem {
 export interface PlexLibraryResponse {
   MediaContainer: {
     size: number;
-    totalSize?: number;
+    totalSize?: number; // Present when paging
     Metadata?:
       | PlexLibraryItem[]
       | PlexCollection[]
@@ -51,6 +51,7 @@ export interface PlexLibraryResponse {
       | PlexPlaylist[];
   };
 }
+
 export interface PlexGenre {
   id: number;
   filter: string;

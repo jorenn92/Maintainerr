@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import _ from 'lodash';
 import { SettingsService } from '../../..//modules/settings/settings.service';
 import { TautulliApi } from './helpers/tautulli-api.helper';
-import _ from 'lodash';
 
 interface TautulliInfo {
   tautulli_version: string;
@@ -107,9 +107,9 @@ export class TautulliApiService {
     });
   }
 
-  public async info(): Promise<Response<TautulliInfo> | null> {
+  public async info(): Promise<Response<TautulliInfo> | undefined> {
     try {
-      const response: Response<TautulliInfo> = await this.api.getWithoutCache(
+      const response = await this.api.getWithoutCache<Response<TautulliInfo>>(
         '',
         {
           signal: AbortSignal.timeout(10000),
@@ -125,25 +125,24 @@ export class TautulliApiService {
         errorMessage: e.message,
       });
       this.logger.debug(e);
-      return null;
     }
   }
 
   public async getPaginatedHistory(
-    options?: TautulliHistoryRequestOptions,
-  ): Promise<TautulliHistory | null> {
+    options: TautulliHistoryRequestOptions,
+  ): Promise<TautulliHistory | undefined> {
     try {
       options.length = options.length ? options.length : MAX_PAGE_SIZE;
       options.start = options.start || options.start === 0 ? options.start : 0;
 
-      const response: Response<TautulliHistory> = await this.api.get('', {
+      const response = await this.api.get<Response<TautulliHistory>>('', {
         params: {
           cmd: 'get_history',
           ...options,
         },
       });
 
-      if (response.response.result !== 'success') {
+      if (response?.response?.result !== 'success') {
         throw new Error(
           'Non-success response when fetching Tautulli paginated history',
         );
@@ -156,13 +155,12 @@ export class TautulliApiService {
         errorMessage: e.message,
       });
       this.logger.debug(e);
-      return null;
     }
   }
 
   public async getHistory(
     options?: Omit<TautulliHistoryRequestOptions, 'length' | 'start'>,
-  ): Promise<TautulliHistoryItem[] | null> {
+  ): Promise<TautulliHistoryItem[] | undefined> {
     try {
       const newOptions: TautulliHistoryRequestOptions = {
         ...options,
@@ -171,30 +169,34 @@ export class TautulliApiService {
       };
 
       let data = await this.getPaginatedHistory(newOptions);
-      const pageSize: number = MAX_PAGE_SIZE;
 
-      const totalCount: number =
-        data && data && data.recordsFiltered ? data.recordsFiltered : 0;
-      const pageCount: number = Math.ceil(totalCount / pageSize);
+      if (!data) {
+        return;
+      }
+
+      const pageSize = MAX_PAGE_SIZE;
+      const totalCount = data.recordsFiltered;
+      const pageCount = Math.ceil(totalCount / pageSize);
       let currentPage = 1;
 
       let results: TautulliHistoryItem[] = [];
-      results = _.unionBy(
-        results,
-        data && data.data && data.data && data.data.length ? data.data : [],
-        'id',
-      );
+      results = _.unionBy(results, data.data?.length ? data.data : [], 'id');
 
       if (results.length < totalCount) {
         while (currentPage < pageCount) {
           newOptions.start = currentPage * pageSize;
+
           data = await this.getPaginatedHistory(newOptions);
+
+          if (!data) {
+            return;
+          }
 
           currentPage++;
 
           results = _.unionBy(
             results,
-            data && data.data && data.data && data.data.length ? data.data : [],
+            data.data?.length ? data.data : [],
             'id',
           );
 
@@ -211,22 +213,21 @@ export class TautulliApiService {
         errorMessage: e.message,
       });
       this.logger.debug(e);
-      return null;
     }
   }
 
   public async getMetadata(
     ratingKey: number | string,
-  ): Promise<TautulliMetadata | null> {
+  ): Promise<TautulliMetadata | undefined> {
     try {
-      const response: Response<TautulliMetadata> = await this.api.get('', {
+      const response = await this.api.get<Response<TautulliMetadata>>('', {
         params: {
           cmd: 'get_metadata',
           rating_key: ratingKey,
         },
       });
 
-      if (response.response.result !== 'success') {
+      if (response?.response?.result !== 'success') {
         throw new Error('Non-success response when fetching Tautulli metadata');
       }
 
@@ -237,15 +238,14 @@ export class TautulliApiService {
         errorMessage: e.message,
       });
       this.logger.debug(e);
-      return null;
     }
   }
 
   public async getChildrenMetadata(
     ratingKey: number | string,
-  ): Promise<TautulliMetadata[] | null> {
+  ): Promise<TautulliMetadata[] | undefined> {
     try {
-      const response: Response<TautulliChildrenMetadata> = await this.api.get(
+      const response = await this.api.get<Response<TautulliChildrenMetadata>>(
         '',
         {
           params: {
@@ -255,7 +255,7 @@ export class TautulliApiService {
         },
       );
 
-      if (response.response.result !== 'success') {
+      if (response?.response?.result !== 'success') {
         throw new Error(
           'Non-success response when fetching Tautulli children metadata',
         );
@@ -268,19 +268,18 @@ export class TautulliApiService {
         errorMessage: e.message,
       });
       this.logger.debug(e);
-      return null;
     }
   }
 
-  public async getUsers(): Promise<TautulliUser[] | null> {
+  public async getUsers(): Promise<TautulliUser[] | undefined> {
     try {
-      const response: Response<TautulliUser[]> = await this.api.get('', {
+      const response = await this.api.get<Response<TautulliUser[]>>('', {
         params: {
           cmd: 'get_users',
         },
       });
 
-      if (response.response.result !== 'success') {
+      if (response?.response?.result !== 'success') {
         throw new Error('Non-success response when fetching Tautulli users');
       }
 
@@ -291,7 +290,6 @@ export class TautulliApiService {
         errorMessage: e.message,
       });
       this.logger.debug(e);
-      return null;
     }
   }
 }
