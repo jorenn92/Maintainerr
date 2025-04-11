@@ -21,6 +21,11 @@ import { RulesDto } from '../dtos/rules.dto';
 import { RuleGroup } from '../entities/rule-group.entities';
 import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
 import { RulesService } from '../rules.service';
+import {
+  CollectionMediaAddedDto,
+  CollectionMediaRemovedDto,
+  RuleHandlerFailedDto,
+} from '../../events/events.dto';
 
 interface PlexData {
   page: number;
@@ -178,10 +183,14 @@ export class RuleExecutorService extends TaskBase {
         this.logger.log(
           'Not all applications are reachable.. Skipped rule execution.',
         );
+
+        this.eventEmitter.emit(MaintainerrEvent.RuleHandler_Failed);
       }
     } catch (err) {
       this.logger.log('Error running rules executor.');
       this.logger.debug(err);
+
+      this.eventEmitter.emit(MaintainerrEvent.RuleHandler_Failed);
     }
 
     // clean up
@@ -334,6 +343,14 @@ export class RuleExecutorService extends TaskBase {
                 : collection.title
             }'.`,
           );
+
+          this.eventEmitter.emit(
+            MaintainerrEvent.CollectionMedia_Removed,
+            new CollectionMediaRemovedDto(dataToRemove, collection.title, {
+              type: 'rulegroup',
+              value: rulegroup.id,
+            }),
+          );
         }
 
         if (dataToAdd.length > 0) {
@@ -343,6 +360,16 @@ export class RuleExecutorService extends TaskBase {
                 ? collection.manualCollectionName
                 : collection.title
             }'.`,
+          );
+
+          this.eventEmitter.emit(
+            MaintainerrEvent.CollectionMedia_Added,
+            new CollectionMediaAddedDto(
+              dataToAdd,
+              collection.title,
+              { type: 'rulegroup', value: rulegroup.id },
+              collection.deleteAfterDays,
+            ),
           );
         }
 
@@ -365,9 +392,25 @@ export class RuleExecutorService extends TaskBase {
         return collection;
       } else {
         this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
+
+        this.eventEmitter.emit(
+          MaintainerrEvent.RuleHandler_Failed,
+          new RuleHandlerFailedDto(collection.title, {
+            type: 'rulegroup',
+            value: rulegroup.id,
+          }),
+        );
       }
     } catch (err) {
       this.logger.warn(`Execption occurred whild handling rule: `, err);
+
+      this.eventEmitter.emit(
+        MaintainerrEvent.RuleHandler_Failed,
+        new RuleHandlerFailedDto(rulegroup.collection?.title, {
+          type: 'rulegroup',
+          value: rulegroup.id,
+        }),
+      );
     }
   }
 
