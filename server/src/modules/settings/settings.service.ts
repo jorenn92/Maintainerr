@@ -30,39 +30,39 @@ export class SettingsService implements SettingDto {
   private readonly logger = new Logger(SettingsService.name);
   id: number;
 
-  clientId: string;
+  clientId: string | null;
 
   applicationTitle: string;
 
   applicationUrl: string;
 
-  apikey: string;
+  apikey: string | null;
 
   locale: string;
 
   cacheImages: number;
 
-  plex_name: string;
+  plex_name: string | null;
 
-  plex_hostname: string;
+  plex_hostname: string | null;
 
-  plex_port: number;
+  plex_port: number | null;
 
-  plex_ssl: number;
+  plex_ssl: number | null;
 
-  plex_auth_token: string;
+  plex_auth_token: string | null;
 
-  overseerr_url: string;
+  overseerr_url: string | null;
 
-  overseerr_api_key: string;
+  overseerr_api_key: string | null;
 
-  tautulli_url: string;
+  tautulli_url: string | null;
 
-  tautulli_api_key: string;
+  tautulli_api_key: string | null;
 
-  jellyseerr_url: string;
+  jellyseerr_url: string | null;
 
-  jellyseerr_api_key: string;
+  jellyseerr_api_key: string | null;
 
   collection_handler_job_cron: string;
 
@@ -93,28 +93,28 @@ export class SettingsService implements SettingDto {
     const settingsDb = await this.settingsRepo.findOne({
       where: {},
     });
+
     if (settingsDb) {
-      this.id = settingsDb?.id;
-      this.clientId = settingsDb?.clientId;
-      this.applicationTitle = settingsDb?.applicationTitle;
-      this.applicationUrl = settingsDb?.applicationUrl;
-      this.apikey = settingsDb?.apikey;
-      this.locale = settingsDb?.locale;
-      this.cacheImages = settingsDb?.cacheImages;
-      this.plex_name = settingsDb?.plex_name;
-      this.plex_hostname = settingsDb?.plex_hostname;
-      this.plex_port = settingsDb?.plex_port;
-      this.plex_ssl = settingsDb?.plex_ssl;
-      this.plex_auth_token = settingsDb?.plex_auth_token;
-      this.overseerr_url = settingsDb?.overseerr_url;
-      this.overseerr_api_key = settingsDb?.overseerr_api_key;
-      this.tautulli_url = settingsDb?.tautulli_url;
-      this.tautulli_api_key = settingsDb?.tautulli_api_key;
-      this.jellyseerr_url = settingsDb?.jellyseerr_url;
-      this.jellyseerr_api_key = settingsDb?.jellyseerr_api_key;
-      this.collection_handler_job_cron =
-        settingsDb?.collection_handler_job_cron;
-      this.rules_handler_job_cron = settingsDb?.rules_handler_job_cron;
+      this.id = settingsDb.id ?? null;
+      this.clientId = settingsDb.clientId ?? null;
+      this.applicationTitle = settingsDb.applicationTitle;
+      this.applicationUrl = settingsDb.applicationUrl;
+      this.apikey = settingsDb.apikey ?? null;
+      this.locale = settingsDb.locale;
+      this.cacheImages = settingsDb.cacheImages;
+      this.plex_name = settingsDb.plex_name ?? null;
+      this.plex_hostname = settingsDb.plex_hostname ?? null;
+      this.plex_port = settingsDb.plex_port ?? null;
+      this.plex_ssl = settingsDb.plex_ssl ?? null;
+      this.plex_auth_token = settingsDb.plex_auth_token ?? null;
+      this.overseerr_url = settingsDb.overseerr_url ?? null;
+      this.overseerr_api_key = settingsDb.overseerr_api_key ?? null;
+      this.tautulli_url = settingsDb.tautulli_url ?? null;
+      this.tautulli_api_key = settingsDb.tautulli_api_key ?? null;
+      this.jellyseerr_url = settingsDb.jellyseerr_url ?? null;
+      this.jellyseerr_api_key = settingsDb.jellyseerr_api_key ?? null;
+      this.collection_handler_job_cron = settingsDb.collection_handler_job_cron;
+      this.rules_handler_job_cron = settingsDb.rules_handler_job_cron;
     } else {
       this.logger.log('Settings not found.. Creating initial settings');
       await this.settingsRepo.insert({
@@ -208,7 +208,7 @@ export class SettingsService implements SettingDto {
     id: number,
   ): Promise<DeleteRadarrSettingResponseDto> {
     try {
-      const settingsDb = await this.radarrSettingsRepo.findOne({
+      const settingsDb = await this.radarrSettingsRepo.findOneOrFail({
         where: { id: id },
         relations: ['collections'],
       });
@@ -312,7 +312,7 @@ export class SettingsService implements SettingDto {
     id: number,
   ): Promise<DeleteSonarrSettingResponseDto> {
     try {
-      const settingsDb = await this.sonarrSettingsRepo.findOne({
+      const settingsDb = await this.sonarrSettingsRepo.findOneOrFail({
         where: { id: id },
         relations: ['collections'],
       });
@@ -371,11 +371,11 @@ export class SettingsService implements SettingDto {
 
   public async updateSettings(settings: Settings): Promise<BasicResponseDto> {
     try {
-      settings.plex_hostname = settings.plex_hostname?.toLowerCase();
-      settings.overseerr_url = settings.overseerr_url?.toLowerCase();
-      settings.tautulli_url = settings.tautulli_url?.toLowerCase();
+      settings.plex_hostname = settings.plex_hostname?.toLowerCase() ?? null;
+      settings.overseerr_url = settings.overseerr_url?.toLowerCase() ?? null;
+      settings.tautulli_url = settings.tautulli_url?.toLowerCase() ?? null;
 
-      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+      const settingsDb = await this.settingsRepo.findOneOrFail({ where: {} });
       // Plex SSL specifics
 
       settings.plex_ssl =
@@ -384,8 +384,8 @@ export class SettingsService implements SettingDto {
           ? 1
           : 0;
       settings.plex_hostname = settings.plex_hostname
-        ?.replace('https://', '')
-        ?.replace('http://', '');
+        ? settings.plex_hostname.replace('https://', '').replace('http://', '')
+        : null;
 
       if (
         this.cronIsValid(settings.collection_handler_job_cron) &&

@@ -4,11 +4,11 @@ import _ from 'lodash';
 import {
   OverseerrApiService,
   OverseerrMediaStatus,
-  OverSeerrMovieResponse,
+  OverseerrMovieResponse,
   OverseerrSeasonRequest,
-  OverSeerrSeasonResponse,
+  OverseerrSeasonResponse,
   OverseerrTVRequest,
-  OverSeerrTVResponse,
+  OverseerrTVResponse,
 } from '../../api/overseerr-api/overseerr-api.service';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
@@ -41,9 +41,9 @@ export class OverseerrGetterService {
   async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
     try {
       let origLibItem = undefined;
-      let seasonMediaResponse: OverSeerrSeasonResponse = undefined;
-      let tvMediaResponse: OverSeerrTVResponse = undefined;
-      let movieMediaResponse: OverSeerrMovieResponse = undefined;
+      let seasonMediaResponse: OverseerrSeasonResponse = undefined;
+      let tvMediaResponse: OverseerrTVResponse = undefined;
+      let movieMediaResponse: OverseerrMovieResponse = undefined;
 
       // get original show in case of season / episode
       if (
@@ -96,7 +96,7 @@ export class OverseerrGetterService {
         );
       }
 
-      const mediaResponse: OverSeerrTVResponse | OverSeerrMovieResponse =
+      const mediaResponse: OverseerrTVResponse | OverseerrMovieResponse =
         tvMediaResponse ?? movieMediaResponse;
 
       if (mediaResponse?.mediaInfo) {
@@ -286,7 +286,7 @@ export class OverseerrGetterService {
 
   private getSeasonRequests(
     libItem: PlexLibraryItem,
-    mediaResponse: OverSeerrTVResponse,
+    mediaResponse: OverseerrTVResponse,
   ) {
     const seasonRequests: OverseerrTVRequest[] = [];
     mediaResponse.mediaInfo?.requests.forEach((el) => {

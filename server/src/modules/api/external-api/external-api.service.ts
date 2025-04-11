@@ -1,5 +1,10 @@
 import { Logger } from '@nestjs/common';
-import axios, { AxiosError, AxiosInstance, RawAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosResponse,
+  RawAxiosRequestConfig,
+} from 'axios';
 import axiosRetry from 'axios-retry';
 import NodeCache from 'node-cache';
 
@@ -40,7 +45,7 @@ export class ExternalApiService {
       onRetry: (_, error, requestConfig) => {
         const url = this.axios.getUri(requestConfig);
         this.logger.debug(
-          `Retrying ${requestConfig.method.toUpperCase()} ${url}: ${error}`,
+          `Retrying ${requestConfig.method ? `${requestConfig.method.toUpperCase()} ${url}` : url}: ${error}`,
         );
       },
     });
@@ -51,7 +56,7 @@ export class ExternalApiService {
     endpoint: string,
     config?: RawAxiosRequestConfig,
     ttl?: number,
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       const cacheKey = this.serializeCacheKey(endpoint, config?.params);
       const cachedItem = this.cache?.get<T>(cacheKey);
@@ -68,20 +73,18 @@ export class ExternalApiService {
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`GET ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
   public async getWithoutCache<T>(
     endpoint: string,
     config?: RawAxiosRequestConfig,
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       return (await this.axios.get<T>(endpoint, config)).data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`GET ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -95,14 +98,13 @@ export class ExternalApiService {
   public async delete<T>(
     endpoint: string,
     config?: RawAxiosRequestConfig,
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       const response = await this.axios.delete<T>(endpoint, config);
       return response.data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`DELETE ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -110,14 +112,13 @@ export class ExternalApiService {
     endpoint: string,
     data: string,
     config?: RawAxiosRequestConfig,
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       const response = await this.axios.put<T>(endpoint, data, config);
       return response.data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`PUT ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -125,14 +126,13 @@ export class ExternalApiService {
     endpoint: string,
     data?: string,
     config?: RawAxiosRequestConfig,
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       const response = await this.axios.post<T>(endpoint, data, config);
       return response.data;
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`POST ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -140,7 +140,7 @@ export class ExternalApiService {
     endpoint: string,
     config?: RawAxiosRequestConfig,
     ttl?: number,
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       const cacheKey = this.serializeCacheKey(endpoint, config?.params);
       const cachedItem = this.cache?.get<T>(cacheKey);
@@ -170,7 +170,6 @@ export class ExternalApiService {
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`GET ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -184,7 +183,7 @@ export class ExternalApiService {
 
     try {
       const cacheKey = this.serializeCacheKey(
-        endpoint + data ? data.replace(/\s/g, '').trim() : '',
+        endpoint + (data ? data.replace(/\s/g, '').trim() : ''),
         config?.params,
       );
       const cachedItem = this.cache?.get<T>(cacheKey);
@@ -215,7 +214,7 @@ export class ExternalApiService {
         return cachedItem;
       }
 
-      const response = await this.axios
+      const response: AxiosResponse<T, any> | undefined = await this.axios
         .post<T>(endpoint, data, config)
         .catch((err: AxiosError) => {
           if (err.response?.status === 429) {
@@ -230,31 +229,25 @@ export class ExternalApiService {
           return undefined;
         });
 
-      if (this.cache) {
+      if (this.cache && response?.data) {
         this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
       }
 
-      return response.data;
+      return response?.data;
     } catch (err: any) {
       this.logger.warn(`POST ${url} failed: ${err.message}`);
       this.logger.debug(err);
-      return undefined;
     }
   }
 
   private serializeCacheKey(
     endpoint: string,
     params?: Record<string, unknown>,
-  ) {
-    try {
-      if (!params) {
-        return `${this.baseUrl}${endpoint}`;
-      }
-
-      return `${this.baseUrl}${endpoint}${JSON.stringify(params)}`;
-    } catch (err) {
-      this.logger.debug(`Failed serializing cache key: ${err}`);
-      return undefined;
+  ): string {
+    if (!params) {
+      return `${this.baseUrl}${endpoint}`;
     }
+
+    return `${this.baseUrl}${endpoint}${JSON.stringify(params)}`;
   }
 }

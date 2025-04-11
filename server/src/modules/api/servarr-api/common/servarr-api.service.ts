@@ -1,6 +1,8 @@
+import { Logger } from '@nestjs/common';
 import { warn } from 'console';
 import { ExternalApiService } from '../../../../modules/api/external-api/external-api.service';
 import { DVRSettings } from '../../../../modules/settings/interfaces/dvr-settings.interface';
+import cacheManager from '../../lib/cache';
 import {
   QualityProfile,
   QueueItem,
@@ -9,8 +11,6 @@ import {
   SystemStatus,
   Tag,
 } from '../interfaces/servarr.interface';
-import cacheManager from '../../lib/cache';
-import { Logger } from '@nestjs/common';
 
 export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
   static buildUrl(settings: DVRSettings, path?: string): string {
@@ -36,7 +36,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
         apikey: apiKey,
       },
       cacheName
-        ? { nodeCache: cacheManager.getCache(cacheName).data }
+        ? { nodeCache: cacheManager.getAnonymousCache(cacheName)?.data }
         : undefined,
     );
 
@@ -44,7 +44,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     this.logger = new Logger(ServarrApi.name);
   }
 
-  public getSystemStatus = async (): Promise<SystemStatus> => {
+  public getSystemStatus = async (): Promise<SystemStatus | undefined> => {
     try {
       const response = await this.axios.get<SystemStatus>('/system/status');
 
@@ -54,35 +54,39 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     }
   };
 
-  public getProfiles = async (): Promise<QualityProfile[]> => {
-    try {
-      const data = await this.getRolling<QualityProfile[]>(
-        `/qualityProfile`,
-        undefined,
-        3600,
-      );
+  public getProfiles = async (): Promise<QualityProfile[] | undefined> => {
+    const data = await this.getRolling<QualityProfile[]>(
+      `/qualityProfile`,
+      undefined,
+      3600,
+    );
 
-      return data;
-    } catch (e) {
-      warn(`[${this.apiName}] Failed to retrieve profiles: ${e.message}`);
+    if (data == null) {
+      warn(`[${this.apiName}] Failed to retrieve profiles`);
+      return;
     }
+
+    return data;
   };
 
-  public getRootFolders = async (): Promise<RootFolder[]> => {
-    try {
-      const data = await this.getRolling<RootFolder[]>(
-        `/rootfolder`,
-        undefined,
-        3600,
-      );
+  public getRootFolders = async (): Promise<RootFolder[] | undefined> => {
+    const data = await this.getRolling<RootFolder[]>(
+      `/rootfolder`,
+      undefined,
+      3600,
+    );
 
-      return data;
-    } catch (e) {
-      warn(`[${this.apiName}] Failed to retrieve root folders: ${e.message}`);
+    if (data == null) {
+      warn(`[${this.apiName}] Failed to retrieve root folders`);
+      return;
     }
+
+    return data;
   };
 
-  public getQueue = async (): Promise<(QueueItem & QueueItemAppendT)[]> => {
+  public getQueue = async (): Promise<
+    (QueueItem & QueueItemAppendT)[] | undefined
+  > => {
     try {
       const response =
         await this.axios.get<QueueResponse<QueueItemAppendT>>(`/queue`);
@@ -93,7 +97,7 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     }
   };
 
-  public getTags = async (): Promise<Tag[]> => {
+  public getTags = async (): Promise<Tag[] | undefined> => {
     try {
       const response = await this.axios.get<Tag[]>(`/tag`);
 
@@ -103,7 +107,11 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     }
   };
 
-  public createTag = async ({ label }: { label: string }): Promise<Tag> => {
+  public createTag = async ({
+    label,
+  }: {
+    label: string;
+  }): Promise<Tag | undefined> => {
     try {
       const response = await this.axios.post<Tag>(`/tag`, {
         label,
@@ -136,18 +144,10 @@ export class ServarrApi<QueueItemAppendT> extends ExternalApiService {
   }
 
   protected async runDelete(command: string): Promise<void> {
-    try {
-      await this.delete(`/${command}`);
-    } catch (e) {
-      warn(`[${this.apiName}] Failed to run DELETE: ${e.message}`);
-    }
+    await this.delete(`/${command}`);
   }
 
   protected async runPut(command: string, body: string): Promise<void> {
-    try {
-      await this.put(`/${command}`, body);
-    } catch (e) {
-      warn(`[${this.apiName}] Failed to run PUT: ${e.message}`);
-    }
+    await this.put(`/${command}`, body);
   }
 }

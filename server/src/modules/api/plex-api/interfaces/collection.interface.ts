@@ -19,13 +19,24 @@ export class PlexCollection {
   smart?: boolean;
 }
 
-export interface CreateUpdateCollection {
+export interface PlexCollectionResponse {
+  MediaContainer: {
+    size: number;
+    totalSize?: number; // Present when paging
+    Metadata?: PlexCollection[];
+  };
+}
+
+export interface CreateCollection {
   libraryId: string;
-  collectionId?: number | string;
   type: EPlexDataType;
-  title?: string;
+  title: string;
   summary?: string;
   child?: string;
+}
+
+export interface UpdateCollection extends CreateCollection {
+  collectionId: number | string;
 }
 
 export interface PlexPlaylist {

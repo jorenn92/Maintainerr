@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strictNullChecks": true
+  },
+  "include": [
+    "src/modules/api/external-api/*.ts",
+    "src/modules/api/internal-api/*.ts"
+  ]
+}

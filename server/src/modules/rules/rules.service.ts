@@ -445,13 +445,13 @@ export class RulesService {
         },
       });
       // get media
-      handleMedia = (await this.plexApi.getAllIdsForContextAction(
+      handleMedia = await this.plexApi.getAllIdsForContextAction(
         group ? group.dataType : undefined,
         data.context
           ? data.context
           : { type: group.dataType, id: data.mediaId },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      );
       data.ruleGroupId = group.id;
     } else {
       // get type from metadata
@@ -459,11 +459,11 @@ export class RulesService {
       const type =
         metaData.type === 'movie' ? EPlexDataType.MOVIES : EPlexDataType.SHOWS;
 
-      handleMedia = (await this.plexApi.getAllIdsForContextAction(
+      handleMedia = await this.plexApi.getAllIdsForContextAction(
         undefined,
         data.context ? data.context : { type: type, id: data.mediaId },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      );
     }
     try {
       // add all items

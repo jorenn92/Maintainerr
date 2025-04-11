@@ -43,9 +43,18 @@ export class TautulliGetterService {
     try {
       const prop = this.appProperties.find((el) => el.id === id);
       const metadata = await this.tautulliApi.getMetadata(libItem.ratingKey);
-      const collection = await this.collectionRepository.findOne({
+
+      if (!metadata) {
+        this.logger.warn(
+          `Tautulli-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}. No metadata found.'`,
+        );
+        return;
+      }
+
+      const collection = await this.collectionRepository.findOneOrFail({
         where: { id: ruleGroup.collection.id },
       });
+
       const tautulliWatchedPercentOverride =
         collection.tautulliWatchedPercentOverride;
 
@@ -200,7 +209,6 @@ export class TautulliGetterService {
         `Tautulli-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
       );
       this.logger.debug(e);
-      return undefined;
     }
   }
 

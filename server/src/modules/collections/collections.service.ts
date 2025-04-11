@@ -8,8 +8,9 @@ import {
 } from '../../modules/collections/entities/collection_log.entities';
 import { BasicResponseDto } from '../api/plex-api/dto/basic-response.dto';
 import {
-  CreateUpdateCollection,
+  CreateCollection,
   PlexCollection,
+  UpdateCollection,
 } from '../api/plex-api/interfaces/collection.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import {
@@ -260,13 +261,15 @@ export class CollectionsService {
         (collection.manualCollection == undefined ||
           !collection.manualCollection)
       ) {
-        const collectionObj: CreateUpdateCollection = {
+        const collectionObj: CreateCollection = {
           libraryId: collection.libraryId.toString(),
           type: collection.type,
           title: collection.title,
           summary: collection?.description,
         };
+
         plexCollection = await this.createPlexCollection(collectionObj);
+
         await this.plexApi.UpdateCollectionSettings({
           libraryId: collectionObj.libraryId,
           collectionId: plexCollection.ratingKey,
@@ -281,6 +284,7 @@ export class CollectionsService {
           collection.manualCollectionName,
           collection.libraryId,
         );
+
         if (plexCollection && plexCollection.ratingKey) {
           await this.plexApi.UpdateCollectionSettings({
             libraryId: collection.libraryId,
@@ -360,7 +364,7 @@ export class CollectionsService {
       let plexColl: PlexCollection;
 
       if (dbCollection?.plexId) {
-        const collectionObj: CreateUpdateCollection = {
+        const collectionObj: UpdateCollection = {
           libraryId: collection.libraryId.toString(),
           title: collection.title,
           type: collection.type,
@@ -514,11 +518,11 @@ export class CollectionsService {
 
     // get media
     const handleMedia: AddCollectionMedia[] =
-      (await this.plexApi.getAllIdsForContextAction(
+      await this.plexApi.getAllIdsForContextAction(
         collection ? collection.type : undefined,
         context,
         media,
-      )) as unknown as AddCollectionMedia[];
+      );
 
     if (handleMedia) {
       if (action === 'add') {
@@ -1012,7 +1016,7 @@ export class CollectionsService {
   }
 
   private async createPlexCollection(
-    collectionData: CreateUpdateCollection,
+    collectionData: CreateCollection,
   ): Promise<PlexCollection> {
     try {
       this.infoLogger(`Creating collection in Plex..`);
