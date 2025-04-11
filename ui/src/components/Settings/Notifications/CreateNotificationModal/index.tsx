@@ -165,6 +165,9 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
         title={'New Notification'}
         iconSvg={''}
         onOk={handleSubmit}
+        secondaryButtonType="success"
+        secondaryText={'Test'}
+        onSecondary={doTest}
       >
         <div>
           <form className="space-y-4">
@@ -362,18 +365,6 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-            <div className="m-auto mb-5 flex justify-end">
-              <div className="ml-2 mr-auto sm:mr-0">
-                <ExecuteButton
-                  onClick={debounce(doTest, 5000, {
-                    leading: true,
-                    trailing: false,
-                  })}
-                  text="Test Notification"
-                  timeout={1000}
-                />
               </div>
             </div>
           </form>

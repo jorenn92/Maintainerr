@@ -21,6 +21,7 @@ import {
   NotificationAgentKey,
   NotificationType,
 } from './notifications-interfaces';
+import { MaintainerrEvent } from '@maintainerr/contracts';
 
 export const hasNotificationType = (
   type: NotificationType,
@@ -549,7 +550,7 @@ export class NotificationService {
     ];
   }
 
-  @OnEvent('agents.notify')
+  @OnEvent(MaintainerrEvent.Notifications_Fire)
   public async handleNotification(
     type: NotificationType,
     mediaItems: { plexId: number }[],

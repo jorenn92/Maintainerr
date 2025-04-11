@@ -21,7 +21,11 @@ import { RulesDto } from '../dtos/rules.dto';
 import { RuleGroup } from '../entities/rule-group.entities';
 import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
 import { RulesService } from '../rules.service';
-import { NotificationType } from '../../notifications/notifications-interfaces';
+import {
+  CollectionMediaAddedDto,
+  CollectionMediaRemovedDto,
+  RuleHandlerFailedDto,
+} from '../../events/events.dto';
 
 interface PlexData {
   page: number;
@@ -180,21 +184,13 @@ export class RuleExecutorService extends TaskBase {
           'Not all applications are reachable.. Skipped rule execution.',
         );
 
-        this.eventEmitter.emit(
-          MaintainerrEvent.Notifications_Fire,
-          NotificationType.RULE_HANDLING_FAILED,
-          undefined,
-        );
+        this.eventEmitter.emit(MaintainerrEvent.RuleHandler_Failed);
       }
     } catch (err) {
       this.logger.log('Error running rules executor.');
       this.logger.debug(err);
 
-      this.eventEmitter.emit(
-        MaintainerrEvent.Notifications_Fire,
-        NotificationType.RULE_HANDLING_FAILED,
-        undefined,
-      );
+      this.eventEmitter.emit(MaintainerrEvent.RuleHandler_Failed);
     }
 
     // clean up
@@ -349,13 +345,11 @@ export class RuleExecutorService extends TaskBase {
           );
 
           this.eventEmitter.emit(
-            MaintainerrEvent.Notifications_Fire,
-            NotificationType.MEDIA_REMOVED_FROM_COLLECTION,
-            dataToRemove,
-            collection.title,
-            undefined,
-            undefined,
-            { type: 'rulegroup', value: rulegroup.id },
+            MaintainerrEvent.CollectionMedia_Removed,
+            new CollectionMediaRemovedDto(dataToRemove, collection.title, {
+              type: 'rulegroup',
+              value: rulegroup.id,
+            }),
           );
         }
 
@@ -369,13 +363,13 @@ export class RuleExecutorService extends TaskBase {
           );
 
           this.eventEmitter.emit(
-            MaintainerrEvent.Notifications_Fire,
-            NotificationType.MEDIA_ADDED_TO_COLLECTION,
-            dataToAdd,
-            collection.title,
-            collection.deleteAfterDays,
-            undefined,
-            { type: 'rulegroup', value: rulegroup.id },
+            MaintainerrEvent.CollectionMedia_Added,
+            new CollectionMediaAddedDto(
+              dataToAdd,
+              collection.title,
+              { type: 'rulegroup', value: rulegroup.id },
+              collection.deleteAfterDays,
+            ),
           );
         }
 
@@ -398,26 +392,24 @@ export class RuleExecutorService extends TaskBase {
         return collection;
       } else {
         this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
+
         this.eventEmitter.emit(
-          MaintainerrEvent.Notifications_Fire,
-          NotificationType.RULE_HANDLING_FAILED,
-          undefined,
-          collection.title,
-          undefined,
-          undefined,
-          { type: 'rulegroup', value: rulegroup.id },
+          MaintainerrEvent.RuleHandler_Failed,
+          new RuleHandlerFailedDto(collection.title, {
+            type: 'rulegroup',
+            value: rulegroup.id,
+          }),
         );
       }
     } catch (err) {
       this.logger.warn(`Execption occurred whild handling rule: `, err);
+
       this.eventEmitter.emit(
-        MaintainerrEvent.Notifications_Fire,
-        NotificationType.RULE_HANDLING_FAILED,
-        undefined,
-        rulegroup.collection?.title,
-        undefined,
-        undefined,
-        { type: 'rulegroup', value: rulegroup.id },
+        MaintainerrEvent.RuleHandler_Failed,
+        new RuleHandlerFailedDto(rulegroup.collection?.title, {
+          type: 'rulegroup',
+          value: rulegroup.id,
+        }),
       );
     }
   }
