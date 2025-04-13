@@ -1,15 +1,22 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
 import { patchNestJsSwagger } from 'nestjs-zod';
 import path from 'path';
 import { AppModule } from './app/app.module';
+
 import { MaintainerrLogger } from './modules/logging/logs.service';
 
 const dataDir =
   process.env.NODE_ENV === 'production'
-    ? '/opt/data'
+    ? process.env.DATA_DIR
     : path.join(__dirname, '../../data');
+
+const appDir =
+  process.env.NODE_ENV === 'production'
+    ? process.env.APP_DIR
+    : path.join(__dirname, '../../');
 
 patchNestJsSwagger();
 
@@ -25,11 +32,21 @@ async function bootstrap() {
   app.useLogger(app.get(MaintainerrLogger));
   app.enableCors({ origin: true });
 
-  const apiPort = process.env.API_PORT || 3001;
+  const configService = app.get(ConfigService);
+  const apiPort = configService.get<number>('API_PORT');
+
   await app.listen(apiPort);
 }
 
 function createDataDirectoryStructure() {
+  // Validate that APP_DIR is correct
+  if (!fs.existsSync(path.join(appDir, 'server'))) {
+    console.error(
+      `Could not locate the server app folder in: ${appDir}. Please make sure APP_DIR is set correctly.`,
+    );
+    process.exit(1);
+  }
+
   try {
     // Check if data directory has read and write permissions
     fs.accessSync(dataDir, fs.constants.R_OK | fs.constants.W_OK);
@@ -49,13 +66,10 @@ function createDataDirectoryStructure() {
       fs.accessSync(db, fs.constants.R_OK | fs.constants.W_OK);
     }
   } catch (err) {
-    console.warn(
-      `THE CONTAINER NO LONGER OPERATES WITH PRIVILEGED USER PERMISSIONS. PLEASE UPDATE YOUR CONFIGURATION ACCORDINGLY: https://github.com/jorenn92/Maintainerr/releases/tag/v2.0.0`,
-    );
     console.error(
-      'Could not create or access (files in) the data directory. Please make sure the necessary permissions are set',
+      `Could not create or access (files in) the data directory: ${dataDir}. Please make sure the necessary permissions are set. Refer to the documentation for more information: https://docs.maintainerr.info/latest/Installation/`,
     );
-    process.exit(0);
+    process.exit(1);
   }
 }
 

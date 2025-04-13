@@ -11,14 +11,18 @@ on:
         type: boolean
         description: Build and push docker images
         default: true
+      with-artifacts:
+        type: boolean
+        description: Build and push artifacts
+        default: true
 
 env:
   DOCKERHUB_SLUG: jorenn92/maintainerr
   GHCR_SLUG: ghcr.io/jorenn92/maintainerr
 
 jobs:
-  semantic-release:
-    name: Tag and release latest version
+  semantic-release-dry:
+    name: Generate version
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -31,26 +35,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Activate corepack
         run: |
           corepack install
           corepack enable
+
       - name: Install dependencies
         run: yarn --immutable
+
       - name: Release
+        id: release-version
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          if [ "${{ github.event.inputs.dry-run-semantic-release }}" == "true" ]; then
-          npx semantic-release --dry-run
-          else
-          npx semantic-release
-          fi
+          npx semantic-release --dry-run --repository-url "$(git config --get remote.origin.url)"
+    outputs:
+      version: ${{ steps.release-version.outputs.version }}
 
   build-docker-image:
-    if: github.event.inputs.with-docker-images == 'true'
-    name: Build ${{ matrix.platform }}
-    needs: semantic-release
+    if: ${{ github.event.inputs.with-docker-images == 'true' && needs.semantic-release-dry.outputs.version != '' }}
+    name: Build Docker image
+    needs: semantic-release-dry
     strategy:
       fail-fast: false
       matrix:
@@ -71,9 +77,6 @@ jobs:
 
       - name: Pull latest changes
         run: git pull
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -98,10 +101,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME  }}
           password: ${{ secrets.DOCKERHUB_TOKEN  }}
-
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
 
       - name: Build & push by digest
         id: build
@@ -129,26 +128,111 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Mkdocs Deploy
-        if: ${{ success() }}
-        continue-on-error: true
-        uses: peter-evans/repository-dispatch@v3
+  build-artifacts:
+    if: github.event.inputs.with-artifacts == 'true' && needs.semantic-release-dry.outputs.version != ''
+    name: Build artifacts
+    needs: semantic-release-dry
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux
+            architecture: x64
+            yarn_setup: yarn config set supportedArchitectures.cpu "x64"
+          - os: ubuntu-24.04-arm
+            name: linux
+            architecture: arm64
+            yarn_setup: yarn config set supportedArchitectures.cpu "arm64"
+          - os: windows-latest
+            name: win
+            architecture: x64
+            yarn_setup: yarn config set supportedArchitectures.cpu "x64"
+          #- os: macos-latest
+          #  name: osx
+          #  architecture: x64
+          #  yarn_setup: yarn config set supportedArchitectures.cpu "x64"
+          #- os: macos-latest
+          #  name: osx
+          #  architecture: arm64
+          #  yarn_setup: yarn config set supportedArchitectures.cpu "arm64"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          token: ${{ secrets.DOCS_DEPLOY }}
-          repository: ydkmlt84/Maintainerr_docs
-          event-type: maintainerr-release
-          client-payload: |
-            {
-              "ref": "refs/heads/main",
-              "versionInput": "${{ steps.package-version.outputs.current-version}}"
-            }
+          node-version: 20
+          architecture: ${{ matrix.architecture }}
+
+      - name: Setup yarn architecture
+        run: ${{ matrix.yarn_setup }}
+
+      - name: Activate corepack
+        run: |
+          corepack install
+          corepack enable
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build
+        run: yarn turbo build
+
+      - name: Install production dependencies
+        run: yarn workspaces focus --all --production
+
+      - name: Prepare artifact
+        if: ${{ matrix.name == 'linux' || matrix.name == 'osx' }}
+        shell: bash
+        run: |
+          chmod +x distribution/prepare_artifact_linux.sh
+          ./distribution/prepare_artifact_linux.sh ${{ github.sha }}
+
+      - name: Prepare artifact
+        if: ${{ matrix.name == 'win' }}
+        shell: pwsh
+        run: |
+          ./distribution/prepare_artifact_win.ps1 ${{ github.sha }}
+
+      - name: Create zip
+        uses: thedoctor0/zip-release@0.7.5
+        if: ${{ matrix.name == 'win' }}
+        with:
+          type: "zip"
+          directory: "./_output/"
+          path: "."
+          filename: "../_artifacts/Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.zip"
+
+      - name: Create tar
+        if: ${{ matrix.name == 'osx' || matrix.name == 'linux' }}
+        shell: pwsh
+        run: |
+          cd ./_output/
+          tar -zcf ../_artifacts/Maintainerr.${{ needs.semantic-release-dry.outputs.version }}.${{ matrix.name }}-${{ matrix.architecture }}.tar.gz .
+
+      - name: Publish artifact
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.name == 'win' }}
+        with:
+          include-hidden-files: true
+          name: release_windows-${{ matrix.architecture }}
+          path: ${{ github.workspace }}/_artifacts/
+
+      - name: Publish artifact
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.name == 'osx' || matrix.name == 'linux' }}
+        with:
+          name: release_${{ matrix.name }}-${{ matrix.architecture }}
+          path: ${{ github.workspace }}/_artifacts/
 
   merge:
     name: Merge Docker digests and push
-    if: github.event.inputs.with-docker-images == 'true'
+    if: ${{ github.event.inputs.with-docker-images == 'true' && needs.semantic-release-dry.outputs.version != '' }}
     runs-on: ubuntu-latest
-    needs:
-      - build-docker-image
+    needs: [build-docker-image, semantic-release-dry]
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4
@@ -181,9 +265,9 @@ jobs:
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
           tags: |
-            ${{ env.GHCR_SLUG }}:${{ steps.package-version.outputs.current-version}}
+            ${{ env.GHCR_SLUG }}:${{ needs.semantic-release-dry.outputs.version }}
             ${{ env.GHCR_SLUG }}:latest
-            ${{ env.DOCKERHUB_SLUG }}:${{ steps.package-version.outputs.current-version}}
+            ${{ env.DOCKERHUB_SLUG }}:${{ needs.semantic-release-dry.outputs.version }}
             ${{ env.DOCKERHUB_SLUG }}:latest
           labels: org.opencontainers.image.revision=${{ github.sha }}
 
@@ -194,3 +278,58 @@ jobs:
             $(printf '${{ env.DOCKERHUB_SLUG }}@sha256:%s ' *)
           docker buildx imagetools create $(jq -cr '.tags | map(select(startswith("${{ env.GHCR_SLUG }}")) | "--tag " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ env.GHCR_SLUG }}@sha256:%s ' *)
+
+  semantic-release:
+    name: Tag and release latest version
+    needs: [semantic-release-dry, build-artifacts, build-docker-image, merge]
+    if: ${{ always() && !cancelled() && !contains(needs.*.result, 'failure') && needs.semantic-release-dry.outputs.version != '' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+          pattern: release_*
+          merge-multiple: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Activate corepack
+        run: |
+          corepack install
+          corepack enable
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.dry-run-semantic-release }}" == "true" ]; then
+          npx semantic-release --dry-run --repository-url "$(git config --get remote.origin.url)"
+          else
+          npx semantic-release --repository-url "$(git config --get remote.origin.url)"
+          fi
+
+      - name: Mkdocs Deploy
+        if: ${{ success() }}
+        continue-on-error: true
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DOCS_DEPLOY }}
+          repository: ydkmlt84/Maintainerr_docs
+          event-type: maintainerr-release
+          client-payload: |
+            {
+              "ref": "refs/heads/main",
+              "versionInput": "${{ needs.semantic-release-dry.outputs.version }}"
+            }
