@@ -1,3 +1,4 @@
+import { RuleValueType } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import {
   PlexLibraryItem,
@@ -11,7 +12,6 @@ import {
   Application,
   Property,
   RuleConstants,
-  RuleValueType,
 } from '../constants/rules.constants';
 import { RulesDto } from '../dtos/rules.dto';
 
