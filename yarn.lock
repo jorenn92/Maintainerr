@@ -2257,7 +2257,7 @@ __metadata:
   resolution: "@maintainerr/contracts@workspace:packages/contracts"
   dependencies:
     "@eslint/js": "npm:^9.23.0"
-    "@nestjs/common": "npm:^11.0.13"
+    "@nestjs/common": "npm:^11.0.16"
     "@nestjs/core": "npm:^11.0.13"
     "@nestjs/swagger": "npm:^11.1.1"
     class-transformer: "npm:^0.5.1"
@@ -2287,7 +2287,7 @@ __metadata:
     "@faker-js/faker": "npm:^9.6.0"
     "@maintainerr/contracts": "workspace:^"
     "@nestjs/cli": "npm:^11.0.6"
-    "@nestjs/common": "npm:^11.0.13"
+    "@nestjs/common": "npm:^11.0.16"
     "@nestjs/core": "npm:^11.0.13"
     "@nestjs/event-emitter": "npm:^3.0.1"
     "@nestjs/platform-express": "npm:^11.0.13"
@@ -2475,9 +2475,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:^11.0.13":
-  version: 11.0.13
-  resolution: "@nestjs/common@npm:11.0.13"
+"@nestjs/common@npm:^11.0.16":
+  version: 11.0.17
+  resolution: "@nestjs/common@npm:11.0.17"
   dependencies:
     iterare: "npm:1.2.1"
     tslib: "npm:2.8.1"
@@ -2485,6 +2485,7 @@ __metadata:
   peerDependencies:
     class-transformer: "*"
     class-validator: "*"
+    file-type: ^20.4.1
     reflect-metadata: ^0.1.12 || ^0.2.0
     rxjs: ^7.1.0
   peerDependenciesMeta:
@@ -2492,7 +2493,9 @@ __metadata:
       optional: true
     class-validator:
       optional: true
-  checksum: 10c0/306a35a22789dd6e73bf3926a17bff4ead51cf6ac4ed20d7122bf8cd32d42fd30de06a877d72e6b3f7e3babded7b09420bd30528d964bd2274d5f22d77df714e
+    file-type:
+      optional: true
+  checksum: 10c0/e5b80c215ac634650e28d2a35045aaf92f57babfb4082ec2dd744e61cd0262c94b1610863c75c74c4b381f59462dbdb5689bb5b92afc9bac32d0aa3373e756dc
   languageName: node
   linkType: hard
 
