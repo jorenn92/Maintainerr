@@ -1,4 +1,5 @@
 import {
+  IComparisonStatistics,
   MaintainerrEvent,
   RuleHandlerFinishedEventDto,
   RuleHandlerProgressedEventDto,
@@ -12,7 +13,7 @@ import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interface
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { CollectionsService } from '../../collections/collections.service';
 import { Collection } from '../../collections/entities/collection.entities';
-import { AddCollectionMedia } from '../../collections/interfaces/collection-media.interface';
+import { AddRemoveCollectionMedia } from '../../collections/interfaces/collection-media.interface';
 import { SettingsService } from '../../settings/settings.service';
 import { TaskBase } from '../../tasks/task.base';
 import { TasksService } from '../../tasks/tasks.service';
@@ -46,6 +47,9 @@ export class RuleExecutorService extends TaskBase {
   plexDataType: EPlexDataType;
   workerData: PlexLibraryItem[];
   resultData: PlexLibraryItem[];
+  statisticsData: IComparisonStatistics[];
+  Data: PlexLibraryItem[];
+
   startTime: Date;
 
   constructor(
@@ -141,6 +145,7 @@ export class RuleExecutorService extends TaskBase {
               // prepare
               this.workerData = [];
               this.resultData = [];
+              this.statisticsData = [];
               this.plexData = { page: 0, finished: false, data: [] };
 
               this.plexDataType = rulegroup.dataType
@@ -150,10 +155,10 @@ export class RuleExecutorService extends TaskBase {
               // Run rules data chunks of 50
               while (!this.plexData.finished) {
                 await this.getPlexData(rulegroup.libraryId);
+
                 const ruleResult = await comparator.executeRulesWithData(
                   rulegroup,
                   this.plexData.data,
-                  false,
                   () => {
                     progressedEvent.processedEvaluations +=
                       this.plexData.data.length;
@@ -164,12 +169,15 @@ export class RuleExecutorService extends TaskBase {
                 );
 
                 if (ruleResult) {
-                  this.resultData.push(...ruleResult?.data);
+                  this.statisticsData.push(...ruleResult.stats);
+                  this.resultData.push(...ruleResult.data);
                 }
               }
+
               await this.handleCollection(
                 await this.rulesService.getRuleGroupById(rulegroup.id), // refetch to get latest changes
               );
+
               this.logger.log(
                 `Execution of rules for '${rulegroup.name}' done.`,
               );
@@ -231,7 +239,14 @@ export class RuleExecutorService extends TaskBase {
               ) {
                 await this.collectionService.addToCollection(
                   collection.id,
-                  [{ plexId: +child.ratingKey }] as AddCollectionMedia[],
+                  [
+                    {
+                      plexId: +child.ratingKey,
+                      reason: {
+                        type: 'media_added_manually',
+                      },
+                    },
+                  ],
                   true,
                 );
               }
@@ -248,7 +263,14 @@ export class RuleExecutorService extends TaskBase {
               ) {
                 await this.collectionService.removeFromCollection(
                   collection.id,
-                  [{ plexId: +media.plexId }] as AddCollectionMedia[],
+                  [
+                    {
+                      plexId: +media.plexId,
+                      reason: {
+                        type: 'media_removed_manually',
+                      },
+                    },
+                  ] satisfies AddRemoveCollectionMedia[],
                 );
               }
             }
@@ -319,21 +341,38 @@ export class RuleExecutorService extends TaskBase {
           ? currentCollectionData
           : [];
 
-        const dataToAdd = this.deDupe(
-          data
-            .filter((el) => !currentCollectionData.includes(el))
-            .map((el) => {
-              return { plexId: +el };
-            }),
+        const mediaToAdd = data.filter(
+          (el) => !currentCollectionData.includes(el),
         );
 
-        const dataToRemove = this.deDupe(
-          currentCollectionData
-            .filter((el) => !data.includes(el))
-            .map((el) => {
-              return { plexId: +el };
-            }),
+        const dataToAdd: AddRemoveCollectionMedia[] = this.prepareDataAmendment(
+          mediaToAdd.map((el) => {
+            return {
+              plexId: +el,
+              reason: {
+                type: 'media_added_by_rule',
+                data: this.statisticsData.find((stat) => el == stat.plexId),
+              },
+            } satisfies AddRemoveCollectionMedia;
+          }),
         );
+
+        const mediaToRemove = currentCollectionData.filter(
+          (el) => !data.includes(el),
+        );
+
+        const dataToRemove: AddRemoveCollectionMedia[] =
+          this.prepareDataAmendment(
+            mediaToRemove.map((el) => {
+              return {
+                plexId: +el,
+                reason: {
+                  type: 'media_removed_by_rule',
+                  data: this.statisticsData.find((stat) => el == stat.plexId),
+                },
+              } satisfies AddRemoveCollectionMedia;
+            }),
+          );
 
         if (dataToRemove.length > 0) {
           this.logInfo(
@@ -418,12 +457,14 @@ export class RuleExecutorService extends TaskBase {
     return await this.rulesService.getRuleGroups(true);
   }
 
-  private deDupe(arr: { plexId: number }[]): { plexId: number }[] {
-    const uniqueArr = [];
+  private prepareDataAmendment(
+    arr: AddRemoveCollectionMedia[],
+  ): AddRemoveCollectionMedia[] {
+    const uniqueArr: AddRemoveCollectionMedia[] = [];
     arr.filter(
       (item) =>
         !uniqueArr.find((el) => el.plexId === item.plexId) &&
-        uniqueArr.push({ plexId: item.plexId }),
+        uniqueArr.push(item),
     );
     return uniqueArr;
   }
