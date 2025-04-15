@@ -5,6 +5,7 @@ import { useContext, useState } from 'react'
 import { DeleteApiHandler } from '../../../utils/ApiHandler'
 import LibrariesContext from '../../../contexts/libraries-context'
 import { PencilIcon, TrashIcon } from '@heroicons/react/solid'
+import { AgentConfiguration } from '../../Settings/Notifications/CreateNotificationModal'
 
 export interface IRuleGroup {
   id: number
@@ -17,7 +18,7 @@ export interface IRuleGroup {
   useRules: boolean
   type?: number
   listExclusions?: boolean
-  notifications?: []
+  notifications?: AgentConfiguration[]
 }
 
 const RuleGroup = (props: {

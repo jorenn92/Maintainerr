@@ -22,6 +22,12 @@ import {
   NotificationType,
 } from './notifications-interfaces';
 import { MaintainerrEvent } from '@maintainerr/contracts';
+import {
+  CollectionMediaAddedDto,
+  CollectionMediaHandledDto,
+  CollectionMediaRemovedDto,
+  RuleHandlerFailedDto,
+} from '../events/events.dto';
 
 export const hasNotificationType = (
   type: NotificationType,
@@ -550,14 +556,13 @@ export class NotificationService {
     ];
   }
 
-  @OnEvent(MaintainerrEvent.Notifications_Fire)
   public async handleNotification(
     type: NotificationType,
-    mediaItems: { plexId: number }[],
+    mediaItems?: { plexId: number }[],
     collectionName?: string,
     dayAmount?: number,
     agent?: NotificationAgent,
-    identifier?: { type: string; value: string },
+    identifier?: { type: string; value: number },
   ) {
     const payload: NotificationPayload = {
       subject: '',
@@ -722,5 +727,60 @@ export class NotificationService {
       : item.parentRatingKey
         ? `${item.parentTitle} - season ${item.index}`
         : item.title;
+  }
+
+  // OnEvent handlers
+
+  @OnEvent(MaintainerrEvent.RuleHandler_Failed)
+  private ruleHandlerFailed(data: RuleHandlerFailedDto) {
+    this.handleNotification(
+      NotificationType.RULE_HANDLING_FAILED,
+      undefined,
+      data?.collectionName,
+      undefined,
+      undefined,
+      data?.identifier,
+    );
+  }
+
+  @OnEvent(MaintainerrEvent.CollectionHandler_Failed)
+  private collectionHandlerFailed() {
+    this.handleNotification(NotificationType.COLLECTION_HANDLING_FAILED);
+  }
+
+  @OnEvent(MaintainerrEvent.CollectionMedia_Added)
+  private collectionMediaAdded(data: CollectionMediaAddedDto) {
+    this.handleNotification(
+      NotificationType.MEDIA_ADDED_TO_COLLECTION,
+      data.mediaItems,
+      data.collectionName,
+      data.dayAmount,
+      undefined,
+      data.identifier,
+    );
+  }
+
+  @OnEvent(MaintainerrEvent.CollectionMedia_Removed)
+  private collectionMediaRemoved(data: CollectionMediaRemovedDto) {
+    this.handleNotification(
+      NotificationType.MEDIA_REMOVED_FROM_COLLECTION,
+      data.mediaItems,
+      data.collectionName,
+      undefined,
+      undefined,
+      data.identifier,
+    );
+  }
+
+  @OnEvent(MaintainerrEvent.CollectionMedia_Handled)
+  private collectionMediaHandled(data: CollectionMediaHandledDto) {
+    this.handleNotification(
+      NotificationType.MEDIA_HANDLED,
+      data.mediaItems,
+      data.collectionName,
+      undefined,
+      undefined,
+      data.identifier,
+    );
   }
 }

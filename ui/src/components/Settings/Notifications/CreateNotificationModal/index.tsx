@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
 import GetApiHandler, { PostApiHandler } from '../../../../utils/ApiHandler'
 import { camelCaseToPrettyText } from '../../../../utils/SettingsUtils'
-import ExecuteButton from '../../../Common/ExecuteButton'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
 import Modal from '../../../Common/Modal'
 import ToggleItem from '../../../Common/ToggleButton'
@@ -162,7 +161,7 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
         okDisabled={false}
         okText="Save"
         okButtonType={'primary'}
-        title={'New Notification'}
+        title={'New Notification Agent'}
         iconSvg={''}
         onOk={handleSubmit}
         secondaryButtonType="success"

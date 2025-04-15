@@ -3,9 +3,8 @@ import {
   PlusCircleIcon,
   TrashIcon,
 } from '@heroicons/react/solid'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
-import SettingsContext from '../../../contexts/settings-context'
 import GetApiHandler, { DeleteApiHandler } from '../../../utils/ApiHandler'
 import Button from '../../Common/Button'
 import CreateNotificationModal, {
@@ -14,7 +13,6 @@ import CreateNotificationModal, {
 import CachedImage from '../../Common/CachedImage'
 
 const NotificationSettings = () => {
-  const settingsCtx = useContext(SettingsContext)
   const [addModalActive, setAddModalActive] = useState(false)
   const [configurations, setConfigurations] = useState<AgentConfiguration[]>()
   const [editConfig, setEditConfig] = useState<AgentConfiguration>()
@@ -24,15 +22,15 @@ const NotificationSettings = () => {
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Notifications'
-    GetApiHandler('/notifications/configurations').then((configs) =>
-      setConfigurations(configs),
+    GetApiHandler<AgentConfiguration[]>('/notifications/configurations').then(
+      (configs) => setConfigurations(configs),
     )
   }, [])
 
   const updateAddModalActive = (active: boolean) => {
     setAddModalActive(active)
-    GetApiHandler('/notifications/configurations').then((configs) =>
-      setConfigurations(configs),
+    GetApiHandler<AgentConfiguration[]>('/notifications/configurations').then(
+      (configs) => setConfigurations(configs),
     )
   }
 
@@ -51,7 +49,7 @@ const NotificationSettings = () => {
 
   return (
     <div className="h-full w-full">
-      <div className="mb-5 mt-6 text-white h-full w-full">
+      <div className="mb-5 mt-6 h-full w-full text-white">
         <h3 className="heading flex items-center gap-2">
           Notification Settings
           <CachedImage
@@ -62,7 +60,7 @@ const NotificationSettings = () => {
             alt="BETA"
           />
         </h3>
-        <p className="description">Notification configuration</p>
+        <p className="description">Notification Agent configuration</p>
       </div>
 
       <div>
@@ -111,10 +109,10 @@ const NotificationSettings = () => {
             <button
               type="button"
               className="add-button m-auto flex h-9 rounded bg-amber-600 px-4 text-zinc-200 shadow-md hover:bg-amber-500"
-              onClick={() => setAddModalActive(!addModalActive)}
+              onClick={() => updateAddModalActive(!addModalActive)}
             >
               {<PlusCircleIcon className="m-auto h-5" />}
-              <p className="m-auto ml-1 font-semibold">Add Notification</p>
+              <p className="m-auto ml-1 font-semibold">Add Agent</p>
             </button>
           </li>
         </ul>
@@ -123,11 +121,11 @@ const NotificationSettings = () => {
       {addModalActive ? (
         <CreateNotificationModal
           onCancel={() => {
-            setAddModalActive(!addModalActive)
+            updateAddModalActive(!addModalActive)
             setEditConfig(undefined)
           }}
           onSave={(bool) => {
-            setAddModalActive(!addModalActive)
+            updateAddModalActive(!addModalActive)
             setEditConfig(undefined)
             if (bool) {
               addToast('Successfully saved notification agent', {
