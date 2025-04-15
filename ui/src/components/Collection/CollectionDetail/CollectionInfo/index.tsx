@@ -310,11 +310,16 @@ const CollectionInfo = (props: ICollectionInfo) => {
                         {/* message */}
                         <Table.TD className="text-gray-300">
                           {row.message}
-                          {row.meta &&
-                            row.type == ECollectionLogType.MEDIA &&
-                            isMetaActionedByRule(row.meta) && (
-                              <>
-                                {' '}
+                          {row.meta && row.type == ECollectionLogType.MEDIA && (
+                            <>
+                              {' '}
+                              {[
+                                'media_added_manually',
+                                'media_removed_manually',
+                              ].includes(row.meta.type) && (
+                                <span className="text-gray-400">(manual)</span>
+                              )}
+                              {isMetaActionedByRule(row.meta) && (
                                 <button
                                   type="button"
                                   className="text-gray-400 hover:text-gray-300"
@@ -329,8 +334,9 @@ const CollectionInfo = (props: ICollectionInfo) => {
                                 >
                                   (meta)
                                 </button>
-                              </>
-                            )}
+                              )}
+                            </>
+                          )}
                         </Table.TD>
                       </tr>
                     )
