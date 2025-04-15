@@ -28,7 +28,7 @@
     "next": "15.2.4",
     "react": "18.2.0",
     "react-dom": "18.3.1",
-    "react-hook-form": "^7.54.2",
+    "react-hook-form": "^7.55.0",
     "react-markdown": "10.1.0",
     "react-select": "^5.10.1",
     "react-toast-notifications": "^2.5.1",
