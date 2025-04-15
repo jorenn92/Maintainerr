@@ -24,7 +24,7 @@ const NotificationSettings = () => {
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Notifications'
-    GetApiHandler('/notifications/configurations').then((configs) =>
+    GetApiHandler<AgentConfiguration>('/notifications/configurations').then((configs) =>
       setConfigurations(configs),
     )
   }, [])
