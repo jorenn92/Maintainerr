@@ -1,4 +1,4 @@
-import { ICollection } from '../../collections/interfaces/collection.interface';
+import { CollectionDto } from '@maintainerr/contracts';
 
 export type SonarrSettingDto = {
   id: number;
@@ -38,6 +38,6 @@ export type DeleteSonarrSettingResponseDto =
       code: 0;
       message: string;
       data: {
-        collectionsInUse: ICollection[];
+        collectionsInUse: CollectionDto[];
       } | null;
     };

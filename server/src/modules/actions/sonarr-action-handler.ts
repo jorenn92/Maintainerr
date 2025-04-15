@@ -1,12 +1,14 @@
+import {
+  EPlexDataType,
+  PlexMetadata,
+  ServarrAction,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
-import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { Collection } from '../collections/entities/collection.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
-import { ServarrAction } from '../collections/interfaces/collection.interface';
 import { MediaIdFinder } from './media-id-finder';
 
 @Injectable()
@@ -22,7 +24,7 @@ export class SonarrActionHandler {
 
   public async handleAction(
     collection: Collection,
-    media: CollectionMedia,
+    media: Omit<CollectionMedia, 'collection'>,
   ): Promise<void> {
     const sonarrApiClient = await this.servarrApi.getSonarrApiClient(
       collection.sonarrSettingsId,

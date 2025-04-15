@@ -1,5 +1,5 @@
+import { RulePossibility } from '@maintainerr/contracts';
 import { TestBed } from '@suites/unit';
-import { RulePossibility } from '../constants/rules.constants';
 import { ValueGetterService } from '../getter/getter.service';
 import { RuleComparatorService } from '../helpers/rule.comparator.service';
 

@@ -1,3 +1,4 @@
+import { EPlexDataType, PlexMetadata } from '@maintainerr/contracts';
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import cacheManager from '../../api/lib/cache';
@@ -13,7 +14,6 @@ import PlexApi from '../lib/plexApi';
 import PlexTvApi, { PlexUser } from '../lib/plextvApi';
 import { BasicResponseDto } from './dto/basic-response.dto';
 import { CollectionHubSettingsDto } from './dto/collection-hub-settings.dto';
-import { EPlexDataType } from './enums/plex-data-type-enum';
 import {
   CreateUpdateCollection,
   PlexCollection,
@@ -30,10 +30,7 @@ import {
   PlexUserAccount,
   SimplePlexUser,
 } from './interfaces/library.interfaces';
-import {
-  PlexMetadata,
-  PlexMetadataResponse,
-} from './interfaces/media.interface';
+import { PlexMetadataResponse } from './interfaces/media.interface';
 import {
   PlexAccountsResponse,
   PlexDevice,

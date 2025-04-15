@@ -1,3 +1,4 @@
+import { ServarrAction } from '@maintainerr/contracts';
 import { Mocked, TestBed } from '@suites/unit';
 import {
   createCollection,
@@ -13,7 +14,6 @@ import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { SettingsService } from '../settings/settings.service';
 import { CollectionHandler } from './collection-handler';
 import { CollectionsService } from './collections.service';
-import { ServarrAction } from './interfaces/collection.interface';
 
 describe('CollectionHandler', () => {
   let collectionHandler: CollectionHandler;

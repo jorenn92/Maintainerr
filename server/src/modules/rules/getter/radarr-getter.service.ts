@@ -1,13 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
-import { ServarrService } from '../../api/servarr-api/servarr.service';
-import { TmdbIdService } from '../../api/tmdb-api/tmdb-id.service';
 import {
   Application,
   Property,
   RuleConstants,
-} from '../constants/rules.constants';
-import { RulesDto } from '../dtos/rules.dto';
+  RuleGroupDto,
+} from '@maintainerr/contracts';
+import { Injectable, Logger } from '@nestjs/common';
+import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
+import { ServarrService } from '../../api/servarr-api/servarr.service';
+import { TmdbIdService } from '../../api/tmdb-api/tmdb-id.service';
 
 @Injectable()
 export class RadarrGetterService {
@@ -24,7 +24,7 @@ export class RadarrGetterService {
     ).props;
   }
 
-  async get(id: number, libItem: PlexLibraryItem, ruleGroup?: RulesDto) {
+  async get(id: number, libItem: PlexLibraryItem, ruleGroup?: RuleGroupDto) {
     if (!ruleGroup.collection?.radarrSettingsId) {
       this.logger.error(
         `No Radarr server configured for ${ruleGroup.collection?.title}`,

@@ -1,11 +1,11 @@
+import { RuleDefinitionDto } from '@maintainerr/contracts'
 import { useRef, useState } from 'react'
-import { IRule } from '..'
 import { PostApiHandler } from '../../../../../utils/ApiHandler'
 import Alert from '../../../../Common/Alert'
 import Modal from '../../../../Common/Modal'
 
 interface ICommunityRuleUpload {
-  rules: IRule[]
+  rules: RuleDefinitionDto[]
   type: 'movie' | 'show'
   onSubmit: () => void
   onCancel: () => void

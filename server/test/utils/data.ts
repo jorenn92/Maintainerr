@@ -1,7 +1,12 @@
 import { faker } from '@faker-js/faker';
-import { EPlexDataType } from '../../src/modules/api/plex-api/enums/plex-data-type-enum';
+import {
+  CollectionMediaDto,
+  CollectionMediaWithPlexDataDto,
+  EPlexDataType,
+  PlexMetadata,
+  ServarrAction,
+} from '@maintainerr/contracts';
 import { PlexLibrary } from '../../src/modules/api/plex-api/interfaces/library.interfaces';
-import { PlexMetadata } from '../../src/modules/api/plex-api/interfaces/media.interface';
 import {
   RadarrMovie,
   RadarrMovieFile,
@@ -12,11 +17,7 @@ import {
   SonarrSeriesTypes,
 } from '../../src/modules/api/servarr-api/interfaces/sonarr.interface';
 import { Collection } from '../../src/modules/collections/entities/collection.entities';
-import {
-  CollectionMedia,
-  CollectionMediaWithPlexData,
-} from '../../src/modules/collections/entities/collection_media.entities';
-import { ServarrAction } from '../../src/modules/collections/interfaces/collection.interface';
+import { CollectionMedia } from '../../src/modules/collections/entities/collection_media.entities';
 
 export const createCollection = (
   properties: Partial<Collection> = {},
@@ -76,21 +77,34 @@ export const createCollectionMedia = (
 export const createCollectionMediaWithPlexData = (
   collection?: Collection,
   type?: PlexMetadata['type'],
-  properties: Partial<CollectionMediaWithPlexData> = {},
-): CollectionMediaWithPlexData => {
+  properties: Partial<CollectionMediaDto> = {},
+): CollectionMediaWithPlexDataDto => {
   return {
     ...createCollectionMedia(collection, type, properties),
     plexData: {
       index: faker.number.int(),
-      addedAt: faker.date.past(),
+      addedAt: faker.date.past().getTime(),
+      updatedAt: faker.date.past().getTime(),
       title: faker.string.sample(10),
       type:
         type ??
         faker.helpers.arrayElement(['movie', 'show', 'season', 'episode']),
-      ...properties.plexData,
+      Guid: faker.helpers.arrayElements([
+        {
+          id: faker.string.uuid(),
+        },
+        {
+          id: faker.string.uuid(),
+        },
+      ]),
+      guid: faker.string.uuid(),
+      leafCount: faker.number.int(),
+      viewedLeafCount: faker.number.int(),
+      summary: faker.string.sample(10),
+      ratingKey: faker.string.uuid(),
     },
     ...properties,
-  };
+  } satisfies CollectionMediaWithPlexDataDto;
 };
 
 export const createPlexLibraries = (

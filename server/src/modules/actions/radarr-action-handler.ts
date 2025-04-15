@@ -1,10 +1,10 @@
+import { ServarrAction } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { Collection } from '../collections/entities/collection.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
-import { ServarrAction } from '../collections/interfaces/collection.interface';
 
 @Injectable()
 export class RadarrActionHandler {

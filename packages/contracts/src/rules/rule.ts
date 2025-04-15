@@ -1,4 +1,5 @@
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import z from 'zod'
+import { EPlexDataType } from '../plex'
 
 export enum RulePossibility {
   BIGGER,
@@ -19,12 +20,20 @@ export enum RulePossibility {
   COUNT_SMALLER,
 }
 
-export enum RuleOperators {
+export enum RuleTypes {
+  NUMBER,
+  DATE,
+  TEXT,
+  BOOL,
+  TEXT_LIST,
+}
+
+export enum RuleOperator {
   AND,
   OR,
 }
 
-export const enum Application {
+export enum Application {
   PLEX,
   RADARR,
   SONARR,
@@ -33,14 +42,14 @@ export const enum Application {
   JELLYSEERR,
 }
 
-export const enum ArrAction {
+export enum ArrAction {
   DELETE,
   UNMONITOR, // this also deletes
   SW_UNMONITOR_EXISTING_SEASONS,
   UNMONITOR_NO_DELETE,
 }
 
-export const enum MediaType {
+export enum MediaType {
   BOTH,
   MOVIE,
   SHOW,
@@ -56,7 +65,7 @@ export class RuleType {
       RulePossibility.NOT_EQUALS,
     ],
     'number',
-  );
+  )
   static readonly DATE = new RuleType(
     '1',
     [
@@ -68,7 +77,7 @@ export class RuleType {
       RulePossibility.IN_NEXT,
     ],
     'date',
-  );
+  )
   static readonly TEXT = new RuleType(
     '2',
     [
@@ -78,12 +87,12 @@ export class RuleType {
       RulePossibility.NOT_CONTAINS,
     ],
     'text',
-  );
+  )
   static readonly BOOL = new RuleType(
     '3',
     [RulePossibility.EQUALS, RulePossibility.NOT_EQUALS],
     'boolean',
-  );
+  )
   static readonly TEXT_LIST = new RuleType(
     '4',
     [
@@ -99,14 +108,14 @@ export class RuleType {
       RulePossibility.COUNT_SMALLER,
     ],
     'text list',
-  );
+  )
   public constructor(
     private readonly key: string,
     public readonly possibilities: number[],
     public readonly humanName: string,
   ) {}
   toString() {
-    return this.key;
+    return this.key
   }
 }
 
@@ -117,24 +126,25 @@ export type RuleValueType =
   | boolean
   | number[]
   | string[]
-  | null;
+  | null
 
 export interface Property {
-  id: number;
-  name: string;
-  type: RuleType;
-  mediaType: MediaType;
-  humanName: string;
-  cacheReset?: boolean; // for properties that require a cache reset between group executions
-  showType?: EPlexDataType[]; // if not configured = available for all types
+  id: number
+  name: string
+  type: RuleType
+  mediaType: MediaType
+  humanName: string
+  cacheReset?: boolean // for properties that require a cache reset between group executions
+  showType?: EPlexDataType[] // if not configured = available for all types
 }
 
 export interface ApplicationProperties {
-  id: number;
-  name: string;
-  mediaType: MediaType;
-  props: Property[];
+  id: number
+  name: string
+  mediaType: MediaType
+  props: Property[]
 }
+
 export class RuleConstants {
   applications: ApplicationProperties[] = [
     {
@@ -1000,5 +1010,134 @@ export class RuleConstants {
         },
       ],
     },
-  ];
+  ]
 }
+
+export const ruleDefinitionSchema = z
+  .object({
+    operator: z.coerce.number().pipe(z.nativeEnum(RuleOperator)).nullable(),
+    action: z.coerce.number().pipe(z.nativeEnum(RulePossibility)),
+    firstVal: z.tuple([z.number(), z.number()]),
+    lastVal: z.tuple([z.number(), z.number()]).optional(),
+    customVal: z
+      .object({
+        ruleTypeId: z.coerce.number().pipe(z.nativeEnum(RuleTypes)),
+        value: z.string(),
+      })
+      .optional(),
+    section: z.number(),
+  })
+  .superRefine((rule, ctx) => {
+    const ruleConstants = new RuleConstants()
+
+    try {
+      const val1 = ruleConstants.applications
+        .find((el) => el.id === rule.firstVal[0])
+        ?.props.find((el) => el.id === rule.firstVal[1])
+
+      if (!val1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Invalid first value',
+          path: ['firstVal'],
+        })
+        return false
+      }
+
+      if (rule.lastVal) {
+        const val2 = ruleConstants.applications
+          .find((el) => el.id === rule.lastVal?.[0])
+          ?.props.find((el) => el.id === rule.lastVal?.[1])
+
+        if (!val2) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Invalid last value',
+            path: ['lastVal'],
+          })
+          return false
+        }
+
+        if (
+          val1.type === val2.type ||
+          ([RuleType.TEXT_LIST, RuleType.TEXT].includes(val1.type) &&
+            [RuleType.TEXT_LIST, RuleType.TEXT].includes(val2.type))
+        ) {
+          if (val1.type.possibilities.includes(+rule.action)) {
+            return true
+          } else {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message:
+                'The specified action is not supported for the provided first value',
+              path: ['action'],
+            })
+            return false
+          }
+        } else {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'First value and last value are not compatible',
+            path: ['firstVal', 'lastVal'],
+          })
+          return false
+        }
+      } else if (rule.customVal) {
+        if (
+          val1.type.toString() === rule.customVal.ruleTypeId.toString() ||
+          (val1.type == RuleType.TEXT_LIST &&
+            rule.customVal.ruleTypeId.toString() == RuleType.TEXT.toString())
+        ) {
+          if (val1.type.possibilities.includes(+rule.action)) {
+            return true
+          } else {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message:
+                'The specified action is not supported for the provided first value',
+              path: ['action'],
+            })
+            return false
+          }
+        }
+
+        if (
+          (rule.action === RulePossibility.IN_LAST ||
+            rule.action === RulePossibility.IN_NEXT) &&
+          rule.customVal.ruleTypeId === RuleTypes.NUMBER
+        ) {
+          return true
+        }
+
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Invalid custom value',
+          path: ['customVal'],
+        })
+        return false
+      } else {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'One of lastVal or customVal is required',
+          path: ['customVal'],
+        })
+        return false
+      }
+    } catch (e) {
+      console.debug(e)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Unexpected error occurred during validation',
+        path: [''],
+      })
+      return false
+    }
+  })
+
+export const ruleSchema = z.object({
+  id: z.number(),
+  rule: ruleDefinitionSchema,
+  section: z.number(),
+  ruleGroupId: z.number(),
+  isActive: z.boolean(),
+})

@@ -5,6 +5,6 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   format: ['cjs', 'esm'],
-  dts: true,
   minify: false,
+  onSuccess: 'yarn build:declarations',
 })

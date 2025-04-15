@@ -10,6 +10,7 @@
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "check-types": "tsc --noEmit",
     "test": "jest",
     "test:clear": "jest --clearCache",
     "test:watch": "jest --watch",

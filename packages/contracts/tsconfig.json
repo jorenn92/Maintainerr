@@ -2,8 +2,6 @@
   "compilerOptions": {
     "allowJs": true,
     "baseUrl": "src",
-    "declaration": true,
-    "declarationMap": true,
     "esModuleInterop": true,
     "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],

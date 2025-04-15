@@ -1,3 +1,4 @@
+import { EPlexDataType, ServarrAction } from '@maintainerr/contracts';
 import { Mocked } from '@suites/doubles.jest';
 import { TestBed } from '@suites/unit';
 import {
@@ -5,12 +6,10 @@ import {
   createCollectionMedia,
   createRadarrMovie,
 } from '../../../test/utils/data';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { RadarrApi } from '../api/servarr-api/helpers/radarr.helper';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
-import { ServarrAction } from '../collections/interfaces/collection.interface';
 import { RadarrActionHandler } from './radarr-action-handler';
 
 describe('RadarrActionHandler', () => {

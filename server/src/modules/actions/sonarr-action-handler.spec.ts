@@ -1,3 +1,4 @@
+import { EPlexDataType, ServarrAction } from '@maintainerr/contracts';
 import { Mocked } from '@suites/doubles.jest';
 import { TestBed } from '@suites/unit';
 import {
@@ -5,11 +6,9 @@ import {
   createCollectionMediaWithPlexData,
   createSonarrSeries,
 } from '../../../test/utils/data';
-import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { SonarrApi } from '../api/servarr-api/helpers/sonarr.helper';
 import { ServarrService } from '../api/servarr-api/servarr.service';
-import { ServarrAction } from '../collections/interfaces/collection.interface';
 import { MediaIdFinder } from './media-id-finder';
 import { SonarrActionHandler } from './sonarr-action-handler';
 

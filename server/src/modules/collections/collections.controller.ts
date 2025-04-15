@@ -1,4 +1,8 @@
 import {
+  CollectionWithMediaDto,
+  IAlterableMediaDto,
+} from '@maintainerr/contracts';
+import {
   Body,
   Controller,
   Delete,
@@ -14,10 +18,7 @@ import {
 import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 import { CollectionWorkerService } from './collection-worker.service';
 import { CollectionsService } from './collections.service';
-import {
-  AddCollectionMedia,
-  IAlterableMediaDto,
-} from './interfaces/collection-media.interface';
+import { AddCollectionMedia } from './interfaces/collection-media.interface';
 
 @Controller('api/collections')
 export class CollectionsController {
@@ -95,7 +96,7 @@ export class CollectionsController {
   getCollections(
     @Query('libraryId') libraryId: number,
     @Query('typeId') typeId: 1 | 2 | 3 | 4,
-  ) {
+  ): Promise<CollectionWithMediaDto[]> {
     if (libraryId) {
       return this.collectionService.getCollections(libraryId, undefined);
     } else if (typeId) {

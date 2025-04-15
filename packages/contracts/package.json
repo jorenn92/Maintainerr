@@ -4,15 +4,15 @@
   "private": true,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
+        "types": "./dist/types/index.d.ts",
         "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/index.d.ts",
+        "types": "./dist/types/index.d.ts",
         "default": "./dist/index.js"
       }
     }
@@ -21,6 +21,7 @@
     "dist"
   ],
   "scripts": {
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
