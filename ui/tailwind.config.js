@@ -16,9 +16,6 @@ module.exports = {
       screens: {
         xs: '440px',
       },
-      colors: {
-        'bg-zinc-910': '#18181b',
-      },
       typography: (theme) => ({
         DEFAULT: {
           css: {
