@@ -17,40 +17,9 @@ env:
   GHCR_SLUG: ghcr.io/jorenn92/maintainerr
 
 jobs:
-  semantic-release:
-    name: Tag and release latest version
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Activate corepack
-        run: |
-          corepack install
-          corepack enable
-      - name: Install dependencies
-        run: yarn --immutable
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        run: |
-          if [ "${{ github.event.inputs.dry-run-semantic-release }}" == "true" ]; then
-          npx semantic-release --dry-run
-          else
-          npx semantic-release
-          fi
-
   build-docker-image:
     if: github.event.inputs.with-docker-images == 'true'
     name: Build ${{ matrix.platform }}
-    needs: semantic-release
     strategy:
       fail-fast: false
       matrix:
@@ -110,7 +79,7 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           build-args: |
-            GIT_SHA=${{ github.sha }}
+            GIT_SHA=c74416fa702d6268fde3a77ed9a5df1306d513a1
             VERSION_TAG=stable
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,"name=${{ env.DOCKERHUB_SLUG }},${{ env.GHCR_SLUG }}",push-by-digest=true,name-canonical=true,push=true
@@ -128,20 +97,6 @@ jobs:
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
           retention-days: 1
-
-      - name: Mkdocs Deploy
-        if: ${{ success() }}
-        continue-on-error: true
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.DOCS_DEPLOY }}
-          repository: ydkmlt84/Maintainerr_docs
-          event-type: maintainerr-release
-          client-payload: |
-            {
-              "ref": "refs/heads/main",
-              "versionInput": "${{ steps.package-version.outputs.current-version}}"
-            }
 
   merge:
     name: Merge Docker digests and push
@@ -181,11 +136,9 @@ jobs:
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
           tags: |
-            ${{ env.GHCR_SLUG }}:${{ steps.package-version.outputs.current-version}}
-            ${{ env.GHCR_SLUG }}:latest
-            ${{ env.DOCKERHUB_SLUG }}:${{ steps.package-version.outputs.current-version}}
-            ${{ env.DOCKERHUB_SLUG }}:latest
-          labels: org.opencontainers.image.revision=${{ github.sha }}
+            type=raw,value=2.14.0
+            type=raw,value=latest
+          labels: org.opencontainers.image.revision=c74416fa702d6268fde3a77ed9a5df1306d513a1
 
       - name: Create manifest list and push
         working-directory: ${{ runner.temp }}/digests
