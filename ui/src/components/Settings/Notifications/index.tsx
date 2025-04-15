@@ -29,17 +29,18 @@ const NotificationSettings = () => {
     )
   }, [])
 
-  useEffect(() => {
+  const updateAddModalActive = (active: boolean) => {
+    setAddModalActive(active)
     GetApiHandler('/notifications/configurations').then((configs) =>
       setConfigurations(configs),
     )
-  }, [addModalActive])
+  }
 
   const doEdit = (id: number) => {
     const config = configurations?.find((c) => c.id === id)
 
     setEditConfig(config)
-    setAddModalActive(!addModalActive)
+    updateAddModalActive(!addModalActive)
   }
 
   function confirmedDelete(id: any) {
