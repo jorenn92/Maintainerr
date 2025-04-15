@@ -32,7 +32,7 @@ describe('RuleComparatorService', () => {
   });
 
   describe('executeRulesWithData', () => {
-    it('should include media item for 3 sections (AND(#2-false), OR(#1-false), OR(#1-true))', async () => {
+    it('should include media item for 4 sections, AND(true,false), OR(false), OR(true), AND(true)', async () => {
       const section0Rule1: RuleDto = {
         action: RulePossibility.EQUALS,
         section: 0,
@@ -68,6 +68,17 @@ describe('RuleComparatorService', () => {
         section: 2,
         firstVal: [Application.PLEX, 6] satisfies [number, number], // collections
         operator: RuleOperators.OR,
+        customVal: {
+          ruleTypeId: +RuleType.NUMBER,
+          value: '0',
+        },
+      };
+
+      const section3Rule1: RuleDto = {
+        action: RulePossibility.BIGGER,
+        section: 3,
+        firstVal: [Application.PLEX, 5] satisfies [number, number], // viewCount
+        operator: RuleOperators.AND,
         customVal: {
           ruleTypeId: +RuleType.NUMBER,
           value: '0',
@@ -110,6 +121,13 @@ describe('RuleComparatorService', () => {
             ruleGroupId: 1,
             section: 2,
           } satisfies RuleDbDto,
+          {
+            id: 5,
+            isActive: true,
+            ruleJson: JSON.stringify(section3Rule1),
+            ruleGroupId: 1,
+            section: 3,
+          } satisfies RuleDbDto,
         ],
       };
 
@@ -131,6 +149,8 @@ describe('RuleComparatorService', () => {
             return Promise.resolve(7);
           } else if (val1 === Application.PLEX && val2 === 6) {
             return Promise.resolve(2);
+          } else if (val1 === Application.PLEX && val2 === 5) {
+            return Promise.resolve(3);
           }
 
           throw new Error('Invalid test setup');
@@ -197,7 +217,6 @@ describe('RuleComparatorService', () => {
                 },
               ],
             },
-
             {
               id: 2,
               result: true,
@@ -214,12 +233,28 @@ describe('RuleComparatorService', () => {
                 },
               ],
             },
+            {
+              id: 3,
+              result: true,
+              operator: 'AND',
+              ruleResults: [
+                {
+                  action: 'bigger',
+                  firstValue: 3,
+                  firstValueName: 'App - rule name',
+                  result: true,
+                  secondValue: 0,
+                  secondValueName: 'custom value type',
+                  operator: 'OR',
+                },
+              ],
+            },
           ],
         } satisfies IComparisonStatistics,
       ]);
     });
 
-    it('should include media item for 1 section with 2 rules (OR)', async () => {
+    it('should include media item for 1 section, OR(false,true)', async () => {
       const section0Rule1: RuleDto = {
         action: RulePossibility.EQUALS,
         section: 0,
@@ -334,7 +369,7 @@ describe('RuleComparatorService', () => {
       ]);
     });
 
-    it('should not include media item for 1 section with 2 rules (AND), 2nd returns false', async () => {
+    it('should not include media item for 1 section, AND(true,false)', async () => {
       const section0Rule1: RuleDto = {
         action: RulePossibility.EQUALS,
         section: 0,
@@ -448,7 +483,7 @@ describe('RuleComparatorService', () => {
       ]);
     });
 
-    it('should include media item for 1 section with 2 rules (AND)', async () => {
+    it('should include media item for 1 section, AND(true,true)', async () => {
       const section0Rule1: RuleDto = {
         action: RulePossibility.EQUALS,
         section: 0,
@@ -562,7 +597,10 @@ describe('RuleComparatorService', () => {
       ]);
     });
 
-    it('should not include media item when a getter fails (it returned undefined)', async () => {
+    /***
+     * Once a rule is marked as failed for a media item, that item should stop being processed and the remaining un-executed rules should not be included in the stats for it.
+     */
+    it('should not include media item when a getter fails (returned undefined)', async () => {
       const section0Rule1: RuleDto = {
         action: RulePossibility.EQUALS,
         section: 0,
@@ -585,6 +623,17 @@ describe('RuleComparatorService', () => {
         },
       };
 
+      const section1Rule1: RuleDto = {
+        action: RulePossibility.EQUALS,
+        section: 1,
+        firstVal: [Application.OVERSEERR, 6] satisfies [number, number], // isRequested
+        operator: RuleOperators.OR,
+        customVal: {
+          ruleTypeId: +RuleType.BOOL,
+          value: '1',
+        },
+      };
+
       const ruleGroup: RulesDto = {
         id: 1,
         dataType: EPlexDataType.MOVIES,
@@ -604,6 +653,13 @@ describe('RuleComparatorService', () => {
             id: 2,
             isActive: true,
             ruleJson: JSON.stringify(section0Rule2),
+            ruleGroupId: 1,
+            section: 0,
+          } satisfies RuleDbDto,
+          {
+            id: 3,
+            isActive: true,
+            ruleJson: JSON.stringify(section1Rule1),
             ruleGroupId: 1,
             section: 0,
           } satisfies RuleDbDto,
@@ -642,7 +698,38 @@ describe('RuleComparatorService', () => {
       );
 
       expect(result.data).toEqual([]);
-      expect(result.stats[0].result).toBeFalsy();
+      expect(result.stats).toEqual([
+        {
+          plexId: 12345,
+          result: false,
+          sectionResults: [
+            {
+              id: 0,
+              result: false,
+              ruleResults: [
+                {
+                  action: 'equals',
+                  firstValue: true,
+                  firstValueName: 'App - rule name',
+                  result: true,
+                  secondValue: 1,
+                  secondValueName: 'custom value type',
+                  operator: 'OR',
+                },
+                {
+                  action: 'bigger',
+                  firstValue: undefined,
+                  firstValueName: 'App - rule name',
+                  result: 'error',
+                  secondValue: 0,
+                  secondValueName: 'custom value type',
+                  operator: 'AND',
+                },
+              ],
+            },
+          ],
+        } satisfies IComparisonStatistics,
+      ]);
     });
   });
 
