@@ -50,7 +50,7 @@ const NotificationSettings = () => {
 
   return (
     <div className="h-full w-full">
-      <div className="section-settings h-full w-full">
+      <div className="mb-5 mt-6 text-white h-full w-full">
         <h3 className="heading flex items-center gap-2">
           Notification Settings
           <CachedImage
