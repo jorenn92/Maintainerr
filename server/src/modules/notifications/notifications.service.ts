@@ -28,6 +28,7 @@ import {
   CollectionMediaRemovedDto,
   RuleHandlerFailedDto,
 } from '../events/events.dto';
+import _ from 'lodash';
 
 export const hasNotificationType = (
   type: NotificationType,
@@ -254,11 +255,13 @@ export class NotificationService {
   public async registerConfiguredAgents(skiplog = false) {
     const configuredAgents = await this.getNotificationConfigurations();
 
+    const isEqual = (a: Notification[], b: Notification[]) =>
+      _.isEqual(_.sortBy(a, 'id'), _.sortBy(b, 'id'));
+
+    const notifications = this.activeAgents.map((e) => e.getNotification());
+
     // Only (re-)register agents when required
-    if (
-      this.activeAgents.length !==
-      configuredAgents.filter((el) => el.enabled).length
-    ) {
+    if (!isEqual(notifications, configuredAgents)) {
       this.activeAgents = [];
 
       const agents: NotificationAgent[] = configuredAgents?.map(
