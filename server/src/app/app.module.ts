@@ -23,6 +23,8 @@ import { SettingsService } from '../modules/settings/settings.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import ormConfig from './config/typeOrmConfig';
+import { NotificationsModule } from '../modules/notifications/notifications.module';
+import { NotificationService } from '../modules/notifications/notifications.service';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import ormConfig from './config/typeOrmConfig';
     JellyseerrApiModule,
     RulesModule,
     CollectionsModule,
+    NotificationsModule,
     EventsModule,
   ],
   controllers: [AppController],
@@ -58,14 +61,18 @@ export class AppModule implements OnModuleInit {
     private readonly plexApi: PlexApiService,
     private readonly overseerApi: OverseerrApiService,
     private readonly tautulliApi: TautulliApiService,
+    private readonly notificationService: NotificationService,
     private readonly jellyseerrApi: JellyseerrApiService,
   ) {}
   async onModuleInit() {
-    // Initialize stuff needing settings here.. Otherwise problems
+    // Initialize modules requiring settings
     await this.settings.init();
     await this.plexApi.initialize({});
     await this.overseerApi.init();
     await this.tautulliApi.init();
     await this.jellyseerrApi.init();
+
+    // intialize notification agents
+    await this.notificationService.registerConfiguredAgents();
   }
 }

@@ -7,10 +7,13 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Rules } from './rules.entities';
+import { Notification } from '../../notifications/entities/notification.entities';
 
-@Entity()
+@Entity('rule_group')
 export class RuleGroup {
   @PrimaryGeneratedColumn()
   id: number;
@@ -40,6 +43,17 @@ export class RuleGroup {
     onDelete: 'CASCADE',
   })
   rules: Rules[];
+
+  @ManyToMany(() => Notification, {
+    eager: true,
+    onDelete: 'NO ACTION',
+  })
+  @JoinTable({
+    name: 'notification_rulegroup',
+    joinColumn: { name: 'rulegroupId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'notificationId', referencedColumnName: 'id' },
+  })
+  notifications: Notification[];
 
   @OneToOne(() => Collection, (c) => c.ruleGroup, {
     eager: true,

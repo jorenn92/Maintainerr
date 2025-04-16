@@ -19,6 +19,9 @@ RUN sed -i "s,basePath: '',basePath: '/__PATH_PREFIX__',g" ./ui/next.config.js
 
 RUN yarn turbo build
 
+# When all packages are hoisted, there is no node_modules folder. Ensure /packages/contracts always has a node_modules folder to COPY later on. 
+RUN mkdir -p ./packages/contracts/node_modules
+
 FROM base AS runner
 
 WORKDIR /opt/app
