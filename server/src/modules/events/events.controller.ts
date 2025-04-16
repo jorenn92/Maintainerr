@@ -97,8 +97,12 @@ export class EventsController {
     // An array with a TTL per event is probably sufficient.
   }
 
-  @OnEvent('rule_handler.*')
-  @OnEvent('collection_handler.*')
+  @OnEvent('rule_handler.started')
+  @OnEvent('rule_handler.progressed')
+  @OnEvent('rule_handler.finished')
+  @OnEvent('collection_handler.started')
+  @OnEvent('collection_handler.progressed')
+  @OnEvent('collection_handler.finished')
   sendEventToClient(
     payload:
       | RuleHandlerStartedEventDto
