@@ -5,6 +5,8 @@ import {
   LogFile,
   LogSettingDto,
   logSettingSchema,
+  LogSettingSchemaInput,
+  LogSettingSchemaOutput,
 } from '@maintainerr/contracts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -41,13 +43,13 @@ const LogSettingsForm = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isLoading },
-  } = useForm<LogSettingDto>({
+  } = useForm<LogSettingSchemaInput, unknown, LogSettingSchemaOutput>({
     resolver: zodResolver(logSettingSchema),
     defaultValues: async () =>
       await GetApiHandler<LogSettingDto>('/logs/settings'),
   })
 
-  const onSubmit = async (data: LogSettingDto) => {
+  const onSubmit = async (data: LogSettingSchemaOutput) => {
     setSaveError(false)
     setIsSubmitSuccessful(false)
 
