@@ -131,7 +131,6 @@ jobs:
             ${{ env.GHCR_SLUG }}
           tags: |
             type=raw,value=main
-            type=raw,value=develop
           labels: org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Create manifest list and push
