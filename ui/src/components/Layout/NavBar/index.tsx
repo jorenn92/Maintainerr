@@ -9,8 +9,8 @@ import Link from 'next/link'
 import { ReactNode, useContext, useEffect, useRef } from 'react'
 import SearchContext from '../../../contexts/search-context'
 import CachedImage from '../../Common/CachedImage'
+import Transition from '../../Common/Transition'
 import Messages from '../../Messages/Messages'
-import Transition from '../../Transition'
 import VersionStatus from '../../VersionStatus'
 
 interface NavBarLink {

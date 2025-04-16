@@ -11,7 +11,7 @@ import {
 import { useRef, useState } from 'react'
 import { useEvent } from '../../contexts/events-context'
 import { SmallLoadingSpinner } from '../Common/LoadingSpinner'
-import Transition from '../Transition'
+import Transition from '../Common/Transition'
 
 const isStartedOrFinishedEvent = (
   event: BaseEventDto,
@@ -50,7 +50,7 @@ const Messages = () => {
 }
 
 const RuleHandlerMessages = () => {
-  const finishedTimer = useRef<NodeJS.Timeout>()
+  const finishedTimer = useRef<NodeJS.Timeout>(undefined)
   const [show, setShow] = useState<boolean>(false)
 
   const [event, setEvent] = useState<
@@ -136,7 +136,7 @@ const RuleHandlerMessages = () => {
 }
 
 const CollectionHandlerMessages = () => {
-  const finishedTimer = useRef<NodeJS.Timeout>()
+  const finishedTimer = useRef<NodeJS.Timeout>(undefined)
   const [show, setShow] = useState<boolean>(false)
 
   const [event, setEvent] = useState<
