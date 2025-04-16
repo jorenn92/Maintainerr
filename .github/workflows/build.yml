@@ -130,8 +130,8 @@ jobs:
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
           tags: |
-            ${{ env.GHCR_SLUG }}:main
-            ${{ env.DOCKERHUB_SLUG }}:develop
+            type=raw,value=main
+            type=raw,value=develop
           labels: org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Create manifest list and push
