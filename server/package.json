@@ -40,7 +40,7 @@
     "mime-types": "^3.0.1",
     "nestjs-zod": "^4.3.1",
     "node-cache": "^5.1.2",
-    "nodemailer": "6.9.1",
+    "nodemailer": "6.9.9",
     "openpgp": "^5.7.0",
     "read-last-lines": "^1.8.0",
     "reflect-metadata": "^0.2.2",
