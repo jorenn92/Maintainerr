@@ -73,7 +73,7 @@ export function camelCaseToPrettyText(camelCaseStr: string): string {
 
 export const handleSettingsInputChange = (
   event: React.ChangeEvent<HTMLInputElement>,
-  ref: RefObject<HTMLInputElement>,
+  ref: RefObject<HTMLInputElement | null>,
   stateSetter: Dispatch<SetStateAction<string | undefined>>,
 ) => {
   // this is required for some reason, even though the state is not used. Otherwise setting values breaks

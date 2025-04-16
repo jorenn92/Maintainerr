@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import { CSSTransition as ReactCSSTransition } from 'react-transition-group'
-import { useRef, useEffect, useContext } from 'react'
 
 interface CSSTransitionProps {
   show?: boolean
@@ -39,6 +38,7 @@ const CSSTransition: React.FC<CSSTransitionProps> = ({
   appear,
   children,
 }) => {
+  const nodeRef = React.useRef(null)
   const enterClasses = enter.split(' ').filter((s) => s.length)
   const enterFromClasses = enterFrom.split(' ').filter((s) => s.length)
   const enterToClasses = enterTo.split(' ').filter((s) => s.length)
@@ -47,19 +47,20 @@ const CSSTransition: React.FC<CSSTransitionProps> = ({
   const leaveToClasses = leaveTo.split(' ').filter((s) => s.length)
 
   const addClasses = (node: HTMLElement, classes: string[]) => {
-    if (classes.length) {
+    if (node && classes.length) {
       node.classList.add(...classes)
     }
   }
 
   const removeClasses = (node: HTMLElement, classes: string[]) => {
-    if (classes.length) {
+    if (node && classes.length) {
       node.classList.remove(...classes)
     }
   }
 
   return (
     <ReactCSSTransition
+      nodeRef={nodeRef}
       appear={appear}
       unmountOnExit
       in={show}

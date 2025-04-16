@@ -1,11 +1,10 @@
 import React, { MouseEvent, ReactNode, useRef } from 'react'
-import ReactDOM from 'react-dom'
+import { createPortal } from 'react-dom'
 import useClickOutside from '../../../hooks/useClickOutside'
 import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll'
-import Transition from '../../Transition'
 import Button, { ButtonType } from '../Button'
-import CachedImage from '../CachedImage'
 import LoadingSpinner from '../LoadingSpinner'
+import Transition from '../Transition'
 
 interface ModalProps {
   title?: string
@@ -88,7 +87,7 @@ const Modal: React.FC<ModalProps> = ({
   })
   useLockBodyScroll(true, disableScrollLock)
 
-  return ReactDOM.createPortal(
+  return createPortal(
     <div
       className="fixed bottom-0 left-0 right-0 top-0 z-50 flex h-full w-full items-center justify-center bg-zinc-800 bg-opacity-70"
       onKeyDown={(e) => {
