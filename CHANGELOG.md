@@ -1,3 +1,21 @@
+# [2.14.0](https://github.com/jorenn92/Maintainerr/compare/v2.13.1...v2.14.0) (2025-04-15)
+
+
+### Bug Fixes
+
+* Ensure signals are passed down to the apps ([#1680](https://github.com/jorenn92/Maintainerr/issues/1680)) ([702fc17](https://github.com/jorenn92/Maintainerr/commit/702fc17feeae9dcc40b625c0710b9478158a182f))
+* force reset Overseerr throwing exception ([#1699](https://github.com/jorenn92/Maintainerr/issues/1699)) ([c74416f](https://github.com/jorenn92/Maintainerr/commit/c74416fa702d6268fde3a77ed9a5df1306d513a1))
+* Reintroduce episode # in media card ([#1688](https://github.com/jorenn92/Maintainerr/issues/1688)) ([b25159d](https://github.com/jorenn92/Maintainerr/commit/b25159d7a846a81bb68e5e777739edf8ca19f3b6))
+* Restrict Test Media to the collection's library ([#1693](https://github.com/jorenn92/Maintainerr/issues/1693)) ([c254d93](https://github.com/jorenn92/Maintainerr/commit/c254d931d75dc2fc8862db394cafb11b5bf0ed1e))
+* stop returning music libraries ([#1695](https://github.com/jorenn92/Maintainerr/issues/1695)) ([7202890](https://github.com/jorenn92/Maintainerr/commit/7202890181827d26f2536e7525df07b912799451))
+* Unable to save rules with 'Bigger' actions ([#1697](https://github.com/jorenn92/Maintainerr/issues/1697)) ([920a86b](https://github.com/jorenn92/Maintainerr/commit/920a86b1df41c35de073f1dbace6ecb4189d5797))
+
+
+### Features
+
+* Add episode number & file path rules ([#1673](https://github.com/jorenn92/Maintainerr/issues/1673)) ([6b3e4c9](https://github.com/jorenn92/Maintainerr/commit/6b3e4c90bf4cd2a76bd993782917a346c2001b21))
+* Add rule & collection job status indicators ([#1659](https://github.com/jorenn92/Maintainerr/issues/1659)) ([aebf3ae](https://github.com/jorenn92/Maintainerr/commit/aebf3ae40befcee0e83796d797c979ca96ab5174))
+
 ## [2.13.1](https://github.com/jorenn92/Maintainerr/compare/v2.13.0...v2.13.1) (2025-04-03)
 
 
