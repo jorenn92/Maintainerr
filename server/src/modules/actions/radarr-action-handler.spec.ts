@@ -35,7 +35,7 @@ describe('RadarrActionHandler', () => {
       radarrSettingsId: 1,
       type: EPlexDataType.MOVIES,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie', {
+    const collectionMedia = createCollectionMedia(collection, {
       tmdbId: undefined,
     });
 
@@ -55,7 +55,7 @@ describe('RadarrActionHandler', () => {
       radarrSettingsId: 1,
       type: EPlexDataType.MOVIES,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie', {
+    const collectionMedia = createCollectionMedia(collection, {
       tmdbId: 1,
     });
 
@@ -85,7 +85,7 @@ describe('RadarrActionHandler', () => {
         radarrSettingsId: 1,
         type: EPlexDataType.MOVIES,
       });
-      const collectionMedia = createCollectionMedia(collection, 'movie', {
+      const collectionMedia = createCollectionMedia(collection, {
         tmdbId: 1,
       });
 
@@ -111,7 +111,7 @@ describe('RadarrActionHandler', () => {
       radarrSettingsId: 1,
       type: EPlexDataType.MOVIES,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie', {
+    const collectionMedia = createCollectionMedia(collection, {
       tmdbId: 1,
     });
 
@@ -132,7 +132,7 @@ describe('RadarrActionHandler', () => {
       radarrSettingsId: 1,
       type: EPlexDataType.MOVIES,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie', {
+    const collectionMedia = createCollectionMedia(collection, {
       tmdbId: 1,
     });
 
