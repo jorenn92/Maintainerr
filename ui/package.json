@@ -14,6 +14,7 @@
     "hoistingLimits": "workspaces"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.1",
     "@heroicons/react": "^1.0.6",
     "@hookform/resolvers": "^5.0.1",
     "@maintainerr/contracts": "workspace:^",
@@ -32,7 +33,6 @@
     "react-markdown": "10.1.0",
     "react-select": "^5.10.1",
     "react-toast-notifications": "^2.5.1",
-    "react-transition-group": "^4.4.5",
     "reconnecting-eventsource": "^1.6.4",
     "yaml": "^2.7.0",
     "zod": "^3.24.2"
@@ -48,7 +48,6 @@
     "@types/node": "^22",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "@types/react-transition-group": "^4.4.12",
     "@typescript-eslint/eslint-plugin": "^8.30.1",
     "@typescript-eslint/parser": "^8.28.0",
     "autoprefixer": "10.4.21",

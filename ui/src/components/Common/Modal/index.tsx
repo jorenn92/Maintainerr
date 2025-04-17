@@ -1,10 +1,10 @@
+import { Transition } from '@headlessui/react'
 import React, { MouseEvent, ReactNode, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import useClickOutside from '../../../hooks/useClickOutside'
 import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll'
 import Button, { ButtonType } from '../Button'
 import LoadingSpinner from '../LoadingSpinner'
-import Transition from '../Transition'
 
 interface ModalProps {
   title?: string
@@ -99,7 +99,9 @@ const Modal: React.FC<ModalProps> = ({
       }}
     >
       <Transition
-        enter="transition opacity-0 duration-300 transform scale-75"
+        as="div"
+        className="absolute"
+        enter="transition opacity-0 duration-1000 transform scale-75"
         enterFrom="opacity-0 scale-75"
         enterTo="opacity-100 scale-100"
         leave="transition opacity-100 duration-300"
@@ -107,21 +109,20 @@ const Modal: React.FC<ModalProps> = ({
         leaveTo="opacity-0"
         show={loading}
       >
-        <div style={{ position: 'absolute' }}>
-          <LoadingSpinner />
-        </div>
+        <LoadingSpinner />
       </Transition>
       <Transition
-        enter="transition opacity-0 duration-300 transform scale-75"
-        enterFrom="opacity-0 scale-75"
-        enterTo="opacity-100 scale-100"
-        leave="transition opacity-100 duration-300"
+        appear
+        as="div"
+        className="transform transition duration-300"
+        enterFrom="scale-75 opacity-0"
+        enterTo="scale-100 opacity-100"
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
         show={!loading}
       >
         <div
-          className={`relative inline-block w-full transform overflow-auto bg-zinc-700 px-4 pb-4 pt-5 text-left align-bottom shadow-xl ring-1 ring-zinc-700 transition-all sm:my-8 ${maxWidthMap[size]} sm:rounded-lg sm:align-middle`}
+          className={`relative inline-block w-full overflow-auto bg-zinc-700 px-4 pb-4 pt-5 text-left align-bottom shadow-xl ring-1 ring-zinc-700 sm:my-8 ${maxWidthMap[size]} sm:rounded-lg sm:align-middle`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-headline"
