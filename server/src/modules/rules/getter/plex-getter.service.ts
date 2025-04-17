@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   PlexLibraryItem,
   PlexSeenBy,
-  SimplePlexUser,
 } from '../../..//modules/api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
@@ -450,8 +449,7 @@ export class PlexGetterService {
               : metadata.guid;
           const media_uuid = guid.match(/plex:\/\/[a-z]+\/([a-z0-9]+)$/);
 
-          const plexUsers: SimplePlexUser[] =
-            await this.plexApi.getCorrectedUsers();
+          const plexUsers = await this.plexApi.getCorrectedUsers();
 
           const usernames: string[] = [];
           for (const u of plexUsers.filter(
@@ -476,8 +474,7 @@ export class PlexGetterService {
               : metadata.guid;
           const media_uuid = guid.match(/plex:\/\/[a-z]+\/([a-z0-9]+)$/);
 
-          const plexUsers: SimplePlexUser[] =
-            await this.plexApi.getCorrectedUsers();
+          const plexUsers = await this.plexApi.getCorrectedUsers();
 
           for (const u of plexUsers.filter(
             (u) => u.uuid !== undefined && media_uuid !== undefined,

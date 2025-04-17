@@ -1,6 +1,6 @@
-import cacheManager, { Cache } from './cache';
-import { PlexLibraryResponse } from '../plex-api/interfaces/library.interfaces';
 import xml2js from 'xml2js';
+import { PlexLibraryResponse } from '../plex-api/interfaces/library.interfaces';
+import cacheManager, { Cache } from './cache';
 
 type PlexApiOptions = {
   hostname: string;
@@ -48,7 +48,7 @@ class PlexApi {
    */
   async queryAll<T>(options): Promise<T> {
     // vars
-    let result = undefined;
+    let result: PlexLibraryResponse | undefined = undefined;
     let next = true;
     let page = 0;
     const size = 120;
@@ -67,6 +67,7 @@ class PlexApi {
         options,
         true,
       );
+
       if (result === undefined) {
         // if first response, replace result
         result = query;
@@ -81,7 +82,10 @@ class PlexApi {
       }
 
       // fetch all if more than 120
-      if (query?.MediaContainer?.totalSize > size * (page + 1)) {
+      if (
+        query.MediaContainer &&
+        query.MediaContainer.totalSize! > size * (page + 1)
+      ) {
         options.extraHeaders['X-Plex-Container-Start'] = `${size * (page + 1)}`;
         page++;
       } else {
@@ -120,7 +124,7 @@ class PlexApi {
       parseResponse: true,
     };
 
-    return this._request<T>(newOptions).then(attachUri(newOptions.uri));
+    return this._request<T>(newOptions).then(attachUri<T>(newOptions.uri));
   }
 
   deleteQuery(options: RequestOptions) {
@@ -140,7 +144,7 @@ class PlexApi {
       parseResponse: true,
     };
 
-    return this._request<T>(newOptions).then(attachUri(newOptions.uri));
+    return this._request<T>(newOptions).then(attachUri<T>(newOptions.uri));
   }
 
   putQuery<T>(options: RequestOptions) {
@@ -150,7 +154,7 @@ class PlexApi {
       parseResponse: true,
     };
 
-    return this._request<T>(newOptions).then(attachUri(newOptions.uri));
+    return this._request<T>(newOptions).then(attachUri<T>(newOptions.uri));
   }
 
   private getServerScheme() {
@@ -215,11 +219,7 @@ class PlexApi {
   }
 
   private serializeCacheKey(params: Record<string, unknown>) {
-    try {
-      return `${JSON.stringify(params)}`;
-    } catch (err) {
-      return undefined;
-    }
+    return `${JSON.stringify(params)}`;
   }
 
   /**
@@ -306,9 +306,9 @@ const addDirectoryUriProperty = (parentUrl: string, directory: any) => {
   directory.uri = parentUrl + directory.key;
 };
 
-const attachUri = (parentUrl: string) => {
+const attachUri = <T>(parentUrl: string) => {
   return function resolveAndAttachUris(result: any) {
-    const children = result._children || [];
+    const children = result?._children || [];
 
     children.forEach(function (child: any) {
       const childType = child._elementType.toLowerCase();
@@ -319,7 +319,7 @@ const attachUri = (parentUrl: string) => {
       }
     });
 
-    return result;
+    return result as T;
   };
 };
 

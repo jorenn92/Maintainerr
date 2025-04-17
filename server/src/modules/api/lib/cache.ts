@@ -1,6 +1,6 @@
 import NodeCache from 'node-cache';
 
-type AvailableCacheIds =
+type AvailableCacheId =
   | 'tmdb'
   | 'plexguid'
   | 'plextv'
@@ -9,7 +9,7 @@ type AvailableCacheIds =
   | 'tautulli'
   | 'jellyseerr';
 
-type CacheType = AvailableCacheIds | 'radarr' | 'sonarr';
+type CacheType = AvailableCacheId | 'radarr' | 'sonarr';
 
 const DEFAULT_TTL = 300; // 5 min
 const DEFAULT_CHECK_PERIOD = 120; // 2 min
@@ -50,7 +50,7 @@ export class Cache {
 }
 
 class CacheManager {
-  private availableCaches: Record<AvailableCacheIds, Cache> = {
+  private availableCaches: Record<AvailableCacheId, Cache> = {
     tmdb: new Cache('tmdb', 'The Movie Database API', 'tmdb', {
       stdTtl: 21600, // 6 hours
       checkPeriod: 60 * 30,
@@ -80,7 +80,11 @@ class CacheManager {
     return (this.availableCaches[id] = new Cache(id, name, type, options));
   }
 
-  public getCache(id: string): Cache | undefined {
+  public getCache(id: AvailableCacheId): Cache {
+    return this.availableCaches[id];
+  }
+
+  public getAnonymousCache(id: string): Cache | undefined {
     return this.availableCaches[id];
   }
 

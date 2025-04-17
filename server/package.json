@@ -6,6 +6,7 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "nest:build": "nest build",
+    "strict-check": "tsc --noEmit -p tsconfig.strict.json",
     "start": "node dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "format": "prettier --write .",

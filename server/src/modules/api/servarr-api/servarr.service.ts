@@ -1,10 +1,10 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SettingsService } from '../../../modules/settings/settings.service';
-import { RadarrApi } from './helpers/radarr.helper';
-import { SonarrApi } from './helpers/sonarr.helper';
-import cacheManager from '../lib/cache';
 import { RadarrSettingRawDto } from "../../settings/dto's/radarr-setting.dto";
 import { SonarrSettingRawDto } from "../../settings/dto's/sonarr-setting.dto";
+import cacheManager from '../lib/cache';
+import { RadarrApi } from './helpers/radarr.helper';
+import { SonarrApi } from './helpers/sonarr.helper';
 
 @Injectable()
 export class ServarrService {
@@ -32,7 +32,7 @@ export class ServarrService {
         }
 
         const cacheKey = `sonarr-${id}`;
-        if (!cacheManager.getCache(cacheKey)) {
+        if (!cacheManager.getAnonymousCache(cacheKey)) {
           cacheManager.createCache(cacheKey, `Sonarr-${id}`, 'sonarr');
         }
 
@@ -62,7 +62,7 @@ export class ServarrService {
         }
 
         const cacheKey = `radarr-${id}`;
-        if (!cacheManager.getCache(cacheKey)) {
+        if (!cacheManager.getAnonymousCache(cacheKey)) {
           cacheManager.createCache(cacheKey, `Radarr-${id}`, 'radarr');
         }
 
