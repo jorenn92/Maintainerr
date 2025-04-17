@@ -219,8 +219,6 @@ const CollectionDetail: React.FC<ICollectionDetail> = (
       {mediaTestModalOpen && props.collection?.id ? (
         <TestMediaItem
           collectionId={+props.collection.id}
-          libraryId={props.libraryId}
-          dataType={props.collection.type}
           onCancel={() => {
             setMediaTestModalOpen(false)
           }}
