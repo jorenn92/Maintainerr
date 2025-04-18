@@ -1,19 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import GetApiHandler, {
-  PostApiHandler,
-  PutApiHandler,
-} from '../../../../utils/ApiHandler'
-import RuleCreator, { IRule } from '../../Rule/RuleCreator'
-import ConstantsContext, {
-  Application,
-} from '../../../../contexts/constants-context'
-import LibrariesContext, {
-  ILibrary,
-} from '../../../../contexts/libraries-context'
-import Alert from '../../../Common/Alert'
-import ArrAction from './ArrAction'
-import { IRuleGroup } from '..'
-import { ICollection } from '../../../Collection'
+import { CloudDownloadIcon } from '@heroicons/react/outline'
 import {
   BanIcon,
   DownloadIcon,
@@ -21,15 +6,32 @@ import {
   SaveIcon,
   UploadIcon,
 } from '@heroicons/react/solid'
-import Router from 'next/router'
 import Link from 'next/link'
-import Button from '../../../Common/Button'
-import CommunityRuleModal from '../../../Common/CommunityRuleModal'
-import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
-import CachedImage from '../../../Common/CachedImage'
-import YamlImporterModal from '../../../Common/YamlImporterModal'
-import { CloudDownloadIcon } from '@heroicons/react/outline'
+import Router from 'next/router'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
+import { IRuleGroup } from '..'
+import ConstantsContext, {
+  Application,
+} from '../../../../contexts/constants-context'
+import LibrariesContext, {
+  ILibrary,
+} from '../../../../contexts/libraries-context'
+import GetApiHandler, {
+  PostApiHandler,
+  PutApiHandler,
+} from '../../../../utils/ApiHandler'
+import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
+import { ICollection } from '../../../Collection'
+import Alert from '../../../Common/Alert'
+import Button from '../../../Common/Button'
+import CachedImage from '../../../Common/CachedImage'
+import CommunityRuleModal from '../../../Common/CommunityRuleModal'
+import YamlImporterModal from '../../../Common/YamlImporterModal'
+import { AgentConfiguration } from '../../../Settings/Notifications/CreateNotificationModal'
+import RuleCreator, { IRule } from '../../Rule/RuleCreator'
+import ArrAction from './ArrAction'
+import ConfigureNotificationModal from './ConfigureNotificationModal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -59,6 +61,7 @@ interface ICreateApiObject {
   }
   rules: IRule[]
   dataType: EPlexDataType
+  notifications: AgentConfiguration[]
 }
 
 const AddModal = (props: AddModal) => {
@@ -73,15 +76,17 @@ const AddModal = (props: AddModal) => {
   const [isLoading, setIsLoading] = useState(true)
   const [CommunityModal, setCommunityModal] = useState(false)
   const [yamlImporterModal, setYamlImporterModal] = useState(false)
-  const yaml = useRef<string>()
+  const [configureNotificionModal, setConfigureNotificationModal] =
+    useState(false)
+  const yaml = useRef<string>(undefined)
 
-  const nameRef = useRef<any>()
-  const descriptionRef = useRef<any>()
-  const libraryRef = useRef<any>()
-  const collectionTypeRef = useRef<any>()
-  const deleteAfterRef = useRef<any>()
-  const keepLogsForMonthsRef = useRef<any>()
-  const tautulliWatchedPercentOverrideRef = useRef<any>()
+  const nameRef = useRef<any>(undefined)
+  const descriptionRef = useRef<any>(undefined)
+  const libraryRef = useRef<any>(undefined)
+  const collectionTypeRef = useRef<any>(undefined)
+  const deleteAfterRef = useRef<any>(undefined)
+  const keepLogsForMonthsRef = useRef<any>(undefined)
+  const tautulliWatchedPercentOverrideRef = useRef<any>(undefined)
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showRecommended, setShowRecommended] = useState<boolean>(true)
   const [showHome, setShowHome] = useState<boolean>(true)
@@ -89,6 +94,12 @@ const AddModal = (props: AddModal) => {
   const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
   const [manualCollection, setManualCollection] = useState<boolean>(false)
   const ConstantsCtx = useContext(ConstantsContext)
+  const [
+    configuredNotificationConfigurations,
+    setConfiguredNotificationConfigurations,
+  ] = useState<AgentConfiguration[]>(
+    props.editData?.notifications ? props.editData?.notifications : [],
+  )
 
   const { addToast } = useToasts()
 
@@ -122,6 +133,8 @@ const AddModal = (props: AddModal) => {
     ConstantsCtx.constants.applications?.some(
       (x) => x.id == Application.OVERSEERR,
     ) ?? false
+
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
   function updateLibraryId(value: string) {
     const lib = LibrariesCtx.libraries.find(
@@ -353,6 +366,7 @@ const AddModal = (props: AddModal) => {
           keepLogsForMonths: +keepLogsForMonthsRef.current.value,
         },
         rules: useRules ? rules : [],
+        notifications: configuredNotificationConfigurations,
       }
 
       if (!props.editData) {
@@ -893,6 +907,36 @@ const AddModal = (props: AddModal) => {
               </div>
             </div>
 
+            <div className="form-row">
+              <label
+                htmlFor="notifications"
+                className="text-label flex items-center gap-2"
+              >
+                Notifications
+                <CachedImage
+                  className="h-[1.8em] w-[4em]"
+                  width={'0'}
+                  height={'0'}
+                  src={`${basePath}/beta.svg`}
+                  alt="BETA"
+                />
+              </label>
+              <div className="form-input">
+                <div className="form-input-field">
+                  <Button
+                    buttonType="default"
+                    type="button"
+                    name="notifications"
+                    onClick={() => {
+                      setConfigureNotificationModal(!configureNotificionModal)
+                    }}
+                  >
+                    <span>Configure</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             <hr className="mt-5" />
             <div className={`section ${useRules ? `` : `hidden`}`}>
               <div className="section">
@@ -963,6 +1007,20 @@ const AddModal = (props: AddModal) => {
                   }}
                 />
               ) : undefined}
+
+              {configureNotificionModal ? (
+                <ConfigureNotificationModal
+                  onSuccess={(selection) => {
+                    setConfiguredNotificationConfigurations(selection)
+                    setConfigureNotificationModal(false)
+                  }}
+                  onCancel={() => {
+                    setConfigureNotificationModal(false)
+                  }}
+                  selectedAgents={configuredNotificationConfigurations}
+                />
+              ) : undefined}
+
               <RuleCreator
                 key={ruleCreatorVersion.current}
                 mediaType={

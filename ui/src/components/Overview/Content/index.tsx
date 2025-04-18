@@ -1,10 +1,10 @@
+import _ from 'lodash'
 import { useEffect } from 'react'
 import { ICollectionMedia } from '../../Collection'
 import LoadingSpinner, {
   SmallLoadingSpinner,
 } from '../../Common/LoadingSpinner'
 import MediaCard from '../../Common/MediaCard'
-import _ from 'lodash'
 
 interface IOverviewContent {
   data: IPlexMetadata[]

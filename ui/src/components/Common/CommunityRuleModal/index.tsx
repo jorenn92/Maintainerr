@@ -1,4 +1,5 @@
 import { UploadIcon } from '@heroicons/react/solid'
+import { compareVersions } from 'compare-versions'
 import { useEffect, useRef, useState } from 'react'
 import GetApiHandler, { PostApiHandler } from '../../../utils/ApiHandler'
 import { IRule } from '../../Rules/Rule/RuleCreator'
@@ -10,7 +11,6 @@ import LoadingSpinner from '../LoadingSpinner'
 import Modal from '../Modal'
 import Pagination from '../Pagination'
 import SearchBar from '../SearchBar'
-import { compareVersions } from 'compare-versions'
 
 interface ICommunityRuleModal {
   onUpdate: (rules: IRule[]) => void
@@ -45,7 +45,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
   const [history, setHistory] = useState<ICommunityRuleKarmaHistory[]>([])
   const [showInfo, setInfo] = useState<boolean>(false)
   const [uploadMyRules, setUploadMyRules] = useState<boolean>(false)
-  const searchText = useRef<string>()
+  const searchText = useRef<string>(undefined)
   const appVersion = useRef<string>('0.0.0')
 
   const paging = 5

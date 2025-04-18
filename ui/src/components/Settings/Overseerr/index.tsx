@@ -39,14 +39,14 @@ const OverseerrSettings = () => {
     setHostname(removePortFromUrl(settingsCtx.settings.overseerr_url))
     // @ts-ignore
     hostnameRef.current = {
-      value: removePortFromUrl(settingsCtx.settings.overseerr_url),
+      value: removePortFromUrl(settingsCtx.settings.overseerr_url) ?? '',
     }
 
     // port
     setPort(getPortFromUrl(settingsCtx.settings.overseerr_url))
     // @ts-ignore
     portRef.current = {
-      value: getPortFromUrl(settingsCtx.settings.overseerr_url),
+      value: getPortFromUrl(settingsCtx.settings.overseerr_url) ?? '',
     }
   }, [settingsCtx])
 

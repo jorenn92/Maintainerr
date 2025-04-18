@@ -273,10 +273,10 @@ jobs:
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
           tags: |
-            ${{ env.GHCR_SLUG }}:${{ needs.semantic-release-dry.outputs.version }}
-            ${{ env.GHCR_SLUG }}:latest
-            ${{ env.DOCKERHUB_SLUG }}:${{ needs.semantic-release-dry.outputs.version }}
-            ${{ env.DOCKERHUB_SLUG }}:latest
+            type=raw,value=latest
+            type=semver,pattern={{version}},value=${{ needs.semantic-release-dry.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.semantic-release-dry.outputs.version }}
+            type=semver,pattern={{major}},value=${{ needs.semantic-release-dry.outputs.version }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Create manifest list and push
