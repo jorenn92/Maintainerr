@@ -1,10 +1,9 @@
-import { clone, debounce } from 'lodash'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { clone } from 'lodash'
+import { useContext, useEffect, useRef, useState } from 'react'
 import LibrariesContext from '../../contexts/libraries-context'
 import SearchContext from '../../contexts/search-context'
 import GetApiHandler from '../../utils/ApiHandler'
 import LibrarySwitcher from '../Common/LibrarySwitcher'
-import { SmallLoadingSpinner } from '../Common/LoadingSpinner'
 import OverviewContent, { IPlexMetadata } from './Content'
 
 const Overview = () => {
@@ -20,7 +19,7 @@ const Overview = () => {
   const totalSizeRef = useRef<number>(999)
 
   const [selectedLibrary, setSelectedLibrary] = useState<number>()
-  const selectedLibraryRef = useRef<number>()
+  const selectedLibraryRef = useRef<number>(undefined)
   const [searchUsed, setsearchUsed] = useState<boolean>(false)
 
   const pageData = useRef<number>(0)

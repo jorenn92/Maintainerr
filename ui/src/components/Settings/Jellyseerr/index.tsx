@@ -39,14 +39,14 @@ const JellyseerrSettings = () => {
     setHostname(removePortFromUrl(settingsCtx.settings.jellyseerr_url))
     // @ts-ignore
     hostnameRef.current = {
-      value: removePortFromUrl(settingsCtx.settings.jellyseerr_url),
+      value: removePortFromUrl(settingsCtx.settings.jellyseerr_url) ?? '',
     }
 
     // port
     setPort(getPortFromUrl(settingsCtx.settings.jellyseerr_url))
     // @ts-ignore
     portRef.current = {
-      value: getPortFromUrl(settingsCtx.settings.jellyseerr_url),
+      value: getPortFromUrl(settingsCtx.settings.jellyseerr_url) ?? '',
     }
   }, [settingsCtx])
 
