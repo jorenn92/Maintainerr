@@ -39,21 +39,21 @@ export class SonarrApi extends ServarrApi<{
   public async getEpisodes(
     seriesID: number,
     seasonNumber?: number,
-    episodeIds?: number[],
+    episodeNumbers?: number[],
   ): Promise<SonarrEpisode[]> {
     try {
       const response = await this.get<SonarrEpisode[]>(
         `/episode?seriesId=${seriesID}${
           seasonNumber ? `&seasonNumber=${seasonNumber}` : ''
-        }${episodeIds ? `&episodeIds=${episodeIds}` : ''}`,
+        }`,
       );
 
-      return episodeIds
-        ? response.filter((el) => episodeIds.includes(el.episodeNumber))
+      return episodeNumbers
+        ? response.filter((el) => episodeNumbers.includes(el.episodeNumber))
         : response;
     } catch (e) {
       this.logger.warn(
-        `[Sonarr] Failed to retrieve show ${seriesID}'s episodes ${episodeIds}: ${e.message}`,
+        `[Sonarr] Failed to retrieve show ${seriesID}'s episodes ${episodeNumbers}: ${e.message}`,
       );
       this.logger.debug(e);
     }

@@ -46,7 +46,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
   const [history, setHistory] = useState<ICommunityRuleKarmaHistory[]>([])
   const [showInfo, setInfo] = useState<boolean>(false)
   const [uploadMyRules, setUploadMyRules] = useState<boolean>(false)
-  const searchText = useRef<string>()
+  const searchText = useRef<string>(undefined)
   const appVersion = useRef<string>('0.0.0')
 
   const paging = 5

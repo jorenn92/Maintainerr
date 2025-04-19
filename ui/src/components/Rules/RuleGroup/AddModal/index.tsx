@@ -28,8 +28,10 @@ import Button from '../../../Common/Button'
 import CachedImage from '../../../Common/CachedImage'
 import CommunityRuleModal from '../../../Common/CommunityRuleModal'
 import YamlImporterModal from '../../../Common/YamlImporterModal'
+import { AgentConfiguration } from '../../../Settings/Notifications/CreateNotificationModal'
 import RuleCreator, { IRule } from '../../Rule/RuleCreator'
 import ArrAction from './ArrAction'
+import ConfigureNotificationModal from './ConfigureNotificationModal'
 
 interface AddModal {
   editData?: IRuleGroup
@@ -59,6 +61,7 @@ interface ICreateApiObject {
   }
   rules: IRule[]
   dataType: EPlexDataType
+  notifications: AgentConfiguration[]
 }
 
 const AddModal = (props: AddModal) => {
@@ -73,14 +76,17 @@ const AddModal = (props: AddModal) => {
   const [isLoading, setIsLoading] = useState(true)
   const [CommunityModal, setCommunityModal] = useState(false)
   const [yamlImporterModal, setYamlImporterModal] = useState(false)
-  const yaml = useRef<string>()
-  const nameRef = useRef<any>()
-  const descriptionRef = useRef<any>()
-  const libraryRef = useRef<any>()
-  const collectionTypeRef = useRef<any>()
-  const deleteAfterRef = useRef<any>()
-  const keepLogsForMonthsRef = useRef<any>()
-  const tautulliWatchedPercentOverrideRef = useRef<any>()
+  const [configureNotificionModal, setConfigureNotificationModal] =
+    useState(false)
+
+  const yaml = useRef<string>(undefined)
+  const nameRef = useRef<any>(undefined)
+  const descriptionRef = useRef<any>(undefined)
+  const libraryRef = useRef<any>(undefined)
+  const collectionTypeRef = useRef<any>(undefined)
+  const deleteAfterRef = useRef<any>(undefined)
+  const keepLogsForMonthsRef = useRef<any>(undefined)
+  const tautulliWatchedPercentOverrideRef = useRef<any>(undefined)
   const manualCollectionNameRef = useRef<any>('My custom collection')
   const [showRecommended, setShowRecommended] = useState<boolean>(true)
   const [showHome, setShowHome] = useState<boolean>(true)
@@ -88,6 +94,12 @@ const AddModal = (props: AddModal) => {
   const [forceOverseerr, setForceOverseerr] = useState<boolean>(false)
   const [manualCollection, setManualCollection] = useState<boolean>(false)
   const ConstantsCtx = useContext(ConstantsContext)
+  const [
+    configuredNotificationConfigurations,
+    setConfiguredNotificationConfigurations,
+  ] = useState<AgentConfiguration[]>(
+    props.editData?.notifications ? props.editData?.notifications : [],
+  )
 
   const [useRules, setUseRules] = useState<boolean>(
     props.editData ? props.editData.useRules : true,
@@ -119,6 +131,8 @@ const AddModal = (props: AddModal) => {
     ConstantsCtx.constants.applications?.some(
       (x) => x.id == Application.OVERSEERR,
     ) ?? false
+
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
   function updateLibraryId(value: string) {
     const lib = LibrariesCtx.libraries.find(
@@ -346,6 +360,7 @@ const AddModal = (props: AddModal) => {
           keepLogsForMonths: +keepLogsForMonthsRef.current.value,
         },
         rules: useRules ? rules : [],
+        notifications: configuredNotificationConfigurations,
       }
 
       if (!props.editData) {
@@ -661,65 +676,6 @@ const AddModal = (props: AddModal) => {
                       </div>
                     </div>
                   )}
-
-                  <div className="form-row">
-                    <label
-                      htmlFor="collection_logs_months"
-                      className="text-label"
-                    >
-                      Keep logs for months*
-                      <p className="text-xs font-normal">
-                        Duration for which collection logs should be retained,
-                        measured in months (0 = forever)
-                      </p>
-                    </label>
-                    <div className="form-input">
-                      <div className="form-input-field">
-                        <input
-                          type="number"
-                          name="collection_logs_months"
-                          id="collection_logs_months"
-                          defaultValue={
-                            collection ? collection.keepLogsForMonths : 6
-                          }
-                          ref={keepLogsForMonthsRef}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {tautulliEnabled && (
-                    <div className="form-row my-2 items-center">
-                      <label
-                        htmlFor="tautulli_watched_percent_override"
-                        className="text-label"
-                      >
-                        Tautulli watched percent override
-                        <p className="text-xs font-normal">
-                          Overrides the configured Watched Percent in Tautulli
-                          which is used to determine when media is counted as
-                          watched
-                        </p>
-                      </label>
-                      <div className="form-input">
-                        <div className="form-input-field">
-                          <input
-                            type="number"
-                            min={0}
-                            max={100}
-                            name="tautulli_watched_percent_override"
-                            id="tautulli_watched_percent_override"
-                            defaultValue={
-                              collection
-                                ? collection.tautulliWatchedPercentOverride
-                                : ''
-                            }
-                            ref={tautulliWatchedPercentOverrideRef}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -947,11 +903,74 @@ const AddModal = (props: AddModal) => {
                       </div>
                     </div>
                   </div>
+                  {tautulliEnabled && (
+                    <div className="form-row my-2">
+                      <label
+                        htmlFor="tautulli_watched_percent_override"
+                        className="text-label"
+                      >
+                        Tautulli watched percent override
+                        <p className="text-xs font-normal">
+                          Overrides the configured Watched Percent in Tautulli
+                          which is used to determine when media is counted as
+                          watched
+                        </p>
+                      </label>
+                      <div className="form-input w-3/4 md:ml-6">
+                        <div className="form-input-field">
+                          <input
+                            type="number"
+                            min={0}
+                            max={100}
+                            name="tautulli_watched_percent_override"
+                            id="tautulli_watched_percent_override"
+                            defaultValue={
+                              collection
+                                ? collection.tautulliWatchedPercentOverride
+                                : ''
+                            }
+                            ref={tautulliWatchedPercentOverrideRef}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="form-row my-2">
+                    <label
+                      htmlFor="notifications"
+                      className="text-label flex items-center gap-2"
+                    >
+                      Notifications
+                      <CachedImage
+                        className="h-[1.8em] w-[4em]"
+                        width={'0'}
+                        height={'0'}
+                        src={`${basePath}/beta.svg`}
+                        alt="BETA"
+                      />
+                    </label>
+                    <div className="form-input w-3/4 md:ml-6">
+                      <div className="form-input-field">
+                        <Button
+                          buttonType="default"
+                          type="button"
+                          name="notifications"
+                          onClick={() => {
+                            setConfigureNotificationModal(
+                              !configureNotificionModal,
+                            )
+                          }}
+                        >
+                          <span>Configure</span>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <hr className="mt-5" />
+          <hr className="mt-6 h-px border-0 bg-gray-200 dark:bg-gray-700"></hr>
           <div className="grid grid-cols-1">
             <div className="flex justify-center">
               <div className={`section ${useRules ? `` : `hidden`} md:w-3/4`}>
@@ -1023,6 +1042,20 @@ const AddModal = (props: AddModal) => {
                     }}
                   />
                 ) : undefined}
+
+                {configureNotificionModal ? (
+                  <ConfigureNotificationModal
+                    onSuccess={(selection) => {
+                      setConfiguredNotificationConfigurations(selection)
+                      setConfigureNotificationModal(false)
+                    }}
+                    onCancel={() => {
+                      setConfigureNotificationModal(false)
+                    }}
+                    selectedAgents={configuredNotificationConfigurations}
+                  />
+                ) : undefined}
+
                 <RuleCreator
                   key={ruleCreatorVersion.current}
                   mediaType={

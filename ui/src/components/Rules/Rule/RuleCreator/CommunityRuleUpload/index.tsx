@@ -13,9 +13,9 @@ interface ICommunityRuleUpload {
 }
 
 const CommunityRuleUpload = (props: ICommunityRuleUpload) => {
-  const nameRef = useRef<any>()
-  const descriptionRef = useRef<any>()
-  const uploadedByRef = useRef<any>()
+  const nameRef = useRef<any>(undefined)
+  const descriptionRef = useRef<any>(undefined)
+  const uploadedByRef = useRef<any>(undefined)
   const [thanksModal, setThanksModal] = useState<boolean>(false)
   const [failed, setFailed] = useState<string>('')
 

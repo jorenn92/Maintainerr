@@ -12,8 +12,6 @@ interface ITestMediaItem {
   onCancel: () => void
   onSubmit: () => void
   collectionId: number
-  libraryId: number
-  dataType: EPlexDataType
 }
 
 interface IOptions {
@@ -32,6 +30,13 @@ const emptyOption: IOptions = {
 }
 
 const TestMediaItem = (props: ITestMediaItem) => {
+  const [loading, setLoading] = useState(true)
+  const [ruleGroup, setRuleGroup] = useState<{
+    dataType: EPlexDataType
+    libraryId: number
+    id: string
+  }>()
+
   const [mediaItem, setMediaItem] = useState<IMediaOptions>()
   const [selectedSeasons, setSelectedSeasons] = useState<number>(-1)
   const [selectedEpisodes, setSelectedEpisodes] = useState<number>(-1)
@@ -42,27 +47,34 @@ const TestMediaItem = (props: ITestMediaItem) => {
   const [comparisonResult, setComparisonResult] = useState<IComparisonResult>()
   const editorRef = useRef(undefined)
 
+  useEffect(() => {
+    GetApiHandler(`/rules/collection/${props.collectionId}`).then((resp) => {
+      setRuleGroup(resp)
+      setLoading(false)
+    })
+  }, [])
+
   const testable = useMemo(() => {
-    if (!mediaItem) return false
+    if (!mediaItem || !ruleGroup) return false
 
     // if movies or shows is selected
     if (
-      props.dataType === EPlexDataType.MOVIES ||
-      props.dataType === EPlexDataType.SHOWS
+      ruleGroup.dataType === EPlexDataType.MOVIES ||
+      ruleGroup.dataType === EPlexDataType.SHOWS
     ) {
       return true
     }
 
     // if seasons & season is selected
     else if (
-      props.dataType === EPlexDataType.SEASONS &&
+      ruleGroup.dataType === EPlexDataType.SEASONS &&
       selectedSeasons !== -1
     ) {
       return true
     }
     // if episodes mediaitem, season & episode is selected
     else if (
-      props.dataType === EPlexDataType.EPISODES &&
+      ruleGroup.dataType === EPlexDataType.EPISODES &&
       selectedSeasons !== -1 &&
       selectedEpisodes !== -1
     ) {
@@ -125,8 +137,10 @@ const TestMediaItem = (props: ITestMediaItem) => {
   const onSubmit = async () => {
     setComparisonResult(undefined)
 
+    if (!ruleGroup) return
+
     const result = await PostApiHandler(`/rules/test`, {
-      rulegroupId: props.collectionId,
+      rulegroupId: ruleGroup.id,
       mediaId: selectedMediaId,
     })
 
@@ -150,6 +164,10 @@ const TestMediaItem = (props: ITestMediaItem) => {
     }
   }, [selectedSeasons, selectedEpisodes, mediaItem])
 
+  if (loading || !ruleGroup) {
+    return
+  }
+
   return (
     <div className={'h-full w-full'}>
       <Modal
@@ -172,22 +190,24 @@ const TestMediaItem = (props: ITestMediaItem) => {
               <br />
               <br />
               {`The rule group is of type ${
-                props.dataType === EPlexDataType.MOVIES
+                ruleGroup.dataType === EPlexDataType.MOVIES
                   ? 'movies'
-                  : props.dataType === EPlexDataType.SEASONS
+                  : ruleGroup.dataType === EPlexDataType.SEASONS
                     ? 'seasons'
-                    : props.dataType === EPlexDataType.EPISODES
+                    : ruleGroup.dataType === EPlexDataType.EPISODES
                       ? 'episodes'
                       : 'series'
               }, as a result only media of type ${
-                props.dataType === EPlexDataType.MOVIES ? 'movies' : 'series'
+                ruleGroup.dataType === EPlexDataType.MOVIES
+                  ? 'movies'
+                  : 'series'
               } will be displayed in the search bar.`}
             </Alert>
           </div>
           <FormItem label="Media">
             <SearchMediaItem
-              mediatype={props.dataType}
-              libraryId={props.libraryId}
+              mediatype={ruleGroup.dataType}
+              libraryId={ruleGroup.libraryId}
               onChange={(el) => {
                 updateMediaItem(el as unknown as IMediaOptions)
               }}
@@ -196,8 +216,8 @@ const TestMediaItem = (props: ITestMediaItem) => {
 
           {/* seasons */}
           <div className="w-full">
-            {props.dataType === EPlexDataType.SEASONS ||
-            props.dataType === EPlexDataType.EPISODES ? (
+            {ruleGroup.dataType === EPlexDataType.SEASONS ||
+            ruleGroup.dataType === EPlexDataType.EPISODES ? (
               <FormItem label="Season">
                 <select
                   name={`Seasons-field`}
@@ -218,7 +238,7 @@ const TestMediaItem = (props: ITestMediaItem) => {
               </FormItem>
             ) : undefined}
 
-            {props.dataType === EPlexDataType.EPISODES ? (
+            {ruleGroup.dataType === EPlexDataType.EPISODES ? (
               // episodes
               <FormItem label="Episode">
                 <select
