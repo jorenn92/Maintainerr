@@ -202,12 +202,7 @@ const RuleCreator = (props: iRuleCreator) => {
         return (
           <div key={`${sid}-${deleted.current}`} className="mb-4">
             <div className="rounded-lg bg-zinc-700 px-6 py-0.5 shadow-md">
-              <SectionHeading
-                id={sid}
-                name={'Section'}
-                onAdd={RuleAdded}
-                addAvailable={added.current.length <= 0}
-              />
+              <SectionHeading id={sid} name={'Section'} />
               <div className="flex flex-col space-y-2">
                 {ruleAmountArr[1][sid - 1].map((id, index) => (
                   <div

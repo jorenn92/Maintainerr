@@ -2,8 +2,6 @@ export interface ISectionHeading {
   id: number
   name: string
   description?: string
-  addAvailable: boolean
-  onAdd: (section: number) => void
 }
 
 const SectionHeading = (props: ISectionHeading) => {
