@@ -686,15 +686,15 @@ const AddModal = (props: AddModal) => {
                 Options{' '}
               </h2>
               <div className="flex w-full flex-col rounded-lg bg-zinc-800 px-3 py-1 md:w-3/4">
-                <div className="md:p-4">
-                  <div className="form-row mt-2">
+                <div className="space-y-2 md:p-4">
+                  <div className="form-row">
                     <label htmlFor="active" className="text-label">
                       Active
                       <p className="text-xs font-normal">
                         Will this rule be included in rule runs.
                       </p>
                     </label>
-                    <div className="form-input w-6 md:ml-6">
+                    <div className="form-input md:ml-6">
                       <div className="form-input-field">
                         <input
                           type="checkbox"
@@ -710,7 +710,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row mt-2">
+                  <div className="form-row">
                     <label htmlFor="collection_visible" className="text-label">
                       Show on library recommended
                       <p className="text-xs font-normal">
@@ -718,7 +718,7 @@ const AddModal = (props: AddModal) => {
                         screen
                       </p>
                     </label>
-                    <div className="form-input w-6 md:ml-6">
+                    <div className="form-input md:ml-6">
                       <div className="form-input-field">
                         <input
                           type="checkbox"
@@ -734,14 +734,14 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row mt-2">
+                  <div className="form-row">
                     <label htmlFor="collection_visible" className="text-label">
                       Show on home
                       <p className="text-xs font-normal">
                         Show the collection on the Plex home screen
                       </p>
                     </label>
-                    <div className="form-input w-6 md:ml-6">
+                    <div className="form-input md:ml-6">
                       <div className="form-input-field">
                         <input
                           type="checkbox"
@@ -757,7 +757,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row mt-2">
+                  <div className="form-row">
                     <label htmlFor="list_exclusions" className="text-label">
                       Add list exclusions
                       <p className="text-xs font-normal">
@@ -765,7 +765,7 @@ const AddModal = (props: AddModal) => {
                         {selectedLibrary ? selectedLibrary.type : 'movie'}
                       </p>
                     </label>
-                    <div className="form-input w-6 md:ml-6">
+                    <div className="form-input md:ml-6">
                       <div className="form-input-field">
                         <input
                           type="checkbox"
@@ -782,7 +782,7 @@ const AddModal = (props: AddModal) => {
                   </div>
 
                   {overseerrEnabled && (
-                    <div className="form-row mt-2">
+                    <div className="form-row">
                       <label htmlFor="force_overseerr" className="text-label">
                         Force reset Overseerr record
                         <p className="text-xs font-normal">
@@ -790,7 +790,7 @@ const AddModal = (props: AddModal) => {
                           availability-sync
                         </p>
                       </label>
-                      <div className="form-input w-6 md:ml-6">
+                      <div className="form-input md:ml-6">
                         <div className="form-input-field">
                           <input
                             type="checkbox"
@@ -807,14 +807,14 @@ const AddModal = (props: AddModal) => {
                     </div>
                   )}
 
-                  <div className="form-row mt-2">
+                  <div className="form-row">
                     <label htmlFor="use_rules" className="text-label">
                       Use rules
                       <p className="text-xs font-normal">
                         Toggle the rule system
                       </p>
                     </label>
-                    <div className="form-input w-6 md:ml-6">
+                    <div className="form-input md:ml-6">
                       <div className="form-input-field">
                         <input
                           type="checkbox"
@@ -830,14 +830,14 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row mt-2">
+                  <div className="form-row">
                     <label htmlFor="manual_collection" className="text-label">
                       Custom collection
                       <p className="text-xs font-normal">
                         Toggle internal collection system
                       </p>
                     </label>
-                    <div className="form-input w-6 md:ml-6">
+                    <div className="form-input md:ml-6">
                       <div className="form-input-field">
                         <input
                           type="checkbox"
@@ -878,7 +878,7 @@ const AddModal = (props: AddModal) => {
                       </div>
                     </div>
                   </div>
-                  <div className="form-row my-2">
+                  <div className="form-row">
                     <label
                       htmlFor="collection_logs_months"
                       className="text-label"
@@ -904,7 +904,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
                   {tautulliEnabled && (
-                    <div className="form-row my-2">
+                    <div className="form-row">
                       <label
                         htmlFor="tautulli_watched_percent_override"
                         className="text-label"
@@ -935,10 +935,10 @@ const AddModal = (props: AddModal) => {
                       </div>
                     </div>
                   )}
-                  <div className="form-row my-2">
+                  <div className="form-row">
                     <label
                       htmlFor="notifications"
-                      className="text-label flex items-center gap-2"
+                      className="text-label flex flex-wrap items-center gap-2"
                     >
                       Notifications
                       <CachedImage
