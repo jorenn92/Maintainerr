@@ -1,10 +1,10 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Timeout } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
-import { Exclusion } from '../entities/exclusion.entities';
 import { SettingsService } from '../../settings/settings.service';
-import { Timeout } from '@nestjs/schedule';
+import { Exclusion } from '../entities/exclusion.entities';
 import { RulesService } from '../rules.service';
 
 @Injectable()
@@ -29,7 +29,7 @@ export class ExclusionTypeCorrectorService implements OnModuleInit {
 
       if (appStatus) {
         // remove media exclusions that are no longer available
-        this.correctExclusionTypes();
+        await this.correctExclusionTypes();
       }
     } catch (e) {
       this.logger.warn(`Exclusion type corrections failed : ${e.message}`);
@@ -48,7 +48,7 @@ export class ExclusionTypeCorrectorService implements OnModuleInit {
       const metaData = await this.plexApi.getMetadata(el.plexId.toString());
       if (!metaData) {
         // remove record if not in Plex
-        this.rulesService.removeExclusion(el.id);
+        await this.rulesService.removeExclusion(el.id);
       } else {
         el.type = metaData?.type
           ? metaData.type === 'movie'
@@ -65,6 +65,6 @@ export class ExclusionTypeCorrectorService implements OnModuleInit {
     }
 
     // save edited data
-    this.exclusionRepo.save(exclusionsWithoutType);
+    await this.exclusionRepo.save(exclusionsWithoutType);
   }
 }
