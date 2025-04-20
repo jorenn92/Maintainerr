@@ -406,7 +406,7 @@ export class RulesService {
         );
 
         // remove previous rules
-        this.rulesRepository.delete({
+        await this.rulesRepository.delete({
           ruleGroupId: groupId,
         });
 

@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import _ from 'lodash';
 import { SettingsService } from '../../..//modules/settings/settings.service';
 import { TautulliApi } from './helpers/tautulli-api.helper';
-import _ from 'lodash';
 
 interface TautulliInfo {
   tautulli_version: string;
@@ -100,7 +100,7 @@ export class TautulliApiService {
     private readonly settings: SettingsService,
   ) {}
 
-  public async init() {
+  public init() {
     this.api = new TautulliApi({
       url: `${this.settings.tautulli_url}/api/v2`,
       apiKey: `${this.settings.tautulli_api_key}`,

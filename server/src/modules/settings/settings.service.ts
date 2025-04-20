@@ -120,7 +120,7 @@ export class SettingsService implements SettingDto {
       await this.settingsRepo.insert({
         apikey: this.generateApiKey(),
       });
-      this.init();
+      await this.init();
     }
   }
 
@@ -397,7 +397,7 @@ export class SettingsService implements SettingDto {
         });
         await this.init();
         this.logger.log('Settings updated');
-        this.plexApi.initialize({});
+        await this.plexApi.initialize({});
         this.overseerr.init();
         this.tautulli.init();
         this.internalApi.init();
@@ -410,7 +410,7 @@ export class SettingsService implements SettingDto {
           this.logger.log(
             `Rule Handler cron schedule changed.. Reloading job.`,
           );
-          this.internalApi
+          await this.internalApi
             .getApi()
             .put(
               '/rules/schedule/update',
@@ -426,7 +426,7 @@ export class SettingsService implements SettingDto {
           this.logger.log(
             `Collection Handler cron schedule changed.. Reloading job.`,
           );
-          this.internalApi
+          await this.internalApi
             .getApi()
             .put(
               '/collections/schedule/update',

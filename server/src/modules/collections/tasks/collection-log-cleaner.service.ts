@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { TasksService } from '../..//tasks/tasks.service';
 import { CollectionsService } from '../../collections/collections.service';
 import { TaskBase } from '../../tasks/task.base';
-import { TasksService } from '../..//tasks/tasks.service';
 
 @Injectable()
 export class CollectionLogCleanerService extends TaskBase {
@@ -27,14 +27,14 @@ export class CollectionLogCleanerService extends TaskBase {
 
       // for each collection
       for (const collection of collections) {
-        this.collectionService.removeOldCollectionLogs(collection);
+        await this.collectionService.removeOldCollectionLogs(collection);
       }
 
       // clean up
-      this.finish();
+      await this.finish();
     } catch (e) {
       this.logger.debug(e);
-      this.finish();
+      await this.finish();
     }
   }
 }
