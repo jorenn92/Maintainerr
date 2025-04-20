@@ -330,9 +330,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
             onSubmit={handleUpload}
             type={props.type}
             rules={props.currentRules ? props.currentRules : []}
-            {...(props.type === 'show' && props.level
-              ? { level: props.level }
-              : {})}
+            level={props.type === 'show' ? props.level : undefined}
           />
         ) : undefined}
       </Modal>

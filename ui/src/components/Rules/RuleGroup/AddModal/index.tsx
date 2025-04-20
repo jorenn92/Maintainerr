@@ -433,15 +433,15 @@ const AddModal = (props: AddModal) => {
           </Alert>
         ) : undefined}
         <form className="flex flex-col">
-          <div className="grid grid-cols-1 gap-x-5 gap-y-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
             {/* Start Left side of top section */}
             <div className="flex flex-col items-center">
               <h2 className="mb-2 flex justify-center font-semibold text-zinc-100">
                 General
               </h2>
-              <div className="flex w-full flex-col rounded-lg bg-zinc-800 px-3 py-1 md:ml-8">
-                <div className="md:p-4">
-                  <div className="form-row mt-2 items-center">
+              <div className="flex w-full flex-col rounded-lg bg-zinc-800 px-3 py-1">
+                <div className="space-y-2 md:p-4">
+                  <div className="form-row items-center">
                     <label htmlFor="name" className="text-label">
                       Name *
                       <p className="text-xs font-normal">
@@ -461,7 +461,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row mt-2 items-center">
+                  <div className="form-row items-center">
                     <label htmlFor="description" className="text-label">
                       Description
                     </label>
@@ -478,7 +478,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row">
+                  <div className="form-row items-center">
                     <label htmlFor="library" className="text-label">
                       Library *
                     </label>
@@ -536,7 +536,7 @@ const AddModal = (props: AddModal) => {
 
                   {selectedLibrary && selectedLibrary!.type !== 'movie' && (
                     <>
-                      <div className="form-row mt-2 items-center">
+                      <div className="form-row items-center">
                         <label htmlFor="type" className="text-label">
                           Media type*
                           <p className="text-xs font-normal">
@@ -650,7 +650,7 @@ const AddModal = (props: AddModal) => {
                   )}
 
                   {arrOption !== undefined && arrOption !== 4 && (
-                    <div className="form-row">
+                    <div className="form-row items-center">
                       <label
                         htmlFor="collection_deleteDays"
                         className="text-label"
@@ -681,13 +681,12 @@ const AddModal = (props: AddModal) => {
             </div>
             {/* Start Right side of top section */}
             <div className="flex flex-col items-center">
-              <h2 className="mb-2 flex font-semibold text-zinc-100">
-                {' '}
-                Options{' '}
+              <h2 className="mb-2 flex justify-center font-semibold text-zinc-100">
+                Options
               </h2>
-              <div className="flex w-full flex-col rounded-lg bg-zinc-800 px-3 py-1 md:w-3/4">
+              <div className="flex w-full flex-col rounded-lg bg-zinc-800 px-3 py-1">
                 <div className="space-y-2 md:p-4">
-                  <div className="form-row">
+                  <div className="form-row items-center">
                     <label htmlFor="active" className="text-label">
                       Active
                       <p className="text-xs font-normal">
@@ -710,7 +709,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row">
+                  <div className="form-row items-center">
                     <label htmlFor="collection_visible" className="text-label">
                       Show on library recommended
                       <p className="text-xs font-normal">
@@ -734,7 +733,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row">
+                  <div className="form-row items-center">
                     <label htmlFor="collection_visible" className="text-label">
                       Show on home
                       <p className="text-xs font-normal">
@@ -757,7 +756,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row">
+                  <div className="form-row items-center">
                     <label htmlFor="list_exclusions" className="text-label">
                       Add list exclusions
                       <p className="text-xs font-normal">
@@ -782,7 +781,7 @@ const AddModal = (props: AddModal) => {
                   </div>
 
                   {overseerrEnabled && (
-                    <div className="form-row">
+                    <div className="form-row items-center">
                       <label htmlFor="force_overseerr" className="text-label">
                         Force reset Overseerr record
                         <p className="text-xs font-normal">
@@ -807,7 +806,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   )}
 
-                  <div className="form-row">
+                  <div className="form-row items-center">
                     <label htmlFor="use_rules" className="text-label">
                       Use rules
                       <p className="text-xs font-normal">
@@ -830,7 +829,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
 
-                  <div className="form-row">
+                  <div className="form-row items-center">
                     <label htmlFor="manual_collection" className="text-label">
                       Custom collection
                       <p className="text-xs font-normal">
@@ -854,7 +853,7 @@ const AddModal = (props: AddModal) => {
                   </div>
 
                   <div
-                    className={`form-row ${manualCollection ? `` : `hidden`} mt-2`}
+                    className={`form-row ${manualCollection ? `` : `hidden`} items-center`}
                   >
                     <label
                       htmlFor="manual_collection_name"
@@ -878,7 +877,7 @@ const AddModal = (props: AddModal) => {
                       </div>
                     </div>
                   </div>
-                  <div className="form-row">
+                  <div className="form-row items-center">
                     <label
                       htmlFor="collection_logs_months"
                       className="text-label"
@@ -904,7 +903,7 @@ const AddModal = (props: AddModal) => {
                     </div>
                   </div>
                   {tautulliEnabled && (
-                    <div className="form-row">
+                    <div className="form-row items-center">
                       <label
                         htmlFor="tautulli_watched_percent_override"
                         className="text-label"
@@ -935,14 +934,14 @@ const AddModal = (props: AddModal) => {
                       </div>
                     </div>
                   )}
-                  <div className="form-row">
+                  <div className="form-row items-center">
                     <label
                       htmlFor="notifications"
                       className="text-label flex flex-wrap items-center gap-2"
                     >
                       Notifications
                       <CachedImage
-                        className="h-[1.8em] w-[4em]"
+                        className="h-[1.8em] w-[5em]"
                         width={'0'}
                         height={'0'}
                         src={`${basePath}/beta.svg`}

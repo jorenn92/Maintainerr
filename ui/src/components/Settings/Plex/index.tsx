@@ -3,7 +3,7 @@ import { SaveIcon } from '@heroicons/react/solid'
 import axios from 'axios'
 import { orderBy } from 'lodash'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { Id, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import SettingsContext from '../../../contexts/settings-context'
 import GetApiHandler, {
   DeleteApiHandler,
@@ -254,29 +254,26 @@ const PlexSettings = () => {
 
   const refreshPresetServers = async () => {
     setIsRefreshingPresets(true)
-    let toastId: Id | undefined
-    try {
-      toastId = toast.info('Retrieving server list from Plex', {
-        autoClose: false,
-      })
+    const toastId = 'plex-refresh-preset-servers'
 
-      const response: PlexDevice[] = await GetApiHandler(
+    try {
+      const serverPromise = GetApiHandler<PlexDevice[]>(
         '/settings/plex/devices/servers',
       )
 
-      if (response) {
-        setAvailableServers(response)
-      }
+      const response = await toast.promise(
+        serverPromise,
+        {
+          pending: 'Retrieving server list from Plex',
+          success: 'Plex server list retrieved successfully!',
+          error: 'Failed to retrieve Plex server list.',
+        },
+        {
+          toastId,
+        },
+      )
 
-      if (toastId) {
-        toast.dismiss(toastId)
-      }
-      toast.success('Plex server list retrieved successfully!')
-    } catch (e) {
-      if (toastId) {
-        toast.dismiss(toastId)
-      }
-      toast.error('Failed to retrieve Plex server list.')
+      setAvailableServers(response)
     } finally {
       setIsRefreshingPresets(false)
     }

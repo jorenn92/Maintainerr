@@ -368,7 +368,9 @@ const RuleInput = (props: IRuleInput) => {
             value={firstval}
             className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
           >
-            <option value={undefined}>Select First Value...</option>
+            <option value={undefined} className="text-amber-600">
+              Select First Value...
+            </option>
             {ConstantsCtx.constants.applications?.map((app) =>
               app.mediaType === MediaType.BOTH ||
               props.mediaType === app.mediaType ? (
@@ -405,7 +407,9 @@ const RuleInput = (props: IRuleInput) => {
             value={action}
             className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
           >
-            <option value={undefined}> </option>
+            <option value={undefined} className="text-amber-600">
+              Select Action...
+            </option>
             {possibilities.map((action) => (
               <option key={action} value={action}>
                 {RulePossibilityTranslations[action]}
@@ -429,14 +433,16 @@ const RuleInput = (props: IRuleInput) => {
             value={secondVal}
             className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
           >
-            <option value={undefined}> </option>
+            <option value={undefined} className="text-amber-600">
+              Select Second Value...
+            </option>
             <optgroup label="Custom values">
               {ruleType === RuleType.DATE ? (
                 <>
                   <option value={CustomParams.CUSTOM_DAYS}>
                     Amount of days
                   </option>
-                  {action &&
+                  {action != null &&
                   action !== RulePossibility.IN_LAST &&
                   action !== RulePossibility.IN_NEXT ? (
                     <option value={CustomParams.CUSTOM_DATE}>
@@ -459,7 +465,7 @@ const RuleInput = (props: IRuleInput) => {
             {ConstantsCtx.constants.applications?.map((app) => {
               return (app.mediaType === MediaType.BOTH ||
                 props.mediaType === app.mediaType) &&
-                action &&
+                action != null &&
                 action !== RulePossibility.IN_LAST &&
                 action !== RulePossibility.IN_NEXT ? (
                 <optgroup key={app.id} label={app.name}>
@@ -490,7 +496,7 @@ const RuleInput = (props: IRuleInput) => {
         </div>
 
         {/* Custom Value Input */}
-        {customValActive && (
+        {customValActive ? (
           <div className="mb-2">
             <label
               htmlFor="custom_val"
@@ -506,11 +512,11 @@ const RuleInput = (props: IRuleInput) => {
                 id="custom_val"
                 onChange={updateCustomValue}
                 value={customVal ? +customVal / 86400 : undefined}
-                placeholder="Amount of Days"
-                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
-              />
-            ) : customValType === RuleType.TEXT &&
-              secondVal === CustomParams.CUSTOM_TEXT ? (
+                placeholder="Amount of days"
+              ></input>
+            ) : (customValType === RuleType.TEXT &&
+                secondVal === CustomParams.CUSTOM_TEXT) ||
+              customValType === RuleType.TEXT_LIST ? (
               <input
                 type="text"
                 name="custom_val"
@@ -518,8 +524,7 @@ const RuleInput = (props: IRuleInput) => {
                 onChange={updateCustomValue}
                 value={customVal}
                 placeholder="Text"
-                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
-              />
+              ></input>
             ) : customValType === RuleType.DATE ? (
               <input
                 type="date"
@@ -527,15 +532,14 @@ const RuleInput = (props: IRuleInput) => {
                 id="custom_val"
                 onChange={updateCustomValue}
                 value={customVal}
-                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
-              />
+                placeholder="Date"
+              ></input>
             ) : customValType === RuleType.BOOL ? (
               <select
                 name="custom_val"
                 id="custom_val"
                 onChange={updateCustomValue}
                 value={customVal}
-                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
               >
                 <option value={1}>True</option>
                 <option value={0}>False</option>
@@ -548,11 +552,10 @@ const RuleInput = (props: IRuleInput) => {
                 onChange={updateCustomValue}
                 value={customVal}
                 placeholder="Number"
-                className="w-full rounded-lg p-2 text-zinc-100 focus:border-amber-500 focus:ring-amber-500"
-              />
+              ></input>
             )}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   )
