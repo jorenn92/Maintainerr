@@ -24,6 +24,7 @@ async function bootstrap() {
 
   app.useLogger(app.get(MaintainerrLogger));
   app.enableCors({ origin: true });
+  app.enableShutdownHooks();
 
   const apiPort = process.env.API_PORT || 3001;
   await app.listen(apiPort);

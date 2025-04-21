@@ -1,11 +1,11 @@
+import { MaintainerrEvent } from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CollectionsService } from '../collections/collections.service';
 import { TaskBase } from '../tasks/task.base';
 import { TasksService } from '../tasks/tasks.service';
-import { NotificationService } from './notifications.service';
 import { NotificationType } from './notifications-interfaces';
-import { CollectionsService } from '../collections/collections.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { MaintainerrEvent } from '@maintainerr/contracts';
+import { NotificationService } from './notifications.service';
 
 // This job sends notifications for the  "About to Be Removed" notificaton type. The job loops through all configured notification providers and sends one notification per provider.
 // Each notification includes all media items from all active child collections that are scheduled for removal within the specified number of days.
@@ -30,19 +30,9 @@ export class NotificationTimerService extends TaskBase {
 
   protected onBootstrapHook(): void {}
 
-  public async execute() {
+  protected async executeTask() {
     // helper submethod
-    const getDayStart = (date) => new Date(date.setHours(0, 0, 0, 0));
-
-    // check if another instance of this task is already running
-    if (await this.isRunning()) {
-      this.logger.log(
-        `Another instance of the ${this.name} task is currently running. Skipping this execution`,
-      );
-      return;
-    }
-
-    await super.execute();
+    const getDayStart = (date: Date) => new Date(date.setHours(0, 0, 0, 0));
 
     const activeAgents = this.notificationService.getActiveAgents();
     const allNotificationConfigurations =
@@ -98,7 +88,5 @@ export class NotificationTimerService extends TaskBase {
         }
       }
     });
-
-    this.finish();
   }
 }
