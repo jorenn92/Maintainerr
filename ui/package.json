@@ -34,7 +34,7 @@
     "react-select": "^5.10.1",
     "react-toast-notifications": "^2.5.1",
     "reconnecting-eventsource": "^1.6.4",
-    "yaml": "^2.7.0",
+    "yaml": "^2.7.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {
