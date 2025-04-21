@@ -40,21 +40,16 @@ export abstract class TaskBase
     }
   }
 
-  async onApplicationShutdown(signal?: string) {
-    console.log(`Received shutdown signal (console): ${signal}`);
-    this.logger.log(`Received shutdown signal (log): ${signal}`);
-
+  async onApplicationShutdown() {
     this.abortController?.abort();
 
     if (!(await this.isRunning())) return;
 
-    this.logger.log(`Stopping the ${this.name} task`);
+    this.logger.log(`Stopping the ${this.name} task...`);
 
     while (await this.isRunning()) {
       await delay(1000);
     }
-
-    // TODO Some max wait time?
 
     this.logger.log(`Task ${this.name} stopped`);
   }
