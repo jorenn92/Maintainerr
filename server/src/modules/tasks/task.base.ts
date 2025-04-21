@@ -40,7 +40,10 @@ export abstract class TaskBase
     }
   }
 
-  async onApplicationShutdown() {
+  async onApplicationShutdown(signal?: string) {
+    console.log(`Received shutdown signal (console): ${signal}`);
+    this.logger.log(`Received shutdown signal (log): ${signal}`);
+
     this.abortController?.abort();
 
     if (!(await this.isRunning())) return;
