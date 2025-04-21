@@ -57,20 +57,6 @@ export abstract class TaskBase
   // implement this on subclasses to do things in onApplicationBootstrap
   protected onBootstrapHook() {}
 
-  public async stopExecution() {
-    if (!(await this.isRunning()) || this.abortController.signal.aborted)
-      return;
-
-    this.logger.log(`Requesting to stop the ${this.name} task`);
-    this.abortController?.abort();
-
-    while (await this.isRunning()) {
-      await delay(1000);
-    }
-
-    this.logger.log(`Task ${this.name} stopped by request`);
-  }
-
   public async execute(abortController?: AbortController) {
     if (await this.isRunning()) {
       this.logger.log(
@@ -86,16 +72,26 @@ export abstract class TaskBase
       abortController?.signal.throwIfAborted();
       await this.executeTask(this.abortController.signal);
     } finally {
-      await this.finish();
+      this.abortController = undefined;
+      await this.taskService.clearRunning(this.name);
     }
   }
 
   protected abstract executeTask(abortSignal: AbortSignal): Promise<void>;
 
-  private finish = async () => {
-    this.abortController = undefined;
-    await this.taskService.clearRunning(this.name);
-  };
+  public async stopExecution() {
+    if (!(await this.isRunning()) || this.abortController.signal.aborted)
+      return;
+
+    this.logger.log(`Requesting to stop the ${this.name} task`);
+    this.abortController?.abort();
+
+    while (await this.isRunning()) {
+      await delay(1000);
+    }
+
+    this.logger.log(`Task ${this.name} stopped by request`);
+  }
 
   public updateJob(cron: string) {
     return this.taskService.updateJob(this.name, cron, this.execute.bind(this));
