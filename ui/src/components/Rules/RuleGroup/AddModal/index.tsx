@@ -685,285 +685,292 @@ const AddModal = (props: AddModal) => {
                 Options
               </h2>
               <div className="flex w-full flex-col rounded-lg bg-zinc-800 px-3 py-1">
-                <div className="space-y-2 md:p-4">
-                  <div className="form-row items-center">
-                    <label htmlFor="active" className="text-label">
-                      Active
-                      <p className="text-xs font-normal">
-                        Will this rule be included in rule runs.
-                      </p>
-                    </label>
-                    <div className="form-input md:ml-6">
-                      <div className="form-input-field">
-                        <input
-                          type="checkbox"
-                          name="is_active"
-                          id="is_active"
-                          className=""
-                          defaultChecked={active}
-                          onChange={() => {
-                            setActive(!active)
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-row items-center">
-                    <label htmlFor="collection_visible" className="text-label">
-                      Show on library recommended
-                      <p className="text-xs font-normal">
-                        Show the collection on the Plex library recommended
-                        screen
-                      </p>
-                    </label>
-                    <div className="form-input md:ml-6">
-                      <div className="form-input-field">
-                        <input
-                          type="checkbox"
-                          name="collection_visible_library"
-                          id="collection_visible_library"
-                          className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
-                          defaultChecked={showRecommended}
-                          onChange={() => {
-                            setShowRecommended(!showRecommended)
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-row items-center">
-                    <label htmlFor="collection_visible" className="text-label">
-                      Show on home
-                      <p className="text-xs font-normal">
-                        Show the collection on the Plex home screen
-                      </p>
-                    </label>
-                    <div className="form-input md:ml-6">
-                      <div className="form-input-field">
-                        <input
-                          type="checkbox"
-                          name="collection_visible"
-                          id="collection_visible"
-                          className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
-                          defaultChecked={showHome}
-                          onChange={() => {
-                            setShowHome(!showHome)
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-row items-center">
-                    <label htmlFor="list_exclusions" className="text-label">
-                      Add list exclusions
-                      <p className="text-xs font-normal">
-                        Prevent lists to re-add removed{' '}
-                        {selectedLibrary ? selectedLibrary.type : 'movie'}
-                      </p>
-                    </label>
-                    <div className="form-input md:ml-6">
-                      <div className="form-input-field">
-                        <input
-                          type="checkbox"
-                          name="list_exclusions"
-                          id="list_exclusions"
-                          className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
-                          defaultChecked={listExclusion}
-                          onChange={() => {
-                            setListExclusion(!listExclusion)
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {overseerrEnabled && (
-                    <div className="form-row items-center">
-                      <label htmlFor="force_overseerr" className="text-label">
-                        Force reset Overseerr record
+                <div className="grid grid-cols-1 md:grid-cols-2 md:gap-3">
+                  {/* Checkbox Options */}
+                  <div className="flex flex-col p-2 md:my-2 md:border-r-2 md:border-dashed md:border-zinc-700 md:p-4">
+                    <div className="flex flex-row items-center justify-between py-4">
+                      <label htmlFor="active" className="text-label">
+                        Active
                         <p className="text-xs font-normal">
-                          Resets the Overseerr record instead of relying on
-                          availability-sync
+                          Will this rule be included in rule runs.
                         </p>
                       </label>
-                      <div className="form-input md:ml-6">
+                      <div className="form-input">
                         <div className="form-input-field">
                           <input
                             type="checkbox"
-                            name="force_overseerr"
-                            id="force_overseerr"
-                            className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
-                            defaultChecked={forceOverseerr}
+                            name="is_active"
+                            id="is_active"
+                            className=""
+                            defaultChecked={active}
                             onChange={() => {
-                              setForceOverseerr(!forceOverseerr)
+                              setActive(!active)
                             }}
                           />
                         </div>
                       </div>
                     </div>
-                  )}
 
-                  <div className="form-row items-center">
-                    <label htmlFor="use_rules" className="text-label">
-                      Use rules
-                      <p className="text-xs font-normal">
-                        Toggle the rule system
-                      </p>
-                    </label>
-                    <div className="form-input md:ml-6">
-                      <div className="form-input-field">
-                        <input
-                          type="checkbox"
-                          name="use_rules"
-                          id="use_rules"
-                          className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
-                          defaultChecked={useRules}
-                          onChange={() => {
-                            setUseRules(!useRules)
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-row items-center">
-                    <label htmlFor="manual_collection" className="text-label">
-                      Custom collection
-                      <p className="text-xs font-normal">
-                        Toggle internal collection system
-                      </p>
-                    </label>
-                    <div className="form-input md:ml-6">
-                      <div className="form-input-field">
-                        <input
-                          type="checkbox"
-                          name="manual_collection"
-                          id="manual_collection"
-                          className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
-                          defaultChecked={manualCollection}
-                          onChange={() => {
-                            setManualCollection(!manualCollection)
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`form-row ${manualCollection ? `` : `hidden`} items-center`}
-                  >
-                    <label
-                      htmlFor="manual_collection_name"
-                      className="text-label"
-                    >
-                      Custom collection name
-                      <p className="text-xs font-normal">
-                        Collection must exist in Plex
-                      </p>
-                    </label>
-
-                    <div className="form-input w-3/4 md:ml-6">
-                      <div className="form-input-field">
-                        <input
-                          type="text"
-                          name="manual_collection_name"
-                          id="manual_collection_name"
-                          defaultValue={collection?.manualCollectionName}
-                          ref={manualCollectionNameRef}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="form-row items-center">
-                    <label
-                      htmlFor="collection_logs_months"
-                      className="text-label"
-                    >
-                      Keep logs for months*
-                      <p className="text-xs font-normal">
-                        Duration for which collection logs should be retained,
-                        measured in months (0 = forever)
-                      </p>
-                    </label>
-                    <div className="form-input w-3/4 md:ml-6">
-                      <div className="form-input-field">
-                        <input
-                          type="number"
-                          name="collection_logs_months"
-                          id="collection_logs_months"
-                          defaultValue={
-                            collection ? collection.keepLogsForMonths : 6
-                          }
-                          ref={keepLogsForMonthsRef}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  {tautulliEnabled && (
-                    <div className="form-row items-center">
+                    <div className="flex flex-row items-center justify-between py-4">
                       <label
-                        htmlFor="tautulli_watched_percent_override"
+                        htmlFor="collection_visible"
                         className="text-label"
                       >
-                        Tautulli watched percent override
+                        Show on library recommended
                         <p className="text-xs font-normal">
-                          Overrides the configured Watched Percent in Tautulli
-                          which is used to determine when media is counted as
-                          watched
+                          Show the collection on the Plex library recommended
+                          screen
                         </p>
                       </label>
-                      <div className="form-input w-3/4 md:ml-6">
+                      <div className="form-input">
                         <div className="form-input-field">
                           <input
-                            type="number"
-                            min={0}
-                            max={100}
-                            name="tautulli_watched_percent_override"
-                            id="tautulli_watched_percent_override"
-                            defaultValue={
-                              collection
-                                ? collection.tautulliWatchedPercentOverride
-                                : ''
-                            }
-                            ref={tautulliWatchedPercentOverrideRef}
+                            type="checkbox"
+                            name="collection_visible_library"
+                            id="collection_visible_library"
+                            className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                            defaultChecked={showRecommended}
+                            onChange={() => {
+                              setShowRecommended(!showRecommended)
+                            }}
                           />
                         </div>
                       </div>
                     </div>
-                  )}
-                  <div className="form-row items-center">
-                    <label
-                      htmlFor="notifications"
-                      className="text-label flex flex-wrap items-center gap-2"
-                    >
-                      Notifications
-                      <CachedImage
-                        className="h-[1.8em] w-[5em]"
-                        width={'0'}
-                        height={'0'}
-                        src={`${basePath}/beta.svg`}
-                        alt="BETA"
-                      />
-                    </label>
-                    <div className="form-input w-3/4 md:ml-6">
-                      <div className="form-input-field">
-                        <Button
-                          buttonType="default"
-                          type="button"
-                          name="notifications"
-                          onClick={() => {
-                            setConfigureNotificationModal(
-                              !configureNotificionModal,
-                            )
-                          }}
-                        >
-                          <span>Configure</span>
-                        </Button>
+
+                    <div className="flex flex-row items-center justify-between py-4">
+                      <label
+                        htmlFor="collection_visible"
+                        className="text-label"
+                      >
+                        Show on home
+                        <p className="text-xs font-normal">
+                          Show the collection on the Plex home screen
+                        </p>
+                      </label>
+                      <div className="form-input">
+                        <div className="form-input-field">
+                          <input
+                            type="checkbox"
+                            name="collection_visible"
+                            id="collection_visible"
+                            className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                            defaultChecked={showHome}
+                            onChange={() => {
+                              setShowHome(!showHome)
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
+
+                    <div className="flex flex-row items-center justify-between py-4">
+                      <label htmlFor="list_exclusions" className="text-label">
+                        Add list exclusions
+                        <p className="text-xs font-normal">
+                          Prevent lists to re-add removed{' '}
+                          {selectedLibrary ? selectedLibrary.type : 'movie'}
+                        </p>
+                      </label>
+                      <div className="form-input">
+                        <div className="form-input-field">
+                          <input
+                            type="checkbox"
+                            name="list_exclusions"
+                            id="list_exclusions"
+                            className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                            defaultChecked={listExclusion}
+                            onChange={() => {
+                              setListExclusion(!listExclusion)
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {overseerrEnabled && (
+                      <div className="flex flex-row items-center justify-between py-4">
+                        <label htmlFor="force_overseerr" className="text-label">
+                          Force reset Overseerr record
+                          <p className="text-xs font-normal">
+                            Resets the Overseerr record instead of relying on
+                            availability-sync
+                          </p>
+                        </label>
+                        <div className="form-input">
+                          <div className="form-input-field">
+                            <input
+                              type="checkbox"
+                              name="force_overseerr"
+                              id="force_overseerr"
+                              className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                              defaultChecked={forceOverseerr}
+                              onChange={() => {
+                                setForceOverseerr(!forceOverseerr)
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex flex-row items-center justify-between py-4">
+                      <label htmlFor="use_rules" className="text-label">
+                        Use rules
+                        <p className="text-xs font-normal">
+                          Toggle the rule system
+                        </p>
+                      </label>
+                      <div className="form-input">
+                        <div className="form-input-field">
+                          <input
+                            type="checkbox"
+                            name="use_rules"
+                            id="use_rules"
+                            className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                            defaultChecked={useRules}
+                            onChange={() => {
+                              setUseRules(!useRules)
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-row items-center justify-between py-4">
+                      <label htmlFor="manual_collection" className="text-label">
+                        Custom collection
+                        <p className="text-xs font-normal">
+                          Toggle internal collection system
+                        </p>
+                      </label>
+                      <div className="form-input">
+                        <div className="form-input-field">
+                          <input
+                            type="checkbox"
+                            name="manual_collection"
+                            id="manual_collection"
+                            className="border-zinc-600 hover:border-zinc-500 focus:border-zinc-500 focus:bg-opacity-100 focus:placeholder-zinc-400 focus:outline-none focus:ring-0"
+                            defaultChecked={manualCollection}
+                            onChange={() => {
+                              setManualCollection(!manualCollection)
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className={`flex flex-col ${manualCollection ? `` : `hidden`} `}
+                    >
+                      <label
+                        htmlFor="manual_collection_name"
+                        className="text-label"
+                      >
+                        Custom collection name
+                        <p className="text-xs font-normal">
+                          Collection must exist in Plex
+                        </p>
+                      </label>
+
+                      <div className="py-2">
+                        <div className="form-input-field">
+                          <input
+                            type="text"
+                            name="manual_collection_name"
+                            id="manual_collection_name"
+                            defaultValue={collection?.manualCollectionName}
+                            ref={manualCollectionNameRef}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Form Input Options */}
+                  <div className="flex flex-col p-2 md:p-4">
+                    <div className="flex flex-row items-center justify-between py-2 md:py-4">
+                      <label htmlFor="notifications" className="text-label">
+                        Notifications
+                        <span className="ml-1.5 rounded-full bg-amber-600 px-3 text-white">
+                          BETA
+                        </span>
+                      </label>
+                      <div className="flex justify-end px-2 py-2">
+                        <div className="form-input-field w-20">
+                          <Button
+                            buttonType="default"
+                            type="button"
+                            name="notifications"
+                            className="w-full !bg-amber-600 hover:!bg-amber-500"
+                            onClick={() => {
+                              setConfigureNotificationModal(
+                                !configureNotificionModal,
+                              )
+                            }}
+                          >
+                            Configure
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row items-center justify-between py-2 md:py-4">
+                      <label
+                        htmlFor="collection_logs_months"
+                        className="text-label text-left"
+                      >
+                        Keep logs for months*
+                        <p className="text-xs font-normal">
+                          Duration for which collection logs should be retained,
+                          measured in months (0 = forever)
+                        </p>
+                      </label>
+                      <div className="flex justify-end px-2 py-2">
+                        <div className="form-input-field w-20">
+                          <input
+                            type="number"
+                            name="collection_logs_months"
+                            id="collection_logs_months"
+                            defaultValue={
+                              collection ? collection.keepLogsForMonths : 6
+                            }
+                            ref={keepLogsForMonthsRef}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {tautulliEnabled && (
+                      <div className="flex flex-row items-center justify-between py-2 md:py-4">
+                        <label
+                          htmlFor="tautulli_watched_percent_override"
+                          className="text-label text-left"
+                        >
+                          Tautulli watched percent override
+                          <p className="text-xs font-normal">
+                            Overrides the configured Watched Percent in
+                            Tautulli, which is used to determine when media is
+                            counted as watched
+                          </p>
+                        </label>
+                        <div className="flex justify-end px-2 py-2">
+                          <div className="form-input-field w-20">
+                            <input
+                              type="number"
+                              min={0}
+                              max={100}
+                              name="tautulli_watched_percent_override"
+                              id="tautulli_watched_percent_override"
+                              defaultValue={
+                                collection
+                                  ? collection.tautulliWatchedPercentOverride
+                                  : ''
+                              }
+                              ref={tautulliWatchedPercentOverrideRef}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
