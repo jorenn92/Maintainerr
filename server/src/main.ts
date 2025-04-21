@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
+import { setupGracefulShutdown } from 'nestjs-graceful-shutdown';
 import { patchNestJsSwagger } from 'nestjs-zod';
 import path from 'path';
 import { AppModule } from './app/app.module';
@@ -18,13 +19,14 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+  setupGracefulShutdown({ app });
+
   const config = new DocumentBuilder().setTitle('Maintainerr').build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/swagger', app, documentFactory);
 
   app.useLogger(app.get(MaintainerrLogger));
   app.enableCors({ origin: true });
-  app.enableShutdownHooks();
 
   const apiPort = process.env.API_PORT || 3001;
   await app.listen(apiPort);
