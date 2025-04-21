@@ -84,7 +84,7 @@ export abstract class TaskBase
       return;
 
     this.logger.log(`Requesting to stop the ${this.name} task`);
-    this.abortController?.abort();
+    this.abortController.abort();
 
     while (await this.isRunning()) {
       await delay(1000);
