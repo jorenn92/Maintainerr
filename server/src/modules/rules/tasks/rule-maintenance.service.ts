@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TasksService } from '../../tasks/tasks.service';
-import { SettingsService } from '../../settings/settings.service';
-import { RulesService } from '../rules.service';
-import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { Collection } from '../../collections/entities/collection.entities';
+import { SettingsService } from '../../settings/settings.service';
 import { TaskBase } from '../../tasks/task.base';
+import { TasksService } from '../../tasks/tasks.service';
+import { RulesService } from '../rules.service';
 
 @Injectable()
 export class RuleMaintenanceService extends TaskBase {
@@ -26,8 +26,7 @@ export class RuleMaintenanceService extends TaskBase {
     super(taskService);
   }
 
-  public async execute() {
-    await super.execute();
+  protected async executeTask() {
     try {
       this.logger.log('Starting maintenance');
       const appStatus = await this.settings.testConnections();
@@ -45,7 +44,6 @@ export class RuleMaintenanceService extends TaskBase {
     } catch (e) {
       this.logger.error(`Rule Maintenance failed : ${e.message}`);
     }
-    this.finish();
   }
 
   private async removeLeftoverExclusions() {

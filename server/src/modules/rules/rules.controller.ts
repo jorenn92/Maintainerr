@@ -97,6 +97,16 @@ export class RulesController {
 
     this.ruleExecutorService.execute().catch((e) => console.error(e));
   }
+
+  @Post('/execute/stop')
+  async stopExecutingRules() {
+    if (!(await this.ruleExecutorService.isRunning())) {
+      return;
+    }
+
+    this.ruleExecutorService.stopExecution().catch((e) => console.error(e));
+  }
+
   @Post()
   async setRules(@Body() body: RulesDto): Promise<ReturnStatus> {
     return await this.rulesService.setRules(body);
