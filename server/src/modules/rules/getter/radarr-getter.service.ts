@@ -150,6 +150,14 @@ export class RadarrGetterService {
           case 'imdbRatingVotes': {
             return movieResponse.ratings.imdb?.votes ?? null;
           }
+          case 'fileQualityCutoffMet': {
+            return movieResponse.movieFile?.qualityCutoffNotMet != null
+              ? !movieResponse.movieFile.qualityCutoffNotMet
+              : false;
+          }
+          case 'fileQualityName': {
+            return movieResponse.movieFile?.quality?.quality?.name ?? null;
+          }
         }
       } else {
         this.logger.debug(
