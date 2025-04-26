@@ -4,6 +4,7 @@ import {
   SonarrEpisode,
   SonarrEpisodeFile,
   SonarrInfo,
+  SonarrSeason,
   SonarrSeries,
 } from '../interfaces/sonarr.interface';
 
@@ -162,26 +163,20 @@ export class SonarrApi extends ServarrApi<{
   public async UnmonitorDeleteEpisodes(
     seriesId: number,
     seasonNumber: number,
-    episodeNumbersOrEpisodes: number[] | SonarrEpisode[],
+    episodeIds: number[],
     deleteFiles = true,
   ) {
     this.logger.log(
       `${!deleteFiles ? 'Unmonitoring' : 'Deleting'} ${
-        episodeNumbersOrEpisodes.length
+        episodeIds.length
       } episode(s) from show with ID ${seriesId} from Sonarr.`,
     );
     try {
-      const isEpisodeArray = episodeNumbersOrEpisodes.every(
-        (x) => typeof x === 'object',
+      const episodes = await this.getEpisodes(
+        seriesId,
+        seasonNumber,
+        episodeIds,
       );
-
-      const episodes = !isEpisodeArray
-        ? await this.getEpisodes(
-            seriesId,
-            seasonNumber,
-            episodeNumbersOrEpisodes,
-          )
-        : episodeNumbersOrEpisodes;
 
       for (const e of episodes) {
         // unmonitor
@@ -190,80 +185,72 @@ export class SonarrApi extends ServarrApi<{
           JSON.stringify({ ...e, monitored: false }),
         );
         // also delete if required
-        if (deleteFiles && e.episodeFileId) {
+        if (deleteFiles) {
           await this.runDelete(`episodefile/${e.episodeFileId}`);
         }
       }
     } catch (e) {
-      this.logger.warn(
-        `Couldn\'t remove/unmonitor episodes: ${episodeNumbersOrEpisodes}`,
-        {
-          label: 'Sonarr API',
-          errorMessage: e.message,
-          seriesId,
-        },
-      );
+      this.logger.warn(`Couldn\'t remove/unmonitor episodes: ${episodeIds}`, {
+        label: 'Sonarr API',
+        errorMessage: e.message,
+        seriesId,
+      });
       this.logger.debug(e);
     }
   }
 
   public async unmonitorSeasons(
     seriesId: number | string,
-    type: 'all' | number | 'existing',
-    deleteFiles: boolean,
+    type: 'all' | number | 'existing' = 'all',
+    deleteFiles = true,
     forceExisting = false,
   ): Promise<SonarrSeries> {
     try {
       const data: SonarrSeries = (await this.axios.get(`series/${seriesId}`))
         .data;
 
-      if (type === 'existing') {
-        for (const season of data.seasons) {
+      const episodes: SonarrEpisode[] = await this.get(
+        `episodefile?seriesId=${seriesId}`,
+      );
+
+      // loop seasons
+      data.seasons = data.seasons.map((s) => {
+        if (type === 'all') {
+          s.monitored = false;
+        } else if (
+          type === 'existing' ||
+          (forceExisting && type === s.seasonNumber)
+        ) {
           // existing episodes only, so don't unmonitor season
-          const episodes = await this.getEpisodes(
-            +seriesId,
-            season.seasonNumber,
-          );
-
-          await this.UnmonitorDeleteEpisodes(
-            +seriesId,
-            season.seasonNumber,
-            episodes,
-            false,
-          );
-        }
-      } else if (type === 'all') {
-        for (const season of data.seasons) {
-          season.monitored = false;
-        }
-
-        await this.runPut(`series/`, JSON.stringify(data));
-      } else if (forceExisting && typeof type === 'number') {
-        // existing episodes only, so don't unmonitor season
-        const episodes = await this.getEpisodes(+seriesId, type);
-        await this.UnmonitorDeleteEpisodes(+seriesId, type, episodes, false);
-      } else if (typeof type === 'number') {
-        for (const s of data.seasons) {
+          episodes.forEach((e) => {
+            if (e.seasonNumber === s.seasonNumber) {
+              this.UnmonitorDeleteEpisodes(
+                +seriesId,
+                e.seasonNumber,
+                [e.id],
+                false,
+              );
+            }
+          });
+        } else if (typeof type === 'number') {
+          // specific season
           if (s.seasonNumber === type) {
             s.monitored = false;
           }
         }
+        return s;
+      });
+      await this.runPut(`series/`, JSON.stringify(data));
 
-        await this.runPut(`series/`, JSON.stringify(data));
-      }
-
+      // delete files
       if (deleteFiles) {
-        const episodeFiles = await this.get<SonarrEpisodeFile[]>(
-          `episodefile?seriesId=${seriesId}`,
-        );
-
-        for (const episodeFile of episodeFiles) {
+        for (const e of episodes) {
           if (typeof type === 'number') {
-            if (episodeFile.seasonNumber === type) {
-              await this.runDelete(`episodefile/${episodeFile.id}`);
+            if (e.seasonNumber === type) {
+              await this.runDelete(`episodefile/${e.id}`);
             }
           } else {
-            await this.runDelete(`episodefile/${episodeFile.id}`);
+            await this.runDelete(`episodefile/${e.id}`);
           }
         }
       }
@@ -283,6 +270,31 @@ export class SonarrApi extends ServarrApi<{
       });
       this.logger.debug(e);
     }
+  }
+
+  private buildSeasonList(
+    seasons: number[],
+    existingSeasons?: SonarrSeason[],
+  ): SonarrSeason[] {
+    if (existingSeasons) {
+      const newSeasons = existingSeasons.map((season) => {
+        if (seasons.includes(season.seasonNumber)) {
+          season.monitored = true;
+        }
+        return season;
+      });
+
+      return newSeasons;
+    }
+
+    const newSeasons = seasons.map(
+      (seasonNumber): SonarrSeason => ({
+        seasonNumber,
+        monitored: true,
+      }),
+    );
+
+    return newSeasons;
   }
 
   public async info(): Promise<SonarrInfo> {
