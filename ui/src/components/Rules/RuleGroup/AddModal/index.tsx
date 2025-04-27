@@ -713,7 +713,7 @@ const AddModal = (props: AddModal) => {
 
                     <div className="flex flex-row items-center justify-between py-4">
                       <label
-                        htmlFor="collection_visible"
+                        htmlFor="collection_visible_library"
                         className="text-label"
                       >
                         Show on library recommended
