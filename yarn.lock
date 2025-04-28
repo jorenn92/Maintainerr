@@ -2324,7 +2324,7 @@ __metadata:
     "@types/xml2js": "npm:^0.4.14"
     "@typescript-eslint/eslint-plugin": "npm:^8.30.1"
     "@typescript-eslint/parser": "npm:^8.28.0"
-    axios: "npm:^1.8.2"
+    axios: "npm:^1.9.0"
     axios-retry: "npm:^4.5.0"
     chalk: "npm:^4.1.2"
     cron-validator: "npm:^1.3.1"
@@ -2379,7 +2379,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.30.1"
     "@typescript-eslint/parser": "npm:^8.28.0"
     autoprefixer: "npm:10.4.21"
-    axios: "npm:^1.8.2"
+    axios: "npm:^1.9.0"
     bowser: "npm:^2.11.0"
     clsx: "npm:^2.1.1"
     compare-versions: "npm:^6.1.1"
@@ -5833,14 +5833,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.8.2":
-  version: 1.8.2
-  resolution: "axios@npm:1.8.2"
+"axios@npm:^1.9.0":
+  version: 1.9.0
+  resolution: "axios@npm:1.9.0"
   dependencies:
     follow-redirects: "npm:^1.15.6"
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/d8c2969e4642dc6d39555ac58effe06c051ba7aac2bd40cad7a9011c019fb2f16ee011c5a6906cb25b8a4f87258c359314eb981f852e60ad445ecaeb793c7aa2
+  checksum: 10c0/9371a56886c2e43e4ff5647b5c2c3c046ed0a3d13482ef1d0135b994a628c41fbad459796f101c655e62f0c161d03883454474d2e435b2e021b1924d9f24994c
   languageName: node
   linkType: hard
 
