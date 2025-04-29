@@ -127,30 +127,30 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                   <nav className="mt-12 flex-1 space-y-4 px-4">
                     {navBarItems.map((link) => {
                       return (
-                        <Link legacyBehavior key={link.key} href={link.href}>
-                          <a
-                            onClick={() => {
-                              if (link.href === '/overview') {
-                                SearchCtx.removeText()
-                              }
+                        <Link
+                          key={link.key}
+                          href={link.href}
+                          onClick={() => {
+                            if (link.href === '/overview') {
+                              SearchCtx.removeText()
+                            }
+                            setHighlight(link.href, true)
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
                               setHighlight(link.href, true)
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                setHighlight(link.href, true)
-                              }
-                            }}
-                            role="button"
-                            tabIndex={0}
-                            className={`flex items-center rounded-md px-2 py-2 text-base font-medium leading-6 text-white transition duration-150 ease-in-out focus:outline-none ${
-                              link.selected
-                                ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'
-                                : 'hover:bg-zinc-700'
-                            }`}
-                          >
-                            {link.svgIcon}
-                            {link.name}
-                          </a>
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          className={`flex items-center rounded-md px-2 py-2 text-base font-medium leading-6 text-white transition duration-150 ease-in-out focus:outline-none ${
+                            link.selected
+                              ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'
+                              : 'hover:bg-zinc-700'
+                          }`}
+                        >
+                          {link.svgIcon}
+                          {link.name}
                         </Link>
                       )
                     })}
@@ -191,27 +191,23 @@ const NavBar: React.FC<NavBarProps> = ({ open, setClosed }) => {
                 {navBarItems.map((navBarLink) => {
                   return (
                     <Link
-                      legacyBehavior
                       key={`desktop-${navBarLink.key}`}
                       href={navBarLink.href}
-                    >
-                      <a
-                        onClick={() => {
-                          if (navBarLink.href === '/overview') {
-                            SearchCtx.removeText()
-                          }
+                      onClick={() => {
+                        if (navBarLink.href === '/overview') {
+                          SearchCtx.removeText()
+                        }
 
-                          setHighlight(navBarLink.href)
-                        }}
-                        className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium leading-6 text-white transition duration-150 ease-in-out ${
-                          navBarLink.selected
-                            ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'
-                            : 'hover:bg-zinc-700'
-                        } focus:bg-amber-800 focus:outline-none`}
-                      >
-                        {navBarLink.svgIcon}
-                        {navBarLink.name}
-                      </a>
+                        setHighlight(navBarLink.href)
+                      }}
+                      className={`group flex items-center rounded-md px-2 py-2 text-lg font-medium leading-6 text-white transition duration-150 ease-in-out ${
+                        navBarLink.selected
+                          ? 'bg-gradient-to-br from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700'
+                          : 'hover:bg-zinc-700'
+                      } focus:bg-amber-800 focus:outline-none`}
+                    >
+                      {navBarLink.svgIcon}
+                      {navBarLink.name}
                     </Link>
                   )
                 })}
