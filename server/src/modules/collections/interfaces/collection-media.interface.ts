@@ -1,3 +1,4 @@
+import { CollectionLogMeta } from '@maintainerr/contracts';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 
 export interface ICollectionMedia {
@@ -9,8 +10,9 @@ export interface ICollectionMedia {
   addDate: Date;
 }
 
-export interface AddCollectionMedia {
+export interface AddRemoveCollectionMedia {
   plexId: number;
+  reason?: CollectionLogMeta;
 }
 
 export interface IAlterableMediaDto {

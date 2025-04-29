@@ -1,6 +1,7 @@
-import cacheManager, { Cache } from './cache';
-import { PlexLibraryResponse } from '../plex-api/interfaces/library.interfaces';
+import { Logger } from '@nestjs/common';
 import xml2js from 'xml2js';
+import { PlexLibraryResponse } from '../plex-api/interfaces/library.interfaces';
+import cacheManager, { Cache } from './cache';
 
 type PlexApiOptions = {
   hostname: string;
@@ -23,6 +24,7 @@ type RequestOptions = {
 };
 
 class PlexApi {
+  private logger = new Logger(PlexApi.name);
   private cache: Cache;
   private options: PlexApiOptions;
   private serverUrl: string;
@@ -210,6 +212,9 @@ class PlexApi {
         }
       }
     } catch (err) {
+      this.logger.debug(
+        `${method} ${reqUrl} failed with exception: ${err}${err.cause?.code ? `, error code: ${err.cause.code}` : ''}`,
+      );
       throw err;
     }
   }
