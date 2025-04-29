@@ -1,14 +1,15 @@
+import { RuleValueType } from '@maintainerr/contracts';
 import { Injectable } from '@nestjs/common';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
-import { Application, RuleValueType } from '../constants/rules.constants';
+import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
+import { Application } from '../constants/rules.constants';
+import { RulesDto } from '../dtos/rules.dto';
+import { JellyseerrGetterService } from './jellyseerr-getter.service';
 import { OverseerrGetterService } from './overseerr-getter.service';
 import { PlexGetterService } from './plex-getter.service';
 import { RadarrGetterService } from './radarr-getter.service';
 import { SonarrGetterService } from './sonarr-getter.service';
-import { RulesDto } from '../dtos/rules.dto';
-import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { TautulliGetterService } from './tautulli-getter.service';
-import { JellyseerrGetterService } from './jellyseerr-getter.service';
 
 @Injectable()
 export class ValueGetterService {
