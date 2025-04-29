@@ -1,5 +1,7 @@
+import { ClipboardCopyIcon } from '@heroicons/react/solid'
 import { Editor } from '@monaco-editor/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 import YAML from 'yaml'
 import GetApiHandler, { PostApiHandler } from '../../../../utils/ApiHandler'
 import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
@@ -168,6 +170,14 @@ const TestMediaItem = (props: ITestMediaItem) => {
     return
   }
 
+  const copyToClipboard = () => {
+    const value = (editorRef.current as any)?.getValue?.()
+    if (value?.trim()) {
+      navigator.clipboard.writeText(value)
+      toast.success('Copied to clipboard')
+    }
+  }
+
   return (
     <div className={'h-full w-full'}>
       <Modal
@@ -260,10 +270,20 @@ const TestMediaItem = (props: ITestMediaItem) => {
               </FormItem>
             ) : undefined}
           </div>
-
-          <label htmlFor={`editor-field`} className="text-label mb-3">
-            {'Output'}
-          </label>
+          <div className="mb-2 flex justify-between">
+            <label htmlFor="editor-field" className="text-label">
+              Output
+            </label>
+            {comparisonResult && (
+              <button
+                onClick={copyToClipboard}
+                title="Copy to clipboard"
+                aria-label="Copy to clipboard"
+              >
+                <ClipboardCopyIcon className="h-5 w-5 text-amber-600 hover:text-amber-500" />
+              </button>
+            )}
+          </div>
           <div className="editor-container h-full">
             <Editor
               options={{ readOnly: true, minimap: { enabled: false } }}
