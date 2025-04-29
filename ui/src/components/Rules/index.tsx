@@ -73,6 +73,22 @@ const Rules = () => {
     }
   }
 
+  const requestStopExecution = async () => {
+    try {
+      await PostApiHandler(`/rules/execute/stop`, {})
+
+      addToast('Requested to stop rule execution.', {
+        autoDismiss: true,
+        appearance: 'success',
+      })
+    } catch (e) {
+      addToast('Failed to request stop of rule execution.', {
+        autoDismiss: true,
+        appearance: 'error',
+      })
+    }
+  }
+
   if (!data || isLoading) {
     return (
       <span>
@@ -119,8 +135,14 @@ const Rules = () => {
           </div>
           <div className="ml-2 mr-auto sm:mr-0">
             <ExecuteButton
-              onClick={sync}
-              text="Run Rules"
+              onClick={() => {
+                if (ruleHandlerRunning) {
+                  requestStopExecution()
+                } else {
+                  sync()
+                }
+              }}
+              text={ruleHandlerRunning ? 'Stop Rules' : 'Run Rules'}
               executing={ruleHandlerRunning}
             />
           </div>
