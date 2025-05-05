@@ -4381,12 +4381,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.14.1":
-  version: 22.14.1
-  resolution: "@types/node@npm:22.14.1"
+"@types/node@npm:^22.15.6":
+  version: 22.15.6
+  resolution: "@types/node@npm:22.15.6"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/d49c4d00403b1c2348cf0701b505fd636d80aabe18102105998dc62fdd36dcaf911e73c7a868c48c21c1022b825c67b475b65b1222d84b704d8244d152bb7f86
+  checksum: 10c0/9b77c184a320a5ba3900350a1b5e80559f42ca7ec9b0e1fa8399cd6fd8f23bda17eb5f3e58d7bf98fd1abd81854948cc92c7bee6c2de9afdccb11c26c5d27d82
   languageName: node
   linkType: hard
 
@@ -12503,7 +12503,7 @@ __metadata:
     "@semantic-release/commit-analyzer": "npm:^13.0.1"
     "@semantic-release/exec": "npm:^7.0.3"
     "@semantic-release/git": "npm:^10.0.1"
-    "@types/node": "npm:^22.14.1"
+    "@types/node": "npm:^22.15.6"
     knip: "npm:^5.50.5"
     semantic-release: "npm:^24.2.3"
     turbo: "npm:^2.5.0"
