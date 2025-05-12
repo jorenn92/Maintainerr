@@ -24,13 +24,13 @@ export enum RuleOperators {
   OR,
 }
 
-export const enum Application {
-  PLEX,
-  RADARR,
-  SONARR,
-  OVERSEERR,
-  TAUTULLI,
-  JELLYSEERR,
+export enum Application {
+  PLEX = 0,
+  RADARR = 1,
+  SONARR = 2,
+  OVERSEERR = 3,
+  TAUTULLI = 4,
+  JELLYSEERR = 5,
 }
 
 export const enum ArrAction {

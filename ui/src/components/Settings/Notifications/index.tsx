@@ -4,19 +4,18 @@ import {
   TrashIcon,
 } from '@heroicons/react/solid'
 import { useEffect, useState } from 'react'
-import { useToasts } from 'react-toast-notifications'
+import { toast } from 'react-toastify'
 import GetApiHandler, { DeleteApiHandler } from '../../../utils/ApiHandler'
 import Button from '../../Common/Button'
+import CachedImage from '../../Common/CachedImage'
 import CreateNotificationModal, {
   AgentConfiguration,
 } from './CreateNotificationModal'
-import CachedImage from '../../Common/CachedImage'
 
 const NotificationSettings = () => {
   const [addModalActive, setAddModalActive] = useState(false)
   const [configurations, setConfigurations] = useState<AgentConfiguration[]>()
   const [editConfig, setEditConfig] = useState<AgentConfiguration>()
-  const { addToast } = useToasts()
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -128,15 +127,9 @@ const NotificationSettings = () => {
             updateAddModalActive(!addModalActive)
             setEditConfig(undefined)
             if (bool) {
-              addToast('Successfully saved notification agent', {
-                autoDismiss: true,
-                appearance: 'success',
-              })
+              toast.success('Successfully saved notification agent')
             } else {
-              addToast("Didn't save incomplete notification agent", {
-                autoDismiss: true,
-                appearance: 'error',
-              })
+              toast.error("Didn't save incomplete notification agent")
             }
           }}
           onTest={() => {}}
