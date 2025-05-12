@@ -77,15 +77,9 @@ const Rules = () => {
     try {
       await PostApiHandler(`/rules/execute/stop`, {})
 
-      addToast('Requested to stop rule execution.', {
-        autoDismiss: true,
-        appearance: 'success',
-      })
+      toast.success('Requested to stop rule execution.')
     } catch (e) {
-      addToast('Failed to request stop of rule execution.', {
-        autoDismiss: true,
-        appearance: 'error',
-      })
+      toast.error('Failed to request stop of rule execution.')
     }
   }
 
