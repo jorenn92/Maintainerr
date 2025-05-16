@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
@@ -10,6 +10,7 @@ import {
   TautulliMetadata,
 } from '../../api/tautulli-api/tautulli-api.service';
 import { Collection } from '../../collections/entities/collection.entities';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import {
   Application,
   Property,
@@ -20,14 +21,15 @@ import { RulesDto } from '../dtos/rules.dto';
 @Injectable()
 export class TautulliGetterService {
   appProperties: Property[];
-  private readonly logger = new Logger(TautulliGetterService.name);
 
   constructor(
     private readonly tautulliApi: TautulliApiService,
     private readonly plexApi: PlexApiService,
     @InjectRepository(Collection)
     private readonly collectionRepository: Repository<Collection>,
+    private readonly logger: MaintainerrLogger,
   ) {
+    logger.setContext(TautulliGetterService.name);
     const ruleConstanst = new RuleConstants();
     this.appProperties = ruleConstanst.applications.find(
       (el) => el.id === Application.TAUTULLI,

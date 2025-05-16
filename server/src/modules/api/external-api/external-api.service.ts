@@ -1,7 +1,7 @@
-import { Logger } from '@nestjs/common';
 import axios, { AxiosError, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import axiosRetry from 'axios-retry';
 import NodeCache from 'node-cache';
+import { MaintainerrLogger } from '../../logging/logs.service';
 
 // 20 minute default TTL (in seconds)
 const DEFAULT_TTL = 1200;
@@ -15,13 +15,14 @@ interface ExternalAPIOptions {
 }
 
 export class ExternalApiService {
-  protected logger = new Logger('ExternalAPI');
   protected axios: AxiosInstance;
   private baseUrl: string;
   private cache?: NodeCache;
+
   constructor(
     baseUrl: string,
     params: Record<string, unknown>,
+    protected readonly logger: MaintainerrLogger,
     options: ExternalAPIOptions = {},
   ) {
     this.axios = axios.create({
@@ -47,6 +48,7 @@ export class ExternalApiService {
     this.baseUrl = baseUrl;
     this.cache = options.nodeCache;
   }
+
   public async get<T>(
     endpoint: string,
     config?: RawAxiosRequestConfig,

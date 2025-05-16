@@ -10,6 +10,7 @@ import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { SonarrApi } from '../api/servarr-api/helpers/sonarr.helper';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { ServarrAction } from '../collections/interfaces/collection.interface';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { MediaIdFinder } from './media-id-finder';
 import { SonarrActionHandler } from './sonarr-action-handler';
 
@@ -18,6 +19,7 @@ describe('SonarrActionHandler', () => {
   let plexApi: Mocked<PlexApiService>;
   let servarrService: Mocked<ServarrService>;
   let mediaIdFinder: Mocked<MediaIdFinder>;
+  let logger: Mocked<MaintainerrLogger>;
 
   beforeEach(async () => {
     const { unit, unitRef } =
@@ -27,6 +29,7 @@ describe('SonarrActionHandler', () => {
     plexApi = unitRef.get(PlexApiService);
     servarrService = unitRef.get(ServarrService);
     mediaIdFinder = unitRef.get(MediaIdFinder);
+    logger = unitRef.get(MaintainerrLogger);
   });
 
   it.each([
@@ -668,7 +671,7 @@ describe('SonarrActionHandler', () => {
   };
 
   const mockSonarrApi = () => {
-    const mockedSonarrApi = new SonarrApi({} as any);
+    const mockedSonarrApi = new SonarrApi({} as any, logger as any);
     jest
       .spyOn(mockedSonarrApi, 'unmonitorSeasons')
       .mockImplementation(jest.fn());

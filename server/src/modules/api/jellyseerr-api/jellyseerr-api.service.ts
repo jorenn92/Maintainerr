@@ -1,5 +1,6 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AxiosError } from 'axios';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
 import { BasicResponseDto } from '../external-api/dto/basic-response.dto';
 import { JellyseerrApi } from './helpers/jellyseerr-api.helper';
@@ -151,17 +152,22 @@ interface JellyseerrUserResponseResult {
 export class JellyseerrApiService {
   api: JellyseerrApi;
 
-  private readonly logger = new Logger(JellyseerrApiService.name);
   constructor(
     @Inject(forwardRef(() => SettingsService))
     private readonly settings: SettingsService,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+  ) {
+    this.logger.setContext(JellyseerrApiService.name);
+  }
 
   public async init() {
-    this.api = new JellyseerrApi({
-      url: `${this.settings.jellyseerr_url?.replace(/\/$/, '')}/api/v1`,
-      apiKey: `${this.settings.jellyseerr_api_key}`,
-    });
+    this.api = new JellyseerrApi(
+      {
+        url: `${this.settings.jellyseerr_url?.replace(/\/$/, '')}/api/v1`,
+        apiKey: `${this.settings.jellyseerr_api_key}`,
+      },
+      this.logger,
+    );
   }
 
   public async getMovie(id: string | number): Promise<JellyseerrMovieResponse> {
@@ -258,7 +264,6 @@ export class JellyseerrApiService {
     } catch (err) {
       this.logger.warn(
         'Jellyseerr communication failed. Is the application running?',
-        err,
       );
       this.logger.debug(err);
       return undefined;
@@ -298,7 +303,6 @@ export class JellyseerrApiService {
     } catch (err) {
       this.logger.warn(
         'Jellyseerr communication failed. Is the application running?',
-        err,
       );
       this.logger.debug(err);
       return undefined;
@@ -312,11 +316,9 @@ export class JellyseerrApiService {
       );
       return response;
     } catch (e) {
-      this.logger.log("Couldn't delete media. Does it exist in Jellyseerr?", {
-        label: 'Jellyseerr API',
-        errorMessage: e.message,
-        mediaId,
-      });
+      this.logger.log(
+        `Couldn't delete media ${mediaId}. Does it exist in Jellyseerr? ${e.message}`,
+      );
       this.logger.debug(e);
       return null;
     }
@@ -338,11 +340,9 @@ export class JellyseerrApiService {
       try {
         this.deleteMediaItem(media.mediaInfo.id.toString());
       } catch (e) {
-        this.logger.log("Couldn't delete media. Does it exist in Jellyseerr?", {
-          label: 'Jellyseerr API',
-          errorMessage: e.message,
-          id,
-        });
+        this.logger.log(
+          `Couldn't delete media by TMDB ID ${id}. Does it exist in Jellyseerr? ${e.message}`,
+        );
       }
     } catch (err) {
       this.logger.warn(
@@ -363,10 +363,7 @@ export class JellyseerrApiService {
       );
       return response;
     } catch (e) {
-      this.logger.log("Couldn't fetch Jellyseerr status!", {
-        label: 'Jellyseerr API',
-        errorMessage: e.message,
-      });
+      this.logger.log(`Couldn't fetch Jellyseerr status: ${e.message}`);
       this.logger.debug(e);
       return null;
     }

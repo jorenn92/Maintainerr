@@ -1,16 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { RuleDto } from '../dtos/rule.dto';
-import { ReturnStatus } from '../rules.service';
-import { RuleOperators, RulePossibility } from '../constants/rules.constants';
+import { Injectable } from '@nestjs/common';
 import YAML from 'yaml';
 import {
   EPlexDataType,
   PlexDataTypeStrings,
 } from '../../..//modules/api/plex-api/enums/plex-data-type-enum';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import {
   ICustomIdentifier,
   RuleConstanstService,
 } from '../constants/constants.service';
+import { RuleOperators, RulePossibility } from '../constants/rules.constants';
+import { RuleDto } from '../dtos/rule.dto';
+import { ReturnStatus } from '../rules.service';
 
 interface IRuleYamlParent {
   mediaType: string;
@@ -31,9 +32,13 @@ interface IRuleYaml {
 
 @Injectable()
 export class RuleYamlService {
-  private readonly logger = new Logger(RuleYamlService.name);
+  constructor(
+    private readonly ruleConstanstService: RuleConstanstService,
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(RuleYamlService.name);
+  }
 
-  constructor(private readonly ruleConstanstService: RuleConstanstService) {}
   public encode(rules: RuleDto[], mediaType: number): ReturnStatus {
     try {
       let workingSection = { id: 0, rules: [] };

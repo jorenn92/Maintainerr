@@ -1,5 +1,5 @@
-import { Logger } from '@nestjs/common';
 import axios from 'axios';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
 import { Notification } from '../entities/notification.entities';
 import {
@@ -30,12 +30,12 @@ class PushoverAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentPushover,
+    private readonly logger: MaintainerrLogger,
     readonly notification: Notification,
   ) {
+    logger.setContext(PushoverAgent.name);
     this.notification = notification;
   }
-
-  private readonly logger = new Logger(PushoverAgent.name);
 
   getNotification = () => this.notification;
 
@@ -71,11 +71,7 @@ class PushoverAgent implements NotificationAgent {
         attachment_type: contentType,
       };
     } catch (e) {
-      this.logger.error('Error getting image payload', {
-        label: 'Notifications',
-        errorMessage: e.message,
-        response: e.response?.data,
-      });
+      this.logger.error(`Error getting image payload: ${e.message}`);
       return {};
     }
   }

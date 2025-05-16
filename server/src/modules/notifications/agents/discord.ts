@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { hasNotificationType } from '../notifications.service';
-import type { NotificationAgent, NotificationPayload } from './agent';
-import { Logger } from '@nestjs/common';
+import { MaintainerrLogger } from '../../logging/logs.service';
+import { Notification } from '../entities/notification.entities';
 import {
   NotificationAgentDiscord,
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
-import { Notification } from '../entities/notification.entities';
+import { hasNotificationType } from '../notifications.service';
+import type { NotificationAgent, NotificationPayload } from './agent';
 
 enum EmbedColors {
   DEFAULT = 0,
@@ -85,12 +85,12 @@ interface DiscordWebhookPayload {
 class DiscordAgent implements NotificationAgent {
   constructor(
     private readonly settings: NotificationAgentDiscord,
+    private readonly logger: MaintainerrLogger,
     readonly notification: Notification,
   ) {
+    logger.setContext(DiscordAgent.name);
     this.notification = notification;
   }
-
-  private readonly logger = new Logger(DiscordAgent.name);
 
   getNotification = () => this.notification;
 

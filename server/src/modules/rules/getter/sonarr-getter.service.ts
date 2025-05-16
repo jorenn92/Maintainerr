@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import _ from 'lodash';
 import { PlexLibraryItem } from '../../../modules/api/plex-api/interfaces/library.interfaces';
 import { PlexMetadata } from '../../../modules/api/plex-api/interfaces/media.interface';
@@ -9,6 +9,7 @@ import { TmdbApiService } from '../../../modules/api/tmdb-api/tmdb.service';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { SonarrApi } from '../../api/servarr-api/helpers/sonarr.helper';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import {
   Application,
   Property,
@@ -19,14 +20,15 @@ import { RulesDto } from '../dtos/rules.dto';
 @Injectable()
 export class SonarrGetterService {
   plexProperties: Property[];
-  private readonly logger = new Logger(SonarrGetterService.name);
 
   constructor(
     private readonly servarrService: ServarrService,
     private readonly plexApi: PlexApiService,
     private readonly tmdbApi: TmdbApiService,
     private readonly tmdbIdHelper: TmdbIdService,
+    private readonly logger: MaintainerrLogger,
   ) {
+    logger.setContext(SonarrGetterService.name);
     const ruleConstanst = new RuleConstants();
     this.plexProperties = ruleConstanst.applications.find(
       (el) => el.id === Application.SONARR,
