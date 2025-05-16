@@ -24,6 +24,7 @@ const CollectionOverview = (props: ICollectionOverview) => {
             onClick={props.doActions}
             text="Handle Collections"
             executing={collectionHandlerRunning}
+            disabled={collectionHandlerRunning}
           />
         </div>
       </div>
