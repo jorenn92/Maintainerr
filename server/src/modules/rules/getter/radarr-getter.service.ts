@@ -1,7 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
 import { ServarrService } from '../../api/servarr-api/servarr.service';
 import { TmdbIdService } from '../../api/tmdb-api/tmdb-id.service';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import {
   Application,
   Property,
@@ -12,12 +13,12 @@ import { RulesDto } from '../dtos/rules.dto';
 @Injectable()
 export class RadarrGetterService {
   plexProperties: Property[];
-  private readonly logger = new Logger(RadarrGetterService.name);
-
   constructor(
     private readonly servarrService: ServarrService,
     private readonly tmdbIdHelper: TmdbIdService,
+    private readonly logger: MaintainerrLogger,
   ) {
+    logger.setContext(RadarrGetterService.name);
     const ruleConstanst = new RuleConstants();
     this.plexProperties = ruleConstanst.applications.find(
       (el) => el.id === Application.RADARR,

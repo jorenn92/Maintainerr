@@ -1,6 +1,6 @@
-import { Logger } from '@nestjs/common';
 import type { EmailOptions } from 'email-templates';
 import path from 'path';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
 import PreparedEmail from '../email/preparedEmail';
 import { Notification } from '../entities/notification.entities';
@@ -15,12 +15,12 @@ class EmailAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentEmail,
+    private readonly logger: MaintainerrLogger,
     readonly notification: Notification,
   ) {
+    logger.setContext(EmailAgent.name);
     this.notification = notification;
   }
-
-  private readonly logger = new Logger(EmailAgent.name);
 
   getNotification = () => this.notification;
 

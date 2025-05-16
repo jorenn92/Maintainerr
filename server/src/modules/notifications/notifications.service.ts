@@ -1,9 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { MaintainerrEvent } from '@maintainerr/contracts';
+import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
+import _ from 'lodash';
 import { DataSource, Repository } from 'typeorm';
 import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
+import {
+  CollectionMediaAddedDto,
+  CollectionMediaHandledDto,
+  CollectionMediaRemovedDto,
+  RuleHandlerFailedDto,
+} from '../events/events.dto';
+import {
+  MaintainerrLogger,
+  MaintainerrLoggerFactory,
+} from '../logging/logs.service';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { SettingsService } from '../settings/settings.service';
 import type { NotificationAgent, NotificationPayload } from './agents/agent';
@@ -21,14 +33,6 @@ import {
   NotificationAgentKey,
   NotificationType,
 } from './notifications-interfaces';
-import { MaintainerrEvent } from '@maintainerr/contracts';
-import {
-  CollectionMediaAddedDto,
-  CollectionMediaHandledDto,
-  CollectionMediaRemovedDto,
-  RuleHandlerFailedDto,
-} from '../events/events.dto';
-import _ from 'lodash';
 
 export const hasNotificationType = (
   type: NotificationType,
@@ -40,7 +44,6 @@ export const hasNotificationType = (
 @Injectable()
 export class NotificationService {
   private activeAgents: NotificationAgent[] = [];
-  private readonly logger = new Logger(NotificationService.name);
 
   constructor(
     @InjectRepository(Notification)
@@ -50,7 +53,11 @@ export class NotificationService {
     private readonly connection: DataSource,
     private readonly settings: SettingsService,
     private readonly plexApi: PlexApiService,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+    private readonly loggerFactory: MaintainerrLoggerFactory,
+  ) {
+    logger.setContext(NotificationService.name);
+  }
 
   public registerAgents = (
     agents: NotificationAgent[],
@@ -281,6 +288,7 @@ export class NotificationService {
             types: JSON.parse(notification.types),
             options: JSON.parse(notification.options),
           },
+          this.loggerFactory.createLogger(),
           notification,
         );
       case NotificationAgentKey.PUSHOVER:
@@ -291,6 +299,7 @@ export class NotificationService {
             types: JSON.parse(notification.types),
             options: JSON.parse(notification.options),
           },
+          this.loggerFactory.createLogger(),
           notification,
         );
       case NotificationAgentKey.EMAIL:
@@ -301,6 +310,7 @@ export class NotificationService {
             types: JSON.parse(notification.types),
             options: JSON.parse(notification.options),
           },
+          this.loggerFactory.createLogger(),
           notification,
         );
       case NotificationAgentKey.GOTIFY:
@@ -311,6 +321,7 @@ export class NotificationService {
             types: JSON.parse(notification.types),
             options: JSON.parse(notification.options),
           },
+          this.loggerFactory.createLogger(),
           notification,
         );
       case NotificationAgentKey.LUNASEA:
@@ -321,6 +332,7 @@ export class NotificationService {
             types: JSON.parse(notification.types),
             options: JSON.parse(notification.options),
           },
+          this.loggerFactory.createLogger(),
           notification,
         );
       case NotificationAgentKey.PUSHBULLET:
@@ -331,6 +343,7 @@ export class NotificationService {
             types: JSON.parse(notification.types),
             options: JSON.parse(notification.options),
           },
+          this.loggerFactory.createLogger(),
           notification,
         );
       case NotificationAgentKey.SLACK:
@@ -341,6 +354,7 @@ export class NotificationService {
             types: JSON.parse(notification.types),
             options: JSON.parse(notification.options),
           },
+          this.loggerFactory.createLogger(),
           notification,
         );
       case NotificationAgentKey.TELEGRAM:
@@ -351,6 +365,7 @@ export class NotificationService {
             types: JSON.parse(notification.types),
             options: JSON.parse(notification.options),
           },
+          this.loggerFactory.createLogger(),
           notification,
         );
       case NotificationAgentKey.WEBHOOK:
@@ -361,6 +376,7 @@ export class NotificationService {
             types: JSON.parse(notification.types),
             options: JSON.parse(notification.options),
           },
+          this.loggerFactory.createLogger(),
           notification,
         );
     }

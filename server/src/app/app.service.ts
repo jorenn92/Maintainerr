@@ -1,12 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ExternalApiService } from '../modules/api/external-api/external-api.service';
 import { type VersionResponse } from '@maintainerr/contracts';
+import { Injectable } from '@nestjs/common';
+import { ExternalApiService } from '../modules/api/external-api/external-api.service';
+import { MaintainerrLogger } from '../modules/logging/logs.service';
 
 @Injectable()
 export class AppService {
-  private readonly logger = new Logger(AppService.name);
-
-  constructor(private readonly externalApi: ExternalApiService) {}
+  constructor(
+    private readonly externalApi: ExternalApiService,
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(AppService.name);
+  }
 
   async getAppVersionStatus(): Promise<VersionResponse> {
     try {

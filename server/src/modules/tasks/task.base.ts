@@ -1,13 +1,16 @@
-import { Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { OnApplicationBootstrap } from '@nestjs/common';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { TasksService } from './tasks.service';
 
-export class TaskBase implements OnApplicationBootstrap {
-  protected logger = new Logger(TaskBase.name);
+export abstract class TaskBase implements OnApplicationBootstrap {
   private jobCreationAttempts = 0;
   protected name = '';
   protected cronSchedule = '';
 
-  constructor(protected readonly taskService: TasksService) {}
+  constructor(
+    protected readonly taskService: TasksService,
+    protected readonly logger: MaintainerrLogger,
+  ) {}
 
   onApplicationBootstrap() {
     this.jobCreationAttempts++;

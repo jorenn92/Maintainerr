@@ -11,6 +11,7 @@ import { RadarrApi } from '../api/servarr-api/helpers/radarr.helper';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { ServarrAction } from '../collections/interfaces/collection.interface';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { RadarrActionHandler } from './radarr-action-handler';
 
 describe('RadarrActionHandler', () => {
@@ -18,6 +19,7 @@ describe('RadarrActionHandler', () => {
   let plexApi: Mocked<PlexApiService>;
   let servarrService: Mocked<ServarrService>;
   let tmdbIdService: Mocked<TmdbIdService>;
+  let logger: Mocked<MaintainerrLogger>;
 
   beforeEach(async () => {
     const { unit, unitRef } =
@@ -27,6 +29,7 @@ describe('RadarrActionHandler', () => {
     plexApi = unitRef.get(PlexApiService);
     servarrService = unitRef.get(ServarrService);
     tmdbIdService = unitRef.get(TmdbIdService);
+    logger = unitRef.get(MaintainerrLogger);
   });
 
   it('should do nothing when tmdbid failed lookup', async () => {
@@ -153,7 +156,7 @@ describe('RadarrActionHandler', () => {
   };
 
   const mockRadarrApi = () => {
-    const mockedRadarrApi = new RadarrApi({} as any);
+    const mockedRadarrApi = new RadarrApi({} as any, logger as any);
     jest.spyOn(mockedRadarrApi, 'deleteMovie').mockImplementation(jest.fn());
     jest.spyOn(mockedRadarrApi, 'unmonitorMovie').mockImplementation(jest.fn());
 
