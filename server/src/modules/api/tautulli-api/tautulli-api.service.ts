@@ -1,8 +1,12 @@
 import { BasicResponseDto } from '@maintainerr/contracts';
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AxiosError, CanceledError } from 'axios';
 import _ from 'lodash';
 import { SettingsService } from '../../..//modules/settings/settings.service';
+import {
+  MaintainerrLogger,
+  MaintainerrLoggerFactory,
+} from '../../logging/logs.service';
 import { TautulliApi } from './helpers/tautulli-api.helper';
 
 interface TautulliInfo {
@@ -96,17 +100,23 @@ const MAX_PAGE_SIZE = 100;
 export class TautulliApiService {
   api: TautulliApi;
 
-  private readonly logger = new Logger(TautulliApiService.name);
   constructor(
     @Inject(forwardRef(() => SettingsService))
     private readonly settings: SettingsService,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+    private readonly loggerFactory: MaintainerrLoggerFactory,
+  ) {
+    logger.setContext(TautulliApiService.name);
+  }
 
   public async init() {
-    this.api = new TautulliApi({
-      url: `${this.settings.tautulli_url}/api/v2`,
-      apiKey: this.settings.tautulli_api_key,
-    });
+    this.api = new TautulliApi(
+      {
+        url: `${this.settings.tautulli_url}/api/v2`,
+        apiKey: this.settings.tautulli_api_key,
+      },
+      this.loggerFactory.createLogger(),
+    );
   }
 
   public async info(): Promise<Response<TautulliInfo> | null> {
@@ -122,10 +132,7 @@ export class TautulliApiService {
       );
       return response;
     } catch (e) {
-      this.logger.log("Couldn't fetch Tautulli info!", {
-        label: 'Tautulli API',
-        errorMessage: e.message,
-      });
+      this.logger.log(`Couldn't fetch Tautulli info: ${e.message}`);
       this.logger.debug(e);
       return null;
     }
@@ -153,10 +160,9 @@ export class TautulliApiService {
 
       return response.response.data;
     } catch (e) {
-      this.logger.log("Couldn't fetch Tautulli paginated history!", {
-        label: 'Tautulli API',
-        errorMessage: e.message,
-      });
+      this.logger.log(
+        `Couldn't fetch Tautulli paginated history: ${e.message}`,
+      );
       this.logger.debug(e);
       return null;
     }
@@ -208,10 +214,7 @@ export class TautulliApiService {
 
       return results;
     } catch (e) {
-      this.logger.log("Couldn't fetch Tautulli history!", {
-        label: 'Tautulli API',
-        errorMessage: e.message,
-      });
+      this.logger.log(`Couldn't fetch Tautulli history: ${e.message}`);
       this.logger.debug(e);
       return null;
     }
@@ -234,10 +237,7 @@ export class TautulliApiService {
 
       return response.response.data;
     } catch (e) {
-      this.logger.log("Couldn't fetch Tautulli metadata!", {
-        label: 'Tautulli API',
-        errorMessage: e.message,
-      });
+      this.logger.log(`Couldn't fetch Tautulli metadata: ${e.message}`);
       this.logger.debug(e);
       return null;
     }
@@ -265,10 +265,9 @@ export class TautulliApiService {
 
       return response.response.data.children_list;
     } catch (e) {
-      this.logger.log("Couldn't fetch Tautulli children metadata!", {
-        label: 'Tautulli API',
-        errorMessage: e.message,
-      });
+      this.logger.log(
+        `Couldn't fetch Tautulli children metadata: ${e.message}`,
+      );
       this.logger.debug(e);
       return null;
     }
@@ -288,10 +287,7 @@ export class TautulliApiService {
 
       return response.response.data;
     } catch (e) {
-      this.logger.log("Couldn't fetch Tautulli users!", {
-        label: 'Tautulli API',
-        errorMessage: e.message,
-      });
+      this.logger.log(`Couldn't fetch Tautulli users: ${e.message}`);
       this.logger.debug(e);
       return null;
     }
@@ -300,10 +296,13 @@ export class TautulliApiService {
   public async testConnection(
     params: ConstructorParameters<typeof TautulliApi>[0],
   ): Promise<BasicResponseDto> {
-    const api = new TautulliApi({
-      apiKey: params.apiKey,
-      url: `${params.url}/api/v2`,
-    });
+    const api = new TautulliApi(
+      {
+        apiKey: params.apiKey,
+        url: `${params.url}/api/v2`,
+      },
+      this.loggerFactory.createLogger(),
+    );
 
     try {
       const response = await api.getRawWithoutCache<

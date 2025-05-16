@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, LessThan, Repository } from 'typeorm';
 
@@ -18,6 +18,7 @@ import {
 } from '../api/tmdb-api/interfaces/tmdb.interface';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { Exclusion } from '../rules/entities/exclusion.entities';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { Collection } from './entities/collection.entities';
@@ -42,8 +43,6 @@ interface addCollectionDbResponse {
 
 @Injectable()
 export class CollectionsService {
-  private readonly logger = new Logger(CollectionsService.name);
-
   constructor(
     @InjectRepository(Collection)
     private readonly collectionRepo: Repository<Collection>,
@@ -59,7 +58,10 @@ export class CollectionsService {
     private readonly plexApi: PlexApiService,
     private readonly tmdbApi: TmdbApiService,
     private readonly tmdbIdHelper: TmdbIdService,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(CollectionsService.name);
+  }
 
   async getCollection(id?: number, title?: string) {
     try {
@@ -664,8 +666,8 @@ export class CollectionsService {
     } catch (err) {
       this.logger.warn(
         `An error occurred while removing media from collection with internal id ${collectionDbId}`,
-        err,
       );
+      this.logger.debug(err);
       return undefined;
     }
   }

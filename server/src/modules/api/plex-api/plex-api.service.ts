@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import cacheManager from '../../api/lib/cache';
 import PlexCommunityApi, {
@@ -6,6 +6,10 @@ import PlexCommunityApi, {
   PlexCommunityWatchList,
   PlexCommunityWatchListResponse,
 } from '../../api/lib/plexCommunityApi';
+import {
+  MaintainerrLogger,
+  MaintainerrLoggerFactory,
+} from '../../logging/logs.service';
 import { Settings } from '../../settings/entities/settings.entities';
 import { PlexSettings } from '../../settings/interfaces/plex-settings.interface';
 import { SettingsService } from '../../settings/settings.service';
@@ -46,12 +50,14 @@ export class PlexApiService {
   private plexTvClient: PlexTvApi;
   private plexCommunityClient: PlexCommunityApi;
   private machineId: string;
-  private readonly logger = new Logger(PlexApiService.name);
 
   constructor(
     @Inject(forwardRef(() => SettingsService))
     private readonly settings: SettingsService,
+    private readonly logger: MaintainerrLogger,
+    private readonly loggerFactory: MaintainerrLoggerFactory,
   ) {
+    this.logger.setContext(PlexApiService.name);
     this.initialize({});
   }
 
@@ -88,8 +94,14 @@ export class PlexApiService {
           token: plexToken,
         });
 
-        this.plexTvClient = new PlexTvApi(plexToken);
-        this.plexCommunityClient = new PlexCommunityApi(plexToken);
+        this.plexTvClient = new PlexTvApi(
+          plexToken,
+          this.loggerFactory.createLogger(),
+        );
+        this.plexCommunityClient = new PlexCommunityApi(
+          plexToken,
+          this.loggerFactory.createLogger(),
+        );
 
         this.setMachineId();
       } else {
@@ -487,11 +499,9 @@ export class PlexApiService {
         `[Plex] Removed media with ID ${plexId} from Plex library.`,
       );
     } catch (e) {
-      this.logger.warn('Something went wrong while removing media from Plex.', {
-        label: 'Plex API',
-        errorMessage: e.message,
-        plexId,
-      });
+      this.logger.warn(
+        `Something went wrong while removing media ${plexId} from Plex.`,
+      );
       this.logger.debug(e);
     }
   }
@@ -676,7 +686,10 @@ export class PlexApiService {
     try {
       // reload requirements, auth token might have changed
       const settings = (await this.settings.getSettings()) as Settings;
-      this.plexTvClient = new PlexTvApi(settings.plex_auth_token);
+      this.plexTvClient = new PlexTvApi(
+        settings.plex_auth_token,
+        this.loggerFactory.createLogger(),
+      );
 
       const devices = (await this.plexTvClient?.getDevices())?.filter(
         (device) => {

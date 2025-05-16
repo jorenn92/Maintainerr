@@ -1,5 +1,5 @@
 import { TautulliSettingDto } from '@maintainerr/contracts';
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isValidCron } from 'cron-validator';
 import { randomUUID } from 'crypto';
@@ -11,6 +11,7 @@ import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service'
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { TautulliApiService } from '../api/tautulli-api/tautulli-api.service';
+import { MaintainerrLogger } from '../logging/logs.service';
 import {
   DeleteRadarrSettingResponseDto,
   RadarrSettingRawDto,
@@ -28,7 +29,6 @@ import { SonarrSettings } from './entities/sonarr_settings.entities';
 
 @Injectable()
 export class SettingsService implements SettingDto {
-  private readonly logger = new Logger(SettingsService.name);
   id: number;
 
   clientId: string;
@@ -88,7 +88,10 @@ export class SettingsService implements SettingDto {
     private readonly radarrSettingsRepo: Repository<RadarrSettings>,
     @InjectRepository(SonarrSettings)
     private readonly sonarrSettingsRepo: Repository<SonarrSettings>,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(SettingsService.name);
+  }
 
   public async init() {
     const settingsDb = await this.settingsRepo.findOne({
