@@ -28,7 +28,7 @@
     "@nestjs/event-emitter": "^3.0.1",
     "@nestjs/platform-express": "^11.1.0",
     "@nestjs/schedule": "^6.0.0",
-    "@nestjs/swagger": "^11.1.5",
+    "@nestjs/swagger": "^11.2.0",
     "@nestjs/typeorm": "^11.0.0",
     "@types/express": "^5.0.1",
     "axios": "^1.9.0",
@@ -51,7 +51,7 @@
     "winston-daily-rotate-file": "^5.0.0",
     "xml2js": "^0.6.2",
     "yaml": "^2.7.1",
-    "zod": "^3.24.3"
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@automock/adapters.nestjs": "^2.1.0",
