@@ -1,7 +1,6 @@
 import { Editor } from '@monaco-editor/react'
-import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
-import { useToasts } from 'react-toast-notifications'
+import { toast } from 'react-toastify'
 import GetApiHandler, { PostApiHandler } from '../../../../utils/ApiHandler'
 import { camelCaseToPrettyText } from '../../../../utils/SettingsUtils'
 import LoadingSpinner from '../../../Common/LoadingSpinner'
@@ -48,7 +47,6 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
 
   const [targetAgent, setTargetAgent] = useState<agentSpec>()
   const [targetTypes, setTargetTypes] = useState<typeSpec[]>([])
-  const { addToast } = useToasts()
 
   const handleSubmit = () => {
     const types = targetTypes ? targetTypes.map((t) => t.id) : []
@@ -83,16 +81,11 @@ const CreateNotificationModal = (props: CreateNotificationModal) => {
         options: formValues,
       }).then((resp) => {
         if (resp !== 'Success') {
-          addToast(resp, {
-            autoDismiss: true,
-            autoDismissTimeout: 10000,
-            appearance: 'error',
+          toast.error(resp, {
+            autoClose: 10000,
           })
         } else {
-          addToast('Successfully fired the notification!', {
-            autoDismiss: true,
-            appearance: 'success',
-          })
+          toast.success('Successfully fired the notification!')
         }
       })
     }

@@ -32,11 +32,11 @@
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@types/node": "^22.13.14",
-    "knip": "^5.47.0",
+    "@types/node": "^22.15.6",
+    "knip": "^5.50.5",
     "semantic-release": "^24.2.3",
     "semantic-release-gha-output": "^1.1.1",
-    "turbo": "^2.5.0",
+    "turbo": "^2.5.3",
     "typescript": "^5.8.3"
   },
   "release": {

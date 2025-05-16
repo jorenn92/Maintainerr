@@ -17,6 +17,7 @@ interface ICommunityRuleModal {
   onCancel: () => void
   currentRules?: IRule[]
   type: 'movie' | 'show'
+  level?: 'show' | 'season' | 'episode'
 }
 
 interface ICommunityRuleKarmaHistory {
@@ -216,6 +217,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         loading={false}
         backgroundClickable={false}
         onCancel={handleCancel}
+        size="5xl"
         okDisabled={clickedRule === -1}
         onOk={handleSubmit}
         okText={'Import'}
@@ -223,15 +225,15 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
         title={'Community Rules'}
         iconSvg={''}
       >
-        <div className="mt-6">
+        <div>
           <Alert type="info">
-            {`Import rules made by the community. This will override your current rules`}
+            {`Import rules made by the community. This will override your current rules.`}
           </Alert>
         </div>
         <SearchBar onSearch={handleSearch} />
         {originalRules.length > 0 ? (
           <div className="flex flex-col">
-            <div className="-mx-4 my-2 overflow-x-auto md:mx-0 lg:mx-0">
+            <div className="-mx-4 overflow-x-auto md:mx-0 lg:mx-0">
               <div className="inline-block min-w-full py-2 align-middle">
                 <div className="overflow-hidden shadow md:mx-0 lg:mx-0">
                   <table className="ml-2 mr-2 min-w-full table-fixed">
@@ -245,6 +247,9 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
                         </th>
                         <th className="truncate bg-gray-500 px-3 text-center text-xs font-medium uppercase text-gray-200">
                           <span>Uploaded By</span>
+                        </th>
+                        <th className="truncate bg-gray-500 px-3 text-center text-xs font-medium uppercase text-gray-200">
+                          <span>Made with Version</span>
                         </th>
                       </tr>
                       {shownRules.map((cr) => {
@@ -325,6 +330,7 @@ const CommunityRuleModal = (props: ICommunityRuleModal) => {
             onSubmit={handleUpload}
             type={props.type}
             rules={props.currentRules ? props.currentRules : []}
+            level={props.type === 'show' ? props.level : undefined}
           />
         ) : undefined}
       </Modal>

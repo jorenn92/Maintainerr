@@ -84,6 +84,9 @@ const CommunityRuleTableRow = (props: ICommunityRuleTableRow) => {
       <td className="px-4 py-4 text-center text-sm leading-5 text-white">
         {props.rule.uploadedBy ? props.rule.uploadedBy : '?'}
       </td>
+      <td className="px-4 py-4 text-center text-sm leading-5 text-white">
+        {props.rule.appVersion ? props.rule.appVersion : '?'}
+      </td>
     </tr>
   )
 }
