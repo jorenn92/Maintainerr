@@ -1,3 +1,4 @@
+import { ECollectionLogType } from '@maintainerr/contracts';
 import {
   Body,
   Controller,
@@ -11,11 +12,10 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 import { CollectionWorkerService } from './collection-worker.service';
 import { CollectionsService } from './collections.service';
 import {
-  AddCollectionMedia,
+  AddRemoveCollectionMedia,
   IAlterableMediaDto,
 } from './interfaces/collection-media.interface';
 
@@ -37,7 +37,7 @@ export class CollectionsController {
     @Body()
     request: {
       collectionId: number;
-      media: AddCollectionMedia[];
+      media: AddRemoveCollectionMedia[];
       manual?: boolean;
     },
   ) {
