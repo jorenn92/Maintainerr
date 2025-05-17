@@ -170,7 +170,7 @@ const TautulliSettings = () => {
               <InputGroup
                 label="URL"
                 value={field.value}
-                placeholder="http://localhost/maintainerr"
+                placeholder="http://localhost:8181"
                 onChange={field.onChange}
                 onBlur={(event) =>
                   field.onChange(stripLeadingSlashes(event.target.value))
@@ -179,6 +179,22 @@ const TautulliSettings = () => {
                 name={field.name}
                 type="text"
                 error={errors.url?.message}
+                helpText={
+                  <>
+                    Example URL formats:{' '}
+                    <span className="whitespace-nowrap">
+                      http://localhost:8181
+                    </span>
+                    ,{' '}
+                    <span className="whitespace-nowrap">
+                      http://192.168.1.5/tautulli
+                    </span>
+                    ,{' '}
+                    <span className="whitespace-nowrap">
+                      https://tautulli.example.com
+                    </span>
+                  </>
+                }
                 required
               />
             )}
