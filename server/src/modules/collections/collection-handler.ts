@@ -44,13 +44,13 @@ export class CollectionHandler {
     collection.handledMediaAmount++;
 
     // save a log record for the handled media item
-    this.collectionService.CollectionLogRecordForChild(
+    await this.collectionService.CollectionLogRecordForChild(
       media.plexId,
       collection.id,
       'handle',
     );
 
-    this.collectionService.saveCollection(collection);
+    await this.collectionService.saveCollection(collection);
 
     if (plexLibrary.type === 'movie' && collection.radarrSettingsId) {
       await this.radarrActionHandler.handleAction(collection, media);

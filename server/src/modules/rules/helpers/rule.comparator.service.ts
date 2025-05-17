@@ -1,3 +1,9 @@
+import {
+  IComparisonStatistics,
+  IRuleComparisonResult,
+  RuleResultType,
+  RuleValueType,
+} from '@maintainerr/contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import _ from 'lodash';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
@@ -7,35 +13,11 @@ import {
   RuleOperators,
   RulePossibility,
   RuleType,
-  RuleValueType,
 } from '../constants/rules.constants';
 import { RuleDto } from '../dtos/rule.dto';
 import { RuleDbDto } from '../dtos/ruleDb.dto';
 import { RulesDto } from '../dtos/rules.dto';
 import { ValueGetterService } from '../getter/getter.service';
-
-interface IComparisonStatistics {
-  plexId: number;
-  result: boolean;
-  sectionResults: ISectionComparisonResults[];
-}
-
-interface ISectionComparisonResults {
-  id: number;
-  result: boolean;
-  operator?: string;
-  ruleResults: IRuleComparisonResult[];
-}
-
-interface IRuleComparisonResult {
-  firstValueName: string;
-  firstValue: RuleValueType;
-  secondValueName: string;
-  secondValue: RuleValueType;
-  action: string;
-  operator?: string;
-  result: boolean;
-}
 
 interface IComparatorReturnValue {
   stats: IComparisonStatistics[];
@@ -60,13 +42,13 @@ export class RuleComparatorServiceFactory {
 @Injectable()
 export class RuleComparatorService {
   private readonly logger = new Logger(RuleComparatorService.name);
-  workerData: PlexLibraryItem[];
+  uncommittedResultData: PlexLibraryItem[];
   resultData: PlexLibraryItem[];
   plexData: PlexLibraryItem[];
+  failedForPlexData: string[];
   plexDataType: EPlexDataType;
   statistics: IComparisonStatistics[];
   statisticWorker: IRuleComparisonResult[];
-  enabledStats: boolean;
 
   constructor(
     private readonly valueGetter: ValueGetterService,
@@ -76,15 +58,14 @@ export class RuleComparatorService {
   public async executeRulesWithData(
     rulegroup: RulesDto,
     plexData: PlexLibraryItem[],
-    withStats = false,
     onRuleProgress?: (processingRule: number) => void,
   ): Promise<IComparatorReturnValue> {
     try {
       // prepare
       this.plexData = plexData;
       this.plexDataType = rulegroup.dataType ? rulegroup.dataType : undefined;
-      this.enabledStats = withStats;
-      this.workerData = [];
+      this.failedForPlexData = [];
+      this.uncommittedResultData = [];
       this.resultData = [];
       this.statistics = [];
       this.statisticWorker = [];
@@ -93,7 +74,6 @@ export class RuleComparatorService {
       let currentSection = 0;
       let sectionActionAnd = false;
 
-      // prepare statistics if needed
       this.prepareStatistics();
 
       let ruleNumber = 0;
@@ -109,19 +89,16 @@ export class RuleComparatorService {
           parsedRule.operator = null;
         }
 
-        if (currentSection === (rule as RuleDbDto).section) {
-          // if section didn't change
-          // execute and store in work array
-          await this.executeRule(parsedRule, rulegroup);
-        } else {
-          // set the stat results of the completed section, if needed
+        // If we've moved onto a new section
+        if (currentSection !== (rule as RuleDbDto).section) {
+          // set the stat results of the now completed/previous section
           this.setStatisticSectionResults();
 
-          // handle section action
-          this.handleSectionAction(sectionActionAnd);
+          // handle previous section action
+          this.commitToResultData(sectionActionAnd);
 
           // save new section action
-          sectionActionAnd = +parsedRule.operator === 0;
+          sectionActionAnd = +parsedRule.operator === RuleOperators.AND;
           // reset first operator of new section
           parsedRule.operator = null;
           // add new section to stats
@@ -129,19 +106,19 @@ export class RuleComparatorService {
             (rule as RuleDbDto).section,
             sectionActionAnd,
           );
-          // Execute the rule and set the new section
-          await this.executeRule(parsedRule, rulegroup);
+
           currentSection = (rule as RuleDbDto).section;
         }
+
+        // execute and store in work array
+        await this.executeRule(parsedRule, rulegroup);
       }
-      // set the stat results of the last section, if needed
+
+      // set the stat results of the last section
       this.setStatisticSectionResults();
 
       // handle last section
-      this.handleSectionAction(sectionActionAnd);
-
-      // update statistics results when needed
-      this.updateStatisticResults();
+      this.commitToResultData(sectionActionAnd);
 
       // update result for matched media
       this.statistics.forEach((el) => {
@@ -158,38 +135,28 @@ export class RuleComparatorService {
     }
   }
 
-  private updateStatisticResults() {
-    if (this.enabledStats) {
-      this.statistics.forEach((el) => {
-        el.result = this.resultData.some((i) => +i.ratingKey === +el.plexId);
-      });
-    }
-  }
-
   private setStatisticSectionResults() {
-    // add the result of the last section. If media is in workerData, section = true.
-    if (this.enabledStats) {
-      this.statistics.forEach((stat) => {
-        if (this.workerData.find((el) => +el.ratingKey === +stat.plexId)) {
-          stat.sectionResults[stat.sectionResults.length - 1].result = true;
-        } else {
-          stat.sectionResults[stat.sectionResults.length - 1].result = false;
-        }
-      });
-    }
+    // add the result of the last section. If media is in uncommittedResultData, section = true.
+    this.statistics.forEach((stat) => {
+      if (
+        this.uncommittedResultData.find((el) => +el.ratingKey === +stat.plexId)
+      ) {
+        stat.sectionResults[stat.sectionResults.length - 1].result = true;
+      } else {
+        stat.sectionResults[stat.sectionResults.length - 1].result = false;
+      }
+    });
   }
 
   private addSectionToStatistics(id: number, isAND: boolean) {
-    if (this.enabledStats) {
-      this.statistics.forEach((data) => {
-        data.sectionResults.push({
-          id: id,
-          result: undefined,
-          operator: isAND ? 'AND' : 'OR',
-          ruleResults: [],
-        });
+    this.statistics.forEach((data) => {
+      data.sectionResults.push({
+        id: id,
+        result: undefined,
+        operator: isAND ? 'AND' : 'OR',
+        ruleResults: [],
       });
-    }
+    });
   }
 
   private async executeRule(rule: RuleDto, ruleGroup: RulesDto) {
@@ -198,59 +165,74 @@ export class RuleComparatorService {
     let secondVal: RuleValueType;
 
     if (rule.operator === null || +rule.operator === +RuleOperators.OR) {
-      data = _.cloneDeep(this.plexData);
+      data = _.cloneDeep(
+        this.plexData.filter(
+          (x) =>
+            !this.failedForPlexData.some(
+              (ratingKey) => ratingKey == x.ratingKey,
+            ),
+        ),
+      );
     } else {
-      data = _.cloneDeep(this.workerData);
+      data = _.cloneDeep(this.uncommittedResultData);
     }
 
     // loop media items
-    for (let i = data.length - 1; i >= 0; i--) {
+    for (const media of data) {
       // fetch values
       firstVal = await this.valueGetter.get(
         rule.firstVal,
-        data[i],
+        media,
         ruleGroup,
         this.plexDataType,
       );
-      secondVal = await this.getSecondValue(rule, data[i], ruleGroup, firstVal);
+      secondVal = await this.getSecondValue(rule, media, ruleGroup, firstVal);
 
-      if (
-        (firstVal !== undefined || null) &&
-        (secondVal !== undefined || null)
-      ) {
+      // TODO Improve firstVal/secondVal null handling (it's used for errors, and normal returns).
+      let ruleResult: RuleResultType | undefined = undefined;
+      if (firstVal !== undefined && secondVal !== undefined) {
         // do action
-        const comparisonResult = this.doRuleAction(
+        const rawComparisonResult = this.doRuleAction(
           firstVal,
           secondVal,
           rule.action,
         );
 
-        // add stats if enabled
-        this.addStatistictoParent(
-          rule,
-          firstVal,
-          secondVal,
-          +data[i].ratingKey,
-          comparisonResult,
-        );
+        ruleResult =
+          rawComparisonResult === null ? 'error' : rawComparisonResult;
+      } else {
+        ruleResult = 'error';
+      }
 
-        // alter workerData
-        if (rule.operator === null || +rule.operator === +RuleOperators.OR) {
-          if (comparisonResult) {
-            // add to workerdata if not yet available
-            if (
-              this.workerData.find((e) => e.ratingKey === data[i].ratingKey) ===
-              undefined
-            ) {
-              this.workerData.push(data[i]);
-            }
-          }
-        } else {
-          if (!comparisonResult) {
-            // remove from workerdata
-            this.workerData.splice(i, 1);
-          }
+      this.addRuleResultToSectionResult(
+        rule,
+        firstVal,
+        secondVal,
+        +media.ratingKey,
+        ruleResult,
+      );
+
+      if (
+        ruleResult === true &&
+        (rule.operator === null || +rule.operator === +RuleOperators.OR)
+      ) {
+        // alter uncommittedResultData
+        if (
+          this.uncommittedResultData.find(
+            (e) => e.ratingKey === media.ratingKey,
+          ) === undefined
+        ) {
+          this.uncommittedResultData.push(media);
         }
+      } else if (ruleResult !== true) {
+        if (ruleResult === 'error') {
+          this.failedForPlexData.push(media.ratingKey);
+        }
+
+        // remove from uncomitted
+        this.uncommittedResultData = this.uncommittedResultData.filter(
+          (x) => x.ratingKey !== media.ratingKey,
+        );
       }
     }
   }
@@ -316,77 +298,73 @@ export class RuleComparatorService {
   }
 
   private prepareStatistics() {
-    if (this.enabledStats) {
-      this.plexData.forEach((data) => {
-        this.statistics.push({
-          plexId: +data.ratingKey,
-          result: false,
-          sectionResults: [
-            {
-              id: 0,
-              result: undefined,
-              ruleResults: [],
-            },
-          ],
-        });
+    this.plexData.forEach((data) => {
+      this.statistics.push({
+        plexId: +data.ratingKey,
+        result: false,
+        sectionResults: [
+          {
+            id: 0,
+            result: undefined,
+            ruleResults: [],
+          },
+        ],
       });
-    }
+    });
   }
 
-  private addStatistictoParent(
+  private addRuleResultToSectionResult(
     rule: RuleDto,
     firstVal: RuleValueType,
     secondVal: RuleValueType,
     plexId: number,
-    result: boolean,
+    result: RuleResultType,
   ) {
-    if (this.enabledStats) {
-      const index = this.statistics.findIndex((el) => +el.plexId === +plexId);
-      const sectionIndex = this.statistics[index].sectionResults.length - 1;
+    const index = this.statistics.findIndex((el) => +el.plexId === +plexId);
+    const sectionIndex = this.statistics[index].sectionResults.length - 1;
 
-      // push result to currently last section
-      this.statistics[index].sectionResults[sectionIndex].ruleResults.push({
-        operator:
-          rule.operator === null || rule.operator === undefined
-            ? RuleOperators[1]
-            : RuleOperators[rule.operator],
-        action: RulePossibility[rule.action].toLowerCase(),
-        firstValueName: this.ruleConstanstService.getValueHumanName(
-          rule.firstVal,
-        ),
-        firstValue: firstVal,
-        secondValueName: rule.lastVal
-          ? this.ruleConstanstService.getValueHumanName(rule.lastVal)
-          : this.ruleConstanstService.getCustomValueIdentifier(rule.customVal)
-              .type,
-        secondValue: secondVal,
-        result: result,
-      });
+    // push result to currently last section
+    this.statistics[index].sectionResults[sectionIndex].ruleResults.push({
+      operator:
+        rule.operator === null || rule.operator === undefined
+          ? RuleOperators[1]
+          : RuleOperators[rule.operator],
+      action: RulePossibility[rule.action].toLowerCase(),
+      firstValueName: this.ruleConstanstService.getValueHumanName(
+        rule.firstVal,
+      ),
+      firstValue: firstVal,
+      secondValueName: rule.lastVal
+        ? this.ruleConstanstService.getValueHumanName(rule.lastVal)
+        : this.ruleConstanstService.getCustomValueIdentifier(rule.customVal)
+            .type,
+      secondValue: secondVal,
+      result: result,
+    });
 
-      // If it's the first rule of a section (but not the first one) then add the operator to the sectionResult
-      if (
-        index > 0 &&
-        this.statistics[index].sectionResults[sectionIndex].ruleResults
-          .length === 1
-      ) {
-        this.statistics[index].sectionResults[sectionIndex].operator =
-          rule.operator === null || rule.operator === undefined
-            ? RuleOperators[1]
-            : RuleOperators[rule.operator];
-      }
+    // If it's the first rule of a section (but not the first one) then add the operator to the sectionResult
+    if (
+      index > 0 &&
+      this.statistics[index].sectionResults[sectionIndex].ruleResults.length ===
+        1
+    ) {
+      this.statistics[index].sectionResults[sectionIndex].operator =
+        rule.operator == null || rule.operator === undefined
+          ? RuleOperators[1]
+          : RuleOperators[rule.operator];
     }
   }
 
-  private handleSectionAction(sectionActionAnd: boolean) {
+  private commitToResultData(sectionActionAnd: boolean) {
     if (!sectionActionAnd) {
       // section action is OR, then push in result array
-      this.resultData.push(...this.workerData);
+      this.resultData.push(...this.uncommittedResultData);
     } else {
       // section action is AND, then filter media not in work array out of result array
       this.resultData = this.resultData.filter((el) => {
         // If in current data.. Otherwise we're removing previously added media
         if (this.plexData.some((plexEl) => plexEl.ratingKey === el.ratingKey)) {
-          return this.workerData.some(
+          return this.uncommittedResultData.some(
             (workEl) => workEl.ratingKey === el.ratingKey,
           );
         } else {
@@ -395,15 +373,16 @@ export class RuleComparatorService {
         }
       });
     }
-    // empty workerdata. prepare for execution of new section
-    this.workerData = [];
+
+    // Prepare for execution of new section
+    this.uncommittedResultData = [];
   }
 
   private doRuleAction(
     val1: RuleValueType,
     val2: RuleValueType,
     action: RulePossibility,
-  ): boolean {
+  ): boolean | null {
     if (typeof val1 === 'string') {
       val1 = val1.toLowerCase();
     }
