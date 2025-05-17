@@ -608,7 +608,10 @@ describe('SonarrActionHandler', () => {
   };
 
   const mockSonarrApi = () => {
-    const mockedSonarrApi = new SonarrApi({} as any);
+    const mockedSonarrApi = new SonarrApi({
+      apiKey: '1234',
+      url: 'http://localhost:8989',
+    });
     jest
       .spyOn(mockedSonarrApi, 'unmonitorSeasons')
       .mockImplementation(jest.fn());
