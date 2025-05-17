@@ -13,6 +13,7 @@ import {
   Res,
   StreamableFile,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Response } from 'express';
 import { createReadStream, readdir } from 'fs';
@@ -37,19 +38,23 @@ import { Readable } from 'stream';
 import { formatLogMessage } from './logFormatting';
 import { LogSettingsService } from './logs.service';
 
-const logsDirectory =
-  process.env.NODE_ENV === 'production'
-    ? '/opt/data/logs'
-    : path.join(__dirname, `../../../../data/logs`);
-
 const safeLogFileRegex = /maintainerr-\d{4}-\d{2}-\d{2}\.log(\.gz)?/;
 
 @Controller('/api/logs')
 export class LogsController {
+  private logsDirectory: string;
+
   constructor(
     private readonly logSettingsService: LogSettingsService,
     private readonly eventEmitter: EventEmitter2,
-  ) {}
+    private configService: ConfigService,
+  ) {
+    const dataDir = this.configService.get<string>('DATA_DIR');
+    this.logsDirectory =
+      process.env.NODE_ENV === 'production'
+        ? path.join(dataDir, 'logs')
+        : path.join(__dirname, `../../../../data/logs`);
+  }
 
   connectedClients = new Map<
     string,
@@ -110,7 +115,7 @@ export class LogsController {
 
     const currentLogFile = new Promise<string | undefined>(
       (resolve, reject) => {
-        readdir(logsDirectory, (err, files) => {
+        readdir(this.logsDirectory, (err, files) => {
           if (err) {
             reject(err);
           } else {
@@ -123,7 +128,7 @@ export class LogsController {
               reject("Couldn't find any log files");
             }
 
-            const filePath = path.join(logsDirectory, currentLogFile);
+            const filePath = path.join(this.logsDirectory, currentLogFile);
             resolve(filePath);
           }
         });
@@ -233,13 +238,13 @@ export class LogsController {
 
   @Get('files')
   async getFiles(): Promise<LogFile[]> {
-    const files = (await readdirp(logsDirectory))
+    const files = (await readdirp(this.logsDirectory))
       .filter((x) => safeLogFileRegex.test(x))
       .sort();
     const response: LogFile[] = [];
 
     for (const file of files) {
-      const stat2 = await stat(path.join(logsDirectory, file));
+      const stat2 = await stat(path.join(this.logsDirectory, file));
       response.push({
         name: file,
         size: stat2.size,
@@ -255,7 +260,7 @@ export class LogsController {
       throw new HttpException('Invalid file', HttpStatus.BAD_REQUEST);
     }
 
-    const filePath = path.join(logsDirectory, file);
+    const filePath = path.join(this.logsDirectory, file);
     const fileMimeType = mime.lookup(filePath);
     const fileStream: Readable = createReadStream(filePath);
 
