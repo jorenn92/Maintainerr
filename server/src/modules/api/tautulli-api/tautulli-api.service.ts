@@ -306,24 +306,31 @@ export class TautulliApiService {
     });
 
     try {
-      const response = await api.getRawWithoutCache<Response<TautulliInfo>>(
-        '',
-        {
-          signal: AbortSignal.timeout(10000),
-          params: {
-            cmd: 'get_tautulli_info',
-          },
+      const response = await api.getRawWithoutCache<
+        Response<TautulliInfo> | string | undefined
+      >('', {
+        signal: AbortSignal.timeout(10000),
+        params: {
+          cmd: 'get_tautulli_info',
         },
-      );
+      });
 
       if (
+        typeof response.data !== 'object' ||
         response.data.response?.result === 'error' ||
         !response.data.response?.data?.tautulli_version
       ) {
+        const message =
+          typeof response.data === 'object'
+            ? response.data.response?.message
+            : undefined;
+
         return {
           status: 'NOK',
           code: 0,
-          message: response.data.response.message,
+          message:
+            message ??
+            'Failure, an unexpected response was returned. The URL is likely incorrect.',
         };
       } else {
         return {
