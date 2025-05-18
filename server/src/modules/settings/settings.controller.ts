@@ -1,3 +1,4 @@
+import { BasicResponseDto, TautulliSettingDto } from '@maintainerr/contracts';
 import {
   Body,
   Controller,
@@ -12,6 +13,7 @@ import { CronScheduleDto } from "./dto's/cron.schedule.dto";
 import { RadarrSettingRawDto } from "./dto's/radarr-setting.dto";
 import { SettingDto } from "./dto's/setting.dto";
 import { SonarrSettingRawDto } from "./dto's/sonarr-setting.dto";
+import { Settings } from './entities/settings.entities';
 import { SettingsService } from './settings.service';
 
 @Controller('/api/settings')
@@ -111,6 +113,35 @@ export class SettingsController {
     });
   }
 
+  @Get('/tautulli')
+  async getTautulliSetting(): Promise<TautulliSettingDto | BasicResponseDto> {
+    const settings = await this.settingsService.getSettings();
+
+    if (!(settings instanceof Settings)) {
+      return settings;
+    }
+
+    return {
+      api_key: settings.tautulli_api_key,
+      url: settings.tautulli_url,
+    };
+  }
+
+  @Post('/tautulli')
+  async updateTautlliSetting(@Body() payload: TautulliSettingDto) {
+    return await this.settingsService.updateTautulliSetting(payload);
+  }
+
+  @Delete('/tautulli')
+  async removeTautlliSetting() {
+    return await this.settingsService.removeTautulliSetting();
+  }
+
+  @Post('/test/tautulli')
+  testTautulli(@Body() payload: TautulliSettingDto): Promise<BasicResponseDto> {
+    return this.settingsService.testTautulli(payload);
+  }
+
   @Delete('/sonarr/:id')
   async deleteSonarrSetting(@Param('id', new ParseIntPipe()) id: number) {
     return await this.settingsService.deleteSonarrSetting(id);
@@ -119,10 +150,6 @@ export class SettingsController {
   @Get('/test/plex')
   testPlex() {
     return this.settingsService.testPlex();
-  }
-  @Get('/test/tautulli')
-  testTautulli() {
-    return this.settingsService.testTautulli();
   }
 
   @Get('/plex/devices/servers')
