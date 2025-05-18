@@ -1,4 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -28,7 +29,15 @@ import { NotificationService } from '../modules/notifications/notifications.serv
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(ormConfig),
+    ConfigModule.forRoot({
+      envFilePath: ['.env.local', '.env', '.env.production'],
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: ormConfig,
+      inject: [ConfigService],
+    }),
     EventEmitterModule.forRoot({
       wildcard: true,
     }),
