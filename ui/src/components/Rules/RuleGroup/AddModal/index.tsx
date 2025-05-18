@@ -6,7 +6,6 @@ import {
   SaveIcon,
   UploadIcon,
 } from '@heroicons/react/solid'
-import Link from 'next/link'
 import Router from 'next/router'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
@@ -405,18 +404,18 @@ const AddModal = (props: AddModal) => {
             <h3 className="heading mb-5">Rule Group Settings</h3>
           </div>
           <div className="ml-auto">
-            <Link
-              legacyBehavior
-              href={`https://docs.maintainerr.info/latest/Rules`}
-              passHref={true}
+            <Button
+              className="ml-3"
+              buttonType="default"
+              type="button"
+              as="a"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://docs.maintainerr.info/latest/Rules"
             >
-              <a target="_blank" rel="noopener noreferrer">
-                <Button className="ml-3" buttonType="default" type="button">
-                  <QuestionMarkCircleIcon />
-                  <span>Help</span>
-                </Button>
-              </a>
-            </Link>
+              <QuestionMarkCircleIcon />
+              <span>Help</span>
+            </Button>
           </div>
         </div>
 

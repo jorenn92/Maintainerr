@@ -84,11 +84,7 @@ export class RadarrGetterService {
             return null;
           }
           case 'monitored': {
-            return movieResponse.monitored
-              ? movieResponse.monitored
-                ? 1
-                : 0
-              : null;
+            return movieResponse.monitored ? 1 : 0;
           }
           case 'tags': {
             const movieTags = movieResponse.tags;
