@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TasksService } from '../../tasks/tasks.service';
-import { SettingsService } from '../../settings/settings.service';
-import { RulesService } from '../rules.service';
-import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { Collection } from '../../collections/entities/collection.entities';
+import { SettingsService } from '../../settings/settings.service';
 import { TaskBase } from '../../tasks/task.base';
+import { TasksService } from '../../tasks/tasks.service';
+import { RulesService } from '../rules.service';
 
 @Injectable()
 export class RuleMaintenanceService extends TaskBase {
@@ -34,8 +34,8 @@ export class RuleMaintenanceService extends TaskBase {
 
       if (appStatus) {
         // remove media exclusions that are no longer available
-        this.removeLeftoverExclusions();
-        this.removeCollectionsWithoutRule();
+        await this.removeLeftoverExclusions();
+        await this.removeCollectionsWithoutRule();
         this.logger.log('Maintenance done');
       } else {
         this.logger.error(
@@ -45,7 +45,8 @@ export class RuleMaintenanceService extends TaskBase {
     } catch (e) {
       this.logger.error(`Rule Maintenance failed : ${e.message}`);
     }
-    this.finish();
+
+    await this.finish();
   }
 
   private async removeLeftoverExclusions() {
@@ -57,7 +58,7 @@ export class RuleMaintenanceService extends TaskBase {
       const resp = await this.plexApi.getMetadata(exclusion.plexId.toString());
       // remove when not
       if (!resp?.ratingKey) {
-        this.rulesService.removeExclusion(exclusion.id);
+        await this.rulesService.removeExclusion(exclusion.id);
       }
     }
   }

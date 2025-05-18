@@ -6,12 +6,12 @@ export interface TaskScheduler {
     name: string,
     cronExp: CronExpression | string,
     task: () => void,
-  ): Status;
+  ): Promise<Status>;
   updateJob(
     name: string,
     cronExp: CronExpression | string,
     task: () => void,
-  ): Status;
+  ): Promise<Status>;
   handleJob(name: string): Status;
   removeJob(name: string): Status;
 }

@@ -69,7 +69,7 @@ export class PlexApiController {
   }
   @Get('library/:id/recent')
   getRecentlyAdded(@Param('id', new ParseIntPipe()) id: number) {
-    this.plexApiService.getRecentlyAdded(id.toString());
+    return this.plexApiService.getRecentlyAdded(id.toString());
   }
   @Get('library/:id/collections')
   async getCollections(@Param('id', new ParseIntPipe()) id: number) {

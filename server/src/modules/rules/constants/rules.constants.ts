@@ -110,15 +110,6 @@ export class RuleType {
   }
 }
 
-export type RuleValueType =
-  | number
-  | Date
-  | string
-  | boolean
-  | number[]
-  | string[]
-  | null;
-
 export interface Property {
   id: number;
   name: string;

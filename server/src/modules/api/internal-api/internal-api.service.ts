@@ -12,7 +12,7 @@ export class InternalApiService {
     private readonly settings: SettingsService,
   ) {}
 
-  public async init() {
+  public init() {
     const apiPort = process.env.API_PORT || 3001;
 
     this.api = new InternalApi({
