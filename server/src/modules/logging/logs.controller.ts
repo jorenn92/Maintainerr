@@ -161,7 +161,7 @@ export class LogsController implements BeforeApplicationShutdown {
       );
     };
 
-    const parseLogLine = (line: string): LogEvent => {
+    const parseLogLine = (line: string): LogEvent | null => {
       const regex =
         /\[(?<context>[^\]]+)\]  \|  (?<timestamp>[^\[]+)  \[(?<level>[^\]]+)\] \[(?<label>[^\]]+)\] (?<message>.*)/s;
 
@@ -202,6 +202,11 @@ export class LogsController implements BeforeApplicationShutdown {
 
           for (const match of matches) {
             const logEvent = parseLogLine(match);
+
+            if (!logEvent) {
+              continue;
+            }
+
             const event = new MessageEvent<LogEvent>('log', { data: logEvent });
             events.push(event);
           }

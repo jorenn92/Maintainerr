@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
@@ -58,9 +59,25 @@ function createDataDirectoryStructure() {
     console.error(
       'Could not create or access (files in) the data directory. Please make sure the necessary permissions are set',
     );
-    process.exit(0);
+    process.exit(1);
   }
 }
 
 createDataDirectoryStructure();
 bootstrap();
+
+process
+  .on('unhandledRejection', (err) => {
+    new Logger('main').error(
+      'An unhandledRejection has occurred. This is likely a bug, please report this issue on GitHub.',
+      err,
+    );
+    // We do not exit the process here as the error is unlikely to be fatal.
+  })
+  .on('uncaughtException', (err) => {
+    new Logger('main').error(
+      'The server has crashed because of an uncaughtException. This is likely a bug, please report this issue on GitHub.',
+      err,
+    );
+    process.exit(1);
+  });
