@@ -49,9 +49,7 @@ const YamlImporterModal = (props: IYamlImporterModal) => {
 
   const download = async () => {
     if (props.yaml) {
-      const blob = new Blob([props.yaml], {
-        type: 'text/yaml',
-      })
+      const blob = new Blob([props.yaml], { type: 'text/yaml' })
       const href = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = href
@@ -62,11 +60,32 @@ const YamlImporterModal = (props: IYamlImporterModal) => {
     }
   }
 
-  const copyToClipboard = () => {
+  const copyToClipboard = async () => {
     const value = (editorRef.current as any)?.getValue?.()
-    if (value?.trim()) {
-      navigator.clipboard.writeText(value)
+    if (!value?.trim()) return
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(value)
+      } else {
+        throw new Error('Clipboard not available')
+      }
       toast.success('Copied to clipboard')
+    } catch {
+      try {
+        const textarea = document.createElement('textarea')
+        textarea.value = value
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.focus()
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+        toast.success('Copied to clipboard')
+      } catch (fallbackError) {
+        toast.error('Failed to copy to clipboard')
+      }
     }
   }
 
@@ -139,4 +158,5 @@ const YamlImporterModal = (props: IYamlImporterModal) => {
     </div>
   )
 }
+
 export default YamlImporterModal

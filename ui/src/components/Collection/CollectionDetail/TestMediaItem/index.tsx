@@ -170,11 +170,32 @@ const TestMediaItem = (props: ITestMediaItem) => {
     return
   }
 
-  const copyToClipboard = () => {
+  const copyToClipboard = async () => {
     const value = (editorRef.current as any)?.getValue?.()
-    if (value?.trim()) {
-      navigator.clipboard.writeText(value)
+    if (!value?.trim()) return
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(value)
+      } else {
+        throw new Error('Clipboard not available')
+      }
       toast.success('Copied to clipboard')
+    } catch {
+      try {
+        const textarea = document.createElement('textarea')
+        textarea.value = value
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.focus()
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+        toast.success('Copied to clipboard')
+      } catch {
+        toast.error('Failed to copy to clipboard')
+      }
     }
   }
 
