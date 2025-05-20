@@ -388,7 +388,7 @@ export class RuleExecutorService extends TaskBase {
         );
 
         // add the run duration to the collection
-        this.AddCollectionRunDuration(collection);
+        await this.AddCollectionRunDuration(collection);
 
         return collection;
       } else {
@@ -433,12 +433,13 @@ export class RuleExecutorService extends TaskBase {
     return uniqueArr;
   }
 
-  private AddCollectionRunDuration(collection: Collection) {
+  private async AddCollectionRunDuration(collection: Collection) {
     // add the run duration to the collection
     collection.lastDurationInSeconds = Math.floor(
       (new Date().getTime() - this.startTime.getTime()) / 1000,
     );
-    this.collectionService.saveCollection(collection);
+
+    await this.collectionService.saveCollection(collection);
   }
 
   private async getPlexData(libraryId: number): Promise<void> {

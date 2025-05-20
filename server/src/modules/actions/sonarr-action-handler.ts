@@ -92,7 +92,7 @@ export class SonarrActionHandler {
         this.logger.log(
           `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. Attempting to remove from the filesystem via Plex.`,
         );
-        this.plexApi.deleteMediaFromDisk(media.plexId.toString());
+        await this.plexApi.deleteMediaFromDisk(media.plexId.toString());
       } else {
         this.logger.log(
           `Couldn't find correct tvdb id. No unmonitor action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
@@ -168,7 +168,7 @@ export class SonarrActionHandler {
             if (sonarrMedia) {
               // unmonitor show
               sonarrMedia.monitored = false;
-              sonarrApiClient.updateSeries(sonarrMedia);
+              await sonarrApiClient.updateSeries(sonarrMedia);
               this.logger.log(
                 `[Sonarr] Unmonitored show '${sonarrMedia.title}'`,
               );
@@ -189,7 +189,7 @@ export class SonarrActionHandler {
             if (sonarrMedia) {
               // unmonitor show
               sonarrMedia.monitored = false;
-              sonarrApiClient.updateSeries(sonarrMedia);
+              await sonarrApiClient.updateSeries(sonarrMedia);
               this.logger.log(
                 `[Sonarr] Unmonitored show '${sonarrMedia.title}' and removed all episodes`,
               );
@@ -226,7 +226,7 @@ export class SonarrActionHandler {
             if (sonarrMedia) {
               // unmonitor show
               sonarrMedia.monitored = false;
-              sonarrApiClient.updateSeries(sonarrMedia);
+              await sonarrApiClient.updateSeries(sonarrMedia);
               this.logger.log(
                 `[Sonarr] Unmonitored show '${sonarrMedia.title}' and Removed exisiting episodes`,
               );

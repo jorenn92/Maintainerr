@@ -109,7 +109,7 @@ export class TautulliApiService {
     logger.setContext(TautulliApiService.name);
   }
 
-  public async init() {
+  public init() {
     this.api = new TautulliApi(
       {
         url: `${this.settings.tautulli_url}/api/v2`,

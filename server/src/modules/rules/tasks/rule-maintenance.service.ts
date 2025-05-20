@@ -35,8 +35,8 @@ export class RuleMaintenanceService extends TaskBase {
 
       if (appStatus) {
         // remove media exclusions that are no longer available
-        this.removeLeftoverExclusions();
-        this.removeCollectionsWithoutRule();
+        await this.removeLeftoverExclusions();
+        await this.removeCollectionsWithoutRule();
         this.logger.log('Maintenance done');
       } else {
         this.logger.error(
@@ -46,7 +46,8 @@ export class RuleMaintenanceService extends TaskBase {
     } catch (e) {
       this.logger.error(`Rule Maintenance failed : ${e.message}`);
     }
-    this.finish();
+
+    await this.finish();
   }
 
   private async removeLeftoverExclusions() {
@@ -58,7 +59,7 @@ export class RuleMaintenanceService extends TaskBase {
       const resp = await this.plexApi.getMetadata(exclusion.plexId.toString());
       // remove when not
       if (!resp?.ratingKey) {
-        this.rulesService.removeExclusion(exclusion.id);
+        await this.rulesService.removeExclusion(exclusion.id);
       }
     }
   }

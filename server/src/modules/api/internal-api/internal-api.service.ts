@@ -13,7 +13,7 @@ export class InternalApiService {
     private readonly logger: MaintainerrLogger,
   ) {}
 
-  public async init() {
+  public init() {
     const apiPort = process.env.API_PORT || 3001;
 
     this.api = new InternalApi(

@@ -529,7 +529,7 @@ export class PlexApiService {
 
   public async createCollection(params: CreateUpdateCollection) {
     try {
-      const response = await this.plexClient.postQuery({
+      const response = await this.plexClient.postQuery<any>({
         uri: `/library/collections?type=${
           params.type
         }&title=${encodeURIComponent(params.title)}&sectionId=${

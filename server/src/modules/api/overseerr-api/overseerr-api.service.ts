@@ -163,7 +163,7 @@ export class OverseerrApiService {
     this.logger.setContext(OverseerrApiService.name);
   }
 
-  public async init() {
+  public init() {
     this.api = new OverseerrApi(
       {
         url: `${this.settings.overseerr_url?.replace(/\/$/, '')}/api/v1`,
@@ -277,14 +277,14 @@ export class OverseerrApiService {
     try {
       const media = await this.getShow(tmdbid);
 
-      if (media && media.mediaInfo) {
+      if (media?.mediaInfo) {
         const requests = media.mediaInfo.requests.filter((el) =>
           el.seasons.find((s) => s.seasonNumber === season),
         );
         if (requests.length > 0) {
-          requests.forEach((el) => {
-            this.deleteRequest(el.id.toString());
-          });
+          for (const el of requests) {
+            await this.deleteRequest(el.id.toString());
+          }
         } else {
           // no requests ? clear data and let Overseerr refetch.
           await this.api.delete(`/media/${media.id}`);
@@ -341,7 +341,7 @@ export class OverseerrApiService {
       }
 
       try {
-        this.deleteMediaItem(media.mediaInfo.id.toString());
+        await this.deleteMediaItem(media.mediaInfo.id.toString());
       } catch (e) {
         this.logger.log(
           `Couldn't delete media by TMDB ID ${id}. Does it exist in Overseerr? ${e.message}`,

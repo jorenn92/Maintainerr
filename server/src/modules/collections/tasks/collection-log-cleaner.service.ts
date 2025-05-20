@@ -28,14 +28,14 @@ export class CollectionLogCleanerService extends TaskBase {
 
       // for each collection
       for (const collection of collections) {
-        this.collectionService.removeOldCollectionLogs(collection);
+        await this.collectionService.removeOldCollectionLogs(collection);
       }
 
       // clean up
-      this.finish();
+      await this.finish();
     } catch (e) {
       this.logger.debug(e);
-      this.finish();
+      await this.finish();
     }
   }
 }

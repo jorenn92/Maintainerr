@@ -160,7 +160,7 @@ export class JellyseerrApiService {
     this.logger.setContext(JellyseerrApiService.name);
   }
 
-  public async init() {
+  public init() {
     this.api = new JellyseerrApi(
       {
         url: `${this.settings.jellyseerr_url?.replace(/\/$/, '')}/api/v1`,
@@ -279,9 +279,9 @@ export class JellyseerrApiService {
           el.seasons.find((s) => s.seasonNumber === season),
         );
         if (requests.length > 0) {
-          requests.forEach((el) => {
-            this.deleteRequest(el.id.toString());
-          });
+          for (const el of requests) {
+            await this.deleteRequest(el.id.toString());
+          }
         } else {
           // no requests ? clear data and let Jellyseerr refetch.
           await this.api.delete(`/media/${media.id}`);
@@ -338,7 +338,7 @@ export class JellyseerrApiService {
       }
 
       try {
-        this.deleteMediaItem(media.mediaInfo.id.toString());
+        await this.deleteMediaItem(media.mediaInfo.id.toString());
       } catch (e) {
         this.logger.log(
           `Couldn't delete media by TMDB ID ${id}. Does it exist in Jellyseerr? ${e.message}`,
