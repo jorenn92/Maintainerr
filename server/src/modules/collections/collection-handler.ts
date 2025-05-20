@@ -1,10 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RadarrActionHandler } from '../actions/radarr-action-handler';
 import { SonarrActionHandler } from '../actions/sonarr-action-handler';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { SettingsService } from '../settings/settings.service';
 import { CollectionsService } from './collections.service';
 import { Collection } from './entities/collection.entities';
@@ -13,8 +14,6 @@ import { ServarrAction } from './interfaces/collection.interface';
 
 @Injectable()
 export class CollectionHandler {
-  private readonly logger = new Logger(CollectionHandler.name);
-
   constructor(
     private readonly plexApi: PlexApiService,
     private readonly collectionService: CollectionsService,
@@ -22,7 +21,10 @@ export class CollectionHandler {
     private readonly settings: SettingsService,
     private readonly radarrActionHandler: RadarrActionHandler,
     private readonly sonarrActionHandler: SonarrActionHandler,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(CollectionHandler.name);
+  }
 
   public async handleMedia(collection: Collection, media: CollectionMedia) {
     if (collection.arrAction === ServarrAction.DO_NOTHING) {
