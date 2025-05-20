@@ -1,20 +1,24 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Mocked, TestBed } from '@suites/unit';
 import { delay } from '../../utils/delay';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { TaskBase } from './task.base';
 import { TasksService } from './tasks.service';
 
 @Injectable()
 class TestTask extends TaskBase {
-  protected logger = new Logger(TestTask.name);
   protected name = 'Test Task';
   protected cronSchedule = '0 0 0 0 0';
   public hasBootstraped = false;
   public hasAbortedDueToSignal = false;
   public taskCompleted = false;
 
-  constructor(protected readonly taskService: TasksService) {
-    super(taskService);
+  constructor(
+    protected readonly taskService: TasksService,
+    protected readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(TestTask.name);
+    super(taskService, logger);
   }
 
   public async executeTask(abortSignal: AbortSignal): Promise<void> {
@@ -48,7 +52,7 @@ describe('TaskBase', () => {
   });
 
   it('should create a job on application bootstrap', () => {
-    tasksService.createJob.mockReturnValue({ code: 0, message: 'OK' });
+    tasksService.createJob.mockResolvedValue({ code: 0, message: 'OK' });
 
     task.onApplicationBootstrap();
 
@@ -61,25 +65,22 @@ describe('TaskBase', () => {
     expect(task.hasBootstraped).toBe(true);
   });
 
-  it('should retry job creation 3 more times if it fails', () => {
-    tasksService.createJob.mockReturnValue({ code: 0, message: 'Error' });
+  it('should try job creation 3 times before stopping', async () => {
+    tasksService.createJob.mockResolvedValue({ code: 0, message: 'Error' });
 
     task.onApplicationBootstrap();
 
     expect(tasksService.createJob).toHaveBeenCalledTimes(1);
 
-    jest.advanceTimersByTime(10000);
+    await jest.advanceTimersByTimeAsync(10000);
     expect(tasksService.createJob).toHaveBeenCalledTimes(2);
 
-    jest.advanceTimersByTime(10000);
+    await jest.advanceTimersByTimeAsync(10000);
     expect(tasksService.createJob).toHaveBeenCalledTimes(3);
 
-    jest.advanceTimersByTime(10000);
-    expect(tasksService.createJob).toHaveBeenCalledTimes(4);
-
     // Should have stopped retrying now
-    jest.advanceTimersByTime(10000);
-    expect(tasksService.createJob).toHaveBeenCalledTimes(4);
+    await jest.advanceTimersByTimeAsync(10000);
+    expect(tasksService.createJob).toHaveBeenCalledTimes(3);
   });
 
   it('should stop execution when requested', async () => {
