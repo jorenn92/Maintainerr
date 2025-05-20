@@ -1,7 +1,8 @@
 import { MaintainerrEvent } from '@maintainerr/contracts';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CollectionsService } from '../collections/collections.service';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { TaskBase } from '../tasks/task.base';
 import { TasksService } from '../tasks/tasks.service';
 import { NotificationType } from './notifications-interfaces';
@@ -13,19 +14,19 @@ import { NotificationService } from './notifications.service';
 // Each media item will only be notified once per notification provider, on the specified day. If this job runs multiple times a day, multiple notifications for the same media items would be sent out.
 @Injectable()
 export class NotificationTimerService extends TaskBase {
-  protected logger = new Logger(NotificationTimerService.name);
-
   protected name = 'Notification Timer';
   protected cronSchedule = '0 14 * * *';
   protected type = NotificationType.MEDIA_ABOUT_TO_BE_HANDLED;
 
   constructor(
     protected readonly taskService: TasksService,
+    protected readonly logger: MaintainerrLogger,
     protected readonly collectionService: CollectionsService,
     private readonly notificationService: NotificationService,
     private readonly eventEmitter: EventEmitter2,
   ) {
-    super(taskService);
+    logger.setContext(NotificationTimerService.name);
+    super(taskService, logger);
   }
 
   protected onBootstrapHook(): void {}

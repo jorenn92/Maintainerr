@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import _ from 'lodash';
@@ -12,6 +12,8 @@ import { Collection } from '../collections/entities/collection.entities';
 import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
 import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
+import { MaintainerrLogger } from '../logging/logs.service';
+import { Notification } from '../notifications/entities/notification.entities';
 import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 import { Settings } from '../settings/entities/settings.entities';
 import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
@@ -33,7 +35,6 @@ import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
 import { RuleComparatorServiceFactory } from './helpers/rule.comparator.service';
 import { RuleYamlService } from './helpers/yaml.service';
-import { Notification } from '../notifications/entities/notification.entities';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -43,7 +44,6 @@ export interface ReturnStatus {
 
 @Injectable()
 export class RulesService {
-  private readonly logger = new Logger(RulesService.name);
   private readonly communityUrl = 'https://community.maintainerr.info';
 
   ruleConstants: RuleConstants;
@@ -69,7 +69,9 @@ export class RulesService {
     private readonly connection: DataSource,
     private readonly ruleYamlService: RuleYamlService,
     private readonly ruleComparatorServiceFactory: RuleComparatorServiceFactory,
+    private readonly logger: MaintainerrLogger,
   ) {
+    logger.setContext(RulesService.name);
     this.ruleConstants = new RuleConstants();
   }
   async getRuleConstants(): Promise<RuleConstants> {
@@ -406,7 +408,7 @@ export class RulesService {
         );
 
         // remove previous rules
-        this.rulesRepository.delete({
+        await this.rulesRepository.delete({
           ruleGroupId: groupId,
         });
 

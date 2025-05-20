@@ -4,7 +4,7 @@ import {
   CollectionHandlerStartedEventDto,
   MaintainerrEvent,
 } from '@maintainerr/contracts';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThanOrEqual, Repository } from 'typeorm';
@@ -12,6 +12,7 @@ import { delay } from '../../utils/delay';
 import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { CollectionMediaHandledDto } from '../events/events.dto';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { SettingsService } from '../settings/settings.service';
 import { TaskBase } from '../tasks/task.base';
 import { TasksService } from '../tasks/tasks.service';
@@ -22,8 +23,6 @@ import { ServarrAction } from './interfaces/collection.interface';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
-  protected logger = new Logger(CollectionWorkerService.name);
-
   protected name = 'Collection Handler';
   protected cronSchedule = ''; // overriden in onBootstrapHook
 
@@ -38,8 +37,10 @@ export class CollectionWorkerService extends TaskBase {
     private readonly settings: SettingsService,
     private readonly eventEmitter: EventEmitter2,
     private readonly collectionHandler: CollectionHandler,
+    protected readonly logger: MaintainerrLogger,
   ) {
-    super(taskService);
+    logger.setContext(CollectionWorkerService.name);
+    super(taskService, logger);
   }
 
   protected onBootstrapHook(): void {

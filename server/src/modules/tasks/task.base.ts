@@ -1,43 +1,55 @@
-import {
-  Logger,
-  OnApplicationBootstrap,
-  OnApplicationShutdown,
-} from '@nestjs/common';
+import { OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { delay } from '../../utils/delay';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { TasksService } from './tasks.service';
 
 export abstract class TaskBase
   implements OnApplicationBootstrap, OnApplicationShutdown
 {
-  protected logger = new Logger(TaskBase.name);
   private jobCreationAttempts = 0;
   protected name = '';
   protected cronSchedule = '';
   private abortController: AbortController | undefined;
 
-  constructor(protected readonly taskService: TasksService) {}
+  constructor(
+    protected readonly taskService: TasksService,
+    protected readonly logger: MaintainerrLogger,
+  ) {}
 
-  onApplicationBootstrap() {
-    this.jobCreationAttempts++;
+  async onApplicationBootstrap(): Promise<void> {
     this.onBootstrapHook();
-    const state = this.taskService.createJob(
-      this.name,
-      this.cronSchedule,
-      this.execute.bind(this),
-      true,
-    );
-    if (state.code === 0) {
-      if (this.jobCreationAttempts <= 3) {
-        this.logger.log(
-          `Creation of ${this.name} task failed. Retrying in 10s..`,
+
+    new Promise<void>(async (resolve, reject) => {
+      while (this.jobCreationAttempts < 3) {
+        this.jobCreationAttempts++;
+        const state = await this.taskService.createJob(
+          this.name,
+          this.cronSchedule,
+          this.execute.bind(this),
+          true,
         );
-        setTimeout(() => {
-          this.onApplicationBootstrap();
-        }, 10000);
-      } else {
-        this.logger.error(`Creation of ${this.name} task failed.`);
+
+        if (state.code === 1) {
+          resolve();
+          return;
+        }
+
+        if (this.jobCreationAttempts < 3) {
+          this.logger.warn(
+            `Creation of ${this.name} task failed. Retrying in 10s... (Attempt ${this.jobCreationAttempts}/3)`,
+          );
+
+          await delay(10_000);
+        }
       }
-    }
+
+      reject();
+    }).catch((err) => {
+      this.logger.error(
+        `Creation of ${this.name} task failed after 3 attempts.`,
+        err,
+      );
+    });
   }
 
   async onApplicationShutdown() {
