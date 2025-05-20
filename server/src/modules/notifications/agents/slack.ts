@@ -1,14 +1,14 @@
 import axios from 'axios';
-import { hasNotificationType } from '../notifications.service';
-import type { NotificationAgent, NotificationPayload } from './agent';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
-import { Logger } from '@nestjs/common';
+import { Notification } from '../entities/notification.entities';
 import {
   NotificationAgentKey,
   NotificationAgentSlack,
   NotificationType,
 } from '../notifications-interfaces';
-import { Notification } from '../entities/notification.entities';
+import { hasNotificationType } from '../notifications.service';
+import type { NotificationAgent, NotificationPayload } from './agent';
 
 interface EmbedField {
   type: 'plain_text' | 'mrkdwn';
@@ -52,12 +52,12 @@ class SlackAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentSlack,
+    private readonly logger: MaintainerrLogger,
     readonly notification: Notification,
   ) {
+    logger.setContext(SlackAgent.name);
     this.notification = notification;
   }
-
-  private readonly logger = new Logger(SlackAgent.name);
 
   getNotification = () => this.notification;
 

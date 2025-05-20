@@ -4,7 +4,7 @@ import {
   RuleHandlerProgressedEventDto,
   RuleHandlerStartedEventDto,
 } from '@maintainerr/contracts';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import cacheManager from '../../api/lib/cache';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
@@ -13,6 +13,12 @@ import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { CollectionsService } from '../../collections/collections.service';
 import { Collection } from '../../collections/entities/collection.entities';
 import { AddCollectionMedia } from '../../collections/interfaces/collection-media.interface';
+import {
+  CollectionMediaAddedDto,
+  CollectionMediaRemovedDto,
+  RuleHandlerFailedDto,
+} from '../../events/events.dto';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
 import { TaskBase } from '../../tasks/task.base';
 import { TasksService } from '../../tasks/tasks.service';
@@ -21,11 +27,6 @@ import { RulesDto } from '../dtos/rules.dto';
 import { RuleGroup } from '../entities/rule-group.entities';
 import { RuleComparatorServiceFactory } from '../helpers/rule.comparator.service';
 import { RulesService } from '../rules.service';
-import {
-  CollectionMediaAddedDto,
-  CollectionMediaRemovedDto,
-  RuleHandlerFailedDto,
-} from '../../events/events.dto';
 
 interface PlexData {
   page: number;
@@ -35,8 +36,6 @@ interface PlexData {
 
 @Injectable()
 export class RuleExecutorService extends TaskBase {
-  protected logger = new Logger(RuleExecutorService.name);
-
   protected name = 'Rule Handler';
   protected cronSchedule = ''; // overriden in onBootstrapHook
 
@@ -56,8 +55,10 @@ export class RuleExecutorService extends TaskBase {
     private readonly settings: SettingsService,
     private readonly comparatorFactory: RuleComparatorServiceFactory,
     private readonly eventEmitter: EventEmitter2,
+    protected readonly logger: MaintainerrLogger,
   ) {
-    super(taskService);
+    super(taskService, logger);
+    logger.setContext(RuleExecutorService.name);
     this.ruleConstants = new RuleConstants();
     this.plexData = { page: 1, finished: false, data: [] };
   }
@@ -336,7 +337,7 @@ export class RuleExecutorService extends TaskBase {
         );
 
         if (dataToRemove.length > 0) {
-          this.logInfo(
+          this.logger.log(
             `Removing ${dataToRemove.length} media items from '${
               collection.manualCollection
                 ? collection.manualCollectionName
@@ -354,7 +355,7 @@ export class RuleExecutorService extends TaskBase {
         }
 
         if (dataToAdd.length > 0) {
-          this.logInfo(
+          this.logger.log(
             `Adding ${dataToAdd.length} media items to '${
               collection.manualCollection
                 ? collection.manualCollectionName
@@ -391,7 +392,9 @@ export class RuleExecutorService extends TaskBase {
 
         return collection;
       } else {
-        this.logInfo(`collection not found with id ${rulegroup.collectionId}`);
+        this.logger.log(
+          `collection not found with id ${rulegroup.collectionId}`,
+        );
 
         this.eventEmitter.emit(
           MaintainerrEvent.RuleHandler_Failed,
@@ -402,7 +405,9 @@ export class RuleExecutorService extends TaskBase {
         );
       }
     } catch (err) {
-      this.logger.warn(`Execption occurred whild handling rule: `, err);
+      this.logger.warn(
+        `Execption occurred whild handling rule: ${err.message}`,
+      );
 
       this.eventEmitter.emit(
         MaintainerrEvent.RuleHandler_Failed,
@@ -457,9 +462,5 @@ export class RuleExecutorService extends TaskBase {
       this.plexData.finished = true;
     }
     this.plexData.page++;
-  }
-
-  private logInfo(message: string) {
-    this.logger.log(message);
   }
 }

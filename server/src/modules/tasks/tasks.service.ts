@@ -1,9 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CronJob } from 'cron';
 import { Repository } from 'typeorm';
 import { delay } from '../../utils/delay';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { TaskRunning } from '../tasks/entities/task_running.entities';
 import { Status } from './interfaces/status.interface';
 import { TaskScheduler } from './interfaces/task-scheduler.interface';
@@ -11,14 +12,15 @@ import { StatusService } from './status.service';
 
 @Injectable()
 export class TasksService implements TaskScheduler {
-  private readonly logger = new Logger(TasksService.name);
-
   constructor(
     private schedulerRegistry: SchedulerRegistry,
     private readonly status: StatusService,
     @InjectRepository(TaskRunning)
     private readonly taskRunningRepo: Repository<TaskRunning>,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(TasksService.name);
+  }
 
   public async createJob(
     name: string,

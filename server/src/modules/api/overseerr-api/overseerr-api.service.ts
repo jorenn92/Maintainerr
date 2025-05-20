@@ -1,6 +1,10 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AxiosError } from 'axios';
 import { SettingsService } from '../../../modules/settings/settings.service';
+import {
+  MaintainerrLogger,
+  MaintainerrLoggerFactory,
+} from '../../logging/logs.service';
 import { BasicResponseDto } from '../external-api/dto/basic-response.dto';
 import { OverseerrApi } from './helpers/overseerr-api.helper';
 
@@ -150,17 +154,23 @@ interface OverseerrUserResponseResult {
 export class OverseerrApiService {
   api: OverseerrApi;
 
-  private readonly logger = new Logger(OverseerrApiService.name);
   constructor(
     @Inject(forwardRef(() => SettingsService))
     private readonly settings: SettingsService,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+    private readonly loggerFactory: MaintainerrLoggerFactory,
+  ) {
+    this.logger.setContext(OverseerrApiService.name);
+  }
 
   public init() {
-    this.api = new OverseerrApi({
-      url: `${this.settings.overseerr_url?.replace(/\/$/, '')}/api/v1`,
-      apiKey: `${this.settings.overseerr_api_key}`,
-    });
+    this.api = new OverseerrApi(
+      {
+        url: `${this.settings.overseerr_url?.replace(/\/$/, '')}/api/v1`,
+        apiKey: `${this.settings.overseerr_api_key}`,
+      },
+      this.loggerFactory.createLogger(),
+    );
   }
 
   public async getMovie(id: string | number): Promise<OverSeerrMovieResponse> {
@@ -257,7 +267,6 @@ export class OverseerrApiService {
     } catch (err) {
       this.logger.warn(
         'Overseerr communication failed. Is the application running?',
-        err,
       );
       this.logger.debug(err);
       return undefined;
@@ -297,7 +306,6 @@ export class OverseerrApiService {
     } catch (err) {
       this.logger.warn(
         'Overseerr communication failed. Is the application running?',
-        err,
       );
       this.logger.debug(err);
       return undefined;
@@ -311,11 +319,9 @@ export class OverseerrApiService {
       );
       return response;
     } catch (e) {
-      this.logger.log("Couldn't delete media. Does it exist in Overseerr?", {
-        label: 'Overseerr API',
-        errorMessage: e.message,
-        mediaId,
-      });
+      this.logger.log(
+        `Couldn't delete media ${mediaId}. Does it exist in Overseerr? ${e.message}`,
+      );
       this.logger.debug(e);
       return null;
     }
@@ -337,11 +343,9 @@ export class OverseerrApiService {
       try {
         await this.deleteMediaItem(media.mediaInfo.id.toString());
       } catch (e) {
-        this.logger.log("Couldn't delete media. Does it exist in Overseerr?", {
-          label: 'Overseerr API',
-          errorMessage: e.message,
-          id,
-        });
+        this.logger.log(
+          `Couldn't delete media by TMDB ID ${id}. Does it exist in Overseerr? ${e.message}`,
+        );
       }
     } catch (err) {
       this.logger.warn(
@@ -362,10 +366,7 @@ export class OverseerrApiService {
       );
       return response;
     } catch (e) {
-      this.logger.log("Couldn't fetch Overseerr status!", {
-        label: 'Overseerr API',
-        errorMessage: e.message,
-      });
+      this.logger.log(`Couldn't fetch Overseerr status: ${e.message}`);
       this.logger.debug(e);
       return null;
     }
