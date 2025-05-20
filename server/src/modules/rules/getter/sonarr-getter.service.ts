@@ -108,7 +108,7 @@ export class SonarrGetterService {
           : undefined;
 
       const episodeFile =
-        episode && dataType === EPlexDataType.EPISODES
+        episode?.episodeFileId && dataType === EPlexDataType.EPISODES
           ? await sonarrApiClient.getEpisodeFile(episode.episodeFileId)
           : undefined;
 
@@ -304,6 +304,21 @@ export class SonarrGetterService {
         }
         case 'ratingVotes': {
           return showResponse.ratings?.votes ?? null;
+        }
+        case 'fileQualityCutoffMet': {
+          return episodeFile?.qualityCutoffNotMet != null
+            ? !episodeFile.qualityCutoffNotMet
+            : false;
+        }
+        case 'fileQualityName': {
+          return episodeFile?.quality?.quality?.name ?? null;
+        }
+        case 'qualityProfileName': {
+          const showProfile = showResponse.qualityProfileId;
+
+          return (await sonarrApiClient.getProfiles())?.find(
+            (el) => el.id === showProfile,
+          ).name;
         }
       }
     } catch (e) {
