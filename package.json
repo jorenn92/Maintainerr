@@ -25,14 +25,14 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=18"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@types/node": "^22.15.6",
+    "@types/node": "^22.15.19",
     "knip": "^5.50.5",
     "semantic-release": "^24.2.3",
     "turbo": "^2.5.3",

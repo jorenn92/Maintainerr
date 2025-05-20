@@ -1,3 +1,4 @@
+import { TautulliSettingDto } from '@maintainerr/contracts';
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isValidCron } from 'cron-validator';
@@ -120,7 +121,7 @@ export class SettingsService implements SettingDto {
       await this.settingsRepo.insert({
         apikey: this.generateApiKey(),
       });
-      this.init();
+      await this.init();
     }
   }
 
@@ -257,6 +258,42 @@ export class SettingsService implements SettingDto {
         `Something went wrong while getting sonarr setting ${id}. Is the database file locked?`,
       );
       return { status: 'NOK', code: 0, message: err } as BasicResponseDto;
+    }
+  }
+
+  public async removeTautulliSetting() {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        tautulli_url: null,
+        tautulli_api_key: null,
+      });
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error removing Tautulli settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
+  public async updateTautulliSetting(
+    settings: TautulliSettingDto,
+  ): Promise<BasicResponseDto> {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        tautulli_url: settings.url,
+        tautulli_api_key: settings.api_key,
+      });
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error while updating Tautulli settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
     }
   }
 
@@ -397,7 +434,7 @@ export class SettingsService implements SettingDto {
         });
         await this.init();
         this.logger.log('Settings updated');
-        this.plexApi.initialize({});
+        await this.plexApi.initialize({});
         this.overseerr.init();
         this.tautulli.init();
         this.internalApi.init();
@@ -410,7 +447,7 @@ export class SettingsService implements SettingDto {
           this.logger.log(
             `Rule Handler cron schedule changed.. Reloading job.`,
           );
-          this.internalApi
+          await this.internalApi
             .getApi()
             .put(
               '/rules/schedule/update',
@@ -426,7 +463,7 @@ export class SettingsService implements SettingDto {
           this.logger.log(
             `Collection Handler cron schedule changed.. Reloading job.`,
           );
-          this.internalApi
+          await this.internalApi
             .getApi()
             .put(
               '/collections/schedule/update',
@@ -503,7 +540,16 @@ export class SettingsService implements SettingDto {
     }
   }
 
-  public async testTautulli(): Promise<BasicResponseDto> {
+  public async testTautulli(
+    setting?: TautulliSettingDto,
+  ): Promise<BasicResponseDto> {
+    if (setting) {
+      return await this.tautulli.testConnection({
+        apiKey: setting.api_key,
+        url: setting.url,
+      });
+    }
+
     try {
       const resp = await this.tautulli.info();
       return resp?.response && resp?.response.result == 'success'

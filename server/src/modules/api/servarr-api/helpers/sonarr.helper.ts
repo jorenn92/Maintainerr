@@ -214,32 +214,34 @@ export class SonarrApi extends ServarrApi<{
       );
 
       // loop seasons
-      data.seasons = data.seasons.map((s) => {
-        if (type === 'all') {
-          s.monitored = false;
-        } else if (
-          type === 'existing' ||
-          (forceExisting && type === s.seasonNumber)
-        ) {
-          // existing episodes only, so don't unmonitor season
-          episodes.forEach((e) => {
-            if (e.seasonNumber === s.seasonNumber) {
-              this.UnmonitorDeleteEpisodes(
-                +seriesId,
-                e.seasonNumber,
-                [e.id],
-                false,
-              );
-            }
-          });
-        } else if (typeof type === 'number') {
-          // specific season
-          if (s.seasonNumber === type) {
+      data.seasons = await Promise.all(
+        data.seasons.map(async (s) => {
+          if (type === 'all') {
             s.monitored = false;
+          } else if (
+            type === 'existing' ||
+            (forceExisting && type === s.seasonNumber)
+          ) {
+            // existing episodes only, so don't unmonitor season
+            for (const e of episodes) {
+              if (e.seasonNumber === s.seasonNumber) {
+                await this.UnmonitorDeleteEpisodes(
+                  +seriesId,
+                  e.seasonNumber,
+                  [e.id],
+                  false,
+                );
+              }
+            }
+          } else if (typeof type === 'number') {
+            // specific season
+            if (s.seasonNumber === type) {
+              s.monitored = false;
+            }
           }
-        }
-        return s;
-      });
+          return s;
+        }),
+      );
       await this.runPut(`series/`, JSON.stringify(data));
 
       // delete files
