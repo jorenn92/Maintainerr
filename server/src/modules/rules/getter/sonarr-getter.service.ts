@@ -254,7 +254,7 @@ export class SonarrGetterService {
             return season.seasonNumber && showResponse.seasons
               ? +season.seasonNumber ===
                   (
-                    await this.getLastSeason(
+                    await this.getLastAiredOrCurrentlyAiringSeason(
                       showResponse.seasons,
                       showResponse.id,
                       sonarrApiClient,
@@ -322,26 +322,28 @@ export class SonarrGetterService {
    * @param {number} showId - The ID of the show.
    * @return {Promise<SonarrSeason>} The last season found, or undefined if none is found.
    */
-  private async getLastSeason(
+  private async getLastAiredOrCurrentlyAiringSeason(
     seasons: SonarrSeason[],
     showId: number,
     apiClient: SonarrApi,
   ): Promise<SonarrSeason> {
-    // array find doesn't work as expected.. so keep this a for loop
     for (const s of seasons.reverse()) {
-      const epResp = showId
-        ? await apiClient.getEpisodes(showId, s.seasonNumber, [1])
-        : [];
+      const epResp = await apiClient.getEpisodes(showId, s.seasonNumber, [1]);
 
-      const resp =
-        epResp[0] && epResp[0].airDate === undefined
-          ? false
-          : s.statistics?.nextAiring !== undefined
-            ? s.statistics?.previousAiring !== undefined
-            : true;
+      if (epResp[0]?.airDateUtc === undefined) {
+        continue;
+      }
 
-      if (resp) return s;
+      const airDate = new Date(epResp[0].airDateUtc);
+      const now = new Date();
+
+      if (airDate > now) {
+        continue;
+      }
+
+      return s;
     }
+
     return undefined;
   }
 
