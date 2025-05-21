@@ -12,12 +12,14 @@ import { PlexApiService } from '../../api/plex-api/plex-api.service';
 import { SonarrApi } from '../../api/servarr-api/helpers/sonarr.helper';
 import { SonarrSeries } from '../../api/servarr-api/interfaces/sonarr.interface';
 import { ServarrService } from '../../api/servarr-api/servarr.service';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SonarrGetterService } from './sonarr-getter.service';
 
 describe('SonarrGetterService', () => {
   let sonarrGetterService: SonarrGetterService;
   let servarrService: Mocked<ServarrService>;
   let plexApi: Mocked<PlexApiService>;
+  let logger: Mocked<MaintainerrLogger>;
 
   beforeEach(async () => {
     const { unit, unitRef } =
@@ -27,6 +29,7 @@ describe('SonarrGetterService', () => {
 
     servarrService = unitRef.get(ServarrService);
     plexApi = unitRef.get(PlexApiService);
+    logger = unitRef.get(MaintainerrLogger);
   });
 
   afterEach(() => {
@@ -226,8 +229,8 @@ describe('SonarrGetterService', () => {
   });
 
   const mockSonarrApi = (series?: SonarrSeries) => {
-    const mockedSonarrApi = new SonarrApi({} as any);
-    const mockedServarrService = new ServarrService({} as any);
+    const mockedSonarrApi = new SonarrApi({} as any, logger as any);
+    const mockedServarrService = new ServarrService({} as any, logger as any);
     jest
       .spyOn(mockedServarrService, 'getSonarrApiClient')
       .mockResolvedValue(mockedSonarrApi);
