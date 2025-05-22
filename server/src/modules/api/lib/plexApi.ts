@@ -27,12 +27,16 @@ class PlexApi {
     this.options = options;
     this.cache = cacheManager.getCache('plexguid');
 
-    const serverUrl =
+    const baseURL =
       this.getServerScheme() + options.hostname + ':' + options.port;
 
     this.axios = axios.create({
-      baseURL: serverUrl,
+      baseURL,
       timeout: options.timeout,
+      headers: {
+        Accept: 'application/json',
+        'X-Plex-Token': this.options.token,
+      },
     });
     axiosRetry(this.axios, {
       retries: 3,
@@ -150,15 +154,10 @@ class PlexApi {
   }
 
   private async _request<T>(method: string, options: RequestOptions) {
-    const extraHeaders = options.extraHeaders || {};
     const requestConfig: AxiosRequestConfig = {
       url: options.uri,
       method,
-      headers: {
-        Accept: 'application/json',
-        'X-Plex-Token': this.options.token,
-        ...extraHeaders,
-      },
+      headers: options.extraHeaders,
     };
 
     try {
@@ -169,29 +168,32 @@ class PlexApi {
 
       if (err instanceof AxiosError) {
         if (err.response?.status === 403) {
-          this.logger.debug(
+          throw new Error(
             `${requestConfig.method} ${url} failed: Plex Server denied request due to lack of managed user permissions! In case of a delete request, delete content must be allowed in plex-media-server options.`,
+            { cause: err },
           );
         } else if (err.response?.status === 401) {
-          this.logger.debug(
+          throw new Error(
             `${requestConfig.method} ${url} failed: Plex Server denied request`,
+            { cause: err },
           );
         } else if (err.response?.status) {
-          this.logger.debug(
-            `${requestConfig.method} ${url} failed: Plex Server didnt respond with a valid 2xx status code, response code: ${err.response?.status}`,
+          throw new Error(
+            `${requestConfig.method} ${url} failed with exception: Plex Server didnt respond with a valid 2xx status code, response code: ${err.response?.status}`,
+            { cause: err },
           );
         } else {
-          this.logger.debug(
+          throw new Error(
             `${requestConfig.method} ${url} failed with exception: ${err}`,
+            { cause: err },
           );
         }
       } else {
-        this.logger.debug(
+        throw new Error(
           `${requestConfig.method} ${url} failed with exception: ${err}${err.cause?.code ? `, error code: ${err.cause.code}` : ''}`,
+          { cause: err },
         );
       }
-
-      throw err;
     }
   }
 
