@@ -123,7 +123,7 @@ const Rules = () => {
       <div className="w-full">
         <LibrarySwitcher onSwitch={onSwitchLibrary} />
 
-        <div className="m-auto mb-3 flex">
+        <div className="m-auto mb-3 mt-4 flex">
           <div className="ml-auto sm:ml-0">
             <AddButton onClick={showAddModal} text="New Rule" />
           </div>

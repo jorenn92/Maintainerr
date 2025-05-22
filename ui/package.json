@@ -29,10 +29,12 @@
     "next": "^15.3.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-hook-form": "^7.56.4",
+    "react-hook-form": "^7.55.0",
+    "react-intersection-observer": "^9.16.0",
     "react-markdown": "10.1.0",
     "react-select": "^5.10.1",
     "react-toastify": "^11.0.5",
+    "react-tooltip": "^5.28.1",
     "reconnecting-eventsource": "^1.6.4",
     "yaml": "^2.8.0",
     "zod": "^3.24.4"
