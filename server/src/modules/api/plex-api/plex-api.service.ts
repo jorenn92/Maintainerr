@@ -226,7 +226,6 @@ export class PlexApiService {
           'X-Plex-Container-Size': '0',
         },
       });
-
       return response.MediaContainer.totalSize;
     } catch (err) {
       this.logger.warn(
