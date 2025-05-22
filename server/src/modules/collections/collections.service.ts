@@ -658,6 +658,7 @@ export class CollectionsService {
               ...collection,
               plexId: null,
             });
+            collection.plexId = null;
           } else {
             this.logger.warn(resp.message);
           }
