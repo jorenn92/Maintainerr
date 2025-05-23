@@ -4,6 +4,7 @@ import {
   SortAscendingIcon,
   SortDescendingIcon,
 } from '@heroicons/react/outline'
+import { DocumentTextIcon } from '@heroicons/react/solid'
 import {
   CollectionLogDto,
   CollectionLogMetaMediaAddedByRule,
@@ -271,6 +272,7 @@ const CollectionInfo = (props: ICollectionInfo) => {
                 <Table.TH>{'DATE'}</Table.TH>
                 <Table.TH>{'LABEL'}</Table.TH>
                 <Table.TH>{'EVENT'}</Table.TH>
+                <Table.TH></Table.TH>
               </tr>
             </thead>
             <Table.TBody>
@@ -319,24 +321,29 @@ const CollectionInfo = (props: ICollectionInfo) => {
                               ].includes(row.meta.type) && (
                                 <span className="text-gray-400">(manual)</span>
                               )}
-                              {isMetaActionedByRule(row.meta) && (
-                                <button
-                                  type="button"
-                                  className="text-gray-400 hover:text-gray-300"
-                                  onClick={() => {
-                                    if (!isMetaActionedByRule(row.meta)) return
-
-                                    setShowMeta({
-                                      meta: row.meta,
-                                      title: row.message,
-                                    })
-                                  }}
-                                >
-                                  (meta)
-                                </button>
-                              )}
                             </>
                           )}
+                        </Table.TD>
+                        <Table.TD className="text-right">
+                          {row.meta &&
+                            row.type == ECollectionLogType.MEDIA &&
+                            isMetaActionedByRule(row.meta) && (
+                              <button
+                                type="button"
+                                className="rounded bg-amber-600 px-2 py-1 text-white shadow-md hover:bg-amber-500"
+                                title="View Metadata"
+                                onClick={() => {
+                                  if (!isMetaActionedByRule(row.meta)) return
+
+                                  setShowMeta({
+                                    meta: row.meta,
+                                    title: row.message,
+                                  })
+                                }}
+                              >
+                                <DocumentTextIcon className="h-5 w-5" />
+                              </button>
+                            )}
                         </Table.TD>
                       </tr>
                     )
