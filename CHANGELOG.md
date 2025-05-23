@@ -1,3 +1,25 @@
+# [2.15.0](https://github.com/jorenn92/Maintainerr/compare/v2.14.0...v2.15.0) (2025-05-23)
+
+
+### Bug Fixes
+
+* Is (part of) latest aired/airing season should exclude future ([#1732](https://github.com/jorenn92/Maintainerr/issues/1732)) ([f7093df](https://github.com/jorenn92/Maintainerr/commit/f7093df90f809d210eead14cd0e958a0d7ba0ee7))
+* Modals not responsive ([#1729](https://github.com/jorenn92/Maintainerr/issues/1729)) ([b14f7e3](https://github.com/jorenn92/Maintainerr/commit/b14f7e3160321ef4a375fe020569adfad5555b1a))
+* Radarr Monitored returns null instead of false ([#1746](https://github.com/jorenn92/Maintainerr/issues/1746)) ([6b5c159](https://github.com/jorenn92/Maintainerr/commit/6b5c15942013b317c6ea6e665d3be74a3cab7861))
+* Remove floating promises ([#1776](https://github.com/jorenn92/Maintainerr/issues/1776)) ([cd3c3b3](https://github.com/jorenn92/Maintainerr/commit/cd3c3b38ca42463edafebc33ae22282bdb88b24c))
+* Test media targeting the wrong rule group ([#1728](https://github.com/jorenn92/Maintainerr/issues/1728)) ([42165b5](https://github.com/jorenn92/Maintainerr/commit/42165b5141d9a9cb4c71e622ac3b1660ec1dc518))
+* Unparsable log lines breaking the logs page ([#1772](https://github.com/jorenn92/Maintainerr/issues/1772)) ([87eee65](https://github.com/jorenn92/Maintainerr/commit/87eee65586285be7b19b057b667f6348920fc29b))
+
+
+### Features
+
+* Add notification support ([#1381](https://github.com/jorenn92/Maintainerr/issues/1381)) ([d729fbf](https://github.com/jorenn92/Maintainerr/commit/d729fbf2056d0ecaa15966548601bd5abc7aeef0))
+* Improve Tautulli settings UX ([#1621](https://github.com/jorenn92/Maintainerr/issues/1621)) ([3a9721f](https://github.com/jorenn92/Maintainerr/commit/3a9721fab2dcf1834a8f10edd3bcfad4be1e7d87))
+* Log unhandledRejection & uncaughtException ([#1733](https://github.com/jorenn92/Maintainerr/issues/1733)) ([139cd5b](https://github.com/jorenn92/Maintainerr/commit/139cd5b2da1d9eea1acf6b1bb9b13f21d8adaf2f))
+* Retry failed Plex API requests ([#1775](https://github.com/jorenn92/Maintainerr/issues/1775)) ([d3769eb](https://github.com/jorenn92/Maintainerr/commit/d3769ebf5566eb3fe9c07e7429bcac77f02ee78f))
+* update rule creation UI/UX & toasts ([#1696](https://github.com/jorenn92/Maintainerr/issues/1696)) ([6c34075](https://github.com/jorenn92/Maintainerr/commit/6c34075d3f94b01f97bbfe81605bcf4dc5e08e6b))
+* YAML Importer Modal additions ([#1754](https://github.com/jorenn92/Maintainerr/issues/1754)) ([66db26e](https://github.com/jorenn92/Maintainerr/commit/66db26eb0c22881930ef5fb58768e23b5fb087e2))
+
 # [2.14.0](https://github.com/jorenn92/Maintainerr/compare/v2.13.1...v2.14.0) (2025-04-15)
 
 
