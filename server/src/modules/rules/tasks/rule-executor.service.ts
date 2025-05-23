@@ -41,14 +41,11 @@ export class RuleExecutorService extends TaskBase {
   protected cronSchedule = ''; // overriden in onBootstrapHook
 
   ruleConstants: RuleConstants;
-  userId: string;
   plexData: PlexData;
   plexDataType: EPlexDataType;
   workerData: PlexLibraryItem[];
   resultData: PlexLibraryItem[];
   statisticsData: IComparisonStatistics[];
-  Data: PlexLibraryItem[];
-
   startTime: Date;
 
   constructor(
