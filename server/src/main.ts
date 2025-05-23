@@ -64,7 +64,7 @@ function createDataDirectoryStructure() {
 }
 
 createDataDirectoryStructure();
-bootstrap();
+void bootstrap();
 
 process
   .on('unhandledRejection', (err) => {
