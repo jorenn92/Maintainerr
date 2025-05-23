@@ -228,7 +228,7 @@ export class SonarrActionHandler {
               sonarrMedia.monitored = false;
               await sonarrApiClient.updateSeries(sonarrMedia);
               this.logger.log(
-                `[Sonarr] Unmonitored show '${sonarrMedia.title}' and Removed exisiting episodes`,
+                `[Sonarr] Unmonitored show '${sonarrMedia.title}' and removed exisiting episodes`,
               );
             }
 

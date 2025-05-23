@@ -235,9 +235,9 @@ export class SonarrApi extends ServarrApi<{
             s.monitored = false;
           }
         }
-      }
 
-      await this.runPut(`series/`, JSON.stringify(data));
+        await this.runPut(`series/`, JSON.stringify(data));
+      }
 
       if (deleteFiles) {
         const episodeFiles = await this.get<SonarrEpisodeFile[]>(
