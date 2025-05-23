@@ -1,5 +1,5 @@
 import { CollectionLogMeta, ECollectionLogType } from '@maintainerr/contracts';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, LessThan, Repository } from 'typeorm';
 import { CollectionLog } from '../../modules/collections/entities/collection_log.entities';
@@ -15,6 +15,7 @@ import {
 } from '../api/tmdb-api/interfaces/tmdb.interface';
 import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { TmdbApiService } from '../api/tmdb-api/tmdb.service';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { Exclusion } from '../rules/entities/exclusion.entities';
 import { RuleGroup } from '../rules/entities/rule-group.entities';
 import { Collection } from './entities/collection.entities';
@@ -39,8 +40,6 @@ interface addCollectionDbResponse {
 
 @Injectable()
 export class CollectionsService {
-  private readonly logger = new Logger(CollectionsService.name);
-
   constructor(
     @InjectRepository(Collection)
     private readonly collectionRepo: Repository<Collection>,
@@ -56,7 +55,10 @@ export class CollectionsService {
     private readonly plexApi: PlexApiService,
     private readonly tmdbApi: TmdbApiService,
     private readonly tmdbIdHelper: TmdbIdService,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(CollectionsService.name);
+  }
 
   async getCollection(id?: number, title?: string) {
     try {
@@ -325,7 +327,7 @@ export class CollectionsService {
       const createdCollection = await this.createCollection(collection, false);
 
       for (const childMedia of media) {
-        this.addChildToCollection(
+        await this.addChildToCollection(
           {
             plexId: +createdCollection.plexCollection.ratingKey,
             dbId: createdCollection.dbCollection.id,
@@ -389,7 +391,9 @@ export class CollectionsService {
           ) {
             if (!dbCollection.manualCollection) {
               // Don't remove the collections if it was a manual one
-              this.plexApi.deleteCollection(dbCollection.plexId.toString());
+              await this.plexApi.deleteCollection(
+                dbCollection.plexId.toString(),
+              );
             }
             dbCollection.plexId = null;
           }
@@ -401,7 +405,7 @@ export class CollectionsService {
         ...collection,
       });
 
-      this.addLogRecord(
+      await this.addLogRecord(
         { id: dbResp.id } as Collection,
         "Successfully updated the collection's settings",
         ECollectionLogType.COLLECTION,
@@ -412,7 +416,7 @@ export class CollectionsService {
       this.logger.warn(
         'An error occurred while performing collection actions.',
       );
-      this.addLogRecord(
+      await this.addLogRecord(
         { id: collection.id } as Collection,
         "Failed to update the collection's settings",
         ECollectionLogType.COLLECTION,
@@ -440,7 +444,7 @@ export class CollectionsService {
         collection.plexId = +plexColl.ratingKey;
         collection = await this.saveCollection(collection);
 
-        this.addLogRecord(
+        await this.addLogRecord(
           { id: collection.id } as Collection,
           'Successfully relinked the manual Plex collection',
           ECollectionLogType.COLLECTION,
@@ -449,7 +453,7 @@ export class CollectionsService {
         this.logger.error(
           'Manual Plex collection not found.. Is it still available in Plex?',
         );
-        this.addLogRecord(
+        await this.addLogRecord(
           { id: collection.id } as Collection,
           'Failed to relink the manual Plex collection',
           ECollectionLogType.COLLECTION,
@@ -524,7 +528,7 @@ export class CollectionsService {
         if (collectionDbId) {
           return this.removeFromCollection(collectionDbId, handleMedia);
         } else {
-          this.removeFromAllCollections(handleMedia);
+          await this.removeFromAllCollections(handleMedia);
         }
       }
     }
@@ -663,8 +667,8 @@ export class CollectionsService {
     } catch (err) {
       this.logger.warn(
         `An error occurred while removing media from collection with internal id ${collectionDbId}`,
-        err,
       );
+      this.logger.debug(err);
       return undefined;
     }
   }
@@ -725,7 +729,7 @@ export class CollectionsService {
         plexId: null,
       });
 
-      this.addLogRecord(
+      await this.addLogRecord(
         { id: collectionDbId } as Collection,
         'Collection deactivated',
         ECollectionLogType.COLLECTION,
@@ -761,7 +765,7 @@ export class CollectionsService {
         isActive: true,
       });
 
-      this.addLogRecord(
+      await this.addLogRecord(
         { id: collectionDbId } as Collection,
         'Collection activated',
         ECollectionLogType.COLLECTION,
@@ -833,7 +837,7 @@ export class CollectionsService {
           .execute();
 
         // log record
-        this.CollectionLogRecordForChild(
+        await this.CollectionLogRecordForChild(
           childId,
           collectionIds.dbId,
           'add',
@@ -870,7 +874,7 @@ export class CollectionsService {
           : plexData.type === 'season'
             ? `${plexData.parentTitle} - season ${plexData.index}`
             : plexData.title;
-      this.addLogRecord(
+      await this.addLogRecord(
         { id: collectionId } as Collection,
         `${type === 'add' ? 'Added' : type === 'handle' ? 'Successfully handled' : type === 'exclude' ? 'Added a specific exclusion for' : type === 'include' ? 'Removed specific exclusion of' : 'Removed'} "${subject}"`,
         ECollectionLogType.MEDIA,
@@ -908,7 +912,7 @@ export class CollectionsService {
           ])
           .execute();
 
-        this.CollectionLogRecordForChild(
+        await this.CollectionLogRecordForChild(
           childId,
           collectionIds.dbId,
           'remove',
@@ -972,7 +976,7 @@ export class CollectionsService {
             .execute()
         ).generatedMaps[0] as addCollectionDbResponse;
 
-        this.addLogRecord(
+        await this.addLogRecord(
           dbCol as Collection,
           'Collection Created',
           ECollectionLogType.COLLECTION,
@@ -1004,7 +1008,7 @@ export class CollectionsService {
         await this.CollectionLogRepo.delete({ collection: collection }); // cascade delete doesn't work for some reason..
         await this.collectionRepo.delete(collection.id);
 
-        this.addLogRecord(
+        await this.addLogRecord(
           { id: collection.id } as Collection,
           'Collection Removed',
           ECollectionLogType.COLLECTION,
@@ -1146,7 +1150,7 @@ export class CollectionsService {
     const collection = await this.collectionRepo.findOne({
       where: { id: collectionId },
     });
-    this.CollectionLogRepo.delete({ collection: collection });
+    await this.CollectionLogRepo.delete({ collection: collection });
   }
 
   /**
@@ -1192,11 +1196,11 @@ export class CollectionsService {
 
         if (logs.length > 0) {
           // delete all old logs
-          this.CollectionLogRepo.remove(logs);
+          await this.CollectionLogRepo.remove(logs);
           this.infoLogger(
             `Removed ${logs.length} old collection log ${logs.length === 1 ? 'record' : 'records'} from collection '${collection.title}'`,
           );
-          this.addLogRecord(
+          await this.addLogRecord(
             collection,
             `Removed ${logs.length} log ${logs.length === 1 ? 'record' : 'records'} older than ${collection.keepLogsForMonths} months`,
             ECollectionLogType.COLLECTION,

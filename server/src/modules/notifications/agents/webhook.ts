@@ -1,15 +1,15 @@
 import axios from 'axios';
 import { get } from 'lodash';
-import { hasNotificationType } from '../notifications.service';
-import type { NotificationAgent, NotificationPayload } from './agent';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
-import { Logger } from '@nestjs/common';
+import { Notification } from '../entities/notification.entities';
 import {
   NotificationAgentKey,
   NotificationAgentWebhook,
   NotificationType,
 } from '../notifications-interfaces';
-import { Notification } from '../entities/notification.entities';
+import { hasNotificationType } from '../notifications.service';
+import type { NotificationAgent, NotificationPayload } from './agent';
 
 type KeyMapFunction = (
   payload: NotificationPayload,
@@ -28,12 +28,12 @@ class WebhookAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentWebhook,
+    private readonly logger: MaintainerrLogger,
     readonly notification: Notification,
   ) {
+    logger.setContext(WebhookAgent.name);
     this.notification = notification;
   }
-
-  private readonly logger = new Logger(WebhookAgent.name);
 
   getNotification = () => this.notification;
 

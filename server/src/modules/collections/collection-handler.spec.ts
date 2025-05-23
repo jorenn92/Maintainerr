@@ -40,8 +40,9 @@ describe('CollectionHandler', () => {
   it('should do nothing if action is DO_NOTHING', async () => {
     const collection = createCollection({
       arrAction: ServarrAction.DO_NOTHING,
+      type: EPlexDataType.MOVIES,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie');
+    const collectionMedia = createCollectionMedia(collection);
 
     plexApi.getLibraries.mockResolvedValue(
       createPlexLibraries({
@@ -57,8 +58,9 @@ describe('CollectionHandler', () => {
   it('should delete from disk', async () => {
     const collection = createCollection({
       arrAction: ServarrAction.DELETE,
+      type: EPlexDataType.SHOWS,
     });
-    const collectionMedia = createCollectionMedia(collection, 'show');
+    const collectionMedia = createCollectionMedia(collection);
 
     plexApi.getLibraries.mockResolvedValue(
       createPlexLibraries({
@@ -76,8 +78,9 @@ describe('CollectionHandler', () => {
     const collection = createCollection({
       arrAction: ServarrAction.DELETE,
       radarrSettingsId: 1,
+      type: EPlexDataType.MOVIES,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie');
+    const collectionMedia = createCollectionMedia(collection);
 
     plexApi.getLibraries.mockResolvedValue(
       createPlexLibraries({
@@ -96,8 +99,9 @@ describe('CollectionHandler', () => {
     const collection = createCollection({
       arrAction: ServarrAction.DELETE,
       sonarrSettingsId: 1,
+      type: EPlexDataType.SHOWS,
     });
-    const collectionMedia = createCollectionMedia(collection, 'show');
+    const collectionMedia = createCollectionMedia(collection);
 
     plexApi.getLibraries.mockResolvedValue(
       createPlexLibraries({
@@ -118,10 +122,7 @@ describe('CollectionHandler', () => {
       forceOverseerr: true,
       type: EPlexDataType.SEASONS,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'season',
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection);
 
     settings.overseerrConfigured.mockReturnValue(true);
 
@@ -148,10 +149,7 @@ describe('CollectionHandler', () => {
       forceOverseerr: true,
       type: EPlexDataType.EPISODES,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'show',
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection);
 
     settings.overseerrConfigured.mockReturnValue(true);
 
@@ -178,7 +176,7 @@ describe('CollectionHandler', () => {
       forceOverseerr: true,
       type: EPlexDataType.MOVIES,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie');
+    const collectionMedia = createCollectionMedia(collection);
 
     settings.overseerrConfigured.mockReturnValue(true);
 
@@ -204,7 +202,7 @@ describe('CollectionHandler', () => {
       forceOverseerr: true,
       type: EPlexDataType.SHOWS,
     });
-    const collectionMedia = createCollectionMedia(collection, 'show');
+    const collectionMedia = createCollectionMedia(collection);
 
     settings.overseerrConfigured.mockReturnValue(true);
 
@@ -230,7 +228,7 @@ describe('CollectionHandler', () => {
       forceOverseerr: false,
       type: EPlexDataType.MOVIES,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie');
+    const collectionMedia = createCollectionMedia(collection);
 
     plexApi.getLibraries.mockResolvedValue(
       createPlexLibraries({
@@ -251,7 +249,7 @@ describe('CollectionHandler', () => {
       forceOverseerr: false,
       type: EPlexDataType.MOVIES,
     });
-    const collectionMedia = createCollectionMedia(collection, 'movie');
+    const collectionMedia = createCollectionMedia(collection);
 
     settings.overseerrConfigured.mockReturnValue(false);
 

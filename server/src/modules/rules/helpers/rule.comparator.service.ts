@@ -3,10 +3,11 @@ import {
   IRuleComparisonResult,
   RuleValueType,
 } from '@maintainerr/contracts';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import _ from 'lodash';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { RuleConstanstService } from '../constants/constants.service';
 import {
   RuleOperators,
@@ -28,19 +29,20 @@ export class RuleComparatorServiceFactory {
   constructor(
     private readonly valueGetter: ValueGetterService,
     private readonly ruleConstanstService: RuleConstanstService,
+    private readonly logger: MaintainerrLogger,
   ) {}
 
   create(): RuleComparatorService {
     return new RuleComparatorService(
       this.valueGetter,
       this.ruleConstanstService,
+      this.logger,
     );
   }
 }
 
 @Injectable()
 export class RuleComparatorService {
-  private readonly logger = new Logger(RuleComparatorService.name);
   workerData: PlexLibraryItem[];
   resultData: PlexLibraryItem[];
   plexData: PlexLibraryItem[];
@@ -51,7 +53,10 @@ export class RuleComparatorService {
   constructor(
     private readonly valueGetter: ValueGetterService,
     private readonly ruleConstanstService: RuleConstanstService,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(RuleComparatorService.name);
+  }
 
   public async executeRulesWithData(
     rulegroup: RulesDto,
