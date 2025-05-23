@@ -227,12 +227,13 @@ export class RuleComparatorService {
         ruleResult,
       );
 
-      if (
-        ruleResult === true &&
-        (rule.operator === null || +rule.operator === +RuleOperators.OR)
-      ) {
-        // alter uncommittedResultData
+      if (ruleResult === 'error') {
+        this.failedForPlexData.push(media.ratingKey);
+      }
+
+      if (rule.operator === null || +rule.operator === +RuleOperators.OR) {
         if (
+          ruleResult === true &&
           this.uncommittedResultData.find(
             (e) => e.ratingKey === media.ratingKey,
           ) === undefined
@@ -240,11 +241,6 @@ export class RuleComparatorService {
           this.uncommittedResultData.push(media);
         }
       } else if (ruleResult !== true) {
-        if (ruleResult === 'error') {
-          this.failedForPlexData.push(media.ratingKey);
-        }
-
-        // remove from uncomitted
         this.uncommittedResultData = this.uncommittedResultData.filter(
           (x) => x.ratingKey !== media.ratingKey,
         );
