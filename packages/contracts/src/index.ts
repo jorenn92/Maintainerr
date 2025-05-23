@@ -1,5 +1,7 @@
 export * from './app'
+export * from './collections'
 export * from './events'
+export * from './rules'
 export * from './settings/logs'
 export * from './settings/tautulli'
 export * from './tasks'
