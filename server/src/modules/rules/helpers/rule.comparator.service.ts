@@ -217,12 +217,13 @@ export class RuleComparatorService {
         ruleResult,
       );
 
-      if (
-        ruleResult === true &&
-        (rule.operator === null || +rule.operator === +RuleOperators.OR)
-      ) {
-        // alter uncommittedResultData
+      if (ruleResult === 'error') {
+        this.failedForPlexData.push(media.ratingKey);
+      }
+
+      if (rule.operator === null || +rule.operator === +RuleOperators.OR) {
         if (
+          ruleResult === true &&
           this.uncommittedResultData.find(
             (e) => e.ratingKey === media.ratingKey,
           ) === undefined
@@ -230,11 +231,6 @@ export class RuleComparatorService {
           this.uncommittedResultData.push(media);
         }
       } else if (ruleResult !== true) {
-        if (ruleResult === 'error') {
-          this.failedForPlexData.push(media.ratingKey);
-        }
-
-        // remove from uncomitted
         this.uncommittedResultData = this.uncommittedResultData.filter(
           (x) => x.ratingKey !== media.ratingKey,
         );
@@ -347,9 +343,9 @@ export class RuleComparatorService {
       result: result,
     });
 
-    // If it's the first rule of a section (but not the first one) then add the operator to the sectionResult
+    // If it's the first rule of a section and not the first section, add the operator to the sectionResult
     if (
-      index > 0 &&
+      sectionIndex > 0 &&
       this.statistics[index].sectionResults[sectionIndex].ruleResults.length ===
         1
     ) {
