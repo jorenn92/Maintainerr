@@ -1,19 +1,16 @@
-import _ from 'lodash'
-import { useEffect } from 'react'
 import { ICollectionMedia } from '../../Collection'
-import LoadingSpinner, {
-  SmallLoadingSpinner,
-} from '../../Common/LoadingSpinner'
+import LoadingSpinner from '../../Common/LoadingSpinner'
 import MediaCard from '../../Common/MediaCard'
+import TableData from '../../Common/TableData'
 
 interface IOverviewContent {
   data: IPlexMetadata[]
-  dataFinished: boolean
   loading: boolean
-  extrasLoading?: boolean
-  fetchData: () => void
   onRemove?: (id: string) => void
   libraryId: number
+  viewMode: 'poster' | 'table'
+  ruleGroups?: Record<number, string>
+  ruleGroupId?: number
   collectionPage?: boolean
   collectionInfo?: ICollectionMedia[]
   collectionId?: number
@@ -71,42 +68,11 @@ export interface IPlexMetadata {
   maintainerrExclusionType?: 'specific' | 'global' // this is added by Maintainerr, not a Plex type
   maintainerrExclusionId?: number // this is added by Maintainerr, not a Plex type
   maintainerrIsManual?: boolean // this is added by Maintainerr, not a Plex type
+  maintainerrRuleGroupId?: number
+  maintainerrRuleGroupIds?: number[]
 }
 
 const OverviewContent = (props: IOverviewContent) => {
-  const handleScroll = () => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop >=
-      document.documentElement.scrollHeight * 0.8
-    ) {
-      if (!props.extrasLoading && !props.dataFinished) {
-        props.fetchData()
-      }
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('scroll', _.debounce(handleScroll.bind(this), 200))
-    return () => {
-      window.removeEventListener(
-        'scroll',
-        _.debounce(handleScroll.bind(this), 200),
-      )
-    }
-  }, [])
-
-  useEffect(() => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.scrollHeight * 0.8 &&
-      !props.loading &&
-      !props.extrasLoading &&
-      !props.dataFinished
-    ) {
-      props.fetchData()
-    }
-  }, [props.data])
-
   const getDaysLeft = (plexId: number) => {
     if (props.collectionInfo) {
       const collectionData = props.collectionInfo.find(
@@ -134,10 +100,23 @@ const OverviewContent = (props: IOverviewContent) => {
     return <LoadingSpinner />
   }
 
+  const isOverviewPage = !props.collectionPage
+
+  if (props.viewMode === 'table' && isOverviewPage) {
+    return (
+      <TableData
+        data={props.data}
+        libraryId={props.libraryId}
+        ruleGroups={props.ruleGroups}
+        ruleGroupId={props.ruleGroupId}
+      />
+    )
+  }
+
   if (props.data && props.data.length > 0) {
     return (
-      <ul className="cards-vertical">
-        {props.data.map((el) => (
+      <ul className="cards-vertical mt-4">
+        {props.data.map((el, index) => (
           <li key={+el.ratingKey}>
             <MediaCard
               id={+el.ratingKey}
@@ -151,7 +130,7 @@ const OverviewContent = (props: IOverviewContent) => {
                       ? 3
                       : 4
               }
-              image={''}
+              image={el.thumb}
               summary={
                 el.type === 'movie' || el.type === 'show'
                   ? el.summary
@@ -219,7 +198,6 @@ const OverviewContent = (props: IOverviewContent) => {
             />
           </li>
         ))}
-        {props.extrasLoading ? <SmallLoadingSpinner /> : undefined}
       </ul>
     )
   }
