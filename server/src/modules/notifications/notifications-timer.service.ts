@@ -31,19 +31,9 @@ export class NotificationTimerService extends TaskBase {
 
   protected onBootstrapHook(): void {}
 
-  public async execute() {
+  protected async executeTask() {
     // helper submethod
-    const getDayStart = (date) => new Date(date.setHours(0, 0, 0, 0));
-
-    // check if another instance of this task is already running
-    if (await this.isRunning()) {
-      this.logger.log(
-        `Another instance of the ${this.name} task is currently running. Skipping this execution`,
-      );
-      return;
-    }
-
-    await super.execute();
+    const getDayStart = (date: Date) => new Date(date.setHours(0, 0, 0, 0));
 
     const activeAgents = this.notificationService.getActiveAgents();
     const allNotificationConfigurations =
@@ -99,7 +89,5 @@ export class NotificationTimerService extends TaskBase {
         }
       }
     });
-
-    this.finish();
   }
 }

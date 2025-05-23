@@ -3,13 +3,17 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Param,
   Post,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
+import { ApiResponse } from '@nestjs/swagger';
+import { Response } from 'express';
 import { CommunityRule } from './dtos/communityRule.dto';
 import { ExclusionAction, ExclusionContextDto } from './dtos/exclusion.dto';
 import { RulesDto } from './dtos/rules.dto';
@@ -97,6 +101,27 @@ export class RulesController {
 
     this.ruleExecutorService.execute().catch((e) => console.error(e));
   }
+
+  @Post('/execute/stop')
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'The rules handler is already stopped.',
+  })
+  @ApiResponse({
+    status: 202,
+    description: 'The rules handler has been requested to stop.',
+  })
+  async stopExecutingRules(@Res() res: Response) {
+    if (!(await this.ruleExecutorService.isRunning())) {
+      res.status(HttpStatus.OK).send();
+      return;
+    }
+
+    this.ruleExecutorService.stopExecution().catch((e) => console.error(e));
+    res.status(HttpStatus.ACCEPTED).send();
+  }
+
   @Post()
   async setRules(@Body() body: RulesDto): Promise<ReturnStatus> {
     return await this.rulesService.setRules(body);

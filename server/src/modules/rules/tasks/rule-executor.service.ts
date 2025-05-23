@@ -71,21 +71,11 @@ export class RuleExecutorService extends TaskBase {
     this.cronSchedule = this.settings.rules_handler_job_cron;
   }
 
-  public async execute() {
-    // check if another instance of this task is already running
-    if (await this.isRunning()) {
-      this.logger.log(
-        `Another instance of the ${this.name} task is currently running. Skipping this execution`,
-      );
-      return;
-    }
-
+  protected async executeTask(abortSignal: AbortSignal) {
     this.eventEmitter.emit(
       MaintainerrEvent.RuleHandler_Started,
       new RuleHandlerStartedEventDto('Started execution of all active rules'),
     );
-
-    await super.execute();
 
     try {
       this.logger.log('Starting execution of all active rules');
@@ -167,6 +157,7 @@ export class RuleExecutorService extends TaskBase {
                       this.plexData.data.length;
                     emitProgressedEvent();
                   },
+                  abortSignal,
                 );
 
                 if (ruleResult) {
@@ -196,14 +187,15 @@ export class RuleExecutorService extends TaskBase {
         this.eventEmitter.emit(MaintainerrEvent.RuleHandler_Failed);
       }
     } catch (err) {
-      this.logger.log('Error running rules executor.');
-      this.logger.debug(err);
+      const executionBeingAborted =
+        err instanceof DOMException && err.name === 'AbortError';
 
-      this.eventEmitter.emit(MaintainerrEvent.RuleHandler_Failed);
+      if (!executionBeingAborted) {
+        this.logger.log('Error running rules executor.');
+        this.logger.debug(err);
+        this.eventEmitter.emit(MaintainerrEvent.RuleHandler_Failed);
+      }
     }
-
-    // clean up
-    await this.finish();
 
     this.eventEmitter.emit(
       MaintainerrEvent.RuleHandler_Finished,

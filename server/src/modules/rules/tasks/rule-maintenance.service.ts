@@ -27,8 +27,7 @@ export class RuleMaintenanceService extends TaskBase {
     super(taskService, logger);
   }
 
-  public async execute() {
-    await super.execute();
+  protected async executeTask() {
     try {
       this.logger.log('Starting maintenance');
       const appStatus = await this.settings.testConnections();
@@ -46,8 +45,6 @@ export class RuleMaintenanceService extends TaskBase {
     } catch (e) {
       this.logger.error(`Rule Maintenance failed : ${e.message}`);
     }
-
-    await this.finish();
   }
 
   private async removeLeftoverExclusions() {

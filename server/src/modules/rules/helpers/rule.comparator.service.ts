@@ -49,6 +49,7 @@ export class RuleComparatorService {
   plexDataType: EPlexDataType;
   statistics: IComparisonStatistics[];
   statisticWorker: IRuleComparisonResult[];
+  abortSignal: AbortSignal;
 
   constructor(
     private readonly valueGetter: ValueGetterService,
@@ -62,6 +63,7 @@ export class RuleComparatorService {
     rulegroup: RulesDto,
     plexData: PlexLibraryItem[],
     onRuleProgress?: (processingRule: number) => void,
+    abortSignal?: AbortSignal,
   ): Promise<IComparatorReturnValue> {
     try {
       // prepare
@@ -71,6 +73,7 @@ export class RuleComparatorService {
       this.resultData = [];
       this.statistics = [];
       this.statisticWorker = [];
+      this.abortSignal = abortSignal;
 
       // run rules
       let currentSection = 0;
@@ -130,6 +133,10 @@ export class RuleComparatorService {
       // return comparatorReturnValue
       return { stats: this.statistics, data: this.resultData };
     } catch (e) {
+      if (e instanceof DOMException && e.name === 'AbortError') {
+        throw e;
+      }
+
       this.logger.log(
         `Something went wrong while running rule ${rulegroup.name}`,
       );
@@ -185,7 +192,10 @@ export class RuleComparatorService {
         ruleGroup,
         this.plexDataType,
       );
+      this.abortSignal.throwIfAborted();
+
       secondVal = await this.getSecondValue(rule, data[i], ruleGroup, firstVal);
+      this.abortSignal.throwIfAborted();
 
       if (
         (firstVal !== undefined || null) &&

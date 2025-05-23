@@ -7,11 +7,10 @@ import { delay } from '../../utils/delay';
 import { MaintainerrLogger } from '../logging/logs.service';
 import { TaskRunning } from '../tasks/entities/task_running.entities';
 import { Status } from './interfaces/status.interface';
-import { TaskScheduler } from './interfaces/task-scheduler.interface';
 import { StatusService } from './status.service';
 
 @Injectable()
-export class TasksService implements TaskScheduler {
+export class TasksService {
   constructor(
     private schedulerRegistry: SchedulerRegistry,
     private readonly status: StatusService,
@@ -26,6 +25,7 @@ export class TasksService implements TaskScheduler {
     name: string,
     cronExp: CronExpression | string,
     task: () => void,
+    isNewInstance: boolean,
   ): Promise<Status> {
     try {
       const job = new CronJob(cronExp, () => {
@@ -35,17 +35,19 @@ export class TasksService implements TaskScheduler {
       this.schedulerRegistry.addCronJob(name, job);
       job.start();
 
-      // create database running entry
-      const taskRunning = await this.taskRunningRepo.findOne({
-        where: { name: name },
-      });
+      if (isNewInstance) {
+        // create database running entry
+        const taskRunning = await this.taskRunningRepo.findOne({
+          where: { name: name },
+        });
 
-      await this.taskRunningRepo.save({
-        id: taskRunning?.id ?? null,
-        name: name,
-        running: false,
-        runningSince: null,
-      });
+        await this.taskRunningRepo.save({
+          id: taskRunning?.id ?? null,
+          name: name,
+          running: false,
+          runningSince: null,
+        });
+      }
 
       this.logger.log(`Task ${name} created successfully`);
       return this.status.createStatus(
@@ -66,26 +68,11 @@ export class TasksService implements TaskScheduler {
   ): Promise<Status> {
     const output = this.removeJob(name);
     if (output.code === 1) {
-      return this.createJob(name, cronExp, task);
+      return this.createJob(name, cronExp, task, false);
     }
   }
 
-  public handleJob(name: string): Status {
-    try {
-      const job = this.schedulerRegistry.getCronJob(name);
-      job.start();
-      return this.status.createStatus(
-        true,
-        `Task ${name} started successfully`,
-      );
-    } catch (e) {
-      const message = `An error occurred while starting the ${name} task.`;
-      this.logger.error(message, e);
-      return this.status.createStatus(false, message);
-    }
-  }
-
-  public removeJob(name: string): Status {
+  private removeJob(name: string): Status {
     try {
       this.schedulerRegistry.deleteCronJob(name);
       this.logger.log(`Task ${name} removed successfully`);

@@ -1,5 +1,6 @@
 import { LogEvent, LogFile, LogSettingDto } from '@maintainerr/contracts';
 import {
+  BeforeApplicationShutdown,
   Body,
   Controller,
   Get,
@@ -45,7 +46,7 @@ const logsDirectory =
 const safeLogFileRegex = /maintainerr-\d{4}-\d{2}-\d{2}\.log(\.gz)?/;
 
 @Controller('/api/logs')
-export class LogsController {
+export class LogsController implements BeforeApplicationShutdown {
   constructor(
     private readonly logSettingsService: LogSettingsService,
     private readonly eventEmitter: EventEmitter2,
@@ -55,6 +56,12 @@ export class LogsController {
     string,
     { close: () => void; subject: Subject<NestMessageEvent> }
   >();
+
+  async beforeApplicationShutdown() {
+    for (const [, client] of this.connectedClients) {
+      client.close();
+    }
+  }
 
   // Source: https://github.com/nestjs/nest/issues/12670
   @Get('stream')
