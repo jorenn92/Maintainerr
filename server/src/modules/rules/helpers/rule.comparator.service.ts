@@ -333,9 +333,9 @@ export class RuleComparatorService {
       result: result,
     });
 
-    // If it's the first rule of a section (but not the first one) then add the operator to the sectionResult
+    // If it's the first rule of a section and not the first section, add the operator to the sectionResult
     if (
-      index > 0 &&
+      sectionIndex > 0 &&
       this.statistics[index].sectionResults[sectionIndex].ruleResults.length ===
         1
     ) {
