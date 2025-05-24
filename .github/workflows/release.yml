@@ -17,40 +17,9 @@ env:
   GHCR_SLUG: ghcr.io/jorenn92/maintainerr
 
 jobs:
-  semantic-release:
-    name: Tag and release latest version
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Activate corepack
-        run: |
-          corepack install
-          corepack enable
-      - name: Install dependencies
-        run: yarn --immutable
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        run: |
-          if [ "${{ github.event.inputs.dry-run-semantic-release }}" == "true" ]; then
-          npx semantic-release --dry-run
-          else
-          npx semantic-release
-          fi
-
   build-docker-image:
     if: github.event.inputs.with-docker-images == 'true'
     name: Build ${{ matrix.platform }}
-    needs: semantic-release
     strategy:
       fail-fast: false
       matrix:
@@ -99,10 +68,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME  }}
           password: ${{ secrets.DOCKERHUB_TOKEN  }}
 
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-
       - name: Build & push by digest
         id: build
         uses: docker/build-push-action@v5
@@ -110,7 +75,7 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           build-args: |
-            GIT_SHA=${{ github.sha }}
+            GIT_SHA=66db26eb0c22881930ef5fb58768e23b5fb087e2
             VERSION_TAG=stable
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,"name=${{ env.DOCKERHUB_SLUG }},${{ env.GHCR_SLUG }}",push-by-digest=true,name-canonical=true,push=true
@@ -129,19 +94,8 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Mkdocs Deploy
-        if: ${{ success() }}
-        continue-on-error: true
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.DOCS_DEPLOY }}
-          repository: ydkmlt84/Maintainerr_docs
-          event-type: maintainerr-release
-          client-payload: |
-            {
-              "ref": "refs/heads/main",
-              "versionInput": "${{ steps.package-version.outputs.current-version}}"
-            }
+    outputs:
+      version: 2.15.0
 
   merge:
     name: Merge Docker digests and push
@@ -181,11 +135,10 @@ jobs:
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
           tags: |
-            type=raw,value=latest
-            type=semver,pattern={{version}},value=${{ steps.package-version.outputs.current-version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.package-version.outputs.current-version }}
-            type=semver,pattern={{major}},value=${{ steps.package-version.outputs.current-version }}
-          labels: org.opencontainers.image.revision=${{ github.sha }}
+            type=semver,pattern={{version}},value=${{ needs.build-docker-image.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.build-docker-image.outputs.version }}
+            type=semver,pattern={{major}},value=${{ needs.build-docker-image.outputs.version }}
+          labels: org.opencontainers.image.revision=66db26eb0c22881930ef5fb58768e23b5fb087e2
 
       - name: Create manifest list and push
         working-directory: ${{ runner.temp }}/digests
