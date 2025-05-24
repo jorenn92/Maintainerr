@@ -1,13 +1,13 @@
 export const delay = (ms: number, fn?: () => Promise<void> | void) => {
-  return new Promise<void>((resolve) => {
-    setTimeout(
-      void (async () => {
-        if (fn) {
-          await fn();
-        }
+  return new Promise<void>((resolve, reject) => {
+    setTimeout(() => {
+      if (fn) {
+        Promise.resolve(fn())
+          .then(() => resolve())
+          .catch((error) => reject(error));
+      } else {
         resolve();
-      }),
-      ms,
-    );
+      }
+    }, ms);
   });
 };

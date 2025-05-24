@@ -19,8 +19,8 @@ export abstract class TaskBase
   async onApplicationBootstrap(): Promise<void> {
     this.onBootstrapHook();
 
-    new Promise<void>(
-      void (async (resolve: () => void, reject: () => void) => {
+    new Promise<void>((resolve, reject) => {
+      void (async () => {
         while (this.jobCreationAttempts < 3) {
           this.jobCreationAttempts++;
           const state = await this.taskService.createJob(
@@ -45,8 +45,8 @@ export abstract class TaskBase
         }
 
         reject();
-      }),
-    ).catch((err) => {
+      })();
+    }).catch((err) => {
       this.logger.error(
         `Creation of ${this.name} task failed after 3 attempts.`,
         err,
