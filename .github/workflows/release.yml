@@ -129,19 +129,8 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Mkdocs Deploy
-        if: ${{ success() }}
-        continue-on-error: true
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.DOCS_DEPLOY }}
-          repository: ydkmlt84/Maintainerr_docs
-          event-type: maintainerr-release
-          client-payload: |
-            {
-              "ref": "refs/heads/main",
-              "versionInput": "${{ steps.package-version.outputs.current-version}}"
-            }
+    outputs:
+      version: ${{ steps.package-version.outputs.current-version }}
 
   merge:
     name: Merge Docker digests and push
@@ -182,9 +171,9 @@ jobs:
             ${{ env.GHCR_SLUG }}
           tags: |
             type=raw,value=latest
-            type=semver,pattern={{version}},value=${{ steps.package-version.outputs.current-version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.package-version.outputs.current-version }}
-            type=semver,pattern={{major}},value=${{ steps.package-version.outputs.current-version }}
+            type=semver,pattern={{version}},value=${{ needs.build-docker-image.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.build-docker-image.outputs.version }}
+            type=semver,pattern={{major}},value=${{ needs.build-docker-image.outputs.version }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Create manifest list and push
@@ -194,3 +183,17 @@ jobs:
             $(printf '${{ env.DOCKERHUB_SLUG }}@sha256:%s ' *)
           docker buildx imagetools create $(jq -cr '.tags | map(select(startswith("${{ env.GHCR_SLUG }}")) | "--tag " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ env.GHCR_SLUG }}@sha256:%s ' *)
+
+      - name: Mkdocs Deploy
+        if: ${{ success() }}
+        continue-on-error: true
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DOCS_DEPLOY }}
+          repository: ydkmlt84/Maintainerr_docs
+          event-type: maintainerr-release
+          client-payload: |
+            {
+              "ref": "refs/heads/main",
+              "versionInput": "${{ needs.build-docker-image.outputs.version }}"
+            }
