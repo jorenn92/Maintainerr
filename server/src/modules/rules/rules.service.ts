@@ -1,3 +1,4 @@
+import { ECollectionLogType } from '@maintainerr/contracts';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
@@ -9,9 +10,8 @@ import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
 import { Collection } from '../collections/entities/collection.entities';
-import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
-import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
+import { AddRemoveCollectionMedia } from '../collections/interfaces/collection-media.interface';
 import { MaintainerrLogger } from '../logging/logs.service';
 import { Notification } from '../notifications/entities/notification.entities';
 import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
@@ -446,7 +446,7 @@ export class RulesService {
     }
   }
   async setExclusion(data: ExclusionContextDto) {
-    let handleMedia: AddCollectionMedia[] = [];
+    let handleMedia: AddRemoveCollectionMedia[] = [];
 
     if (data.collectionId) {
       const group = await this.ruleGroupRepository.findOne({
@@ -461,7 +461,7 @@ export class RulesService {
           ? data.context
           : { type: group.dataType, id: data.mediaId },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      )) as unknown as AddRemoveCollectionMedia[];
       data.ruleGroupId = group.id;
     } else {
       // get type from metadata
@@ -473,7 +473,7 @@ export class RulesService {
         undefined,
         data.context ? data.context : { type: type, id: data.mediaId },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      )) as unknown as AddRemoveCollectionMedia[];
     }
     try {
       // add all items
@@ -580,7 +580,7 @@ export class RulesService {
   }
 
   async removeExclusionWitData(data: ExclusionContextDto) {
-    let handleMedia: AddCollectionMedia[] = [];
+    let handleMedia: AddRemoveCollectionMedia[] = [];
 
     if (data.collectionId) {
       const group = await this.ruleGroupRepository.findOne({
@@ -597,14 +597,14 @@ export class RulesService {
           ? data.context
           : { type: group.libraryId, id: data.mediaId },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      )) as unknown as AddRemoveCollectionMedia[];
     } else {
       // get type from metadata
       handleMedia = (await this.plexApi.getAllIdsForContextAction(
         undefined,
         { type: data.context.type, id: data.context.id },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      )) as unknown as AddRemoveCollectionMedia[];
     }
 
     try {
@@ -646,7 +646,7 @@ export class RulesService {
 
   async removeAllExclusion(plexId: number) {
     // get type from metadata
-    let handleMedia: AddCollectionMedia[] = [];
+    let handleMedia: AddRemoveCollectionMedia[] = [];
 
     const metaData = await this.plexApi.getMetadata(plexId.toString());
     const type =
@@ -656,7 +656,7 @@ export class RulesService {
       undefined,
       { type: type, id: plexId },
       { plexId: plexId },
-    )) as unknown as AddCollectionMedia[];
+    )) as unknown as AddRemoveCollectionMedia[];
 
     try {
       for (const media of handleMedia) {
@@ -1006,7 +1006,6 @@ export class RulesService {
       const result = await ruleComparator.executeRulesWithData(
         group as RulesDto,
         [mediaResp as unknown as PlexLibraryItem],
-        true,
       );
 
       if (result) {

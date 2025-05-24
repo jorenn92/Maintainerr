@@ -1,3 +1,8 @@
+import {
+  IComparisonStatistics,
+  IRuleComparisonResult,
+  RuleValueType,
+} from '@maintainerr/contracts';
 import { Injectable } from '@nestjs/common';
 import _ from 'lodash';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
@@ -8,35 +13,11 @@ import {
   RuleOperators,
   RulePossibility,
   RuleType,
-  RuleValueType,
 } from '../constants/rules.constants';
 import { RuleDto } from '../dtos/rule.dto';
 import { RuleDbDto } from '../dtos/ruleDb.dto';
 import { RulesDto } from '../dtos/rules.dto';
 import { ValueGetterService } from '../getter/getter.service';
-
-interface IComparisonStatistics {
-  plexId: number;
-  result: boolean;
-  sectionResults: ISectionComparisonResults[];
-}
-
-interface ISectionComparisonResults {
-  id: number;
-  result: boolean;
-  operator?: string;
-  ruleResults: IRuleComparisonResult[];
-}
-
-interface IRuleComparisonResult {
-  firstValueName: string;
-  firstValue: RuleValueType;
-  secondValueName: string;
-  secondValue: RuleValueType;
-  action: string;
-  operator?: string;
-  result: boolean;
-}
 
 interface IComparatorReturnValue {
   stats: IComparisonStatistics[];
@@ -68,7 +49,6 @@ export class RuleComparatorService {
   plexDataType: EPlexDataType;
   statistics: IComparisonStatistics[];
   statisticWorker: IRuleComparisonResult[];
-  enabledStats: boolean;
 
   constructor(
     private readonly valueGetter: ValueGetterService,
@@ -81,14 +61,12 @@ export class RuleComparatorService {
   public async executeRulesWithData(
     rulegroup: RulesDto,
     plexData: PlexLibraryItem[],
-    withStats = false,
     onRuleProgress?: (processingRule: number) => void,
   ): Promise<IComparatorReturnValue> {
     try {
       // prepare
       this.plexData = plexData;
       this.plexDataType = rulegroup.dataType ? rulegroup.dataType : undefined;
-      this.enabledStats = withStats;
       this.workerData = [];
       this.resultData = [];
       this.statistics = [];
@@ -98,7 +76,6 @@ export class RuleComparatorService {
       let currentSection = 0;
       let sectionActionAnd = false;
 
-      // prepare statistics if needed
       this.prepareStatistics();
 
       let ruleNumber = 0;
@@ -119,7 +96,7 @@ export class RuleComparatorService {
           // execute and store in work array
           await this.executeRule(parsedRule, rulegroup);
         } else {
-          // set the stat results of the completed section, if needed
+          // set the stat results of the completed section
           this.setStatisticSectionResults();
 
           // handle section action
@@ -139,14 +116,11 @@ export class RuleComparatorService {
           currentSection = (rule as RuleDbDto).section;
         }
       }
-      // set the stat results of the last section, if needed
+      // set the stat results of the last section
       this.setStatisticSectionResults();
 
       // handle last section
       this.handleSectionAction(sectionActionAnd);
-
-      // update statistics results when needed
-      this.updateStatisticResults();
 
       // update result for matched media
       this.statistics.forEach((el) => {
@@ -164,37 +138,31 @@ export class RuleComparatorService {
   }
 
   private updateStatisticResults() {
-    if (this.enabledStats) {
-      this.statistics.forEach((el) => {
-        el.result = this.resultData.some((i) => +i.ratingKey === +el.plexId);
-      });
-    }
+    this.statistics.forEach((el) => {
+      el.result = this.resultData.some((i) => +i.ratingKey === +el.plexId);
+    });
   }
 
   private setStatisticSectionResults() {
     // add the result of the last section. If media is in workerData, section = true.
-    if (this.enabledStats) {
-      this.statistics.forEach((stat) => {
-        if (this.workerData.find((el) => +el.ratingKey === +stat.plexId)) {
-          stat.sectionResults[stat.sectionResults.length - 1].result = true;
-        } else {
-          stat.sectionResults[stat.sectionResults.length - 1].result = false;
-        }
-      });
-    }
+    this.statistics.forEach((stat) => {
+      if (this.workerData.find((el) => +el.ratingKey === +stat.plexId)) {
+        stat.sectionResults[stat.sectionResults.length - 1].result = true;
+      } else {
+        stat.sectionResults[stat.sectionResults.length - 1].result = false;
+      }
+    });
   }
 
   private addSectionToStatistics(id: number, isAND: boolean) {
-    if (this.enabledStats) {
-      this.statistics.forEach((data) => {
-        data.sectionResults.push({
-          id: id,
-          result: undefined,
-          operator: isAND ? 'AND' : 'OR',
-          ruleResults: [],
-        });
+    this.statistics.forEach((data) => {
+      data.sectionResults.push({
+        id: id,
+        result: undefined,
+        operator: isAND ? 'AND' : 'OR',
+        ruleResults: [],
       });
-    }
+    });
   }
 
   private async executeRule(rule: RuleDto, ruleGroup: RulesDto) {
@@ -321,21 +289,19 @@ export class RuleComparatorService {
   }
 
   private prepareStatistics() {
-    if (this.enabledStats) {
-      this.plexData.forEach((data) => {
-        this.statistics.push({
-          plexId: +data.ratingKey,
-          result: false,
-          sectionResults: [
-            {
-              id: 0,
-              result: undefined,
-              ruleResults: [],
-            },
-          ],
-        });
+    this.plexData.forEach((data) => {
+      this.statistics.push({
+        plexId: +data.ratingKey,
+        result: false,
+        sectionResults: [
+          {
+            id: 0,
+            result: undefined,
+            ruleResults: [],
+          },
+        ],
       });
-    }
+    });
   }
 
   private addStatistictoParent(
@@ -345,40 +311,38 @@ export class RuleComparatorService {
     plexId: number,
     result: boolean,
   ) {
-    if (this.enabledStats) {
-      const index = this.statistics.findIndex((el) => +el.plexId === +plexId);
-      const sectionIndex = this.statistics[index].sectionResults.length - 1;
+    const index = this.statistics.findIndex((el) => +el.plexId === +plexId);
+    const sectionIndex = this.statistics[index].sectionResults.length - 1;
 
-      // push result to currently last section
-      this.statistics[index].sectionResults[sectionIndex].ruleResults.push({
-        operator:
-          rule.operator === null || rule.operator === undefined
-            ? RuleOperators[1]
-            : RuleOperators[rule.operator],
-        action: RulePossibility[rule.action].toLowerCase(),
-        firstValueName: this.ruleConstanstService.getValueHumanName(
-          rule.firstVal,
-        ),
-        firstValue: firstVal,
-        secondValueName: rule.lastVal
-          ? this.ruleConstanstService.getValueHumanName(rule.lastVal)
-          : this.ruleConstanstService.getCustomValueIdentifier(rule.customVal)
-              .type,
-        secondValue: secondVal,
-        result: result,
-      });
+    // push result to currently last section
+    this.statistics[index].sectionResults[sectionIndex].ruleResults.push({
+      operator:
+        rule.operator === null || rule.operator === undefined
+          ? RuleOperators[1]
+          : RuleOperators[rule.operator],
+      action: RulePossibility[rule.action].toLowerCase(),
+      firstValueName: this.ruleConstanstService.getValueHumanName(
+        rule.firstVal,
+      ),
+      firstValue: firstVal,
+      secondValueName: rule.lastVal
+        ? this.ruleConstanstService.getValueHumanName(rule.lastVal)
+        : this.ruleConstanstService.getCustomValueIdentifier(rule.customVal)
+            .type,
+      secondValue: secondVal,
+      result: result,
+    });
 
-      // If it's the first rule of a section (but not the first one) then add the operator to the sectionResult
-      if (
-        index > 0 &&
-        this.statistics[index].sectionResults[sectionIndex].ruleResults
-          .length === 1
-      ) {
-        this.statistics[index].sectionResults[sectionIndex].operator =
-          rule.operator === null || rule.operator === undefined
-            ? RuleOperators[1]
-            : RuleOperators[rule.operator];
-      }
+    // If it's the first rule of a section and not the first section, add the operator to the sectionResult
+    if (
+      sectionIndex > 0 &&
+      this.statistics[index].sectionResults[sectionIndex].ruleResults.length ===
+        1
+    ) {
+      this.statistics[index].sectionResults[sectionIndex].operator =
+        rule.operator === null || rule.operator === undefined
+          ? RuleOperators[1]
+          : RuleOperators[rule.operator];
     }
   }
 
