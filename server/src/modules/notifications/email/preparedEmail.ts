@@ -1,8 +1,8 @@
-import nodemailer from 'nodemailer';
 import Email from 'email-templates';
+import nodemailer from 'nodemailer';
 import { URL } from 'url';
-import { NotificationAgentEmail } from '../notifications-interfaces';
 import { SettingsService } from '../../settings/settings.service';
+import { NotificationAgentEmail } from '../notifications-interfaces';
 import { openpgpEncrypt } from './openPgpEncrypt';
 
 class PreparedEmail extends Email {
@@ -38,7 +38,7 @@ class PreparedEmail extends Email {
       transport.use(
         'stream',
         openpgpEncrypt({
-          signingKey: settings.options.pgpPrivateKey,
+          signingKey: settings.options.pgpKey,
           password: settings.options.pgpPassword,
           encryptionKeys: [pgpKey],
         }),
