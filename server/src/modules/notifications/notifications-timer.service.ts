@@ -1,6 +1,4 @@
-import { MaintainerrEvent } from '@maintainerr/contracts';
 import { Injectable } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CollectionsService } from '../collections/collections.service';
 import { MaintainerrLogger } from '../logging/logs.service';
 import { TaskBase } from '../tasks/task.base';
@@ -23,7 +21,6 @@ export class NotificationTimerService extends TaskBase {
     protected readonly logger: MaintainerrLogger,
     protected readonly collectionService: CollectionsService,
     private readonly notificationService: NotificationService,
-    private readonly eventEmitter: EventEmitter2,
   ) {
     logger.setContext(NotificationTimerService.name);
     super(taskService, logger);
@@ -33,7 +30,7 @@ export class NotificationTimerService extends TaskBase {
 
   public async execute() {
     // helper submethod
-    const getDayStart = (date) => new Date(date.setHours(0, 0, 0, 0));
+    const getDayStart = (date: Date) => new Date(date.setHours(0, 0, 0, 0));
 
     // check if another instance of this task is already running
     if (await this.isRunning()) {
@@ -49,57 +46,61 @@ export class NotificationTimerService extends TaskBase {
     const allNotificationConfigurations =
       await this.notificationService.getNotificationConfigurations(true);
 
-    activeAgents.forEach(async (agent) => {
-      const notification = allNotificationConfigurations.find(
-        (n) => n.id === agent.getNotification().id,
-      );
+    await Promise.allSettled(
+      activeAgents.map(async (agent) => {
+        const notification = allNotificationConfigurations.find(
+          (n) =>
+            n.id === agent.getNotification().id &&
+            n.enabled &&
+            n.rulegroups?.length > 0,
+        );
 
-      if (notification && notification.enabled) {
-        const itemsToNotify = (
-          await Promise.all(
-            (notification.rulegroups || []).map(async (group) => {
-              const notifyDate = new Date(
-                new Date().getTime() -
-                  group.collection.deleteAfterDays * 86400000 +
-                  notification.aboutScale * 86400000,
-              );
-
-              const collectionMedia =
-                await this.collectionService.getCollectionMedia(
-                  group.collection?.id,
+        if (notification) {
+          const itemsToNotify = (
+            await Promise.all(
+              notification.rulegroups.map(async (group) => {
+                const notifyDate = new Date(
+                  new Date().getTime() -
+                    group.collection.deleteAfterDays * 86400000 +
+                    notification.aboutScale * 86400000,
                 );
 
-              return (
-                collectionMedia?.filter((media) => {
-                  const mediaDate = new Date(media.addDate);
-                  return (
-                    getDayStart(mediaDate).getTime() ===
-                    getDayStart(notifyDate).getTime()
+                const collectionMedia =
+                  await this.collectionService.getCollectionMedia(
+                    group.collection?.id,
                   );
-                }) || []
-              );
-            }),
-          )
-        ).flat();
 
-        const transformedItems = itemsToNotify.map((i) => ({
-          plexId: i.plexId,
-        }));
+                return (
+                  collectionMedia?.filter((media) => {
+                    const mediaDate = new Date(media.addDate);
+                    return (
+                      getDayStart(mediaDate).getTime() ===
+                      getDayStart(notifyDate).getTime()
+                    );
+                  }) || []
+                );
+              }),
+            )
+          ).flat();
 
-        // send the notification if required
-        if (notification.rulegroups && transformedItems.length > 0) {
-          this.eventEmitter.emit(
-            MaintainerrEvent.Notifications_Fire,
-            this.type,
-            transformedItems,
-            undefined,
-            notification.aboutScale,
-            agent,
-          );
+          const transformedItems = itemsToNotify.map((i) => ({
+            plexId: i.plexId,
+          }));
+
+          // send the notification if required
+          if (transformedItems.length > 0) {
+            await this.notificationService.handleNotification(
+              this.type,
+              transformedItems,
+              undefined,
+              notification.aboutScale,
+              agent,
+            );
+          }
         }
-      }
-    });
+      }),
+    );
 
-    this.finish();
+    await this.finish();
   }
 }
