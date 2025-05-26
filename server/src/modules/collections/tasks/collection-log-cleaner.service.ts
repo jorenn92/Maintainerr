@@ -18,10 +18,8 @@ export class CollectionLogCleanerService extends TaskBase {
     super(taskService, logger);
   }
 
-  public async execute() {
+  protected async executeTask() {
     try {
-      await super.execute();
-
       // start execution
       // get all collections
       const collections = await this.collectionService.getAllCollections();
@@ -30,12 +28,8 @@ export class CollectionLogCleanerService extends TaskBase {
       for (const collection of collections) {
         await this.collectionService.removeOldCollectionLogs(collection);
       }
-
-      // clean up
-      await this.finish();
     } catch (e) {
       this.logger.debug(e);
-      await this.finish();
     }
   }
 }

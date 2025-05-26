@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
+import { setupGracefulShutdown } from 'nestjs-graceful-shutdown';
 import { patchNestJsSwagger } from 'nestjs-zod';
 import path from 'path';
 import { AppModule } from './app/app.module';
@@ -18,6 +19,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+
+  setupGracefulShutdown({ app });
 
   const config = new DocumentBuilder().setTitle('Maintainerr').build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
