@@ -2180,9 +2180,11 @@ __metadata:
     eslint: "npm:^9.27.0"
     eslint-config-prettier: "npm:^10.1.2"
     eslint-plugin-jest: "npm:^28.11.0"
+    http-terminator: "npm:^3.2.0"
     jest: "npm:^29.7.0"
     lodash: "npm:^4.17.21"
     mime-types: "npm:^3.0.1"
+    nestjs-graceful-shutdown: "npm:^1.0.3"
     nestjs-zod: "npm:^4.3.1"
     node-cache: "npm:^5.1.2"
     nodemailer: "npm:6.9.9"
@@ -7244,6 +7246,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"delay@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "delay@npm:5.0.0"
+  checksum: 10c0/01cdc4cd0cd35fb622518a3df848e67e09763a38e7cdada2232b6fda9ddda72eddcf74f0e24211200fbe718434f2335f2a2633875a6c96037fefa6de42896ad7
+  languageName: node
+  linkType: hard
+
 "delayed-stream@npm:~1.0.0":
   version: 1.0.0
   resolution: "delayed-stream@npm:1.0.0"
@@ -9849,6 +9858,18 @@ __metadata:
     agent-base: "npm:^7.1.0"
     debug: "npm:^4.3.4"
   checksum: 10c0/a11574ff39436cee3c7bc67f259444097b09474605846ddd8edf0bf4ad8644be8533db1aa463426e376865047d05dc22755e638632819317c0c2f1b2196657c8
+  languageName: node
+  linkType: hard
+
+"http-terminator@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "http-terminator@npm:3.2.0"
+  dependencies:
+    delay: "npm:^5.0.0"
+    p-wait-for: "npm:^3.2.0"
+    roarr: "npm:^7.0.4"
+    type-fest: "npm:^2.3.3"
+  checksum: 10c0/2f3981c19b12a836620ea4c6bad5b5a135ecb19c5751bfed7a0be543e99cb4b7d0dbffd18eac9c028de3ad1e493445bad503b0564060eb5fb44d02280217b112
   languageName: node
   linkType: hard
 
@@ -13190,6 +13211,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nestjs-graceful-shutdown@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "nestjs-graceful-shutdown@npm:1.0.3"
+  peerDependencies:
+    "@nestjs/common": "*"
+    http-terminator: ^3.2.0
+  checksum: 10c0/ae654c534a1a569ddd89e37e7c112ff0579af9ee77cebd6f91fbfb55bd7672c872d5bb68c3daae593b6e9fae2c3b7408850dc61f90086439b23eced537352a51
+  languageName: node
+  linkType: hard
+
 "nestjs-zod@npm:^4.3.1":
   version: 4.3.1
   resolution: "nestjs-zod@npm:4.3.1"
@@ -14103,7 +14134,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"p-wait-for@npm:3.2.0":
+"p-wait-for@npm:3.2.0, p-wait-for@npm:^3.2.0":
   version: 3.2.0
   resolution: "p-wait-for@npm:3.2.0"
   dependencies:
@@ -15609,6 +15640,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"roarr@npm:^7.0.4":
+  version: 7.21.1
+  resolution: "roarr@npm:7.21.1"
+  dependencies:
+    fast-printf: "npm:^1.6.9"
+    safe-stable-stringify: "npm:^2.4.3"
+    semver-compare: "npm:^1.0.0"
+  checksum: 10c0/2fa490bdea0e77c4794735d27e14469b96e733c7286df0191e79759bf87357923ca81523816e1007cbdc5389702a749373bfd29dc91ef1da21d4e925709f8d96
+  languageName: node
+  linkType: hard
+
 "router@npm:^2.2.0":
   version: 2.2.0
   resolution: "router@npm:2.2.0"
@@ -15766,6 +15808,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"safe-stable-stringify@npm:^2.4.3":
+  version: 2.5.0
+  resolution: "safe-stable-stringify@npm:2.5.0"
+  checksum: 10c0/baea14971858cadd65df23894a40588ed791769db21bafb7fd7608397dbdce9c5aac60748abae9995e0fc37e15f2061980501e012cd48859740796bea2987f49
+  languageName: node
+  linkType: hard
+
 "safer-buffer@npm:>= 2.1.2 < 3, safer-buffer@npm:>= 2.1.2 < 3.0.0, safer-buffer@npm:^2.1.0":
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
@@ -15864,6 +15913,13 @@ __metadata:
   bin:
     semantic-release: bin/semantic-release.js
   checksum: 10c0/2b8d09c0bba73b01be18a10c9bea733cf79be18cc266009c898b530d240b91d92dba3aef0ee8e2e08413cd4fa75c79e10c56cbf604f2aecfcf4de962b52412de
+  languageName: node
+  linkType: hard
+
+"semver-compare@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "semver-compare@npm:1.0.0"
+  checksum: 10c0/9ef4d8b81847556f0865f46ddc4d276bace118c7cb46811867af82e837b7fc473911981d5a0abc561fa2db487065572217e5b06e18701c4281bcdd2a1affaff1
   languageName: node
   linkType: hard
 
@@ -17610,7 +17666,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^2.12.2":
+"type-fest@npm:^2.12.2, type-fest@npm:^2.3.3":
   version: 2.19.0
   resolution: "type-fest@npm:2.19.0"
   checksum: 10c0/a5a7ecf2e654251613218c215c7493574594951c08e52ab9881c9df6a6da0aeca7528c213c622bc374b4e0cb5c443aa3ab758da4e3c959783ce884c3194e12cb
