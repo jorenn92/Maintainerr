@@ -58,7 +58,7 @@
     "@automock/jest": "^2.1.0",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.27.0",
-    "@faker-js/faker": "^9.6.0",
+    "@faker-js/faker": "^9.8.0",
     "@nestjs/cli": "^11.0.7",
     "@nestjs/schematics": "^11.0.5",
     "@nestjs/testing": "^11.1.1",
