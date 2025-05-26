@@ -8,6 +8,7 @@ import {
   RuleHandlerStartedEventDto,
 } from '@maintainerr/contracts';
 import {
+  BeforeApplicationShutdown,
   Controller,
   Get,
   MessageEvent as NestMessageEvent,
@@ -21,13 +22,19 @@ import { IncomingMessage } from 'http';
 import { interval, map, Subject } from 'rxjs';
 
 @Controller('/api/events')
-export class EventsController {
+export class EventsController implements BeforeApplicationShutdown {
   private mostRecentEvent: NestMessageEvent | null = null;
 
   connectedClients = new Map<
     string,
     { close: () => void; subject: Subject<NestMessageEvent> }
   >();
+
+  async beforeApplicationShutdown() {
+    for (const [, client] of this.connectedClients) {
+      client.close();
+    }
+  }
 
   // Source: https://github.com/nestjs/nest/issues/12670
   @Get('stream')
