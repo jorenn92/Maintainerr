@@ -274,6 +274,10 @@ export class SettingsService implements SettingDto {
         tautulli_api_key: null,
       });
 
+      this.tautulli_url = null;
+      this.tautulli_api_key = null;
+      this.tautulli.init();
+
       return { status: 'OK', code: 1, message: 'Success' };
     } catch (e) {
       this.logger.error('Error removing Tautulli settings: ', e);
@@ -292,6 +296,10 @@ export class SettingsService implements SettingDto {
         tautulli_url: settings.url,
         tautulli_api_key: settings.api_key,
       });
+
+      this.tautulli_url = settings.url;
+      this.tautulli_api_key = settings.api_key;
+      this.tautulli.init();
 
       return { status: 'OK', code: 1, message: 'Success' };
     } catch (e) {
