@@ -1,3 +1,18 @@
+# [2.16.0](https://github.com/jorenn92/Maintainerr/compare/v2.15.0...v2.16.0) (2025-05-28)
+
+
+### Bug Fixes
+
+* Rule groups not in consistent order ([#1787](https://github.com/jorenn92/Maintainerr/issues/1787)) ([fe5c0d2](https://github.com/jorenn92/Maintainerr/commit/fe5c0d286406cf7e5fb13a6725be2b06f54bc5c0))
+* Tautulli settings not updating until restart ([#1804](https://github.com/jorenn92/Maintainerr/issues/1804)) ([ddae9d3](https://github.com/jorenn92/Maintainerr/commit/ddae9d3fd4b6932bb56662c1dea79597ccb9ec13))
+* Test media failing due to missing AbortSignal ([#1802](https://github.com/jorenn92/Maintainerr/issues/1802)) ([3d088b0](https://github.com/jorenn92/Maintainerr/commit/3d088b0de1445b5de7055f30673aaf36a8ba6826))
+
+
+### Features
+
+* Request stop of running rules ([#1735](https://github.com/jorenn92/Maintainerr/issues/1735)) ([7a08d94](https://github.com/jorenn92/Maintainerr/commit/7a08d94f490abbe4bfd68d66ed29a5c35aa5ba10))
+* Save rule results against collection log ([#1777](https://github.com/jorenn92/Maintainerr/issues/1777)) ([f379b39](https://github.com/jorenn92/Maintainerr/commit/f379b39bb8df4009eb0b5cae5374aee904310fe2))
+
 # [2.15.0](https://github.com/jorenn92/Maintainerr/compare/v2.14.0...v2.15.0) (2025-05-23)
 
 
