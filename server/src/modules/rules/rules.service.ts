@@ -141,7 +141,6 @@ export class RulesService {
       const rulegroups = await this.connection
         .createQueryBuilder('rule_group', 'rg')
         .innerJoinAndSelect('rg.rules', 'r')
-        .orderBy('r.id')
         .innerJoinAndSelect('rg.collection', 'c')
         .leftJoinAndSelect('rg.notifications', 'n')
         .where(
@@ -154,7 +153,7 @@ export class RulesService {
               ? `c.type = ${typeId}`
               : 'rg.libraryId != -1',
         )
-        // .where(typeId !== undefined ? `c.type = ${typeId}` : '')
+        .orderBy('rg.id, r.id')
         .getMany();
       return rulegroups as RulesDto[];
     } catch (e) {
