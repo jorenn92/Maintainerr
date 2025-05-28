@@ -49,7 +49,7 @@ export class RuleComparatorService {
   plexDataType: EPlexDataType;
   statistics: IComparisonStatistics[];
   statisticWorker: IRuleComparisonResult[];
-  abortSignal: AbortSignal;
+  abortSignal?: AbortSignal;
 
   constructor(
     private readonly valueGetter: ValueGetterService,
@@ -192,10 +192,10 @@ export class RuleComparatorService {
         ruleGroup,
         this.plexDataType,
       );
-      this.abortSignal.throwIfAborted();
+      this.abortSignal?.throwIfAborted();
 
       secondVal = await this.getSecondValue(rule, data[i], ruleGroup, firstVal);
-      this.abortSignal.throwIfAborted();
+      this.abortSignal?.throwIfAborted();
 
       if (
         (firstVal !== undefined || null) &&
