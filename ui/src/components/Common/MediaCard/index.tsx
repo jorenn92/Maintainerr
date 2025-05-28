@@ -7,6 +7,7 @@ import AddModal from '../../AddModal'
 import RemoveFromCollectionBtn from '../../Collection/CollectionDetail/RemoveFromCollectionBtn'
 import Button from '../Button'
 import CachedImage from '../CachedImage'
+import Tooltipwrapper from '../Tooltip'
 import MediaModalContent from './MediaModal'
 
 interface IMediaCard {
@@ -26,6 +27,8 @@ interface IMediaCard {
   daysLeft?: number
   exclusionId?: number
   exclusionType?: 'global' | 'specific' | undefined
+  ruleGroups?: Record<number, string>
+  maintainerrRuleGroupIds?: number[]
   collectionId?: number
   isManual?: boolean
   onRemove?: (id: string) => void
@@ -48,6 +51,8 @@ const MediaCard: React.FC<IMediaCard> = ({
   collectionPage = false,
   exclusionType = undefined,
   isManual = false,
+  maintainerrRuleGroupIds,
+  ruleGroups,
   onRemove = (id: string) => {},
 }) => {
   const isTouch = useIsTouch()
@@ -106,7 +111,7 @@ const MediaCard: React.FC<IMediaCard> = ({
       <div
         className={`relative transform-gpu cursor-default overflow-hidden rounded-xl bg-zinc-800 bg-cover pb-[150%] outline-none transition duration-300 ${
           showDetail
-            ? 'scale-105 shadow-lg ring-zinc-500'
+            ? 'scale-100 shadow-lg ring-zinc-500'
             : 'scale-100 shadow ring-zinc-700'
         }`}
         onMouseEnter={() => !isTouch && setShowDetail(true)}
@@ -143,11 +148,10 @@ const MediaCard: React.FC<IMediaCard> = ({
               </div>
             </div>
           </div>
-          {exclusionType === 'global' ||
-          (exclusionType === 'specific' && !collectionPage) ? (
+          {exclusionType === 'global' && !collectionPage ? (
             <div className="absolute right-0 flex items-center justify-between p-2">
               <div
-                className={`pointer-events-none z-40 rounded-full shadow ${
+                className={`pointer-events-auto z-40 rounded-full shadow ${
                   mediaType === 'movie'
                     ? 'bg-zinc-900'
                     : mediaType === 'show'
@@ -157,9 +161,56 @@ const MediaCard: React.FC<IMediaCard> = ({
                         : 'bg-rose-900'
                 }`}
               >
-                <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
-                  {'EXCL'}
-                </div>
+                <Tooltipwrapper
+                  id={`global-tooltip-${id}`}
+                  content="Excluded from all rules"
+                  placement="right"
+                >
+                  <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
+                    {'EXCL'}
+                  </div>
+                </Tooltipwrapper>
+              </div>
+            </div>
+          ) : undefined}
+
+          {exclusionType === 'specific' && !collectionPage ? (
+            <div className="absolute right-0 flex items-center justify-between p-2">
+              <div
+                className={`pointer-events-auto z-40 rounded-full shadow ${
+                  mediaType === 'movie'
+                    ? 'bg-zinc-900'
+                    : mediaType === 'show'
+                      ? 'bg-amber-900'
+                      : mediaType === 'season'
+                        ? 'bg-yellow-700'
+                        : 'bg-rose-900'
+                }`}
+              >
+                <Tooltipwrapper
+                  id={`specific-tooltip-${id}`}
+                  content={
+                    maintainerrRuleGroupIds?.length ? (
+                      <div className="inline-block text-left">
+                        <div className="mb-1 font-medium text-amber-400">
+                          Excluded from:
+                        </div>
+                        {maintainerrRuleGroupIds.map((id) => (
+                          <div key={id}>
+                            • {ruleGroups?.[id] || `Rule ${id}`}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      'Excluded at season or episode level'
+                    )
+                  }
+                  placement="right"
+                >
+                  <div className="flex h-4 items-center px-2 py-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-200 sm:h-5">
+                    {'EXCL'}
+                  </div>
+                </Tooltipwrapper>
               </div>
             </div>
           ) : undefined}

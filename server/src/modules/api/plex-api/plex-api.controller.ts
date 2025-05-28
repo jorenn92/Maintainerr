@@ -31,11 +31,11 @@ export class PlexApiController {
     return this.plexApiService.getLibraries();
   }
   @Get('library/:id/content')
-  async getPagedContent(
+  async getLibraryContent(
     @Param('id') id: string,
     @Query('page') page = '1',
-    @Query('size') size = '120',
-    @Query('sort') sort = 'addedAt:desc',
+    @Query('size') size?: string,
+    @Query('sort') sort?: string,
   ) {
     const offset = (parseInt(page) - 1) * parseInt(size);
 

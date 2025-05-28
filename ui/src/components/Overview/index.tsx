@@ -85,7 +85,7 @@ const Overview = () => {
           ? +stored
           : fallbackId
 
-      switchLib(validId) // 💥 This is the missing piece
+      switchLib(validId)
     }
   }, [LibrariesCtx.libraries])
 
