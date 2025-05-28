@@ -148,7 +148,7 @@ describe('TaskBase', () => {
   });
 
   it('should update the job schedule', () => {
-    task.updateJob('0 0 * * *');
+    void task.updateJob('0 0 * * *');
     expect(tasksService.updateJob).toHaveBeenCalledWith(
       'Test Task',
       '0 0 * * *',
