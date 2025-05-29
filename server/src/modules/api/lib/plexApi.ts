@@ -52,18 +52,36 @@ class PlexApi {
 
   async query<T>(
     options: RequestOptions | string,
-    docache: boolean = true,
+    useCache: boolean = true,
   ): Promise<T> {
-    return this.queryWithCache(options, docache);
+    if (typeof options === 'string') {
+      options = {
+        uri: options,
+      };
+    }
+
+    const cacheKey = this.serializeCacheKey(options);
+
+    if (useCache && this.cache.data.has(cacheKey)) {
+      return this.cache.data.get<T>(cacheKey);
+    } else {
+      const response = await this.getQuery<T>(options);
+      if (useCache && response) this.cache.data.set(cacheKey, response);
+      return response;
+    }
   }
 
   /**
    * Queries all items with the given options, will fetch all pages.
    *
    * @param {RequestOptions} options - The options for the query.
+   * @param {boolean} [useCache=true] - Whether to use the cache for the query.
    * @return {Promise<T[]>} - A promise that resolves to an array of T.
    */
-  async queryAll<T>(options: RequestOptions): Promise<T> {
+  async queryAll<T>(
+    options: RequestOptions,
+    useCache: boolean = true,
+  ): Promise<T> {
     // vars
     let result = undefined;
     let next = true;
@@ -80,10 +98,7 @@ class PlexApi {
 
     // loop responses
     while (next) {
-      const query: PlexLibraryResponse = await this.queryWithCache(
-        options,
-        true,
-      );
+      const query: PlexLibraryResponse = await this.query(options, useCache);
       if (result === undefined) {
         // if first response, replace result
         result = query;
@@ -106,28 +121,6 @@ class PlexApi {
       }
     }
     return result as unknown as T;
-  }
-
-  async queryWithCache<T>(
-    options: RequestOptions | string,
-    doCache: boolean = true,
-  ): Promise<T> {
-    if (typeof options === 'string') {
-      options = {
-        uri: options,
-      };
-    }
-
-    const cacheKey = this.serializeCacheKey(options);
-    const cachedItem = this.cache.data.get<T>(cacheKey);
-
-    if (cachedItem && doCache) {
-      return cachedItem;
-    } else {
-      const response = await this.getQuery<T>(options);
-      if (doCache) this.cache.data.set(cacheKey, response);
-      return response;
-    }
   }
 
   private getQuery<T>(options: RequestOptions) {

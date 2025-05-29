@@ -225,6 +225,7 @@ export class RuleExecutorService extends TaskBase {
 
     const plexMedias = await this.plexApi.getCollectionChildren(
       collection.plexId.toString(),
+      false,
     );
 
     // Handle manually added
