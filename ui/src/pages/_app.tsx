@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { AppProps } from 'next/app'
 import { ToastContainer } from 'react-toastify'
+import { Tooltip } from 'react-tooltip'
 import '../../styles/globals.css'
 import Layout from '../components/Layout'
 import { EventsProvider } from '../contexts/events-context'
@@ -27,6 +28,10 @@ function CoreApp({ Component, pageProps }: AppProps) {
                     hideProgressBar={false}
                     theme="dark"
                     closeOnClick
+                  />
+                  <Tooltip
+                    anchorSelect="[data-tooltip-id]"
+                    render={({ content }) => content}
                   />
                   <Component {...pageProps} />
                 </LibrariesContextProvider>

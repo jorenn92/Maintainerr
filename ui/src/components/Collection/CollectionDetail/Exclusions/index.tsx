@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
-import OverviewContent, { IPlexMetadata } from '../../../Overview/Content'
 import _ from 'lodash'
+import { useEffect, useRef, useState } from 'react'
 import { ICollection } from '../..'
 import GetApiHandler from '../../../../utils/ApiHandler'
+import OverviewContent, { IPlexMetadata } from '../../../Overview/Content'
 
 interface ICollectionExclusions {
   collection: ICollection
@@ -116,18 +116,12 @@ const CollectionExcludions = (props: ICollectionExclusions) => {
 
   return (
     <OverviewContent
-      dataFinished={true}
-      fetchData={() => {}}
       loading={loadingRef.current}
+      viewMode="poster"
       data={data}
       libraryId={props.libraryId}
       collectionPage={true}
       collectionId={props.collection.id}
-      extrasLoading={
-        loadingExtraRef &&
-        !loadingRef.current &&
-        totalSize >= pageData.current * fetchAmount
-      }
       onRemove={(id: string) =>
         setTimeout(() => {
           setData(dataRef.current.filter((el) => +el.ratingKey !== +id))
