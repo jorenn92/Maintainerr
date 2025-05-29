@@ -8,9 +8,11 @@ import { PlexMetadata } from '../../src/modules/api/plex-api/interfaces/media.in
 import {
   RadarrMovie,
   RadarrMovieFile,
+  RadarrQuality,
 } from '../../src/modules/api/servarr-api/interfaces/radarr.interface';
 import {
   SonarrEpisode,
+  SonarrEpisodeFile,
   SonarrSeries,
   SonarrSeriesStatusTypes,
   SonarrSeriesTypes,
@@ -234,10 +236,7 @@ export const createRadarrMovie = (
   path: faker.system.directoryPath(),
   tmdbId: faker.number.int(),
   qualityProfileId: faker.number.int(),
-  movieFile: {
-    id: faker.number.int(),
-    dateAdded: faker.date.past().toISOString(),
-  } as RadarrMovieFile,
+  movieFile: createRadarrMovieFile(),
   ratings: {
     imdb: {
       votes: faker.number.int(),
@@ -268,6 +267,56 @@ export const createRadarrMovie = (
   sizeOnDisk: faker.number.int(),
   tags: [],
   titleSlug: faker.string.sample(10),
+  ...properties,
+});
+
+export const createRadarrMovieFile = (
+  properties: Partial<RadarrMovieFile> = {},
+): RadarrMovieFile => ({
+  id: faker.number.int(),
+  dateAdded: faker.date.past().toISOString(),
+  path: faker.system.filePath(),
+  qualityCutoffNotMet: faker.datatype.boolean(),
+  size: faker.number.int(),
+  quality: {
+    quality: createRadarrQuality(),
+  },
+  mediaInfo: {
+    audioBitrate: faker.number.int(),
+    audioChannels: faker.helpers.arrayElement([1, 2, 5.1, 6, 8]),
+    audioCodec: faker.helpers.arrayElement([
+      'DTS-HD MA',
+      'DTS',
+      'AC3',
+      'E-AC3',
+      'AAC',
+    ]),
+    audioLanguages: faker.helpers.arrayElement(['eng', 'spa', 'fre']),
+    audioStreamCount: faker.number.int(),
+    videoBitDepth: faker.number.int(),
+    resolution: faker.helpers.arrayElement([
+      '1920xc1080',
+      '1280x720',
+      '3840x2160',
+    ]),
+    videoBitrate: faker.number.int(),
+    runTime: faker.date.anytime().toISOString().split('T')[1].split('.')[0],
+    videoCodec: faker.helpers.arrayElement(['AVC', 'HEVC', 'VP9', 'AV1']),
+    scanType: faker.helpers.arrayElement(['Progressive', 'Interlaced']),
+    subtitles: faker.helpers.arrayElements(['eng', 'spa', 'fre']).join('/'),
+    videoFps: faker.helpers.arrayElement([24, 30, 60]),
+  },
+  ...properties,
+});
+
+export const createRadarrQuality = (
+  properties: Partial<RadarrQuality> = {},
+): RadarrQuality => ({
+  id: faker.number.int(),
+  name: faker.string.sample(10),
+  modifier: 'remux',
+  resolution: faker.helpers.arrayElement([720, 1080, 2160, 480, 360, 240]),
+  source: faker.helpers.arrayElement(['bluray', 'tv', 'webdl', 'dvd']),
   ...properties,
 });
 
@@ -355,6 +404,20 @@ export const createSonarrEpisode = (
   hasFile: faker.datatype.boolean(),
   episodeFileId: faker.number.int(),
   monitored: faker.datatype.boolean(),
+  ...properties,
+});
+
+export const createSonarrEpisodeFile = (
+  properties: Partial<SonarrEpisodeFile> = {},
+): SonarrEpisodeFile => ({
+  id: faker.number.int(),
+  seriesId: faker.number.int(),
+  seasonNumber: faker.number.int(),
+  dateAdded: faker.date.past(),
+  path: faker.system.filePath(),
+  relativePath: faker.system.filePath(),
+  qualityCutoffNotMet: faker.datatype.boolean(),
+  size: faker.number.int(),
   ...properties,
 });
 
