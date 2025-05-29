@@ -131,8 +131,6 @@ const AddModal = (props: AddModal) => {
       (x) => x.id == Application.OVERSEERR,
     ) ?? false
 
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-
   function updateLibraryId(value: string) {
     const lib = LibrariesCtx.libraries.find(
       (el: ILibrary) => +el.key === +value,
