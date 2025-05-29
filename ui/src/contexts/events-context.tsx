@@ -8,7 +8,8 @@ export const EventsProvider = (props: any) => {
   const [eventSource, setEventSource] = useState<EventSource>()
 
   useEffect(() => {
-    const es = new ReconnectingEventSource('/api/events/stream')
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH
+    const es = new ReconnectingEventSource(`${basePath}/api/events/stream`)
 
     es.onerror = (e) => {
       console.error('EventSource failed:', e)
