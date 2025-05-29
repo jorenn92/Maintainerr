@@ -37,7 +37,7 @@ export interface SonarrEpisode {
   seriesId: number;
   seasonNumber: number;
   episodeNumber: number;
-  episodeFileId: number;
+  episodeFileId: number; // 0 if not downloaded
   hasFile: boolean;
   monitored: boolean;
   finaleType?: 'series' | 'season' | 'midseason';
