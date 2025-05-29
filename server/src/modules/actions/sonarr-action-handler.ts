@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EPlexDataType } from '../api/plex-api/enums/plex-data-type-enum';
 import { PlexMetadata } from '../api/plex-api/interfaces/media.interface';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
@@ -7,18 +7,20 @@ import { TmdbIdService } from '../api/tmdb-api/tmdb-id.service';
 import { Collection } from '../collections/entities/collection.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
 import { ServarrAction } from '../collections/interfaces/collection.interface';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { MediaIdFinder } from './media-id-finder';
 
 @Injectable()
 export class SonarrActionHandler {
-  private readonly logger = new Logger(SonarrActionHandler.name);
-
   constructor(
     private readonly servarrApi: ServarrService,
     private readonly plexApi: PlexApiService,
     private readonly tmdbIdService: TmdbIdService,
     private readonly mediaIdFinder: MediaIdFinder,
-  ) {}
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(SonarrActionHandler.name);
+  }
 
   public async handleAction(
     collection: Collection,
@@ -90,7 +92,7 @@ export class SonarrActionHandler {
         this.logger.log(
           `Couldn't find correct tvdb id. No Sonarr action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}. Attempting to remove from the filesystem via Plex.`,
         );
-        this.plexApi.deleteMediaFromDisk(media.plexId.toString());
+        await this.plexApi.deleteMediaFromDisk(media.plexId.toString());
       } else {
         this.logger.log(
           `Couldn't find correct tvdb id. No unmonitor action was taken for show: https://www.themoviedb.org/tv/${media.tmdbId}`,
@@ -166,7 +168,7 @@ export class SonarrActionHandler {
             if (sonarrMedia) {
               // unmonitor show
               sonarrMedia.monitored = false;
-              sonarrApiClient.updateSeries(sonarrMedia);
+              await sonarrApiClient.updateSeries(sonarrMedia);
               this.logger.log(
                 `[Sonarr] Unmonitored show '${sonarrMedia.title}'`,
               );
@@ -187,7 +189,7 @@ export class SonarrActionHandler {
             if (sonarrMedia) {
               // unmonitor show
               sonarrMedia.monitored = false;
-              sonarrApiClient.updateSeries(sonarrMedia);
+              await sonarrApiClient.updateSeries(sonarrMedia);
               this.logger.log(
                 `[Sonarr] Unmonitored show '${sonarrMedia.title}' and removed all episodes`,
               );
@@ -224,7 +226,7 @@ export class SonarrActionHandler {
             if (sonarrMedia) {
               // unmonitor show
               sonarrMedia.monitored = false;
-              sonarrApiClient.updateSeries(sonarrMedia);
+              await sonarrApiClient.updateSeries(sonarrMedia);
               this.logger.log(
                 `[Sonarr] Unmonitored show '${sonarrMedia.title}' and Removed exisiting episodes`,
               );

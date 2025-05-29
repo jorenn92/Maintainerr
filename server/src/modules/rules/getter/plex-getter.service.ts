@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { RuleValueType } from '@maintainerr/contracts';
+import { Injectable } from '@nestjs/common';
 import {
   PlexLibraryItem,
   PlexSeenBy,
@@ -7,20 +8,23 @@ import {
 import { PlexApiService } from '../../../modules/api/plex-api/plex-api.service';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexMetadata } from '../../api/plex-api/interfaces/media.interface';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import {
   Application,
   Property,
   RuleConstants,
-  RuleValueType,
 } from '../constants/rules.constants';
 import { RulesDto } from '../dtos/rules.dto';
 
 @Injectable()
 export class PlexGetterService {
   plexProperties: Property[];
-  private readonly logger = new Logger(PlexGetterService.name);
 
-  constructor(private readonly plexApi: PlexApiService) {
+  constructor(
+    private readonly plexApi: PlexApiService,
+    private readonly logger: MaintainerrLogger,
+  ) {
+    logger.setContext(PlexGetterService.name);
     const ruleConstanst = new RuleConstants();
     this.plexProperties = ruleConstanst.applications.find(
       (el) => el.id === Application.PLEX,

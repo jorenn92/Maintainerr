@@ -10,6 +10,7 @@ import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { SonarrApi } from '../api/servarr-api/helpers/sonarr.helper';
 import { ServarrService } from '../api/servarr-api/servarr.service';
 import { ServarrAction } from '../collections/interfaces/collection.interface';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { MediaIdFinder } from './media-id-finder';
 import { SonarrActionHandler } from './sonarr-action-handler';
 
@@ -18,6 +19,7 @@ describe('SonarrActionHandler', () => {
   let plexApi: Mocked<PlexApiService>;
   let servarrService: Mocked<ServarrService>;
   let mediaIdFinder: Mocked<MediaIdFinder>;
+  let logger: Mocked<MaintainerrLogger>;
 
   beforeEach(async () => {
     const { unit, unitRef } =
@@ -27,6 +29,7 @@ describe('SonarrActionHandler', () => {
     plexApi = unitRef.get(PlexApiService);
     servarrService = unitRef.get(ServarrService);
     mediaIdFinder = unitRef.get(MediaIdFinder);
+    logger = unitRef.get(MaintainerrLogger);
   });
 
   it.each([
@@ -45,15 +48,11 @@ describe('SonarrActionHandler', () => {
       const collection = createCollection({
         arrAction: ServarrAction.DELETE,
         sonarrSettingsId: 1,
-        type: type,
+        type,
       });
-      const collectionMedia = createCollectionMediaWithPlexData(
-        collection,
-        'show',
-        {
-          tmdbId: 1,
-        },
-      );
+      const collectionMedia = createCollectionMediaWithPlexData(collection, {
+        tmdbId: 1,
+      });
 
       plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -87,15 +86,11 @@ describe('SonarrActionHandler', () => {
       const collection = createCollection({
         arrAction: ServarrAction.UNMONITOR,
         sonarrSettingsId: 1,
-        type: type,
+        type,
       });
-      const collectionMedia = createCollectionMediaWithPlexData(
-        collection,
-        'show',
-        {
-          tmdbId: 1,
-        },
-      );
+      const collectionMedia = createCollectionMediaWithPlexData(collection, {
+        tmdbId: 1,
+      });
 
       plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -173,15 +168,11 @@ describe('SonarrActionHandler', () => {
       const collection = createCollection({
         arrAction: action,
         sonarrSettingsId: 1,
-        type: type,
+        type,
       });
-      const collectionMedia = createCollectionMediaWithPlexData(
-        collection,
-        'show',
-        {
-          tmdbId: 1,
-        },
-      );
+      const collectionMedia = createCollectionMediaWithPlexData(collection, {
+        tmdbId: 1,
+      });
 
       plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -207,13 +198,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.SEASONS,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'season',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -246,13 +233,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.EPISODES,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'episode',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -285,13 +268,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.SHOWS,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'show',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -323,13 +302,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.SEASONS,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'season',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -362,13 +337,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.EPISODES,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'episode',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -401,13 +372,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.SHOWS,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'show',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -445,13 +412,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.SEASONS,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'season',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -476,13 +439,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.EPISODES,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'episode',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -507,13 +466,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.SHOWS,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'show',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -551,13 +506,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.SEASONS,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'season',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -591,13 +542,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.EPISODES,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'episode',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -622,13 +569,9 @@ describe('SonarrActionHandler', () => {
       sonarrSettingsId: 1,
       type: EPlexDataType.SHOWS,
     });
-    const collectionMedia = createCollectionMediaWithPlexData(
-      collection,
-      'show',
-      {
-        tmdbId: 1,
-      },
-    );
+    const collectionMedia = createCollectionMediaWithPlexData(collection, {
+      tmdbId: 1,
+    });
 
     plexApi.getMetadata.mockResolvedValue(collectionMedia.plexData);
 
@@ -668,10 +611,13 @@ describe('SonarrActionHandler', () => {
   };
 
   const mockSonarrApi = () => {
-    const mockedSonarrApi = new SonarrApi({
-      apiKey: '1234',
-      url: 'http://localhost:8989',
-    });
+    const mockedSonarrApi = new SonarrApi(
+      {
+        apiKey: '1234',
+        url: 'http://localhost:8989',
+      },
+      logger as any,
+    );
     jest
       .spyOn(mockedSonarrApi, 'unmonitorSeasons')
       .mockImplementation(jest.fn());

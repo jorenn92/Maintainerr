@@ -1,26 +1,30 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { SettingsService } from '../../../modules/settings/settings.service';
-import { InternalApi } from './helpers/internal-api.helper';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { SettingsService } from '../../../modules/settings/settings.service';
+import { MaintainerrLogger } from '../../logging/logs.service';
+import { InternalApi } from './helpers/internal-api.helper';
 
 @Injectable()
 export class InternalApiService {
   private api: InternalApi;
 
-  private readonly logger = new Logger(InternalApiService.name);
   constructor(
     @Inject(forwardRef(() => SettingsService))
     private readonly settings: SettingsService,
     private readonly configService: ConfigService,
+    private readonly logger: MaintainerrLogger,
   ) {}
 
-  public async init() {
+  public init() {
     const apiPort = this.configService.get<number>('API_PORT');
 
-    this.api = new InternalApi({
-      url: `http://localhost:${apiPort}/api/`,
-      apiKey: `${this.settings.apikey}`,
-    });
+    this.api = new InternalApi(
+      {
+        url: `http://localhost:${apiPort}/api/`,
+        apiKey: `${this.settings.apikey}`,
+      },
+      this.logger,
+    );
   }
 
   public getApi() {

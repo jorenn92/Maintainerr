@@ -1,5 +1,5 @@
-import { Logger } from '@nestjs/common';
 import axios from 'axios';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
 import { Notification } from '../entities/notification.entities';
 import {
@@ -21,12 +21,12 @@ class GotifyAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentGotify,
+    private readonly logger: MaintainerrLogger,
     readonly notification: Notification,
   ) {
+    logger.setContext(GotifyAgent.name);
     this.notification = notification;
   }
-
-  private readonly logger = new Logger(GotifyAgent.name);
 
   getNotification = () => this.notification;
 

@@ -1,14 +1,14 @@
 import axios from 'axios';
-import { hasNotificationType } from '../notifications.service';
-import type { NotificationAgent, NotificationPayload } from './agent';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
-import { Logger } from '@nestjs/common';
+import { Notification } from '../entities/notification.entities';
 import {
   NotificationAgentKey,
   NotificationAgentTelegram,
   NotificationType,
 } from '../notifications-interfaces';
-import { Notification } from '../entities/notification.entities';
+import { hasNotificationType } from '../notifications.service';
+import type { NotificationAgent, NotificationPayload } from './agent';
 
 interface TelegramMessagePayload {
   text: string;
@@ -31,12 +31,12 @@ class TelegramAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentTelegram,
+    private readonly logger: MaintainerrLogger,
     readonly notification: Notification,
   ) {
+    logger.setContext(TelegramAgent.name);
     this.notification = notification;
   }
-
-  private readonly logger = new Logger(TelegramAgent.name);
 
   getNotification = () => this.notification;
 

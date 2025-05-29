@@ -10,13 +10,18 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 import { LogSettings } from './entities/logSettings.entities';
 import { formatLogMessage } from './logFormatting';
 import { LogsController } from './logs.controller';
-import { LogSettingsService, MaintainerrLogger } from './logs.service';
+import {
+  LogSettingsService,
+  MaintainerrLogger,
+  MaintainerrLoggerFactory,
+} from './logs.service';
 import { EventEmitterTransport } from './winston/eventEmitterTransport';
 
 @Module({
   imports: [TypeOrmModule.forFeature([LogSettings])],
   providers: [
     MaintainerrLogger,
+    MaintainerrLoggerFactory,
     LogSettingsService,
     {
       provide: winston.Logger,
@@ -95,7 +100,7 @@ import { EventEmitterTransport } from './winston/eventEmitterTransport';
       },
     },
   ],
-  exports: [MaintainerrLogger, LogSettingsService],
+  exports: [MaintainerrLogger, LogSettingsService, MaintainerrLoggerFactory],
   controllers: [LogsController],
 })
 export class LogsModule {}

@@ -1,6 +1,6 @@
 {
   "name": "maintainerr",
-  "version": "2.14.0",
+  "version": "2.16.0",
   "private": true,
   "packageManager": "yarn@4.5.1",
   "repository": {
@@ -32,9 +32,9 @@
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@types/node": "^22.15.6",
+    "@types/node": "^22.15.19",
     "knip": "^5.50.5",
-    "semantic-release": "^24.2.3",
+    "semantic-release": "^24.2.5",
     "semantic-release-gha-output": "^1.1.1",
     "turbo": "^2.5.3",
     "typescript": "^5.8.3"

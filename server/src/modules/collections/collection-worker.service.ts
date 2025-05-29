@@ -4,13 +4,15 @@ import {
   CollectionHandlerStartedEventDto,
   MaintainerrEvent,
 } from '@maintainerr/contracts';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThanOrEqual, Repository } from 'typeorm';
 import { delay } from '../../utils/delay';
 import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
+import { CollectionMediaHandledDto } from '../events/events.dto';
+import { MaintainerrLogger } from '../logging/logs.service';
 import { SettingsService } from '../settings/settings.service';
 import { TaskBase } from '../tasks/task.base';
 import { TasksService } from '../tasks/tasks.service';
@@ -18,12 +20,9 @@ import { CollectionHandler } from './collection-handler';
 import { Collection } from './entities/collection.entities';
 import { CollectionMedia } from './entities/collection_media.entities';
 import { ServarrAction } from './interfaces/collection.interface';
-import { CollectionMediaHandledDto } from '../events/events.dto';
 
 @Injectable()
 export class CollectionWorkerService extends TaskBase {
-  protected logger = new Logger(CollectionWorkerService.name);
-
   protected name = 'Collection Handler';
   protected cronSchedule = ''; // overriden in onBootstrapHook
 
@@ -38,31 +37,23 @@ export class CollectionWorkerService extends TaskBase {
     private readonly settings: SettingsService,
     private readonly eventEmitter: EventEmitter2,
     private readonly collectionHandler: CollectionHandler,
+    protected readonly logger: MaintainerrLogger,
   ) {
-    super(taskService);
+    logger.setContext(CollectionWorkerService.name);
+    super(taskService, logger);
   }
 
   protected onBootstrapHook(): void {
     this.cronSchedule = this.settings.collection_handler_job_cron;
   }
 
-  public async execute() {
-    // check if another instance of this task is already running
-    if (await this.isRunning()) {
-      this.logger.log(
-        `Another instance of the ${this.name} task is currently running. Skipping this execution`,
-      );
-      return;
-    }
-
+  protected async executeTask() {
     this.eventEmitter.emit(
       MaintainerrEvent.CollectionHandler_Started,
       new CollectionHandlerStartedEventDto(
         'Started handling of all collections',
       ),
     );
-
-    await super.execute();
 
     // wait 5 seconds to make sure we're not executing together with the rule handler
     await delay(5000);
@@ -77,7 +68,6 @@ export class CollectionWorkerService extends TaskBase {
       this.infoLogger(
         'Not all applications are reachable.. Skipping collection handling',
       );
-      await this.finish();
       this.eventEmitter.emit(
         MaintainerrEvent.CollectionHandler_Finished,
         new CollectionHandlerFinishedEventDto('Finished collection handling'),
@@ -233,8 +223,6 @@ export class CollectionWorkerService extends TaskBase {
     } else {
       this.infoLogger(`All collections handled. No data was altered`);
     }
-
-    await this.finish();
 
     this.eventEmitter.emit(
       MaintainerrEvent.CollectionHandler_Finished,

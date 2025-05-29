@@ -1,12 +1,16 @@
 import { faker } from '@faker-js/faker';
 import { EPlexDataType } from '../../src/modules/api/plex-api/enums/plex-data-type-enum';
-import { PlexLibrary } from '../../src/modules/api/plex-api/interfaces/library.interfaces';
+import {
+  PlexLibrary,
+  PlexLibraryItem,
+} from '../../src/modules/api/plex-api/interfaces/library.interfaces';
 import { PlexMetadata } from '../../src/modules/api/plex-api/interfaces/media.interface';
 import {
   RadarrMovie,
   RadarrMovieFile,
 } from '../../src/modules/api/servarr-api/interfaces/radarr.interface';
 import {
+  SonarrEpisode,
   SonarrSeries,
   SonarrSeriesStatusTypes,
   SonarrSeriesTypes,
@@ -17,6 +21,14 @@ import {
   CollectionMediaWithPlexData,
 } from '../../src/modules/collections/entities/collection_media.entities';
 import { ServarrAction } from '../../src/modules/collections/interfaces/collection.interface';
+import { RulesDto } from '../../src/modules/rules/dtos/rules.dto';
+
+export const EPlexDataTypeToPlexTypeMap = {
+  [EPlexDataType.MOVIES]: 'movie',
+  [EPlexDataType.EPISODES]: 'episode',
+  [EPlexDataType.SHOWS]: 'show',
+  [EPlexDataType.SEASONS]: 'season',
+} as const;
 
 export const createCollection = (
   properties: Partial<Collection> = {},
@@ -27,7 +39,12 @@ export const createCollection = (
     description: '',
     isActive: true,
     arrAction: ServarrAction.DELETE,
-    type: EPlexDataType.MOVIES,
+    type: faker.helpers.arrayElement([
+      EPlexDataType.MOVIES,
+      EPlexDataType.EPISODES,
+      EPlexDataType.SEASONS,
+      EPlexDataType.SHOWS,
+    ]),
     libraryId: faker.number.int(),
     plexId: faker.number.int(),
     addDate: faker.date.past(),
@@ -54,11 +71,13 @@ export const createCollection = (
 };
 
 export const createCollectionMedia = (
-  collection?: Collection,
-  type?: PlexMetadata['type'],
+  collectionOrType?: Collection | EPlexDataType,
   properties: Partial<CollectionMedia> = {},
 ): CollectionMedia => {
-  const collectionToUse = collection ?? createCollection();
+  const collectionToUse =
+    collectionOrType instanceof Collection
+      ? collectionOrType
+      : createCollection({ type: collectionOrType });
 
   return {
     id: faker.number.int(),
@@ -73,23 +92,68 @@ export const createCollectionMedia = (
   };
 };
 
+type CollectionMediaWithPlexDataOptional = Omit<
+  CollectionMediaWithPlexData,
+  'plexData'
+> & {
+  plexData: Partial<Omit<PlexMetadata, 'type'>>;
+};
+
 export const createCollectionMediaWithPlexData = (
-  collection?: Collection,
-  type?: PlexMetadata['type'],
-  properties: Partial<CollectionMediaWithPlexData> = {},
+  collectionOrType?: Collection | EPlexDataType,
+  properties: Partial<CollectionMediaWithPlexDataOptional> = {},
 ): CollectionMediaWithPlexData => {
-  return {
-    ...createCollectionMedia(collection, type, properties),
-    plexData: {
-      index: faker.number.int(),
-      addedAt: faker.date.past(),
-      title: faker.string.sample(10),
-      type:
-        type ??
-        faker.helpers.arrayElement(['movie', 'show', 'season', 'episode']),
-      ...properties.plexData,
-    },
+  const collectionMedia: CollectionMedia = {
+    ...createCollectionMedia(collectionOrType, properties),
     ...properties,
+  };
+
+  return {
+    ...createCollectionMedia(collectionOrType, properties),
+    ...properties,
+    plexData: createPlexMetadata({
+      ...properties.plexData,
+      type: EPlexDataTypeToPlexTypeMap[collectionMedia.collection.type],
+    }),
+  };
+};
+
+export const createPlexMetadata = (
+  properties: Partial<PlexMetadata> = {},
+): PlexMetadata => {
+  const type =
+    properties.type ??
+    faker.helpers.arrayElement(['movie', 'show', 'season', 'episode']);
+
+  return {
+    ratingKey: faker.string.sample(10),
+    index: faker.number.int(),
+    addedAt: faker.date.past().getTime(),
+    updatedAt: faker.date.past().getTime(),
+    title: faker.word.words(2),
+    Guid: [
+      {
+        id: `tvdb://${faker.number.int()}`,
+      },
+      {
+        id: `tmdb://${faker.number.int()}`,
+      },
+      {
+        id: `imdb://tt${faker.number.int()}`,
+      },
+    ],
+    guid: `plex://${type}/${faker.string.sample(24)}`,
+    leafCount: ['show', 'season'].includes(type)
+      ? faker.number.int()
+      : undefined,
+    originallyAvailableAt: faker.date.past().toISOString().split('T')[0],
+    viewedLeafCount: ['show', 'season'].includes(type)
+      ? faker.number.int()
+      : undefined,
+    Media: [],
+    media: [],
+    ...properties,
+    type,
   };
 };
 
@@ -110,6 +174,41 @@ export const createPlexLibrary = (
   type: faker.helpers.arrayElement(['movie', 'show']),
   key: faker.string.sample(10),
   title: faker.string.sample(10),
+  ...properties,
+});
+
+export const createPlexLibraryItem = (
+  type?: PlexMetadata['type'],
+  properties: Partial<PlexLibraryItem> = {},
+): PlexLibraryItem => ({
+  ratingKey: faker.string.sample(10),
+  title: faker.string.sample(10),
+  index: faker.number.int(),
+  parentIndex:
+    type == 'season' || type == 'episode' ? faker.number.int() : undefined,
+  parentRatingKey:
+    type == 'season' || type == 'episode' ? faker.string.sample(10) : undefined,
+  parentGuid:
+    type == 'season' || type == 'episode' ? faker.string.sample(10) : undefined,
+  guid: faker.string.sample(10),
+  grandparentRatingKey: type == 'episode' ? faker.string.sample(10) : undefined,
+  grandparentGuid: type == 'episode' ? faker.string.sample(10) : undefined,
+  addedAt: faker.date.past().getTime(),
+  audienceRating: faker.number.float({ min: 0, max: 10 }),
+  duration: faker.number.int(),
+  lastViewedAt: faker.date.past().getTime(),
+  librarySectionID: faker.number.int(),
+  librarySectionKey: faker.string.sample(10),
+  librarySectionTitle: faker.string.sample(10),
+  originallyAvailableAt: faker.date.past().toISOString(),
+  skipCount: faker.number.int(),
+  summary: faker.string.sample(10),
+  type:
+    type ?? faker.helpers.arrayElement(['movie', 'show', 'season', 'episode']),
+  Media: [],
+  updatedAt: faker.date.past().getTime(),
+  viewCount: faker.number.int(),
+  year: faker.number.int(),
   ...properties,
 });
 
@@ -243,3 +342,35 @@ export const createSonarrSeries = (
     ...properties,
   };
 };
+
+export const createSonarrEpisode = (
+  properties: Partial<SonarrEpisode> = {},
+): SonarrEpisode => ({
+  id: faker.number.int(),
+  seriesId: faker.number.int(),
+  seasonNumber: faker.number.int(),
+  episodeNumber: faker.number.int(),
+  airDate: faker.date.past().toISOString().split('T')[0],
+  airDateUtc: faker.date.past().toISOString(),
+  hasFile: faker.datatype.boolean(),
+  episodeFileId: faker.number.int(),
+  monitored: faker.datatype.boolean(),
+  ...properties,
+});
+
+export const createRulesDto = (
+  properties: Partial<RulesDto> = {},
+): RulesDto => ({
+  id: faker.number.int(),
+  libraryId: faker.number.int(),
+  dataType: faker.helpers.arrayElement([
+    EPlexDataType.MOVIES,
+    EPlexDataType.EPISODES,
+    EPlexDataType.SEASONS,
+    EPlexDataType.SHOWS,
+  ]),
+  name: faker.string.sample(10),
+  rules: [],
+  description: faker.string.sample(10),
+  ...properties,
+});

@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ECollectionLogType } from '@maintainerr/contracts';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import _ from 'lodash';
@@ -9,9 +10,10 @@ import { PlexLibraryItem } from '../api/plex-api/interfaces/library.interfaces';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { CollectionsService } from '../collections/collections.service';
 import { Collection } from '../collections/entities/collection.entities';
-import { ECollectionLogType } from '../collections/entities/collection_log.entities';
 import { CollectionMedia } from '../collections/entities/collection_media.entities';
-import { AddCollectionMedia } from '../collections/interfaces/collection-media.interface';
+import { AddRemoveCollectionMedia } from '../collections/interfaces/collection-media.interface';
+import { MaintainerrLogger } from '../logging/logs.service';
+import { Notification } from '../notifications/entities/notification.entities';
 import { RadarrSettings } from '../settings/entities/radarr_settings.entities';
 import { Settings } from '../settings/entities/settings.entities';
 import { SonarrSettings } from '../settings/entities/sonarr_settings.entities';
@@ -33,7 +35,6 @@ import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
 import { RuleComparatorServiceFactory } from './helpers/rule.comparator.service';
 import { RuleYamlService } from './helpers/yaml.service';
-import { Notification } from '../notifications/entities/notification.entities';
 
 export interface ReturnStatus {
   code: 0 | 1;
@@ -43,7 +44,6 @@ export interface ReturnStatus {
 
 @Injectable()
 export class RulesService {
-  private readonly logger = new Logger(RulesService.name);
   private readonly communityUrl = 'https://community.maintainerr.info';
 
   ruleConstants: RuleConstants;
@@ -69,7 +69,9 @@ export class RulesService {
     private readonly connection: DataSource,
     private readonly ruleYamlService: RuleYamlService,
     private readonly ruleComparatorServiceFactory: RuleComparatorServiceFactory,
+    private readonly logger: MaintainerrLogger,
   ) {
+    logger.setContext(RulesService.name);
     this.ruleConstants = new RuleConstants();
   }
   async getRuleConstants(): Promise<RuleConstants> {
@@ -139,7 +141,6 @@ export class RulesService {
       const rulegroups = await this.connection
         .createQueryBuilder('rule_group', 'rg')
         .innerJoinAndSelect('rg.rules', 'r')
-        .orderBy('r.id')
         .innerJoinAndSelect('rg.collection', 'c')
         .leftJoinAndSelect('rg.notifications', 'n')
         .where(
@@ -152,7 +153,7 @@ export class RulesService {
               ? `c.type = ${typeId}`
               : 'rg.libraryId != -1',
         )
-        // .where(typeId !== undefined ? `c.type = ${typeId}` : '')
+        .orderBy('rg.id, r.id')
         .getMany();
       return rulegroups as RulesDto[];
     } catch (e) {
@@ -406,7 +407,7 @@ export class RulesService {
         );
 
         // remove previous rules
-        this.rulesRepository.delete({
+        await this.rulesRepository.delete({
           ruleGroupId: groupId,
         });
 
@@ -445,7 +446,7 @@ export class RulesService {
     }
   }
   async setExclusion(data: ExclusionContextDto) {
-    let handleMedia: AddCollectionMedia[] = [];
+    let handleMedia: AddRemoveCollectionMedia[] = [];
 
     if (data.collectionId) {
       const group = await this.ruleGroupRepository.findOne({
@@ -460,7 +461,7 @@ export class RulesService {
           ? data.context
           : { type: group.dataType, id: data.mediaId },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      )) as unknown as AddRemoveCollectionMedia[];
       data.ruleGroupId = group.id;
     } else {
       // get type from metadata
@@ -472,7 +473,7 @@ export class RulesService {
         undefined,
         data.context ? data.context : { type: type, id: data.mediaId },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      )) as unknown as AddRemoveCollectionMedia[];
     }
     try {
       // add all items
@@ -579,7 +580,7 @@ export class RulesService {
   }
 
   async removeExclusionWitData(data: ExclusionContextDto) {
-    let handleMedia: AddCollectionMedia[] = [];
+    let handleMedia: AddRemoveCollectionMedia[] = [];
 
     if (data.collectionId) {
       const group = await this.ruleGroupRepository.findOne({
@@ -596,14 +597,14 @@ export class RulesService {
           ? data.context
           : { type: group.libraryId, id: data.mediaId },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      )) as unknown as AddRemoveCollectionMedia[];
     } else {
       // get type from metadata
       handleMedia = (await this.plexApi.getAllIdsForContextAction(
         undefined,
         { type: data.context.type, id: data.context.id },
         { plexId: data.mediaId },
-      )) as unknown as AddCollectionMedia[];
+      )) as unknown as AddRemoveCollectionMedia[];
     }
 
     try {
@@ -645,7 +646,7 @@ export class RulesService {
 
   async removeAllExclusion(plexId: number) {
     // get type from metadata
-    let handleMedia: AddCollectionMedia[] = [];
+    let handleMedia: AddRemoveCollectionMedia[] = [];
 
     const metaData = await this.plexApi.getMetadata(plexId.toString());
     const type =
@@ -655,7 +656,7 @@ export class RulesService {
       undefined,
       { type: type, id: plexId },
       { plexId: plexId },
-    )) as unknown as AddCollectionMedia[];
+    )) as unknown as AddRemoveCollectionMedia[];
 
     try {
       for (const media of handleMedia) {
@@ -1005,7 +1006,6 @@ export class RulesService {
       const result = await ruleComparator.executeRulesWithData(
         group as RulesDto,
         [mediaResp as unknown as PlexLibraryItem],
-        true,
       );
 
       if (result) {

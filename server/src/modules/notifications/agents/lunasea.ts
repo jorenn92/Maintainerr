@@ -1,5 +1,5 @@
-import { Logger } from '@nestjs/common';
 import axios from 'axios';
+import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
 import { Notification } from '../entities/notification.entities';
 import {
@@ -14,12 +14,12 @@ class LunaSeaAgent implements NotificationAgent {
   public constructor(
     private readonly appSettings: SettingsService,
     private readonly settings: NotificationAgentLunaSea,
+    private readonly logger: MaintainerrLogger,
     readonly notification: Notification,
   ) {
+    logger.setContext(LunaSeaAgent.name);
     this.notification = notification;
   }
-
-  private readonly logger = new Logger(LunaSeaAgent.name);
 
   getNotification = () => this.notification;
 

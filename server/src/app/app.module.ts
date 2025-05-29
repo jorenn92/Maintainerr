@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GracefulShutdownModule } from 'nestjs-graceful-shutdown';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { ExternalApiModule } from '../modules/api/external-api/external-api.module';
 import { JellyseerrApiModule } from '../modules/api/jellyseerr-api/jellyseerr-api.module';
@@ -18,17 +19,18 @@ import { TmdbApiModule } from '../modules/api/tmdb-api/tmdb.module';
 import { CollectionsModule } from '../modules/collections/collections.module';
 import { EventsModule } from '../modules/events/events.module';
 import { LogsModule } from '../modules/logging/logs.module';
+import { NotificationsModule } from '../modules/notifications/notifications.module';
+import { NotificationService } from '../modules/notifications/notifications.service';
 import { RulesModule } from '../modules/rules/rules.module';
 import { SettingsModule } from '../modules/settings/settings.module';
 import { SettingsService } from '../modules/settings/settings.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import ormConfig from './config/typeOrmConfig';
-import { NotificationsModule } from '../modules/notifications/notifications.module';
-import { NotificationService } from '../modules/notifications/notifications.service';
 
 @Module({
   imports: [
+    GracefulShutdownModule.forRoot(),
     ConfigModule.forRoot({
       envFilePath: ['.env.local', '.env', '.env.production'],
       isGlobal: true,

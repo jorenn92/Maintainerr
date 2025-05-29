@@ -61,7 +61,7 @@ jobs:
 
   build-docker-image:
     if: github.event.inputs.with-docker-images == 'true'
-    name: Build Docker image
+    name: Build ${{ matrix.platform }}
     needs: semantic-release-dry
     strategy:
       fail-fast: false
