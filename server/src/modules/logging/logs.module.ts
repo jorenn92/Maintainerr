@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
@@ -17,6 +17,7 @@ import {
 } from './logs.service';
 import { EventEmitterTransport } from './winston/eventEmitterTransport';
 
+@Global()
 @Module({
   imports: [TypeOrmModule.forFeature([LogSettings])],
   providers: [
