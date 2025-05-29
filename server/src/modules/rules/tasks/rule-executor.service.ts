@@ -271,7 +271,7 @@ export class RuleExecutorService extends TaskBase {
       if (maintainerrMediaToRemove.length > 0) {
         await this.collectionService.removeFromCollection(
           collection.id,
-          manuallyRemoved,
+          maintainerrMediaToRemove,
         );
       }
     }
