@@ -499,7 +499,7 @@ export class RuleConstants {
           humanName: 'Quality profile',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
-        }, // TODO
+        },
         {
           id: 4,
           name: 'releaseDate',
@@ -612,6 +612,20 @@ export class RuleConstants {
           mediaType: MediaType.MOVIE,
           type: RuleType.NUMBER,
         },
+        {
+          id: 20,
+          name: 'fileQualityCutoffMet',
+          humanName: 'File - quality cutoff met',
+          mediaType: MediaType.MOVIE,
+          type: RuleType.BOOL,
+        },
+        {
+          id: 21,
+          name: 'fileQualityName',
+          humanName: 'File - quality name',
+          mediaType: MediaType.MOVIE,
+          type: RuleType.TEXT,
+        },
       ],
     },
     {
@@ -645,6 +659,13 @@ export class RuleConstants {
           humanName: '[list] Tags (show)',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT_LIST, // return text[]
+        },
+        {
+          id: 25,
+          name: 'qualityProfileName',
+          humanName: 'Quality profile name',
+          mediaType: MediaType.SHOW,
+          type: RuleType.TEXT,
         },
         {
           id: 3,
@@ -797,6 +818,22 @@ export class RuleConstants {
           showType: [EPlexDataType.EPISODES],
           mediaType: MediaType.SHOW,
           type: RuleType.NUMBER,
+        },
+        {
+          id: 23,
+          name: 'fileQualityCutoffMet',
+          humanName: 'Episode file quality cutoff met',
+          showType: [EPlexDataType.EPISODES],
+          mediaType: MediaType.SHOW,
+          type: RuleType.BOOL,
+        },
+        {
+          id: 24,
+          name: 'fileQualityName',
+          humanName: 'Episode file quality',
+          showType: [EPlexDataType.EPISODES],
+          mediaType: MediaType.SHOW,
+          type: RuleType.TEXT,
         },
       ],
     },
