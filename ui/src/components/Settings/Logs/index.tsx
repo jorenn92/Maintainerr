@@ -133,7 +133,8 @@ const Logs = () => {
   const logsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const es = new ReconnectingEventSource('/api/logs/stream')
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+    const es = new ReconnectingEventSource(`${basePath}/api/logs/stream`)
     es.addEventListener('log', (event) => {
       const message: LogEvent = JSON.parse(event.data)
       setLogLines((prev) => [...prev, message])
