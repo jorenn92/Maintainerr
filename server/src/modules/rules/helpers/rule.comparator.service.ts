@@ -332,14 +332,13 @@ export class RuleComparatorService {
     result: RuleResultType,
   ) {
     const index = this.statistics.findIndex((el) => +el.plexId === +plexId);
-    const sectionIndex = this.statistics[index].sectionResults.length - 1;
+    const lastSectionIndex = this.statistics[index].sectionResults.length - 1;
 
     // push result to currently last section
-    this.statistics[index].sectionResults[sectionIndex].ruleResults.push({
-      operator:
-        rule.operator === null || rule.operator === undefined
-          ? RuleOperators[1]
-          : RuleOperators[rule.operator],
+    this.statistics[index].sectionResults[lastSectionIndex].ruleResults.push({
+      ...(rule.operator != null
+        ? { operator: RuleOperators[rule.operator] }
+        : undefined),
       action: RulePossibility[rule.action].toLowerCase(),
       firstValueName: this.ruleConstanstService.getValueHumanName(
         rule.firstVal,
@@ -352,18 +351,6 @@ export class RuleComparatorService {
       secondValue: secondVal,
       result: result,
     });
-
-    // If it's the first rule of a section and not the first section, add the operator to the sectionResult
-    if (
-      sectionIndex > 0 &&
-      this.statistics[index].sectionResults[sectionIndex].ruleResults.length ===
-        1
-    ) {
-      this.statistics[index].sectionResults[sectionIndex].operator =
-        rule.operator == null || rule.operator === undefined
-          ? RuleOperators[1]
-          : RuleOperators[rule.operator];
-    }
   }
 
   private commitToResultData(sectionActionAnd: boolean) {

@@ -32,7 +32,7 @@ describe('RuleComparatorService', () => {
   });
 
   describe('executeRulesWithData', () => {
-    it.skip('should include media item for 4 sections, AND(true,false), OR(false), OR(true), AND(true)', async () => {
+    it('should include media item for 4 sections, AND(true,false), OR(false), OR(true), AND(true)', async () => {
       const section0Rule1: RuleDto = {
         action: RulePossibility.EQUALS,
         section: 0,
@@ -188,7 +188,6 @@ describe('RuleComparatorService', () => {
                   result: true,
                   secondValue: 1,
                   secondValueName: 'custom value type',
-                  operator: 'OR',
                 },
                 {
                   action: 'contains',
@@ -213,7 +212,6 @@ describe('RuleComparatorService', () => {
                   result: false,
                   secondValue: 7,
                   secondValueName: 'App - rule name',
-                  operator: 'OR',
                 },
               ],
             },
@@ -229,14 +227,13 @@ describe('RuleComparatorService', () => {
                   result: true,
                   secondValue: 0,
                   secondValueName: 'custom value type',
-                  operator: 'OR',
                 },
               ],
             },
             {
               id: 3,
               result: true,
-              operator: 'AND', // TODO Fix
+              operator: 'AND',
               ruleResults: [
                 {
                   action: 'bigger',
@@ -245,7 +242,6 @@ describe('RuleComparatorService', () => {
                   result: true,
                   secondValue: 0,
                   secondValueName: 'custom value type',
-                  operator: 'OR',
                 },
               ],
             },
@@ -351,7 +347,6 @@ describe('RuleComparatorService', () => {
                   result: false,
                   secondValue: 1,
                   secondValueName: 'custom value type',
-                  operator: 'OR',
                 },
                 {
                   action: 'bigger',
@@ -465,7 +460,6 @@ describe('RuleComparatorService', () => {
                   result: true,
                   secondValue: 0,
                   secondValueName: 'custom value type',
-                  operator: 'OR',
                 },
                 {
                   action: 'equals',
@@ -579,7 +573,6 @@ describe('RuleComparatorService', () => {
                   result: true,
                   secondValue: 1,
                   secondValueName: 'custom value type',
-                  operator: 'OR',
                 },
                 {
                   action: 'bigger',
@@ -693,7 +686,6 @@ describe('RuleComparatorService', () => {
                   result: true,
                   secondValue: 1,
                   secondValueName: 'custom value type',
-                  operator: 'OR',
                 },
                 {
                   action: 'bigger',
@@ -828,7 +820,6 @@ describe('RuleComparatorService', () => {
                   result: true,
                   secondValue: 1,
                   secondValueName: 'custom value type',
-                  operator: 'OR',
                 },
                 {
                   action: 'bigger',
