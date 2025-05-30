@@ -86,11 +86,11 @@ const OverviewContent = (props: IOverviewContent) => {
   }
 
   useEffect(() => {
-    const debouncedScroll = _.debounce(handleScroll, 200);
-    window.addEventListener('scroll', debouncedScroll);
+    const debouncedScroll = _.debounce(handleScroll, 200)
+    window.addEventListener('scroll', debouncedScroll)
     return () => {
-      window.removeEventListener('scroll', debouncedScroll);
-      debouncedScroll.cancel(); // Cancel pending debounced calls
+      window.removeEventListener('scroll', debouncedScroll)
+      debouncedScroll.cancel() // Cancel pending debounced calls
     }
   }, [])
 

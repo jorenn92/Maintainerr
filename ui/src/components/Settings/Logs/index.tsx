@@ -1,19 +1,19 @@
 import { DownloadIcon, SaveIcon } from '@heroicons/react/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-    LogEvent,
-    LogFile,
-    LogSettingDto,
-    logSettingSchema,
-    LogSettingSchemaInput,
-    LogSettingSchemaOutput,
+  LogEvent,
+  LogFile,
+  LogSettingDto,
+  logSettingSchema,
+  LogSettingSchemaInput,
+  LogSettingSchemaOutput,
 } from '@maintainerr/contracts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReconnectingEventSource from 'reconnecting-eventsource'
 import GetApiHandler, {
-    API_BASE_PATH,
-    PostApiHandler,
+  API_BASE_PATH,
+  PostApiHandler,
 } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
@@ -133,15 +133,15 @@ const Logs = () => {
   const logsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const MAX_LOG_LINES = 1000;
+    const MAX_LOG_LINES = 1000
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
     const es = new ReconnectingEventSource(`${basePath}/api/logs/stream`)
     es.addEventListener('log', (event) => {
       const message: LogEvent = JSON.parse(event.data)
       setLogLines((prev) => {
-        const newLines = [...prev, message];
+        const newLines = [...prev, message]
         // Keep only the last MAX_LOG_LINES
-        return newLines.slice(-MAX_LOG_LINES);
+        return newLines.slice(-MAX_LOG_LINES)
       })
     })
 
