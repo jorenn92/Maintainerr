@@ -385,7 +385,7 @@ const AddModal = (props: AddModal) => {
   }
 
   if (isLoading) {
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH
 
     return (
       <span>
