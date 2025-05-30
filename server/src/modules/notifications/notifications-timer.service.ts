@@ -39,55 +39,57 @@ export class NotificationTimerService extends TaskBase {
     const allNotificationConfigurations =
       await this.notificationService.getNotificationConfigurations(true);
 
-    activeAgents.forEach(async (agent) => {
-      const notification = allNotificationConfigurations.find(
-        (n) => n.id === agent.getNotification().id,
-      );
+    await Promise.allSettled(
+      activeAgents.map(async (agent) => {
+        const notification = allNotificationConfigurations.find(
+          (n) => n.id === agent.getNotification().id,
+        );
 
-      if (notification && notification.enabled) {
-        const itemsToNotify = (
-          await Promise.all(
-            (notification.rulegroups || []).map(async (group) => {
-              const notifyDate = new Date(
-                new Date().getTime() -
-                  group.collection.deleteAfterDays * 86400000 +
-                  notification.aboutScale * 86400000,
-              );
-
-              const collectionMedia =
-                await this.collectionService.getCollectionMedia(
-                  group.collection?.id,
+        if (notification?.enabled) {
+          const itemsToNotify = (
+            await Promise.all(
+              (notification.rulegroups || []).map(async (group) => {
+                const notifyDate = new Date(
+                  new Date().getTime() -
+                    group.collection.deleteAfterDays * 86400000 +
+                    notification.aboutScale * 86400000,
                 );
 
-              return (
-                collectionMedia?.filter((media) => {
-                  const mediaDate = new Date(media.addDate);
-                  return (
-                    getDayStart(mediaDate).getTime() ===
-                    getDayStart(notifyDate).getTime()
+                const collectionMedia =
+                  await this.collectionService.getCollectionMedia(
+                    group.collection?.id,
                   );
-                }) || []
-              );
-            }),
-          )
-        ).flat();
 
-        const transformedItems = itemsToNotify.map((i) => ({
-          plexId: i.plexId,
-        }));
+                return (
+                  collectionMedia?.filter((media) => {
+                    const mediaDate = new Date(media.addDate);
+                    return (
+                      getDayStart(mediaDate).getTime() ===
+                      getDayStart(notifyDate).getTime()
+                    );
+                  }) || []
+                );
+              }),
+            )
+          ).flat();
 
-        // send the notification if required
-        if (notification.rulegroups && transformedItems.length > 0) {
-          this.eventEmitter.emit(
-            MaintainerrEvent.Notifications_Fire,
-            this.type,
-            transformedItems,
-            undefined,
-            notification.aboutScale,
-            agent,
-          );
+          const transformedItems = itemsToNotify.map((i) => ({
+            plexId: i.plexId,
+          }));
+
+          // send the notification if required
+          if (notification.rulegroups && transformedItems.length > 0) {
+            this.eventEmitter.emit(
+              MaintainerrEvent.Notifications_Fire,
+              this.type,
+              transformedItems,
+              undefined,
+              notification.aboutScale,
+              agent,
+            );
+          }
         }
-      }
-    });
+      }),
+    );
   }
 }
