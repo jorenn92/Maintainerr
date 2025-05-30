@@ -33,6 +33,7 @@ class EmailAgent implements NotificationAgent {
     if (
       settings.enabled &&
       settings.options.emailFrom &&
+      settings.options.emailTo &&
       settings.options.smtpHost &&
       settings.options.smtpPort
     ) {
@@ -90,15 +91,11 @@ class EmailAgent implements NotificationAgent {
     try {
       const email = new PreparedEmail(
         this.appSettings,
-        this.getSettings() as NotificationAgentEmail,
-        this.getSettings().options.pgpKey as string,
+        this.getSettings(),
+        this.getSettings().options.pgpKey,
       );
       await email.send(
-        this.buildMessage(
-          type,
-          payload,
-          this.getSettings().options.emailTo as string,
-        ),
+        this.buildMessage(type, payload, this.getSettings().options.emailTo),
       );
     } catch (e) {
       this.logger.error(

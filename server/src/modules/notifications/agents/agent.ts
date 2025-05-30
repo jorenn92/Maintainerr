@@ -1,6 +1,6 @@
 import { Notification } from '../entities/notification.entities';
 import {
-  NotificationAgentConfig,
+  AnyNotificationAgentConfig,
   NotificationAgentKey,
   NotificationType,
 } from '../notifications-interfaces';
@@ -18,6 +18,6 @@ export interface NotificationAgent {
   shouldSend(): boolean;
   send(type: NotificationType, payload: NotificationPayload): Promise<string>;
   getIdentifier(): NotificationAgentKey;
-  getSettings(): NotificationAgentConfig;
+  getSettings(): AnyNotificationAgentConfig;
   getNotification(): Notification;
 }
