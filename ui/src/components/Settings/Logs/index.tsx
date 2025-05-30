@@ -1,19 +1,19 @@
 import { DownloadIcon, SaveIcon } from '@heroicons/react/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  LogEvent,
-  LogFile,
-  LogSettingDto,
-  logSettingSchema,
-  LogSettingSchemaInput,
-  LogSettingSchemaOutput,
+    LogEvent,
+    LogFile,
+    LogSettingDto,
+    logSettingSchema,
+    LogSettingSchemaInput,
+    LogSettingSchemaOutput,
 } from '@maintainerr/contracts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReconnectingEventSource from 'reconnecting-eventsource'
 import GetApiHandler, {
-  API_BASE_PATH,
-  PostApiHandler,
+    API_BASE_PATH,
+    PostApiHandler,
 } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
@@ -167,7 +167,7 @@ const Logs = () => {
     if (!scrollToBottom || !logsRef.current) return
 
     logsRef.current.scrollTop = logsRef.current.scrollHeight
-  }, [filteredLogLines.length])
+  }, [filteredLogLines])
 
   return (
     <div className="section">
