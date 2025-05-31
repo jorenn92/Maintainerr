@@ -213,6 +213,8 @@ const PlexSettings = () => {
   const verifyToken = (token?: string) => {
     const authToken = token || settingsCtx.settings.plex_auth_token
     if (authToken) {
+      const source = axios.CancelToken.source()
+
       axios
         .get('https://plex.tv/api/v2/user', {
           headers: {
@@ -226,6 +228,11 @@ const PlexSettings = () => {
           setTokenValid(response.status === 200 ? true : false)
         })
         .catch(() => setTokenValid(false))
+
+      // Cancel the request if component unmounts
+      return () => {
+        source.cancel('Component unmounted')
+      }
     } else {
       setTokenValid(false)
     }

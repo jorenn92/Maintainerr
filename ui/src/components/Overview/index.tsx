@@ -46,6 +46,14 @@ const Overview = () => {
         )
       }
     }, 300)
+
+    // Cleanup on unmount
+    return () => {
+      setData([])
+      dataRef.current = []
+      totalSizeRef.current = 999
+      pageData.current = 0
+    }
   }, [])
 
   useEffect(() => {

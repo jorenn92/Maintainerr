@@ -64,6 +64,15 @@ const CollectionInfo = (props: ICollectionInfo) => {
   useEffect(() => {
     // Initial first fetch
     setPage(1)
+
+    // Cleanup on unmount
+    return () => {
+      // Clear all data to prevent memory leaks
+      setData([])
+      dataRef.current = []
+      totalSizeRef.current = 999
+      pageData.current = 0
+    }
   }, [])
 
   useEffect(() => {
