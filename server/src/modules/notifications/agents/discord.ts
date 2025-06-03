@@ -148,16 +148,13 @@ class DiscordAgent implements NotificationAgent {
     this.logger.log('Sending Discord notification');
 
     try {
-      await axios.post(
-        this.getSettings().options.webhookUrl as string,
-        {
-          username: this.getSettings().options.botUsername
-            ? this.getSettings().options.botUsername
-            : 'Maintainerr',
-          avatar_url: this.getSettings().options.botAvatarUrl,
-          embeds: [this.buildEmbed(type, payload)],
-        } as DiscordWebhookPayload,
-      );
+      await axios.post(this.getSettings().options.webhookUrl, {
+        username: this.getSettings().options.botUsername
+          ? this.getSettings().options.botUsername
+          : 'Maintainerr',
+        avatar_url: this.getSettings().options.botAvatarUrl,
+        embeds: [this.buildEmbed(type, payload)],
+      } as DiscordWebhookPayload);
 
       return 'Success';
     } catch (e) {

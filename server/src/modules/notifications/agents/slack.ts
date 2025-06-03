@@ -153,7 +153,7 @@ class SlackAgent implements NotificationAgent {
     this.logger.log('Sending Slack notification');
     try {
       await axios.post(
-        settings.options.webhookUrl as string,
+        settings.options.webhookUrl,
         this.buildEmbed(type, payload),
       );
 

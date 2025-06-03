@@ -81,7 +81,7 @@ class PushbulletAgent implements NotificationAgent {
           { ...notificationPayload, channel_tag: settings.options.channelTag },
           {
             headers: {
-              'Access-Token': settings.options.accessToken as string,
+              'Access-Token': settings.options.accessToken,
             },
           },
         );
@@ -108,7 +108,7 @@ class PushbulletAgent implements NotificationAgent {
       try {
         await axios.post(endpoint, notificationPayload, {
           headers: {
-            'Access-Token': settings.options.accessToken as string,
+            'Access-Token': settings.options.accessToken,
           },
         });
       } catch (e) {
