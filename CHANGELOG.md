@@ -1,3 +1,17 @@
+# [2.17.0](https://github.com/jorenn92/Maintainerr/compare/v2.16.0...v2.17.0) (2025-05-29)
+
+
+### Bug Fixes
+
+* Incorrect sectionResults operator ([#1805](https://github.com/jorenn92/Maintainerr/issues/1805)) ([4c97819](https://github.com/jorenn92/Maintainerr/commit/4c97819ae31f807425b497fbcb96941168b3c398))
+* prepend missing basePath occurences ([#1806](https://github.com/jorenn92/Maintainerr/issues/1806)) ([3e13645](https://github.com/jorenn92/Maintainerr/commit/3e13645fa505ad81a7b9cbbbe8627c82fdcc0d24))
+* Prevent undefined base path appearing in path ([#1807](https://github.com/jorenn92/Maintainerr/issues/1807)) ([e8b8815](https://github.com/jorenn92/Maintainerr/commit/e8b8815ec40abff0e07f21672f938526a82ef51b))
+
+
+### Features
+
+* Add additional *arr quality profile rules ([#1743](https://github.com/jorenn92/Maintainerr/issues/1743)) ([beb326a](https://github.com/jorenn92/Maintainerr/commit/beb326a47a13f480ab858e1a7a0c178f474425af))
+
 # [2.16.0](https://github.com/jorenn92/Maintainerr/compare/v2.15.0...v2.16.0) (2025-05-28)
 
 
