@@ -2166,8 +2166,8 @@ __metadata:
     "@types/email-templates": "npm:^10.0.4"
     "@types/express": "npm:^5.0.1"
     "@types/jest": "npm:^29.5.14"
-    "@types/lodash": "npm:^4.17.16"
-    "@types/mime-types": "npm:^2"
+    "@types/lodash": "npm:^4.17.17"
+    "@types/mime-types": "npm:^3"
     "@types/node": "npm:^22"
     "@types/xml2js": "npm:^0.4.14"
     "@typescript-eslint/eslint-plugin": "npm:^8.30.1"
@@ -2187,7 +2187,7 @@ __metadata:
     nestjs-graceful-shutdown: "npm:^1.0.3"
     nestjs-zod: "npm:^4.3.1"
     node-cache: "npm:^5.1.2"
-    nodemailer: "npm:6.9.9"
+    nodemailer: "npm:7.0.3"
     openpgp: "npm:^5.7.0"
     prettier: "npm:^3.5.3"
     read-last-lines: "npm:^1.8.0"
@@ -2223,10 +2223,10 @@ __metadata:
     "@tailwindcss/typography": "npm:^0.5.16"
     "@tanstack/eslint-plugin-query": "npm:^5.78.0"
     "@tanstack/react-query": "npm:^5.76.0"
-    "@types/lodash": "npm:^4.17.16"
+    "@types/lodash": "npm:^4.17.17"
     "@types/node": "npm:^22"
-    "@types/react": "npm:^19.1.6"
-    "@types/react-dom": "npm:^19.1.5"
+    "@types/react": "npm:^19.1.7"
+    "@types/react-dom": "npm:^19.1.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.30.1"
     "@typescript-eslint/parser": "npm:^8.28.0"
     autoprefixer: "npm:10.4.21"
@@ -4026,10 +4026,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:^4.17.16":
-  version: 4.17.16
-  resolution: "@types/lodash@npm:4.17.16"
-  checksum: 10c0/cf017901b8ab1d7aabc86d5189d9288f4f99f19a75caf020c0e2c77b8d4cead4db0d0b842d009b029339f92399f49f34377dd7c2721053388f251778b4c23534
+"@types/lodash@npm:^4.17.17":
+  version: 4.17.17
+  resolution: "@types/lodash@npm:4.17.17"
+  checksum: 10c0/8e75df02a15f04d4322c5a503e4efd0e7a92470570ce80f17e9f11ce2b1f1a7c994009c9bcff39f07e0f9ffd8ccaff09b3598997c404b801abd5a7eee5a639dc
   languageName: node
   linkType: hard
 
@@ -4049,10 +4049,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mime-types@npm:^2":
-  version: 2.1.4
-  resolution: "@types/mime-types@npm:2.1.4"
-  checksum: 10c0/a10d57881d14a053556b3d09292de467968d965b0a06d06732c748da39b3aa569270b5b9f32529fd0e9ac1e5f3b91abb894f5b1996373254a65cb87903c86622
+"@types/mime-types@npm:^3":
+  version: 3.0.1
+  resolution: "@types/mime-types@npm:3.0.1"
+  checksum: 10c0/61c2056529dc5bc73c25b2a053e21f063fd547c21e12a2be94ca78b89b0f83c9a75afed9a8bda3c78592ee880acc82778302651527f7882cf5ba8e58ab320e29
   languageName: node
   linkType: hard
 
@@ -4148,12 +4148,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^19.1.5":
-  version: 19.1.5
-  resolution: "@types/react-dom@npm:19.1.5"
+"@types/react-dom@npm:^19.1.6":
+  version: 19.1.6
+  resolution: "@types/react-dom@npm:19.1.6"
   peerDependencies:
     "@types/react": ^19.0.0
-  checksum: 10c0/2a29e77cf6bb6e9f57bcfa54509c216cad2e16e244f0bd56369966ec88c072b9c91f6011d14f9e18fbfe2b801b18b86f616de75e5c8aef0be73c1f74abb33b49
+  checksum: 10c0/7ba74eee2919e3f225e898b65fdaa16e54952aaf9e3472a080ddc82ca54585e46e60b3c52018d21d4b7053f09d27b8293e9f468b85f9932ff452cd290cc131e8
   languageName: node
   linkType: hard
 
@@ -4176,12 +4176,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.1.6":
-  version: 19.1.6
-  resolution: "@types/react@npm:19.1.6"
+"@types/react@npm:^19.1.7":
+  version: 19.1.7
+  resolution: "@types/react@npm:19.1.7"
   dependencies:
     csstype: "npm:^3.0.2"
-  checksum: 10c0/8b10b198e28997b3c57559750f8bcf5ae7b33c554b16b6f4fe2ece1d4de6a2fc8cb53e7effe08ec9cb939d2f479eb97c5e08aac2cf83b10a90164fe451cc8ea2
+  checksum: 10c0/3bb8fb865debad4328b0d623e1c669f2ee90e9302638a64e65a0a1c61efca4f4ef91f58b55ff94075358c190d80bb8472a5823c6901d8cdc9009dd436a1dcab1
   languageName: node
   linkType: hard
 
@@ -13450,10 +13450,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:6.9.9":
-  version: 6.9.9
-  resolution: "nodemailer@npm:6.9.9"
-  checksum: 10c0/ba72da4ca8a003921c86f3d132d64d9bb86c1a3d79d248664b3de28f6a7a621f0476273ad7cf3ecc48d3b78a66ae4ec62b7c4c8ab6f07d9ca26d4bad4d08802e
+"nodemailer@npm:7.0.3":
+  version: 7.0.3
+  resolution: "nodemailer@npm:7.0.3"
+  checksum: 10c0/835492262328471b94a080cea43ea20f4232e19a915400cd71c7f4f4ab93a7d361775154eebe30a8fc40379eecf11a0bbc73e6cf4bbee9dccb6dd1cf7a1dc792
   languageName: node
   linkType: hard
 
