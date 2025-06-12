@@ -113,12 +113,12 @@ class WebhookAgent implements NotificationAgent {
 
     try {
       await axios.post(
-        settings.options.webhookUrl as string,
+        settings.options.webhookUrl,
         this.buildPayload(type, payload),
         settings.options.authHeader
           ? {
               headers: {
-                Authorization: settings.options.authHeader as string,
+                Authorization: settings.options.authHeader,
               },
             }
           : undefined,
