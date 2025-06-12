@@ -606,7 +606,11 @@ export class NotificationService {
     };
 
     payload.message = await this.transformMessageContent(
-      this.getMessageContent(type, mediaItems && mediaItems.length > 1),
+      this.getMessageContent(
+        type,
+        mediaItems && mediaItems.length > 1,
+        dayAmount,
+      ),
       mediaItems,
       collectionName,
       dayAmount,
@@ -651,7 +655,11 @@ export class NotificationService {
     }
   }
 
-  private getMessageContent(type: NotificationType, multiple: boolean): string {
+  private getMessageContent(
+    type: NotificationType,
+    multiple: boolean,
+    dayAmount?: number,
+  ): string {
     let message: string;
 
     if (!multiple) {
@@ -673,16 +681,20 @@ export class NotificationService {
             "⏰ Reminder: {media_title} will be handled in {days} days. If you want to keep it, make sure to take action before it's gone. Don’t miss out!";
           break;
         case NotificationType.MEDIA_ADDED_TO_COLLECTION:
-          message =
-            "\uD83D\uDCC2 '{media_title}' has been added to '{collection_name}'. The item will be handled in {days} days";
+          message = `\uD83D\uDCC2 '{media_title}' has been added to '{collection_name}'.`;
+          if (dayAmount != null) {
+            message += ' The item will be handled in {days} days.';
+          }
           break;
         case NotificationType.MEDIA_REMOVED_FROM_COLLECTION:
-          message =
-            "\uD83D\uDCC2 '{media_title}' has been removed from '{collection_name}'. It won't be handled anymore.";
+          message = `\uD83D\uDCC2 '{media_title}' has been removed from '{collection_name}'.`;
+          if (dayAmount != null) {
+            message += ` It won't be handled anymore.`;
+          }
           break;
         case NotificationType.MEDIA_HANDLED:
           message =
-            "✅ Media Handled. '{media_title}' has been handled by '{collection_name}'";
+            "✅ Media Handled. '{media_title}' has been handled by '{collection_name}'.";
           break;
       }
     } else {
@@ -692,12 +704,22 @@ export class NotificationService {
             "⏰ Reminder: These media items will be handled in {days} days. If you want to keep them, make sure to take action before they're gone. Don’t miss out! \n \n {media_items}";
           break;
         case NotificationType.MEDIA_ADDED_TO_COLLECTION:
-          message =
-            "\uD83D\uDCC2 These media items have been added to '{collection_name}'. The items will be handled in {days} days. \n \n {media_items}";
+          message = `\uD83D\uDCC2 These media items have been added to '{collection_name}'.`;
+          if (dayAmount != null) {
+            message +=
+              ' The items will be handled in {days} days. \n \n {media_items}';
+          } else {
+            message += ' \n \n {media_items}';
+          }
           break;
         case NotificationType.MEDIA_REMOVED_FROM_COLLECTION:
-          message =
-            "\uD83D\uDCC2 These media items have been removed from '{collection_name}'. The items will not be handled anymore. \n \n {media_items}";
+          message = `\uD83D\uDCC2 These media items have been removed from '{collection_name}'.`;
+          if (dayAmount != null) {
+            message +=
+              ' The items will not be handled anymore. \n \n {media_items}';
+          } else {
+            message += ' \n \n {media_items}';
+          }
           break;
         case NotificationType.MEDIA_HANDLED:
           message =
@@ -723,7 +745,7 @@ export class NotificationService {
           for (const i of items) {
             const item = await this.plexApi.getMetadata(i.plexId.toString());
 
-            titles.push(this.getTitle(item));
+            titles.push(item ? this.getTitle(item) : 'Unknown media item');
           }
 
           const result = titles
@@ -736,8 +758,10 @@ export class NotificationService {
           const item = await this.plexApi.getMetadata(
             items[0].plexId.toString(),
           );
-
-          message = message.replace('{media_title}', this.getTitle(item));
+          message = message.replace(
+            '{media_title}',
+            item ? this.getTitle(item) : 'Unknown media item',
+          );
         }
       }
 
@@ -802,7 +826,7 @@ export class NotificationService {
       NotificationType.MEDIA_REMOVED_FROM_COLLECTION,
       data.mediaItems,
       data.collectionName,
-      undefined,
+      data.dayAmount,
       undefined,
       data.identifier,
     );
