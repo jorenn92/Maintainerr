@@ -1,4 +1,4 @@
-import { MaintainerrEvent } from '@maintainerr/contracts';
+import { BasicResponseDto, MaintainerrEvent } from '@maintainerr/contracts';
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -30,8 +30,18 @@ import TelegramAgent from './agents/telegram';
 import WebhookAgent from './agents/webhook';
 import { Notification } from './entities/notification.entities';
 import {
+  DiscordOptions,
+  EmailOptions,
+  GotifyOptions,
+  LunaSeaOptions,
   NotificationAgentKey,
+  NotificationAgentOptions,
   NotificationType,
+  PushbulletOptions,
+  PushoverOptions,
+  SlackOptions,
+  TelegramOptions,
+  WebhookOptions,
 } from './notifications-interfaces';
 
 export const hasNotificationType = (
@@ -107,13 +117,13 @@ export class NotificationService {
 
   async addNotificationConfiguration(payload: {
     id?: number;
-    agent: string;
+    agent: NotificationAgentKey;
     name: string;
     enabled: boolean;
     types: number[];
     aboutScale: number;
-    options: object;
-  }) {
+    options: NotificationAgentOptions;
+  }): Promise<BasicResponseDto> {
     try {
       if (payload.id !== undefined) {
         // update
@@ -125,8 +135,8 @@ export class NotificationService {
             agent: payload.agent,
             enabled: payload.enabled,
             aboutScale: payload.aboutScale,
-            types: JSON.stringify(payload.types),
-            options: JSON.stringify(payload.options),
+            types: payload.types,
+            options: payload.options,
           })
           .where('id = :id', { id: payload.id })
           .execute();
@@ -140,19 +150,19 @@ export class NotificationService {
             agent: payload.agent,
             enabled: payload.enabled,
             aboutScale: payload.aboutScale,
-
-            types: JSON.stringify(payload.types),
-            options: JSON.stringify(payload.options),
+            types: payload.types,
+            options: payload.options,
           })
           .execute();
       }
+
       // reset & reload notification agents
-      this.registerConfiguredAgents(true);
-      return { code: 1, result: 'success' };
+      await this.registerConfiguredAgents(true);
+      return { code: 1, status: 'OK', message: 'Success' };
     } catch (err) {
       this.logger.warn('Adding a new notification configuration failed');
       this.logger.debug(err);
-      return { code: 0, result: err };
+      return { code: 0, status: 'NOK', message: err };
     }
   }
 
@@ -238,12 +248,12 @@ export class NotificationService {
 
   public createDummyTestAgent(payload: {
     id?: number;
-    agent: string;
+    agent: NotificationAgentKey;
     name: string;
     enabled: boolean;
     types: number[];
     aboutScale: number;
-    options: object;
+    options: NotificationAgentOptions;
   }) {
     payload.types = [...payload.types, NotificationType.TEST_NOTIFICATION];
 
@@ -253,8 +263,8 @@ export class NotificationService {
     notification.enabled = payload.enabled;
     notification.aboutScale = payload.aboutScale;
     notification.name = payload.name;
-    notification.options = JSON.stringify(payload.options);
-    notification.types = JSON.stringify(payload.types);
+    notification.options = payload.options;
+    notification.types = payload.types;
 
     return this.createAgent(notification);
   }
@@ -280,13 +290,13 @@ export class NotificationService {
   }
 
   private createAgent(notification: Notification) {
-    switch (notification.agent) {
+    switch (notification.agent as NotificationAgentKey) {
       case NotificationAgentKey.DISCORD:
         return new DiscordAgent(
           {
             enabled: notification.enabled,
-            types: JSON.parse(notification.types),
-            options: JSON.parse(notification.options),
+            types: notification.types,
+            options: notification.options as DiscordOptions,
           },
           this.loggerFactory.createLogger(),
           notification,
@@ -296,8 +306,8 @@ export class NotificationService {
           this.settings,
           {
             enabled: notification.enabled,
-            types: JSON.parse(notification.types),
-            options: JSON.parse(notification.options),
+            types: notification.types,
+            options: notification.options as PushoverOptions,
           },
           this.loggerFactory.createLogger(),
           notification,
@@ -307,8 +317,8 @@ export class NotificationService {
           this.settings,
           {
             enabled: notification.enabled,
-            types: JSON.parse(notification.types),
-            options: JSON.parse(notification.options),
+            types: notification.types,
+            options: notification.options as EmailOptions,
           },
           this.loggerFactory.createLogger(),
           notification,
@@ -318,8 +328,8 @@ export class NotificationService {
           this.settings,
           {
             enabled: notification.enabled,
-            types: JSON.parse(notification.types),
-            options: JSON.parse(notification.options),
+            types: notification.types,
+            options: notification.options as GotifyOptions,
           },
           this.loggerFactory.createLogger(),
           notification,
@@ -329,8 +339,8 @@ export class NotificationService {
           this.settings,
           {
             enabled: notification.enabled,
-            types: JSON.parse(notification.types),
-            options: JSON.parse(notification.options),
+            types: notification.types,
+            options: notification.options as LunaSeaOptions,
           },
           this.loggerFactory.createLogger(),
           notification,
@@ -340,8 +350,8 @@ export class NotificationService {
           this.settings,
           {
             enabled: notification.enabled,
-            types: JSON.parse(notification.types),
-            options: JSON.parse(notification.options),
+            types: notification.types,
+            options: notification.options as PushbulletOptions,
           },
           this.loggerFactory.createLogger(),
           notification,
@@ -351,8 +361,8 @@ export class NotificationService {
           this.settings,
           {
             enabled: notification.enabled,
-            types: JSON.parse(notification.types),
-            options: JSON.parse(notification.options),
+            types: notification.types,
+            options: notification.options as SlackOptions,
           },
           this.loggerFactory.createLogger(),
           notification,
@@ -362,8 +372,8 @@ export class NotificationService {
           this.settings,
           {
             enabled: notification.enabled,
-            types: JSON.parse(notification.types),
-            options: JSON.parse(notification.options),
+            types: notification.types,
+            options: notification.options as TelegramOptions,
           },
           this.loggerFactory.createLogger(),
           notification,
@@ -373,8 +383,8 @@ export class NotificationService {
           this.settings,
           {
             enabled: notification.enabled,
-            types: JSON.parse(notification.types),
-            options: JSON.parse(notification.options),
+            types: notification.types,
+            options: notification.options as WebhookOptions,
           },
           this.loggerFactory.createLogger(),
           notification,
@@ -421,10 +431,11 @@ export class NotificationService {
   public getAgentSpec() {
     return [
       {
-        name: 'email',
+        name: NotificationAgentKey.EMAIL,
         friendlyName: 'Email',
         options: [
           { field: 'emailFrom', type: 'text', required: true, extraInfo: '' },
+          { field: 'senderName', type: 'text', required: true, extraInfo: '' },
           { field: 'emailTo', type: 'text', required: true, extraInfo: '' },
           { field: 'smtpHost', type: 'text', required: true, extraInfo: '' },
           { field: 'smtpPort', type: 'number', required: true, extraInfo: '' },
@@ -446,13 +457,19 @@ export class NotificationService {
             required: false,
             extraInfo: 'TLS: Always use STARTLS',
           },
+          { field: 'authUser', type: 'text', required: false, extraInfo: '' },
+          {
+            field: 'authPass',
+            type: 'password',
+            required: false,
+            extraInfo: '',
+          },
           {
             field: 'allowSelfSigned',
             type: 'checkbox',
             required: false,
             extraInfo: '',
           },
-          { field: 'senderName', type: 'text', required: false, extraInfo: '' },
           { field: 'pgpKey', type: 'text', required: false, extraInfo: '' },
           {
             field: 'pgpPassword',
@@ -463,7 +480,7 @@ export class NotificationService {
         ],
       },
       {
-        name: 'discord',
+        name: NotificationAgentKey.DISCORD,
         friendlyName: 'Discord',
         options: [
           { field: 'webhookUrl', type: 'text', required: true, extraInfo: '' },
@@ -482,8 +499,8 @@ export class NotificationService {
         ],
       },
       {
-        name: 'lunasea',
-        friendlyName: 'Lunasea',
+        name: NotificationAgentKey.LUNASEA,
+        friendlyName: 'LunaSea',
         options: [
           { field: 'webhookUrl', type: 'text', required: true, extraInfo: '' },
           {
@@ -495,14 +512,14 @@ export class NotificationService {
         ],
       },
       {
-        name: 'slack',
+        name: NotificationAgentKey.SLACK,
         friendlyName: 'Slack',
         options: [
           { field: 'webhookUrl', type: 'text', required: true, extraInfo: '' },
         ],
       },
       {
-        name: 'telegram',
+        name: NotificationAgentKey.TELEGRAM,
         friendlyName: 'Telegram',
         options: [
           {
@@ -534,7 +551,7 @@ export class NotificationService {
         ],
       },
       {
-        name: 'pushbullet',
+        name: NotificationAgentKey.PUSHBULLET,
         friendlyName: 'Pushbullet',
         options: [
           { field: 'accessToken', type: 'text', required: true, extraInfo: '' },
@@ -542,7 +559,7 @@ export class NotificationService {
         ],
       },
       {
-        name: 'pushover',
+        name: NotificationAgentKey.PUSHOVER,
         friendlyName: 'Pushover',
         options: [
           { field: 'accessToken', type: 'text', required: true, extraInfo: '' },
@@ -556,7 +573,7 @@ export class NotificationService {
         ],
       },
       {
-        name: 'webhook',
+        name: NotificationAgentKey.WEBHOOK,
         friendlyName: 'Webhook',
         options: [
           { field: 'webhookUrl', type: 'text', required: true, extraInfo: '' },
@@ -565,7 +582,7 @@ export class NotificationService {
         ],
       },
       {
-        name: 'gotify',
+        name: NotificationAgentKey.GOTIFY,
         friendlyName: 'Gotify',
         options: [
           { field: 'url', type: 'text', required: true, extraInfo: '' },
