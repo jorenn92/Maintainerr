@@ -600,17 +600,18 @@ export class NotificationService {
     agent?: NotificationAgent,
     identifier?: { type: string; value: number },
   ) {
+    const { subject, message } = this.getContent(
+      type,
+      mediaItems && mediaItems.length > 1,
+    );
+
     const payload: NotificationPayload = {
-      subject: '',
-      message: '',
+      subject,
+      message,
     };
 
     payload.message = await this.transformMessageContent(
-      this.getMessageContent(
-        type,
-        mediaItems && mediaItems.length > 1,
-        dayAmount,
-      ),
+      message,
       mediaItems,
       collectionName,
       dayAmount,
@@ -655,55 +656,66 @@ export class NotificationService {
     }
   }
 
-  private getMessageContent(
+  private getContent(
     type: NotificationType,
     multiple: boolean,
     dayAmount?: number,
-  ): string {
+  ): { subject: string; message: string } {
+    let subject: string;
+
     let message: string;
 
     if (!multiple) {
       switch (type) {
         case NotificationType.TEST_NOTIFICATION:
+          subject = 'Test Notification';
           message =
-            "\uD83D\uDD0D Test Notification: Just checking if this thing works... if you're seeing this, success! If not, well... we have a problem!";
+            "\uD83D\uDD0D Just checking if this thing works... if you're seeing this, success! If not, well... we have a problem!";
           break;
         case NotificationType.COLLECTION_HANDLING_FAILED:
+          subject = 'Collection Handling Failed';
           message =
-            '⚠️ Collection Handling Failed: Oops! Something went wrong while processing your collections.';
+            '⚠️ Oops! Something went wrong while processing your collections.';
           break;
         case NotificationType.RULE_HANDLING_FAILED:
+          subject = 'Rule Handling Failed';
           message =
-            '⚠️ Rule Handling Failed: Oops! Something went wrong while processing your rules.';
+            '⚠️ Oops! Something went wrong while processing your rules.';
           break;
         case NotificationType.MEDIA_ABOUT_TO_BE_HANDLED:
+          subject = 'Media About to be Handled';
           message =
             "⏰ Reminder: {media_title} will be handled in {days} days. If you want to keep it, make sure to take action before it's gone. Don’t miss out!";
           break;
         case NotificationType.MEDIA_ADDED_TO_COLLECTION:
+          subject = 'Media Added to Collection';
           message = `\uD83D\uDCC2 '{media_title}' has been added to '{collection_name}'.`;
           if (dayAmount != null) {
             message += ' The item will be handled in {days} days.';
           }
           break;
         case NotificationType.MEDIA_REMOVED_FROM_COLLECTION:
+          subject = 'Media Removed from Collection';
           message = `\uD83D\uDCC2 '{media_title}' has been removed from '{collection_name}'.`;
           if (dayAmount != null) {
             message += ` It won't be handled anymore.`;
           }
           break;
         case NotificationType.MEDIA_HANDLED:
+          subject = 'Media Handled';
           message =
-            "✅ Media Handled. '{media_title}' has been handled by '{collection_name}'.";
+            "✅ '{media_title}' has been handled by '{collection_name}'.";
           break;
       }
     } else {
       switch (type) {
         case NotificationType.MEDIA_ABOUT_TO_BE_HANDLED:
+          subject = 'Media About to be Handled';
           message =
             "⏰ Reminder: These media items will be handled in {days} days. If you want to keep them, make sure to take action before they're gone. Don’t miss out! \n \n {media_items}";
           break;
         case NotificationType.MEDIA_ADDED_TO_COLLECTION:
+          subject = 'Media Added to Collection';
           message = `\uD83D\uDCC2 These media items have been added to '{collection_name}'.`;
           if (dayAmount != null) {
             message +=
@@ -713,6 +725,7 @@ export class NotificationService {
           }
           break;
         case NotificationType.MEDIA_REMOVED_FROM_COLLECTION:
+          subject = 'Media Removed from Collection';
           message = `\uD83D\uDCC2 These media items have been removed from '{collection_name}'.`;
           if (dayAmount != null) {
             message +=
@@ -722,12 +735,17 @@ export class NotificationService {
           }
           break;
         case NotificationType.MEDIA_HANDLED:
+          subject = 'Media Handled';
           message =
-            "✅ Media Handled: These media items have been handled by '{collection_name}'. \n \n {media_items}";
+            "✅ These media items have been handled by '{collection_name}'. \n \n {media_items}";
           break;
       }
     }
-    return message;
+
+    return {
+      subject,
+      message,
+    };
   }
 
   private async transformMessageContent(
