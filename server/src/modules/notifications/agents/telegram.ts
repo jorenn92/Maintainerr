@@ -47,7 +47,7 @@ class TelegramAgent implements NotificationAgent {
   public shouldSend(): boolean {
     const settings = this.getSettings();
 
-    if (settings.enabled && settings.options.botAPI) {
+    if (settings.enabled && settings.options.botAuthToken) {
       return true;
     }
 
@@ -90,7 +90,7 @@ class TelegramAgent implements NotificationAgent {
     payload: NotificationPayload,
   ): Promise<string> {
     const settings = this.getSettings();
-    const endpoint = `${this.baseUrl}bot${settings.options.botAPI}/${
+    const endpoint = `${this.baseUrl}bot${settings.options.botAuthToken}/${
       payload.image ? 'sendPhoto' : 'sendMessage'
     }`;
     const notificationPayload = this.getNotificationPayload(type, payload);

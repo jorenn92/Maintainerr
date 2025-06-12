@@ -34,11 +34,6 @@ class LunaSeaAgent implements NotificationAgent {
       subject: payload.subject,
       message: payload.message,
       image: payload.image ?? null,
-      email: this.getSettings().options.email,
-      username: this.getSettings().options.displayName
-        ? this.getSettings().options.profileName
-        : this.getSettings().options.displayName,
-      avatar: this.getSettings().options.avatar,
       extra: payload.extra ?? [],
     };
   }
@@ -67,7 +62,7 @@ class LunaSeaAgent implements NotificationAgent {
 
     try {
       await axios.post(
-        this.getSettings().options.webhookUrl as string,
+        this.getSettings().options.webhookUrl,
         this.buildPayload(type, payload),
         settings.options.profileName
           ? {
