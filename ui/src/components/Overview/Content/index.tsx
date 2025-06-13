@@ -87,7 +87,7 @@ const OverviewContent = (props: IOverviewContent) => {
 
   useEffect(() => {
     const debouncedScroll = _.debounce(handleScroll, 200)
-    window.addEventListener('scroll', debouncedScroll)
+    window.addEventListener('scroll', debouncedScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', debouncedScroll)
       debouncedScroll.cancel() // Cancel pending debounced calls

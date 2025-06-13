@@ -136,21 +136,27 @@ const Logs = () => {
     const MAX_LOG_LINES = 1000
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
     const es = new ReconnectingEventSource(`${basePath}/api/logs/stream`)
-    es.addEventListener('log', (event) => {
+
+    const handleLog = (event: MessageEvent) => {
       const message: LogEvent = JSON.parse(event.data)
       setLogLines((prev) => {
         const newLines = [...prev, message]
         // Keep only the last MAX_LOG_LINES
         return newLines.slice(-MAX_LOG_LINES)
       })
-    })
+    }
+
+    es.addEventListener('log', handleLog)
 
     es.onerror = (e) => {
       console.error('EventSource failed:', e)
     }
 
     return () => {
+      es.removeEventListener('log', handleLog)
       es.close()
+      // Clear logs on unmount to prevent memory leak
+      setLogLines([])
     }
   }, [])
 
