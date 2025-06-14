@@ -176,6 +176,8 @@ export class CollectionWorkerService extends TaskBase {
     }
 
     if (handledCollectionMedia > 0) {
+      this.infoLogger(`All collections handled`);
+
       const promises = [];
       if (this.settings.overseerrConfigured()) {
         promises.push(
@@ -186,13 +188,13 @@ export class CollectionWorkerService extends TaskBase {
               );
 
               this.infoLogger(
-                `All collections handled. Triggered Overseerr's availability-sync because media was altered`,
+                `Triggered Overseerr's availability-sync because media was altered`,
               );
             } catch (err) {
               this.logger.error(
-                `Failed to trigger Overseerr's availability-sync: ${err}`,
+                `Failed to trigger Overseerr's availability-sync`,
+                err,
               );
-              this.logger.debug(err);
             }
           }),
         );
@@ -207,13 +209,13 @@ export class CollectionWorkerService extends TaskBase {
               );
 
               this.infoLogger(
-                `All collections handled. Triggered Jellyseerr's availability-sync because media was altered`,
+                `Triggered Jellyseerr's availability-sync because media was altered`,
               );
             } catch (err) {
               this.logger.error(
-                `Failed to trigger Jellyseerr's availability-sync: ${err}`,
+                `Failed to trigger Jellyseerr's availability-sync`,
+                err,
               );
-              this.logger.debug(err);
             }
           }),
         );

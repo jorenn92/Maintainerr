@@ -163,11 +163,10 @@ export class RadarrGetterService {
         return null;
       }
     } catch (e) {
-      this.logger.warn(
-        `Radarr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      this.logger.error(
+        `Radarr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}'`,
+        e,
       );
-      this.logger.debug(e);
-      return undefined;
     }
   }
 }

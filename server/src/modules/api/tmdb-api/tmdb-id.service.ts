@@ -37,9 +37,7 @@ export class TmdbIdService {
         );
       }
     } catch (e) {
-      this.logger.warn(`Failed to fetch id : ${e.message}`);
-      this.logger.debug(e);
-      return undefined;
+      this.logger.error('Failed to fetch TMDB ID', e);
     }
   }
 
@@ -95,9 +93,7 @@ export class TmdbIdService {
         id: id,
       };
     } catch (e) {
-      this.logger.warn(`Failed to fetch id : ${e.message}`);
-      this.logger.debug(e);
-      return undefined;
+      this.logger.error('Failed to fetch TMDB ID', e);
     }
   }
 }

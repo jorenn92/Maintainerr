@@ -43,7 +43,7 @@ export class RuleMaintenanceService extends TaskBase {
         );
       }
     } catch (e) {
-      this.logger.error(`Rule Maintenance failed : ${e.message}`);
+      this.logger.error(`Rule Maintenance failed`, e);
     }
   }
 
@@ -76,10 +76,7 @@ export class RuleMaintenanceService extends TaskBase {
         }
       }
     } catch (err) {
-      this.logger.warn(
-        `Couldn't remove collection without rule: ${err.message}`,
-      );
-      this.logger.debug(err);
+      this.logger.error(`Couldn't remove collection without rule`, err);
     }
   }
 }

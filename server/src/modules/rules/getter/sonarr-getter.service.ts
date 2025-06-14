@@ -322,11 +322,10 @@ export class SonarrGetterService {
         }
       }
     } catch (e) {
-      this.logger.warn(
-        `Sonarr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      this.logger.error(
+        `Sonarr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}'`,
+        e,
       );
-      this.logger.debug(e);
-      return undefined;
     }
   }
 
@@ -358,8 +357,6 @@ export class SonarrGetterService {
 
       return s;
     }
-
-    return undefined;
   }
 
   public async findTvdbidFromPlexLibItem(libItem: PlexLibraryItem) {

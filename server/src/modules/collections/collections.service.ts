@@ -68,10 +68,7 @@ export class CollectionsService {
         return await this.collectionRepo.findOne({ where: { id: id } });
       }
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
-      );
-      return undefined;
+      this.logger.error('An error occurred while getting collection', err);
     }
   }
 
@@ -81,10 +78,10 @@ export class CollectionsService {
         where: { collectionId: id },
       });
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions: ' + err,
+      this.logger.error(
+        'An error occurred while getting collection media',
+        err,
       );
-      return undefined;
     }
   }
 
@@ -140,10 +137,10 @@ export class CollectionsService {
         items: entitiesWithPlexData ?? [],
       };
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions: ' + err,
+      this.logger.error(
+        'An error occurred getting collection media with Plex data',
+        err,
       );
-      return undefined;
     }
   }
 
@@ -196,10 +193,10 @@ export class CollectionsService {
         items: entities ?? [],
       };
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions: ' + err,
+      this.logger.error(
+        'An error occurred getting collection exclusions with Plex data',
+        err,
       );
-      return undefined;
     }
   }
 
@@ -227,11 +224,7 @@ export class CollectionsService {
         }),
       );
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error('An error occurred getting collections', err);
     }
   }
 
@@ -239,8 +232,7 @@ export class CollectionsService {
     try {
       return await this.collectionRepo.find();
     } catch (err) {
-      this.logger.warn('An error occurred while fetching collections.');
-      this.logger.debug(err);
+      this.logger.error('An error occurred while fetching collections', err);
       return [];
     }
   }
@@ -294,7 +286,7 @@ export class CollectionsService {
           this.logger.error(
             `Manual Plex collection not found.. Is the spelling correct? `,
           );
-          return undefined;
+          return;
         }
       }
       // create collection in db
@@ -309,10 +301,9 @@ export class CollectionsService {
         return { plexCollection: plexCollection, dbCollection: collectionDb };
     } catch (err) {
       this.logger.error(
-        `An error occurred while creating or fetching a collection: ${err}`,
+        `An error occurred while creating or fetching a collection`,
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -340,10 +331,10 @@ export class CollectionsService {
         dbCollection: addCollectionDbResponse;
       };
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
+      this.logger.error(
+        'An error occurred creating a collection with children',
+        err,
       );
-      return undefined;
     }
   }
 
@@ -413,15 +404,12 @@ export class CollectionsService {
 
       return { plexCollection: plexColl, dbCollection: dbResp };
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
-      );
+      this.logger.error('An error occurred updating collection', err);
       await this.addLogRecord(
         { id: collection.id } as Collection,
         "Failed to update the collection's settings",
         ECollectionLogType.COLLECTION,
       );
-      return undefined;
     }
   }
 
@@ -605,10 +593,7 @@ export class CollectionsService {
         this.logger.warn("Collection doesn't exist.");
       }
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
-      );
-      return undefined;
+      this.logger.error('An error occurred adding to collection', err);
     }
   }
 
@@ -665,11 +650,10 @@ export class CollectionsService {
       }
       return collection;
     } catch (err) {
-      this.logger.warn(
+      this.logger.error(
         `An error occurred while removing media from collection with internal id ${collectionDbId}`,
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -679,8 +663,9 @@ export class CollectionsService {
       collection.forEach((c) => this.removeFromCollection(c.id, media));
       return { status: 'OK', code: 1, message: 'Success' };
     } catch (e) {
-      this.logger.warn(
-        `An error occurred while removing media from all collections : ${e}`,
+      this.logger.error(
+        `An error occurred while removing media from all collections`,
+        e,
       );
       return { status: 'NOK', code: 0, message: 'Failed' };
     }
@@ -705,10 +690,7 @@ export class CollectionsService {
         this.logger.warn('An error occurred while deleting the collection.');
       }
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
-      );
-      return undefined;
+      this.logger.error('An error occurred deleting collection', err);
     }
   }
 
@@ -747,10 +729,7 @@ export class CollectionsService {
         });
       }
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
-      );
-      return undefined;
+      this.logger.error('An error occurred deactivating a collection', err);
     }
   }
 
@@ -783,10 +762,7 @@ export class CollectionsService {
         });
       }
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
-      );
-      return undefined;
+      this.logger.error('An error occurred activating a collection', err);
     }
   }
 
@@ -797,7 +773,7 @@ export class CollectionsService {
     logMeta?: CollectionLogMeta,
   ) {
     try {
-      this.infoLogger(`Adding media with id ${childId} to collection..`);
+      this.logger.log(`Adding media with id ${childId} to collection..`);
 
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexRatingKey(
         childId.toString(),
@@ -850,10 +826,10 @@ export class CollectionsService {
         );
       }
     } catch (err) {
-      this.logger.warn(
-        `An error occurred while performing collection actions: ${err}`,
+      this.logger.error(
+        `An error occurred while performing collection actions`,
+        err,
       );
-      return undefined;
     }
   }
 
@@ -889,7 +865,7 @@ export class CollectionsService {
     logMeta?: CollectionLogMeta,
   ) {
     try {
-      this.infoLogger(`Removing media with id ${childId} from collection..`);
+      this.logger.log(`Removing media with id ${childId} from collection..`);
 
       const responseColl: BasicResponseDto =
         await this.plexApi.deleteChildFromCollection(
@@ -919,16 +895,15 @@ export class CollectionsService {
           logMeta,
         );
       } else {
-        this.infoLogger(
+        this.logger.log(
           `Couldn't remove media from collection: ` + responseColl.message,
         );
       }
     } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
+      this.logger.error(
+        'An error occurred removing child from collection',
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -936,94 +911,80 @@ export class CollectionsService {
     collection: ICollection,
     plexId?: number,
   ): Promise<addCollectionDbResponse> {
+    this.logger.log(`Adding collection to the Database..`);
     try {
-      this.infoLogger(`Adding collection to the Database..`);
-      try {
-        const dbCol = (
-          await this.connection
-            .createQueryBuilder()
-            .insert()
-            .into(Collection)
-            .values([
-              {
-                title: collection.title,
-                description: collection.description,
-                plexId: plexId,
-                type: collection.type,
-                libraryId: collection.libraryId,
-                arrAction: collection.arrAction ? collection.arrAction : 0,
-                isActive: collection.isActive,
-                visibleOnRecommended: collection.visibleOnRecommended,
-                visibleOnHome: collection.visibleOnHome,
-                deleteAfterDays: collection.deleteAfterDays,
-                listExclusions: collection.listExclusions,
-                forceOverseerr: collection.forceOverseerr,
-                keepLogsForMonths: collection.keepLogsForMonths,
-                tautulliWatchedPercentOverride:
-                  collection.tautulliWatchedPercentOverride ?? null,
-                manualCollection:
-                  collection.manualCollection !== undefined
-                    ? collection.manualCollection
-                    : false,
-                manualCollectionName:
-                  collection.manualCollectionName !== undefined
-                    ? collection.manualCollectionName
-                    : '',
-                sonarrSettingsId: collection.sonarrSettingsId,
-                radarrSettingsId: collection.radarrSettingsId,
-              },
-            ])
-            .execute()
-        ).generatedMaps[0] as addCollectionDbResponse;
+      const dbCol = (
+        await this.connection
+          .createQueryBuilder()
+          .insert()
+          .into(Collection)
+          .values([
+            {
+              title: collection.title,
+              description: collection.description,
+              plexId: plexId,
+              type: collection.type,
+              libraryId: collection.libraryId,
+              arrAction: collection.arrAction ? collection.arrAction : 0,
+              isActive: collection.isActive,
+              visibleOnRecommended: collection.visibleOnRecommended,
+              visibleOnHome: collection.visibleOnHome,
+              deleteAfterDays: collection.deleteAfterDays,
+              listExclusions: collection.listExclusions,
+              forceOverseerr: collection.forceOverseerr,
+              keepLogsForMonths: collection.keepLogsForMonths,
+              tautulliWatchedPercentOverride:
+                collection.tautulliWatchedPercentOverride ?? null,
+              manualCollection:
+                collection.manualCollection !== undefined
+                  ? collection.manualCollection
+                  : false,
+              manualCollectionName:
+                collection.manualCollectionName !== undefined
+                  ? collection.manualCollectionName
+                  : '',
+              sonarrSettingsId: collection.sonarrSettingsId,
+              radarrSettingsId: collection.radarrSettingsId,
+            },
+          ])
+          .execute()
+      ).generatedMaps[0] as addCollectionDbResponse;
 
-        await this.addLogRecord(
-          dbCol as Collection,
-          'Collection Created',
-          ECollectionLogType.COLLECTION,
-        );
-        return dbCol;
-      } catch (err) {
-        // Log error
-        this.infoLogger(
-          `Something went wrong creating the collection in the Database..`,
-        );
-        this.logger.debug(err);
-      }
-    } catch (err) {
-      this.logger.warn(
-        'An error occurred while performing collection actions.',
+      await this.addLogRecord(
+        dbCol as Collection,
+        'Collection Created',
+        ECollectionLogType.COLLECTION,
       );
-      this.logger.debug(err);
-      return undefined;
+      return dbCol;
+    } catch (err) {
+      this.logger.error(
+        `Something went wrong creating the collection in the database..`,
+        err,
+      );
     }
   }
 
   private async RemoveCollectionFromDB(
     collection: ICollection,
   ): Promise<BasicResponseDto> {
+    this.logger.log(`Removing collection from Database..`);
     try {
-      this.infoLogger(`Removing collection from Database..`);
-      try {
-        await this.CollectionMediaRepo.delete({ collectionId: collection.id }); // cascade delete doesn't work for some reason..
-        await this.CollectionLogRepo.delete({ collection: collection }); // cascade delete doesn't work for some reason..
-        await this.collectionRepo.delete(collection.id);
+      await this.CollectionMediaRepo.delete({ collectionId: collection.id }); // cascade delete doesn't work for some reason..
+      await this.CollectionLogRepo.delete({ collection: collection }); // cascade delete doesn't work for some reason..
+      await this.collectionRepo.delete(collection.id);
 
-        await this.addLogRecord(
-          { id: collection.id } as Collection,
-          'Collection Removed',
-          ECollectionLogType.COLLECTION,
-        );
+      await this.addLogRecord(
+        { id: collection.id } as Collection,
+        'Collection Removed',
+        ECollectionLogType.COLLECTION,
+      );
 
-        return { status: 'OK', code: 1, message: 'Success' };
-      } catch (err) {
-        this.infoLogger(
-          `Something went wrong deleting the collection from the Database..`,
-        );
-        this.logger.debug(err);
-        return { status: 'NOK', code: 0, message: 'Removing from DB failed' };
-      }
+      return { status: 'OK', code: 1, message: 'Success' };
     } catch (err) {
-      this.logger.debug(err);
+      this.logger.error(
+        `Something went wrong deleting the collection from the database..`,
+        err,
+      );
       return { status: 'NOK', code: 0, message: 'Removing from DB failed' };
     }
   }
@@ -1032,7 +993,7 @@ export class CollectionsService {
     collectionData: CreateUpdateCollection,
   ): Promise<PlexCollection> {
     try {
-      this.infoLogger(`Creating collection in Plex..`);
+      this.logger.log(`Creating collection in Plex..`);
       const resp = await this.plexApi.createCollection(collectionData);
       if (resp?.ratingKey) {
         return resp;
@@ -1040,11 +1001,10 @@ export class CollectionsService {
         return resp[0];
       }
     } catch (err) {
-      this.logger.warn(
+      this.logger.error(
         'An error occurred while performing collection actions.',
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -1062,12 +1022,10 @@ export class CollectionsService {
         return found?.ratingKey !== undefined ? found : undefined;
       }
     } catch (err) {
-      this.logger.warn(
+      this.logger.error(
         'An error occurred while searching for a specific Plex collection.',
+        err,
       );
-      this.logger.debug(err);
-
-      return undefined;
     }
   }
 
@@ -1079,16 +1037,15 @@ export class CollectionsService {
         this.logger.warn(
           `Plex collection ${id} is a smart collection which is not supported.`,
         );
-        return undefined;
+        return;
       }
 
       return result;
     } catch (err) {
-      this.logger.warn(
+      this.logger.error(
         'An error occurred while searching for a specific Plex collection.',
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -1197,7 +1154,7 @@ export class CollectionsService {
         if (logs.length > 0) {
           // delete all old logs
           await this.CollectionLogRepo.remove(logs);
-          this.infoLogger(
+          this.logger.log(
             `Removed ${logs.length} old collection log ${logs.length === 1 ? 'record' : 'records'} from collection '${collection.title}'`,
           );
           await this.addLogRecord(
@@ -1208,14 +1165,10 @@ export class CollectionsService {
         }
       }
     } catch (e) {
-      this.logger.warn(
+      this.logger.error(
         `An error occurred while removing old collection logs for collection '${collection?.title}'`,
+        e,
       );
-      this.logger.debug(e);
     }
-  }
-
-  private infoLogger(message: string) {
-    this.logger.log(message);
   }
 }

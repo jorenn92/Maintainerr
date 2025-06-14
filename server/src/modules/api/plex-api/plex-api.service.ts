@@ -110,8 +110,10 @@ export class PlexApiService {
         );
       }
     } catch (err) {
-      this.logger.warn(`Couldn't connect to Plex.. Please check your settings`);
-      this.logger.debug(err);
+      this.logger.error(
+        `Couldn't connect to Plex.. Please check your settings`,
+        err,
+      );
     }
   }
 
@@ -123,11 +125,7 @@ export class PlexApiService {
       );
       return response.MediaContainer;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error('An error occurred getting Plex status', err);
     }
   }
 
@@ -157,11 +155,7 @@ export class PlexApiService {
       });
       return filteredResults;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error('An error occurred searching Plex', err);
     }
   }
 
@@ -172,11 +166,7 @@ export class PlexApiService {
       });
       return response.MediaContainer.Account;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error('An error occurred getting users from Plex', err);
     }
   }
 
@@ -187,11 +177,7 @@ export class PlexApiService {
       });
       return response?.MediaContainer?.Account[0];
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error('An error occurred getting a user from Plex', err);
     }
   }
 
@@ -205,11 +191,7 @@ export class PlexApiService {
         (x) => x.type == 'movie' || x.type == 'show',
       ) as PlexLibrary[];
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error('An error occurred getting libraries from Plex', err);
     }
   }
 
@@ -229,11 +211,10 @@ export class PlexApiService {
 
       return response.MediaContainer.totalSize;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        'An error occurred getting library content count from Plex',
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -257,11 +238,10 @@ export class PlexApiService {
         items: (response.MediaContainer.Metadata as PlexLibraryItem[]) ?? [],
       };
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        'An error occurred getting library content from Plex',
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -283,11 +263,10 @@ export class PlexApiService {
 
       return response.MediaContainer.Metadata as PlexLibraryItem[];
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        'An error occurred searching library content in Plex',
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -307,15 +286,9 @@ export class PlexApiService {
       );
       if (response) {
         return response.MediaContainer.Metadata[0];
-      } else {
-        return undefined;
       }
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error('An error occurred getting metadata from Plex', err);
     }
   }
 
@@ -345,11 +318,10 @@ export class PlexApiService {
 
       return response.data.MediaContainer.UserState;
     } catch (err) {
-      this.logger.warn(
-        "Outbound call to discover.provider.plex.tv failed. Couldn't fetch userState",
+      this.logger.error(
+        `Outbound call to discover.provider.plex.tv failed. Couldn't fetch userState`,
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -358,9 +330,10 @@ export class PlexApiService {
       const response = await this.plexTvClient.getUsers();
       return response.MediaContainer.User;
     } catch (err) {
-      this.logger.warn("Outbound call to plex.tv failed. Couldn't fetch users");
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error(
+        `Outbound call to plex.tv failed. Couldn't fetch users`,
+        err,
+      );
     }
   }
 
@@ -368,9 +341,10 @@ export class PlexApiService {
     try {
       return await this.plexTvClient.getUser();
     } catch (err) {
-      this.logger.warn("Outbound call to plex.tv failed. Couldn't fetch owner");
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error(
+        `Outbound call to plex.tv failed. Couldn't fetch owner`,
+        err,
+      );
     }
   }
 
@@ -382,11 +356,10 @@ export class PlexApiService {
 
       return response.MediaContainer.Metadata;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        `An error occurred getting children metadata from Plex`,
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -404,11 +377,10 @@ export class PlexApiService {
       });
       return response.MediaContainer.Metadata as PlexLibraryItem[];
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        `An error occurred getting recently added from Plex`,
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -420,11 +392,10 @@ export class PlexApiService {
         });
       return response.MediaContainer.Metadata as PlexSeenBy[];
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        `An error occurred getting watch history from Plex`,
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -441,11 +412,7 @@ export class PlexApiService {
 
       return collection;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error(`An error occurred getting collections from Plex`, err);
     }
   }
 
@@ -482,11 +449,7 @@ export class PlexApiService {
 
       return filteredItems;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error(`An error occurred getting playlists from Plex`, err);
     }
   }
 
@@ -499,10 +462,10 @@ export class PlexApiService {
         `[Plex] Removed media with ID ${plexId} from Plex library.`,
       );
     } catch (e) {
-      this.logger.warn(
+      this.logger.error(
         `Something went wrong while removing media ${plexId} from Plex.`,
+        e,
       );
-      this.logger.debug(e);
     }
   }
 
@@ -521,9 +484,10 @@ export class PlexApiService {
 
       return collection;
     } catch (err) {
-      this.logger.warn(`Couldn't find collection with id ${+collectionId}`);
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error(
+        `Couldn't find collection with id ${+collectionId}`,
+        err,
+      );
     }
   }
 
@@ -544,11 +508,7 @@ export class PlexApiService {
       }
       return collection;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error('An error occurred creating collection in Plex', err);
     }
   }
 
@@ -564,11 +524,7 @@ export class PlexApiService {
       });
       return await this.getCollection(+body.collectionId);
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
-      );
-      this.logger.debug(err);
-      return undefined;
+      this.logger.error('An error occurred updating collection in Plex', err);
     }
   }
 
@@ -580,7 +536,7 @@ export class PlexApiService {
         uri: `/library/collections/${collectionId}`,
       });
     } catch (err) {
-      this.logger.debug(err);
+      this.logger.error('An error occurred deleting collection in Plex', err);
       return {
         status: 'NOK',
         code: 0,
@@ -611,11 +567,10 @@ export class PlexApiService {
 
       return response.MediaContainer.Metadata as PlexLibraryItem[];
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        'An error occurred getting collection children from Plex',
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -631,7 +586,11 @@ export class PlexApiService {
       });
       return response.MediaContainer.Metadata[0] as PlexCollection;
     } catch (e) {
-      this.logger.debug(e);
+      this.logger.error(
+        'An error occurred adding child to collection in Plex',
+        e,
+      );
+
       return {
         status: 'NOK',
         code: 0,
@@ -654,7 +613,11 @@ export class PlexApiService {
         message: `successfully deleted child with id ${childId}`,
       } as BasicResponseDto;
     } catch (e) {
-      this.logger.debug(e);
+      this.logger.error(
+        'An error occurred deleting child from collection in Plex',
+        e,
+      );
+
       return {
         status: 'NOK',
         code: 0,
@@ -674,11 +637,10 @@ export class PlexApiService {
       });
       return response.MediaContainer.Hub[0] as PlexHub;
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        'An error occurred updating collection settings in Plex',
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -735,10 +697,10 @@ export class PlexApiService {
       }
       return devices;
     } catch (e) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        'An error occurred getting available servers from Plex',
+        e,
       );
-      this.logger.debug(e);
       return [];
     }
   }
@@ -787,12 +749,12 @@ export class PlexApiService {
           this.logger.warn(
             `Failure while fetching watchlist of user ${userId} (${username})`,
           );
-          return undefined;
+          return;
         } else if (resp.errors) {
           this.logger.warn(
             `Failure while fetching watchlist of user ${userId} (${username}): ${resp.errors.map((x) => x.message).join(', ')}`,
           );
-          return undefined;
+          return;
         }
 
         const watchlist = resp.data.user.watchlist;
@@ -806,10 +768,10 @@ export class PlexApiService {
       }
       return result;
     } catch (e) {
-      this.logger.warn(
+      this.logger.error(
         `Failure while fetching watchlist of user ${userId} (${username})`,
+        e,
       );
-      this.logger.debug(e);
     }
   }
 
@@ -1008,11 +970,10 @@ export class PlexApiService {
         return null;
       }
     } catch (err) {
-      this.logger.warn(
-        'Plex api communication failure.. Is the application running?',
+      this.logger.error(
+        'An error occurred setting the machine ID for Plex',
+        err,
       );
-      this.logger.debug(err);
-      return undefined;
     }
   }
 

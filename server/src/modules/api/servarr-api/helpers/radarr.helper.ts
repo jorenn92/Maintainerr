@@ -6,7 +6,7 @@ import {
   RadarrMovieFile,
 } from '../interfaces/radarr.interface';
 
-export class RadarrApi extends ServarrApi<{ movieId: number }> {
+export class RadarrApi extends ServarrApi {
   constructor(
     {
       url,
@@ -23,53 +23,15 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
     this.logger.setContext(ServarrApi.name);
   }
 
-  public getMovies = async (): Promise<RadarrMovie[]> => {
-    try {
-      const response = await this.get<RadarrMovie[]>('/movie');
-
-      return response;
-    } catch (e) {
-      this.logger.warn(`Failed to retrieve movies`);
-      this.logger.debug(`Failed to retrieve movies: ${e.message}`);
-    }
-  };
-
-  public getMovie = async ({ id }: { id: number }): Promise<RadarrMovie> => {
-    try {
-      const response = await this.get<RadarrMovie>(`/movie/${id}`);
-      return response;
-    } catch (e) {
-      this.logger.warn(`Failed to retrieve movie with id ${id}`);
-      this.logger.debug(`Failed to retrieve movie: ${e.message}`);
-    }
-  };
-
   public async getMovieByTmdbId(id: number): Promise<RadarrMovie> {
-    try {
-      const response = await this.get<RadarrMovie[]>(`/movie?tmdbId=${id}`);
+    const response = await this.get<RadarrMovie[]>(`/movie?tmdbId=${id}`);
 
-      if (!response[0]) {
-        this.logger.warn(`Could not find Movie with TMDb id ${id} in Radarr`);
-      }
-
-      return response[0];
-    } catch (e) {
-      this.logger.warn(`Error retrieving movie by TMDb ID ${id}`);
-      this.logger.debug(e);
+    if (!response[0]) {
+      this.logger.warn(`Could not find Movie with TMDb id ${id} in Radarr`);
+      return;
     }
-  }
 
-  public async searchMovie(movieId: number): Promise<void> {
-    this.logger.log('Executing movie search command');
-
-    try {
-      await this.runCommand('MoviesSearch', { movieIds: [movieId] });
-    } catch (e) {
-      this.logger.warn(
-        'Something went wrong while executing Radarr movie search.',
-      );
-      this.logger.debug(e);
-    }
+    return response[0];
   }
 
   public async deleteMovie(
@@ -77,14 +39,9 @@ export class RadarrApi extends ServarrApi<{ movieId: number }> {
     deleteFiles = true,
     importExclusion = false,
   ) {
-    try {
-      await this.runDelete(
-        `movie/${movieId}?deleteFiles=${deleteFiles}&addImportExclusion=${importExclusion}`,
-      );
-    } catch (e) {
-      this.logger.log("Couldn't delete movie. Does it exist in radarr?");
-      this.logger.debug(e);
-    }
+    await this.runDelete(
+      `movie/${movieId}?deleteFiles=${deleteFiles}&addImportExclusion=${importExclusion}`,
+    );
   }
 
   public async unmonitorMovie(movieId: number, deleteFiles = true) {

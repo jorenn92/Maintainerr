@@ -61,7 +61,6 @@ export class OverseerrGetterService {
 
       const prop = this.appProperties.find((el) => el.id === id);
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
-      // const overseerrUsers = await this.overseerrApi.getUsers();
 
       if (tmdb && tmdb.id) {
         if (libItem.type === 'movie') {
@@ -152,8 +151,10 @@ export class OverseerrGetterService {
               }
               return [];
             } catch (e) {
-              this.logger.warn("Couldn't get addUser from Overseerr");
-              this.logger.debug(e);
+              this.logger.error(
+                'An error occurred getting addUser for Overseerr',
+                e,
+              );
             }
           }
           case 'amountRequested': {
@@ -277,11 +278,10 @@ export class OverseerrGetterService {
         return null;
       }
     } catch (e) {
-      this.logger.warn(
-        `Overseerr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      this.logger.error(
+        `Overseerr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}'`,
+        e,
       );
-      this.logger.debug(e);
-      return undefined;
     }
   }
 

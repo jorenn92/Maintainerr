@@ -70,7 +70,6 @@ export class ExternalApiService {
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`GET ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -83,7 +82,6 @@ export class ExternalApiService {
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`GET ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -104,7 +102,6 @@ export class ExternalApiService {
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`DELETE ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -119,7 +116,6 @@ export class ExternalApiService {
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`PUT ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -134,7 +130,6 @@ export class ExternalApiService {
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`POST ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -172,7 +167,6 @@ export class ExternalApiService {
     } catch (err) {
       const url = this.axios.getUri({ ...config, url: endpoint });
       this.logger.debug(`GET ${url} failed: ${err}`);
-      return undefined;
     }
   }
 
@@ -217,30 +211,27 @@ export class ExternalApiService {
         return cachedItem;
       }
 
-      const response = await this.axios
-        .post<T>(endpoint, data, config)
-        .catch((err: AxiosError) => {
-          if (err.response?.status === 429) {
-            const retryAfter = err.response.headers['retry-after'] || 'unknown';
-            this.logger.warn(
-              `${url} Rate limit hit. Retry after: ${retryAfter} seconds.`,
-            );
-          } else {
-            this.logger.warn(`POST ${url} failed: ${err.message}`);
-            this.logger.debug(err);
-          }
-          return undefined;
-        });
+      try {
+        const response = await this.axios.post<T>(endpoint, data, config);
 
-      if (this.cache) {
-        this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
+        if (this.cache) {
+          this.cache.set(cacheKey, response.data, ttl ?? DEFAULT_TTL);
+        }
+
+        return response.data;
+      } catch (err) {
+        if (err instanceof AxiosError && err.response?.status === 429) {
+          const retryAfter = err.response.headers['retry-after'] || 'unknown';
+          this.logger.warn(
+            `${url} Rate limit hit. Retry after: ${retryAfter} seconds.`,
+          );
+        } else {
+          throw err;
+        }
       }
-
-      return response.data;
     } catch (err: any) {
       this.logger.warn(`POST ${url} failed: ${err.message}`);
       this.logger.debug(err);
-      return undefined;
     }
   }
 
@@ -256,7 +247,6 @@ export class ExternalApiService {
       return `${this.baseUrl}${endpoint}${JSON.stringify(params)}`;
     } catch (err) {
       this.logger.debug(`Failed serializing cache key: ${err}`);
-      return undefined;
     }
   }
 }

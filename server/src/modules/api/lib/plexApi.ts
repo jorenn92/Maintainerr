@@ -199,7 +199,7 @@ class PlexApi {
     try {
       return `${JSON.stringify(params)}`;
     } catch (err) {
-      return undefined;
+      return;
     }
   }
 
@@ -219,7 +219,7 @@ class PlexApi {
     if (arrayKey !== undefined) {
       return obj[arrayKey];
     } else {
-      return undefined; // No key with an array value found
+      return; // No key with an array value found
     }
   }
 

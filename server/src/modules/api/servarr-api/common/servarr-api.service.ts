@@ -2,16 +2,9 @@ import { ExternalApiService } from '../../../../modules/api/external-api/externa
 import { DVRSettings } from '../../../../modules/settings/interfaces/dvr-settings.interface';
 import { MaintainerrLogger } from '../../../logging/logs.service';
 import cacheManager from '../../lib/cache';
-import {
-  QualityProfile,
-  QueueItem,
-  QueueResponse,
-  RootFolder,
-  SystemStatus,
-  Tag,
-} from '../interfaces/servarr.interface';
+import { QualityProfile, Tag } from '../interfaces/servarr.interface';
 
-export abstract class ServarrApi<QueueItemAppendT> extends ExternalApiService {
+export abstract class ServarrApi extends ExternalApiService {
   static buildUrl(settings: DVRSettings, path?: string): string {
     return `${settings.useSsl ? 'https' : 'http'}://${settings.hostname}:${settings.port}${settings.baseUrl ?? ''}${path}`;
   }
@@ -42,53 +35,14 @@ export abstract class ServarrApi<QueueItemAppendT> extends ExternalApiService {
     );
   }
 
-  public getSystemStatus = async (): Promise<SystemStatus> => {
-    try {
-      const response = await this.axios.get<SystemStatus>('/system/status');
-
-      return response.data;
-    } catch (e) {
-      this.logger.warn(`Failed to retrieve system status: ${e.message}`);
-    }
-  };
-
   public getProfiles = async (): Promise<QualityProfile[]> => {
-    try {
-      const data = await this.getRolling<QualityProfile[]>(
-        `/qualityProfile`,
-        undefined,
-        3600,
-      );
+    const data = await this.getRolling<QualityProfile[]>(
+      `/qualityProfile`,
+      undefined,
+      3600,
+    );
 
-      return data;
-    } catch (e) {
-      this.logger.warn(`Failed to retrieve profiles: ${e.message}`);
-    }
-  };
-
-  public getRootFolders = async (): Promise<RootFolder[]> => {
-    try {
-      const data = await this.getRolling<RootFolder[]>(
-        `/rootfolder`,
-        undefined,
-        3600,
-      );
-
-      return data;
-    } catch (e) {
-      this.logger.warn(`Failed to retrieve root folders: ${e.message}`);
-    }
-  };
-
-  public getQueue = async (): Promise<(QueueItem & QueueItemAppendT)[]> => {
-    try {
-      const response =
-        await this.axios.get<QueueResponse<QueueItemAppendT>>(`/queue`);
-
-      return response.data.records;
-    } catch (e) {
-      this.logger.warn(`Failed to retrieve queue: ${e.message}`);
-    }
+    return data;
   };
 
   public getTags = async (): Promise<Tag[]> => {
@@ -97,19 +51,7 @@ export abstract class ServarrApi<QueueItemAppendT> extends ExternalApiService {
 
       return response.data;
     } catch (e) {
-      this.logger.warn(`Failed to retrieve tags: ${e.message}`);
-    }
-  };
-
-  public createTag = async ({ label }: { label: string }): Promise<Tag> => {
-    try {
-      const response = await this.axios.post<Tag>(`/tag`, {
-        label,
-      });
-
-      return response.data;
-    } catch (e) {
-      this.logger.warn(`Failed to create tag: ${e.message}`);
+      this.logger.error(`Failed to retrieve tags`, e);
     }
   };
 
@@ -129,23 +71,15 @@ export abstract class ServarrApi<QueueItemAppendT> extends ExternalApiService {
       }
       return resp ? resp.data : undefined;
     } catch (e) {
-      this.logger.warn(`Failed to run command: ${e.message}`);
+      this.logger.error(`Failed to run command`, e);
     }
   }
 
   protected async runDelete(command: string): Promise<void> {
-    try {
-      await this.delete(`/${command}`);
-    } catch (e) {
-      this.logger.warn(`Failed to run DELETE: ${e.message}`);
-    }
+    await this.delete(`/${command}`);
   }
 
   protected async runPut(command: string, body: string): Promise<void> {
-    try {
-      await this.put(`/${command}`, body);
-    } catch (e) {
-      this.logger.warn(`Failed to run PUT: ${e.message}`);
-    }
+    await this.put(`/${command}`, body);
   }
 }

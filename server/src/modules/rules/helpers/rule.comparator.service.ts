@@ -137,17 +137,11 @@ export class RuleComparatorService {
         throw e;
       }
 
-      this.logger.log(
+      this.logger.error(
         `Something went wrong while running rule ${rulegroup.name}`,
+        e,
       );
-      this.logger.debug(e);
     }
-  }
-
-  private updateStatisticResults() {
-    this.statistics.forEach((el) => {
-      el.result = this.resultData.some((i) => +i.ratingKey === +el.plexId);
-    });
   }
 
   private setStatisticSectionResults() {

@@ -61,7 +61,6 @@ export class JellyseerrGetterService {
 
       const prop = this.appProperties.find((el) => el.id === id);
       const tmdb = await this.tmdbIdHelper.getTmdbIdFromPlexData(libItem);
-      // const jellyseerrUsers = await this.jellyseerrApi.getUsers();
 
       if (tmdb && tmdb.id) {
         if (libItem.type === 'movie') {
@@ -164,8 +163,10 @@ export class JellyseerrGetterService {
               }
               return [];
             } catch (e) {
-              this.logger.warn("Couldn't get addUser from Jellyseerr");
-              this.logger.debug(e);
+              this.logger.error(
+                'An error occurred getting addUser for Jellyseerr',
+                e,
+              );
             }
           }
           case 'amountRequested': {
@@ -289,11 +290,10 @@ export class JellyseerrGetterService {
         return null;
       }
     } catch (e) {
-      this.logger.warn(
-        `Jellyseerr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      this.logger.error(
+        `Jellyseerr-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}'`,
+        e,
       );
-      this.logger.debug(e);
-      return undefined;
     }
   }
 

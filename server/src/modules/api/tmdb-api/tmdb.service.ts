@@ -39,8 +39,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      this.logger.warn(`Failed to fetch person details: ${e.message}`);
-      this.logger.debug(e);
+      this.logger.error('Failed to fetch person details', e);
     }
   };
 
@@ -66,8 +65,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      this.logger.warn(`Failed to fetch movie details: ${e.message}`);
-      this.logger.debug(e);
+      this.logger.error('Failed to fetch movie details', e);
     }
   };
 
@@ -93,8 +91,7 @@ export class TmdbApiService extends ExternalApiService {
 
       return data;
     } catch (e) {
-      this.logger.warn(`Failed to fetch TV show details: ${e.message}`);
-      this.logger.debug(e);
+      this.logger.error('Failed to fetch TV show details', e);
     }
   };
 
@@ -113,8 +110,7 @@ export class TmdbApiService extends ExternalApiService {
         return (await this.getTvShow({ tvId: tmdbId }))?.poster_path;
       }
     } catch (e) {
-      this.logger.warn(`Failed to fetch image path: ${e.message}`);
-      this.logger.debug(e);
+      this.logger.error('Failed to fetch image path', e);
     }
   };
 
@@ -132,8 +128,7 @@ export class TmdbApiService extends ExternalApiService {
         return (await this.getTvShow({ tvId: tmdbId }))?.backdrop_path;
       }
     } catch (e) {
-      this.logger.warn(`Failed to fetch backdrop image path: ${e.message}`);
-      this.logger.debug(e);
+      this.logger.error('Failed to fetch backdrop image path', e);
     }
   };
 
@@ -164,8 +159,7 @@ export class TmdbApiService extends ExternalApiService {
       );
       return data;
     } catch (e) {
-      this.logger.warn(`Failed to find by external ID: ${e.message}`);
-      this.logger.debug(e);
+      this.logger.error('Failed to find by external ID', e);
     }
   }
 }

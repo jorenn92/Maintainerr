@@ -29,7 +29,10 @@ export class CollectionLogCleanerService extends TaskBase {
         await this.collectionService.removeOldCollectionLogs(collection);
       }
     } catch (e) {
-      this.logger.debug(e);
+      this.logger.error(
+        'An error occurred while removing old collection logs',
+        e,
+      );
     }
   }
 }

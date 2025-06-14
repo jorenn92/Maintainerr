@@ -198,11 +198,10 @@ export class TautulliGetterService {
         }
       }
     } catch (e) {
-      this.logger.warn(
-        `Tautulli-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}': ${e.message}`,
+      this.logger.error(
+        `Tautulli-Getter - Action failed for '${libItem.title}' with id '${libItem.ratingKey}'`,
+        e,
       );
-      this.logger.debug(e);
-      return undefined;
     }
   }
 

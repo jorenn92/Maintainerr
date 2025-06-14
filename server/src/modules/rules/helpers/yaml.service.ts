@@ -92,8 +92,7 @@ export class RuleYamlService {
         message: 'success',
       };
     } catch (e) {
-      this.logger.warn(`Yaml export failed : ${e.message}`);
-      this.logger.debug(e);
+      this.logger.error('Yaml export failed', e);
       return {
         code: 0,
         message: 'Yaml export failed. Please check logs',
@@ -164,8 +163,7 @@ export class RuleYamlService {
         message: 'success',
       };
     } catch (e) {
-      this.logger.warn(`Yaml import failed. Is the yaml valid?`);
-      this.logger.debug(e);
+      this.logger.error('Yaml import failed. Is the yaml valid?', e);
       return {
         code: 0,
         message: 'Import failed, please check your yaml',

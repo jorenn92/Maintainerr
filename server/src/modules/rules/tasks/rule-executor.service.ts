@@ -191,8 +191,7 @@ export class RuleExecutorService extends TaskBase {
         err instanceof DOMException && err.name === 'AbortError';
 
       if (!executionBeingAborted) {
-        this.logger.log('Error running rules executor.');
-        this.logger.debug(err);
+        this.logger.error('Error running rules executor.', err);
         this.eventEmitter.emit(MaintainerrEvent.RuleHandler_Failed);
       }
     }
@@ -441,9 +440,7 @@ export class RuleExecutorService extends TaskBase {
         );
       }
     } catch (err) {
-      this.logger.warn(
-        `Execption occurred whild handling rule: ${err.message}`,
-      );
+      this.logger.error(`Execption occurred while handling rule`, err);
 
       this.eventEmitter.emit(
         MaintainerrEvent.RuleHandler_Failed,

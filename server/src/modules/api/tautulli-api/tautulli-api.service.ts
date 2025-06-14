@@ -120,22 +120,16 @@ export class TautulliApiService {
   }
 
   public async info(): Promise<Response<TautulliInfo> | null> {
-    try {
-      const response: Response<TautulliInfo> = await this.api.getWithoutCache(
-        '',
-        {
-          signal: AbortSignal.timeout(10000),
-          params: {
-            cmd: 'get_tautulli_info',
-          },
+    const response: Response<TautulliInfo> = await this.api.getWithoutCache(
+      '',
+      {
+        signal: AbortSignal.timeout(10000),
+        params: {
+          cmd: 'get_tautulli_info',
         },
-      );
-      return response;
-    } catch (e) {
-      this.logger.log(`Couldn't fetch Tautulli info: ${e.message}`);
-      this.logger.debug(e);
-      return null;
-    }
+      },
+    );
+    return response;
   }
 
   public async getPaginatedHistory(
@@ -339,9 +333,7 @@ export class TautulliApiService {
         };
       }
     } catch (e) {
-      this.logger.warn(
-        `A failure occurred testing Tautulli connectivity: ${e}`,
-      );
+      this.logger.error(`A failure occurred testing Tautulli connectivity`, e);
 
       if (e instanceof CanceledError) {
         return {
