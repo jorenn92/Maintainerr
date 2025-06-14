@@ -143,9 +143,8 @@ const JellyseerrSettings = () => {
                   name="hostname"
                   id="hostname"
                   type="text"
-                  defaultValue={hostname}
+                  value={hostname ?? ''}
                   ref={hostnameRef}
-                  value={hostnameRef.current?.value}
                   onChange={(e) =>
                     handleSettingsInputChange(e, hostnameRef, setHostname)
                   }
@@ -165,8 +164,7 @@ const JellyseerrSettings = () => {
                   id="port"
                   type="number"
                   ref={portRef}
-                  value={portRef.current?.value}
-                  defaultValue={port}
+                  value={port ?? ''}
                   onChange={(e) =>
                     handleSettingsInputChange(e, portRef, setPort)
                   }
