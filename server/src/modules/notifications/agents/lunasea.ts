@@ -30,7 +30,6 @@ class LunaSeaAgent implements NotificationAgent {
   private buildPayload(type: NotificationType, payload: NotificationPayload) {
     return {
       notification_type: NotificationType[type],
-      event: payload.event,
       subject: payload.subject,
       message: payload.message,
       image: payload.image ?? null,
@@ -81,11 +80,10 @@ class LunaSeaAgent implements NotificationAgent {
         `Error sending Lunasea notification. Details: ${JSON.stringify({
           type: NotificationType[type],
           subject: payload.subject,
-          errorMessage: e.message,
           response: e.response?.data,
         })}`,
+        e,
       );
-      this.logger.debug(e);
 
       return `Failure: ${e.message}`;
     }

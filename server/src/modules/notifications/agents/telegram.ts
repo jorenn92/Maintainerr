@@ -62,9 +62,7 @@ class TelegramAgent implements NotificationAgent {
     type: NotificationType,
     payload: NotificationPayload,
   ): Partial<TelegramMessagePayload | TelegramPhotoPayload> {
-    let message = `\*${this.escapeText(
-      payload.event ? `${payload.event} - ${payload.subject}` : payload.subject,
-    )}\*`;
+    let message = `\*${this.escapeText(payload.subject)}\*`;
     if (payload.message) {
       message += `\n${this.escapeText(payload.message)}`;
     }
@@ -99,7 +97,7 @@ class TelegramAgent implements NotificationAgent {
       hasNotificationType(type, settings.types ?? [0]) &&
       settings.options.chatId
     ) {
-      this.logger.debug('Sending Telegram notification');
+      this.logger.log('Sending Telegram notification');
 
       try {
         await axios.post(endpoint, {
@@ -112,11 +110,10 @@ class TelegramAgent implements NotificationAgent {
           `Error sending Telegram notification. Details: ${JSON.stringify({
             type: NotificationType[type],
             subject: payload.subject,
-            errorMessage: e.message,
             response: e.response?.data,
           })}`,
+          e,
         );
-        this.logger.debug(e);
         return `Failure: ${e.message}`;
       }
     }

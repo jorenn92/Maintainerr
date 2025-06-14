@@ -80,18 +80,6 @@ class SlackAgent implements NotificationAgent {
 
     const blocks: EmbedBlock[] = [];
 
-    if (payload.event) {
-      blocks.push({
-        type: 'context',
-        elements: [
-          {
-            type: 'mrkdwn',
-            text: `*${payload.event}*`,
-          },
-        ],
-      });
-    }
-
     blocks.push({
       type: 'header',
       text: {
@@ -125,7 +113,7 @@ class SlackAgent implements NotificationAgent {
     }
 
     return {
-      text: payload.event ?? payload.subject,
+      text: payload.subject,
       blocks,
     };
   }
@@ -163,11 +151,10 @@ class SlackAgent implements NotificationAgent {
         `Error sending Slack notification. Details: ${JSON.stringify({
           type: NotificationType[type],
           subject: payload.subject,
-          errorMessage: e.message,
           response: e.response?.data,
         })}`,
+        e,
       );
-      this.logger.debug(e);
       return `Failure: ${e.message}`;
     }
   }

@@ -42,9 +42,7 @@ class PushbulletAgent implements NotificationAgent {
     type: NotificationType,
     payload: NotificationPayload,
   ): PushbulletPayload {
-    const title = payload.event
-      ? `${payload.event} - ${payload.subject}`
-      : payload.subject;
+    const title = payload.subject;
     const body = payload.message ?? '';
 
     // for (const extra of payload.extra ?? []) {
@@ -90,11 +88,10 @@ class PushbulletAgent implements NotificationAgent {
           `Error sending Pushbullet notification. Details: ${JSON.stringify({
             type: NotificationType[type],
             subject: payload.subject,
-            errorMessage: e.message,
             response: e.response?.data,
           })}`,
+          e,
         );
-        this.logger.debug(e);
 
         return `Failure: ${e.message}`;
       }
@@ -116,11 +113,10 @@ class PushbulletAgent implements NotificationAgent {
           `Error sending Pushbullet notification. Details: ${JSON.stringify({
             type: NotificationType[type],
             subject: payload.subject,
-            errorMessage: e.message,
             response: e.response?.data,
           })}`,
+          e,
         );
-        this.logger.debug(e);
 
         return `Failure: ${e.message}`;
       }
