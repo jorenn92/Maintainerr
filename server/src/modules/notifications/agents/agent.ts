@@ -6,7 +6,6 @@ import {
 } from '../notifications-interfaces';
 
 export interface NotificationPayload {
-  event?: string;
   subject: string;
   image?: string;
   message?: string;

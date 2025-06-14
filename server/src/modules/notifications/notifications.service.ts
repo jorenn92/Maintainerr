@@ -160,8 +160,7 @@ export class NotificationService {
       await this.registerConfiguredAgents(true);
       return { code: 1, status: 'OK', message: 'Success' };
     } catch (err) {
-      this.logger.warn('Adding a new notification configuration failed');
-      this.logger.debug(err);
+      this.logger.error('Adding a new notification configuration failed', err);
       return { code: 0, status: 'NOK', message: err };
     }
   }
@@ -189,8 +188,10 @@ export class NotificationService {
       this.logger.warn('Connecting the notification configuration failed');
       return { code: 0, result: 'failed' };
     } catch (err) {
-      this.logger.error('Connecting the notification configuration failed');
-      this.logger.debug(err);
+      this.logger.error(
+        'Connecting the notification configuration failed',
+        err,
+      );
       return { code: 0, result: err };
     }
   }
@@ -218,8 +219,10 @@ export class NotificationService {
 
       return { code: 0, result: 'failed' };
     } catch (err) {
-      this.logger.error('Disconnecting the notification configuration failed');
-      this.logger.debug(err);
+      this.logger.error(
+        'Disconnecting the notification configuration failed',
+        err,
+      );
       return { code: 0, result: err };
     }
   }
@@ -241,8 +244,7 @@ export class NotificationService {
 
       return await this.notificationRepo.find();
     } catch (err) {
-      this.logger.warn('Fetching Notification configurations failed');
-      this.logger.debug(err);
+      this.logger.error('Fetching Notification configurations failed', err);
     }
   }
 
@@ -401,8 +403,7 @@ export class NotificationService {
 
       return { code: 1, result: 'success' };
     } catch (err) {
-      this.logger.error('Notification configuration removal failed');
-      this.logger.debug(err);
+      this.logger.error('Notification configuration removal failed', err);
       return { code: 0, result: err };
     }
   }
@@ -795,7 +796,6 @@ export class NotificationService {
       return message;
     } catch (e) {
       this.logger.error("Couldn't transform notification message", e);
-      this.logger.debug(e);
     }
   }
 
