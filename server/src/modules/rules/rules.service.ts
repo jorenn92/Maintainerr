@@ -982,6 +982,36 @@ export class RulesService {
     return this.ruleYamlService.decode(yaml, mediaType);
   }
 
+  public async testRules(rules: RulesDto, mediaId: string): Promise<any> {
+    // flush caches
+    this.plexApi.resetMetadataCache(mediaId);
+    cacheManager.getCache('overseerr').data.flushAll();
+    cacheManager.getCache('tautulli').data.flushAll();
+    cacheManager.getCache('jellyseerr').flush();
+    cacheManager
+      .getCachesByType('radarr')
+      .forEach((cache) => cache.data.flushAll());
+    cacheManager
+      .getCachesByType('sonarr')
+      .forEach((cache) => cache.data.flushAll());
+
+    const mediaResp = await this.plexApi.getMetadata(mediaId);
+    if (mediaResp) {
+      const ruleComparator = this.ruleComparatorServiceFactory.create();
+      const result = await ruleComparator.executeRulesWithData(rules, [
+        mediaResp as unknown as PlexLibraryItem,
+      ]);
+
+      if (result) {
+        return { code: 1, result: result.stats };
+      } else {
+        return { code: 0, result: 'An error occurred executing rules' };
+      }
+    }
+
+    return { code: 0, result: 'Invalid input' };
+  }
+
   public async testRuleGroupWithData(
     rulegroupId: number,
     mediaId: string,

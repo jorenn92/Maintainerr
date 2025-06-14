@@ -22,6 +22,7 @@ import GetApiHandler, {
 } from '../../../../utils/ApiHandler'
 import { EPlexDataType } from '../../../../utils/PlexDataType-enum'
 import { ICollection } from '../../../Collection'
+import TestMediaItem from '../../../Collection/CollectionDetail/TestMediaItem'
 import Alert from '../../../Common/Alert'
 import Button from '../../../Common/Button'
 import CachedImage from '../../../Common/CachedImage'
@@ -38,7 +39,7 @@ interface AddModal {
   onSuccess: () => void
 }
 
-interface ICreateApiObject {
+export interface IRulesPut {
   name: string
   description: string
   libraryId: number
@@ -120,6 +121,7 @@ const AddModal = (props: AddModal) => {
   )
   const [error, setError] = useState<boolean>(false)
   const [formIncomplete, setFormIncomplete] = useState<boolean>(false)
+  const [test, setTest] = useState<boolean>(false)
   const ruleCreatorVersion = useRef<number>(1)
   const LibrariesCtx = useContext(LibrariesContext)
   const tautulliEnabled =
@@ -323,7 +325,7 @@ const AddModal = (props: AddModal) => {
       ((useRules && rules.length > 0) || !useRules)
     ) {
       setFormIncomplete(false)
-      const creationObj: ICreateApiObject = {
+      const creationObj: IRulesPut = {
         name: nameRef.current.value,
         description: descriptionRef.current.value,
         libraryId: +libraryRef.current.value,
@@ -1057,6 +1059,50 @@ const AddModal = (props: AddModal) => {
                   />
                 ) : undefined}
 
+                {test && (
+                  <TestMediaItem
+                    ruleGroup={
+                      {
+                        name: nameRef.current.value,
+                        description: descriptionRef.current.value,
+                        libraryId: +libraryRef.current.value,
+                        arrAction: arrOption ? arrOption : 0,
+                        dataType: +selectedType,
+                        isActive: active,
+                        useRules: useRules,
+                        listExclusions: listExclusion,
+                        forceOverseerr: forceOverseerr,
+                        tautulliWatchedPercentOverride:
+                          tautulliWatchedPercentOverrideRef.current &&
+                          tautulliWatchedPercentOverrideRef.current.value != ''
+                            ? +tautulliWatchedPercentOverrideRef.current.value
+                            : undefined,
+                        radarrSettingsId: radarrSettingsId ?? undefined,
+                        sonarrSettingsId: sonarrSettingsId ?? undefined,
+                        collection: {
+                          visibleOnRecommended: showRecommended,
+                          visibleOnHome: showHome,
+                          deleteAfterDays:
+                            arrOption === undefined || arrOption === 4
+                              ? undefined
+                              : +deleteAfterRef.current.value,
+                          manualCollection: manualCollection,
+                          manualCollectionName:
+                            manualCollectionNameRef.current.value,
+                          keepLogsForMonths:
+                            +keepLogsForMonthsRef.current.value,
+                        },
+                        rules: useRules ? rules : [],
+                        notifications: configuredNotificationConfigurations,
+                      } satisfies IRulesPut
+                    }
+                    onCancel={() => {
+                      setTest(false)
+                    }}
+                    onSubmit={() => {}}
+                  />
+                )}
+
                 <RuleCreator
                   key={ruleCreatorVersion.current}
                   mediaType={
@@ -1085,6 +1131,10 @@ const AddModal = (props: AddModal) => {
                 <p className="button-text m-auto ml-1 mr-5 text-zinc-100">
                   Save
                 </p>
+              </button>
+
+              <button type="button" onClick={() => setTest(true)}>
+                Test
               </button>
 
               <button

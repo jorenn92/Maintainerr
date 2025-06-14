@@ -226,10 +226,16 @@ export class RulesController {
   }
 
   @Post('/test')
-  async testRuleGroup(@Body() body: { mediaId: string; rulegroupId: number }) {
-    return this.rulesService.testRuleGroupWithData(
-      body.rulegroupId,
-      body.mediaId,
-    );
+  async testRuleGroup(
+    @Body() body: { mediaId: string; ruleGroup: number | RulesDto },
+  ) {
+    if (typeof body.ruleGroup === 'number') {
+      return this.rulesService.testRuleGroupWithData(
+        body.ruleGroup,
+        body.mediaId,
+      );
+    } else {
+      return this.rulesService.testRules(body.ruleGroup, body.mediaId);
+    }
   }
 }

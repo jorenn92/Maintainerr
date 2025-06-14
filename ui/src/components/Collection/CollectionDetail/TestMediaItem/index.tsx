@@ -9,12 +9,21 @@ import Alert from '../../../Common/Alert'
 import FormItem from '../../../Common/FormItem'
 import Modal from '../../../Common/Modal'
 import SearchMediaItem, { IMediaOptions } from '../../../Common/SearchMediaITem'
+import { IRulesPut } from '../../../Rules/RuleGroup/AddModal'
 
-interface ITestMediaItem {
+type ITestMediaItem = {
   onCancel: () => void
   onSubmit: () => void
-  collectionId: number
-}
+} & (
+  | {
+      collectionId?: never
+      ruleGroup: IRulesPut
+    }
+  | {
+      collectionId: number
+      ruleGroup?: never
+    }
+)
 
 interface IOptions {
   id: number
@@ -33,12 +42,11 @@ const emptyOption: IOptions = {
 
 const TestMediaItem = (props: ITestMediaItem) => {
   const [loading, setLoading] = useState(true)
-  const [ruleGroup, setRuleGroup] = useState<{
+  const [existingRuleGroup, setExistingRuleGroup] = useState<{
     dataType: EPlexDataType
     libraryId: number
     id: string
   }>()
-
   const [mediaItem, setMediaItem] = useState<IMediaOptions>()
   const [selectedSeasons, setSelectedSeasons] = useState<number>(-1)
   const [selectedEpisodes, setSelectedEpisodes] = useState<number>(-1)
@@ -48,35 +56,41 @@ const TestMediaItem = (props: ITestMediaItem) => {
   ])
   const [comparisonResult, setComparisonResult] = useState<IComparisonResult>()
   const editorRef = useRef(undefined)
+  const activeRuleGroup = existingRuleGroup ?? props.ruleGroup
 
   useEffect(() => {
+    if (!props.collectionId) {
+      setLoading(false)
+      return
+    }
+
     GetApiHandler(`/rules/collection/${props.collectionId}`).then((resp) => {
-      setRuleGroup(resp)
+      setExistingRuleGroup(resp)
       setLoading(false)
     })
-  }, [])
+  }, [props.collectionId])
 
   const testable = useMemo(() => {
-    if (!mediaItem || !ruleGroup) return false
+    if (!mediaItem || !activeRuleGroup) return false
 
     // if movies or shows is selected
     if (
-      ruleGroup.dataType === EPlexDataType.MOVIES ||
-      ruleGroup.dataType === EPlexDataType.SHOWS
+      activeRuleGroup.dataType === EPlexDataType.MOVIES ||
+      activeRuleGroup.dataType === EPlexDataType.SHOWS
     ) {
       return true
     }
 
     // if seasons & season is selected
     else if (
-      ruleGroup.dataType === EPlexDataType.SEASONS &&
+      activeRuleGroup.dataType === EPlexDataType.SEASONS &&
       selectedSeasons !== -1
     ) {
       return true
     }
     // if episodes mediaitem, season & episode is selected
     else if (
-      ruleGroup.dataType === EPlexDataType.EPISODES &&
+      activeRuleGroup.dataType === EPlexDataType.EPISODES &&
       selectedSeasons !== -1 &&
       selectedEpisodes !== -1
     ) {
@@ -139,10 +153,10 @@ const TestMediaItem = (props: ITestMediaItem) => {
   const onSubmit = async () => {
     setComparisonResult(undefined)
 
-    if (!ruleGroup) return
+    if (!activeRuleGroup) return
 
     const result = await PostApiHandler(`/rules/test`, {
-      rulegroupId: ruleGroup.id,
+      ruleGroup: activeRuleGroup,
       mediaId: selectedMediaId,
     })
 
@@ -166,7 +180,7 @@ const TestMediaItem = (props: ITestMediaItem) => {
     }
   }, [selectedSeasons, selectedEpisodes, mediaItem])
 
-  if (loading || !ruleGroup) {
+  if (loading || !activeRuleGroup) {
     return
   }
 
@@ -221,15 +235,15 @@ const TestMediaItem = (props: ITestMediaItem) => {
               <br />
               <br />
               {`The rule group is of type ${
-                ruleGroup.dataType === EPlexDataType.MOVIES
+                activeRuleGroup.dataType === EPlexDataType.MOVIES
                   ? 'movies'
-                  : ruleGroup.dataType === EPlexDataType.SEASONS
+                  : activeRuleGroup.dataType === EPlexDataType.SEASONS
                     ? 'seasons'
-                    : ruleGroup.dataType === EPlexDataType.EPISODES
+                    : activeRuleGroup.dataType === EPlexDataType.EPISODES
                       ? 'episodes'
                       : 'series'
               }, as a result only media of type ${
-                ruleGroup.dataType === EPlexDataType.MOVIES
+                activeRuleGroup.dataType === EPlexDataType.MOVIES
                   ? 'movies'
                   : 'series'
               } will be displayed in the search bar.`}
@@ -237,8 +251,8 @@ const TestMediaItem = (props: ITestMediaItem) => {
           </div>
           <FormItem label="Media">
             <SearchMediaItem
-              mediatype={ruleGroup.dataType}
-              libraryId={ruleGroup.libraryId}
+              mediatype={activeRuleGroup.dataType}
+              libraryId={activeRuleGroup.libraryId}
               onChange={(el) => {
                 updateMediaItem(el as unknown as IMediaOptions)
               }}
@@ -247,8 +261,8 @@ const TestMediaItem = (props: ITestMediaItem) => {
 
           {/* seasons */}
           <div className="w-full">
-            {ruleGroup.dataType === EPlexDataType.SEASONS ||
-            ruleGroup.dataType === EPlexDataType.EPISODES ? (
+            {activeRuleGroup.dataType === EPlexDataType.SEASONS ||
+            activeRuleGroup.dataType === EPlexDataType.EPISODES ? (
               <FormItem label="Season">
                 <select
                   name={`Seasons-field`}
@@ -269,7 +283,7 @@ const TestMediaItem = (props: ITestMediaItem) => {
               </FormItem>
             ) : undefined}
 
-            {ruleGroup.dataType === EPlexDataType.EPISODES ? (
+            {activeRuleGroup.dataType === EPlexDataType.EPISODES ? (
               // episodes
               <FormItem label="Episode">
                 <select
