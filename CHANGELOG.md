@@ -1,3 +1,20 @@
+# [2.18.0](https://github.com/jorenn92/Maintainerr/compare/v2.17.0...v2.18.0) (2025-06-13)
+
+
+### Bug Fixes
+
+* Hide days in notifications for Do nothing rules ([#1788](https://github.com/jorenn92/Maintainerr/issues/1788)) ([d590220](https://github.com/jorenn92/Maintainerr/commit/d590220a94806100fa0b9e140f0382fa94fd08ff))
+* Improve community rule loading states ([#1810](https://github.com/jorenn92/Maintainerr/issues/1810)) ([17691f4](https://github.com/jorenn92/Maintainerr/commit/17691f44607b10b8915ecbd92657bc2080eff6db))
+* Improve UI memory handling ([#1808](https://github.com/jorenn92/Maintainerr/issues/1808)) ([ec110b9](https://github.com/jorenn92/Maintainerr/commit/ec110b9116606a29726cce14abb63589acfed84f))
+* Media About To Be Handled notifications not sending ([#1801](https://github.com/jorenn92/Maintainerr/issues/1801)) ([1ef0346](https://github.com/jorenn92/Maintainerr/commit/1ef0346b1304e6ffcb416e1dceb78596a0d98fa5))
+* Notification selected types, agent checkbox options ([#1791](https://github.com/jorenn92/Maintainerr/issues/1791)) ([b43066a](https://github.com/jorenn92/Maintainerr/commit/b43066a5c35cd61f740f61211c435e6e569b3055))
+* **notifications:** Subject missing breaking some agents ([#1812](https://github.com/jorenn92/Maintainerr/issues/1812)) ([0d283de](https://github.com/jorenn92/Maintainerr/commit/0d283de710b14ccae33f6e2d332d8a914091d401))
+
+
+### Features
+
+* **rules:** add new CONTAINS_ALL action for complete subset validation ([#1825](https://github.com/jorenn92/Maintainerr/issues/1825)) ([67d85dd](https://github.com/jorenn92/Maintainerr/commit/67d85ddd23297527d56e67f6dd51ed2319745326))
+
 # [2.17.0](https://github.com/jorenn92/Maintainerr/compare/v2.16.0...v2.17.0) (2025-05-29)
 
 
