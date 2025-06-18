@@ -1287,14 +1287,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hookform/resolvers@npm:^5.0.1":
-  version: 5.0.1
-  resolution: "@hookform/resolvers@npm:5.0.1"
+"@hookform/resolvers@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@hookform/resolvers@npm:5.1.1"
   dependencies:
     "@standard-schema/utils": "npm:^0.3.0"
   peerDependencies:
     react-hook-form: ^7.55.0
-  checksum: 10c0/8260de1cd1b8b53629ea67555f3f027fdeabf4cd6da7f20cb76e646d353d998e61cf3a338d6313c94a31f32c23447403df5e584e5c8dddbca766ed7776513f8b
+  checksum: 10c0/74601ba4abb3159bbaa25175af9459a2c0337a28d8c0a5be95c7ae7b0a76ddafcf63c03eea8561fd099fe80b226194ad09e3824c53b9beda38393ff9fd264a03
   languageName: node
   linkType: hard
 
@@ -2428,7 +2428,7 @@ __metadata:
     rxjs: "npm:^7.8.2"
     typescript: "npm:^5.8.3"
     typescript-eslint: "npm:^8.34.1"
-    zod: "npm:^3.24.4"
+    zod: "npm:^3.25.67"
   languageName: unknown
   linkType: soft
 
@@ -2495,7 +2495,7 @@ __metadata:
     winston-daily-rotate-file: "npm:^5.0.0"
     xml2js: "npm:^0.6.2"
     yaml: "npm:^2.8.0"
-    zod: "npm:^3.24.4"
+    zod: "npm:^3.25.67"
   languageName: unknown
   linkType: soft
 
@@ -2507,7 +2507,7 @@ __metadata:
     "@eslint/js": "npm:^9.29.0"
     "@headlessui/react": "npm:^2.2.4"
     "@heroicons/react": "npm:^1.0.6"
-    "@hookform/resolvers": "npm:^5.0.1"
+    "@hookform/resolvers": "npm:^5.1.1"
     "@maintainerr/contracts": "workspace:^"
     "@monaco-editor/react": "npm:^4.7.0"
     "@tailwindcss/aspect-ratio": "npm:^0.4.2"
@@ -2546,7 +2546,7 @@ __metadata:
     tailwindcss: "npm:^3.4.17"
     typescript: "npm:^5.8.3"
     yaml: "npm:^2.8.0"
-    zod: "npm:^3.24.4"
+    zod: "npm:^3.25.67"
   languageName: unknown
   linkType: soft
 
@@ -19575,10 +19575,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.24.4":
-  version: 3.24.4
-  resolution: "zod@npm:3.24.4"
-  checksum: 10c0/ab3112f017562180a41a0f83d870b333677f7d6b77f106696c56894567051b91154714a088149d8387a4f50806a2520efcb666f108cd384a35c236a191186d91
+"zod@npm:^3.25.67":
+  version: 3.25.67
+  resolution: "zod@npm:3.25.67"
+  checksum: 10c0/80a0cab3033272c4ab9312198081f0c4ea88e9673c059aa36dc32024906363729db54bdb78f3dc9d5529bd1601f74974d5a56c0a23e40c6f04a9270c9ff22336
   languageName: node
   linkType: hard
 
