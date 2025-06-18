@@ -117,11 +117,6 @@ class DiscordAgent implements NotificationAgent {
       description: payload.message,
       color,
       timestamp: new Date().toISOString(),
-      author: payload.event
-        ? {
-            name: payload.event,
-          }
-        : undefined,
       fields,
       thumbnail: {
         url: payload.image,
@@ -162,11 +157,10 @@ class DiscordAgent implements NotificationAgent {
         `Error sending Discord notification. Details: ${JSON.stringify({
           type: NotificationType[type],
           subject: payload.subject,
-          errorMessage: e.message,
           response: e.response?.data,
         })}`,
+        e,
       );
-      this.logger.debug(e);
 
       return `Failure: ${e.message}`;
     }
