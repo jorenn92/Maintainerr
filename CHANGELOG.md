@@ -1,3 +1,11 @@
+## [2.18.1](https://github.com/jorenn92/Maintainerr/compare/v2.18.0...v2.18.1) (2025-06-19)
+
+
+### Bug Fixes
+
+* **notifications:** Missing email templates ([#1834](https://github.com/jorenn92/Maintainerr/issues/1834)) ([f3a09d1](https://github.com/jorenn92/Maintainerr/commit/f3a09d12769e210e63fc89ed034d9dd873e2e32e))
+* Patch remaining runtime and cleanup issues ([#1813](https://github.com/jorenn92/Maintainerr/issues/1813)) ([d5bec2e](https://github.com/jorenn92/Maintainerr/commit/d5bec2e2ba13ecebfb5b1dc7d9029c33071e5269))
+
 # [2.18.0](https://github.com/jorenn92/Maintainerr/compare/v2.17.0...v2.18.0) (2025-06-13)
 
 
