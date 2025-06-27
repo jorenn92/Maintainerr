@@ -20,6 +20,7 @@ interface IRadarrSettingsModal {
 interface TestStatus {
   status: boolean
   version: string
+  appName?: string
 }
 
 type RadarrSettingSaveResponse =
@@ -173,6 +174,7 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
         setTestResult({
           status: resp.code == 1 ? true : false,
           version: resp.message,
+          appName: resp.message,
         })
 
         if (resp.code == 1) {
@@ -222,7 +224,7 @@ const RadarrSettingsModal = (props: IRadarrSettingsModal) => {
             title={`Successfully connected to Radarr (${testResult.version})`}
           />
         ) : (
-          <Alert type="error" title="Failed to connect to Radarr" />
+          <Alert type="error" title={testResult.appName || 'Failure'} />
         )
       ) : undefined}
 
