@@ -2514,7 +2514,7 @@ __metadata:
     "@tailwindcss/forms": "npm:^0.5.10"
     "@tailwindcss/typography": "npm:^0.5.16"
     "@tanstack/eslint-plugin-query": "npm:^5.78.0"
-    "@tanstack/react-query": "npm:^5.76.0"
+    "@tanstack/react-query": "npm:^5.81.5"
     "@types/lodash": "npm:^4.17.17"
     "@types/node": "npm:^22"
     "@types/react": "npm:^19.1.8"
@@ -4102,21 +4102,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.76.0":
-  version: 5.76.0
-  resolution: "@tanstack/query-core@npm:5.76.0"
-  checksum: 10c0/970cc783838bf7e30acbad476c72e4bb3b302c15525152cfcf5ffef8b185537e780b608e3f77793cb355b49cc98a9de597d978d400df44dbd550cba78742d67c
+"@tanstack/query-core@npm:5.81.5":
+  version: 5.81.5
+  resolution: "@tanstack/query-core@npm:5.81.5"
+  checksum: 10c0/8d3af841f0e2f3fba1dfd100a8bbc2d07e7b1d5b8570d3d0d8bba5127601c2788e5f7c84839f93f3b0cbe54f14866c1fef8e3f9e745f02d27afaaeea33b7b755
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.76.0":
-  version: 5.76.0
-  resolution: "@tanstack/react-query@npm:5.76.0"
+"@tanstack/react-query@npm:^5.81.5":
+  version: 5.81.5
+  resolution: "@tanstack/react-query@npm:5.81.5"
   dependencies:
-    "@tanstack/query-core": "npm:5.76.0"
+    "@tanstack/query-core": "npm:5.81.5"
   peerDependencies:
     react: ^18 || ^19
-  checksum: 10c0/d17b7840f00a6f6d6253f436f9d32d63d255e6945e81930a36b58deb39a5fb63f6911f4ccdf393570ccfc8675cf0439c1db1d8c87532fd09d93807aa9771f819
+  checksum: 10c0/04803dd7d7d6ac73ba8c55bb25d76aa2f74d173d1574a113c35559bf6a8ac7d04a75db5e470e9a2e4132fee5e0ce1ab23bd8c27d17f70a461aca0e7ae740e76b
   languageName: node
   linkType: hard
 
