@@ -583,6 +583,14 @@ export class SettingsService implements SettingDto {
       const apiClient = await this.servarr.getRadarrApiClient(id);
 
       const resp = await apiClient.info();
+      //Make sure it's actually Radarr and not Sonarr
+      if (resp?.appName && resp.appName.toLowerCase() !== 'radarr') {
+        return {
+          status: 'NOK',
+          code: 0,
+          message: `Unexpected application name returned: ${resp.appName}`,
+        };
+      }
       return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
@@ -599,6 +607,14 @@ export class SettingsService implements SettingDto {
       const apiClient = await this.servarr.getSonarrApiClient(id);
 
       const resp = await apiClient.info();
+      //Make sure it's actually Sonarr and not Radarr
+      if (resp?.appName && resp.appName.toLowerCase() !== 'sonarr') {
+        return {
+          status: 'NOK',
+          code: 0,
+          message: `Unexpected application name returned: ${resp.appName}`,
+        };
+      }
       return resp?.version != null
         ? { status: 'OK', code: 1, message: resp.version }
         : { status: 'NOK', code: 0, message: 'Failure' };
