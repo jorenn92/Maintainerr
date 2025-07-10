@@ -588,7 +588,7 @@ export class SettingsService implements SettingDto {
         return {
           status: 'NOK',
           code: 0,
-          message: `Returned appName is "${resp?.appName ?? 'unknown'}"`,
+          message: `Unexpected application name returned: ${resp.appName}`,
         };
       }
       return resp?.version != null
@@ -612,7 +612,7 @@ export class SettingsService implements SettingDto {
         return {
           status: 'NOK',
           code: 0,
-          message: `Returned appName is "${resp?.appName ?? 'unknown'}"`,
+          message: `Unexpected application name returned: ${resp.appName}`,
         };
       }
       return resp?.version != null

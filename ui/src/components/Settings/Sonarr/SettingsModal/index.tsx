@@ -20,7 +20,6 @@ interface ISonarrSettingsModal {
 interface TestStatus {
   status: boolean
   version: string
-  appName?: string
 }
 
 type SonarrSettingSaveResponse =
@@ -174,7 +173,6 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
         setTestResult({
           status: resp.code == 1 ? true : false,
           version: resp.message,
-          appName: resp.message,
         })
 
         if (resp.code == 1) {
@@ -224,7 +222,10 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
             title={`Successfully connected to Sonarr (${testResult.version})`}
           />
         ) : (
-          <Alert type="error" title={testResult.appName || 'Failure'} />
+          <Alert
+            type="error"
+            title={testResult.version || 'Failed to connect to Sonarr'}
+          />
         )
       ) : undefined}
 
