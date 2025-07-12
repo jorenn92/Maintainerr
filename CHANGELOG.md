@@ -1,3 +1,10 @@
+## [2.18.2](https://github.com/jorenn92/Maintainerr/compare/v2.18.1...v2.18.2) (2025-07-12)
+
+
+### Bug Fixes
+
+* ensuring correct application during connection test ([#1849](https://github.com/jorenn92/Maintainerr/issues/1849)) ([363661d](https://github.com/jorenn92/Maintainerr/commit/363661dc34b959579fda86aeb17606bff125cbbd))
+
 ## [2.18.1](https://github.com/jorenn92/Maintainerr/compare/v2.18.0...v2.18.1) (2025-06-19)
 
 
