@@ -1,4 +1,7 @@
-import { TautulliSettingDto } from '@maintainerr/contracts';
+import {
+  OverseerrSettingDto,
+  TautulliSettingDto,
+} from '@maintainerr/contracts';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isValidCron } from 'cron-validator';
@@ -308,6 +311,50 @@ export class SettingsService implements SettingDto {
     }
   }
 
+  public async removeOverseerrSetting() {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        overseerr_url: null,
+        overseerr_api_key: null,
+      });
+
+      this.overseerr_url = null;
+      this.overseerr_api_key = null;
+      this.overseerr.init();
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error removing Overseerr settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
+  public async updateOverseerrSetting(
+    settings: OverseerrSettingDto,
+  ): Promise<BasicResponseDto> {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        overseerr_url: settings.url,
+        overseerr_api_key: settings.api_key,
+      });
+
+      this.overseerr_url = settings.url;
+      this.overseerr_api_key = settings.api_key;
+      this.overseerr.init();
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error while updating Overseerr settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
   public async addSonarrSetting(
     settings: Omit<SonarrSettings, 'id' | 'collections'>,
   ): Promise<SonarrSettingResponseDto> {
@@ -505,9 +552,18 @@ export class SettingsService implements SettingDto {
     );
   }
 
-  public async testOverseerr(): Promise<BasicResponseDto> {
+  public async testOverseerr(
+    setting?: OverseerrSettingDto,
+  ): Promise<BasicResponseDto> {
     try {
-      const validateResponse = await this.overseerr.validateApiConnectivity();
+      const validateResponse = await this.overseerr.testConnection(
+        setting
+          ? {
+              apiKey: setting.api_key,
+              url: setting.url,
+            }
+          : undefined,
+      );
 
       if (validateResponse.status === 'OK') {
         const resp = await this.overseerr.status();
