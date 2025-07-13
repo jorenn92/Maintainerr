@@ -1,8 +1,8 @@
+import { BasicResponseDto } from '@maintainerr/contracts';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AxiosError } from 'axios';
 import { MaintainerrLogger } from '../../logging/logs.service';
 import { SettingsService } from '../../settings/settings.service';
-import { BasicResponseDto } from '../external-api/dto/basic-response.dto';
 import { JellyseerrApi } from './helpers/jellyseerr-api.helper';
 
 interface JellyseerrMediaInfo {
@@ -369,9 +369,21 @@ export class JellyseerrApiService {
     }
   }
 
-  public async validateApiConnectivity(): Promise<BasicResponseDto> {
+  public async testConnection(
+    params?: ConstructorParameters<typeof JellyseerrApi>[0],
+  ): Promise<BasicResponseDto> {
+    const api = params
+      ? new JellyseerrApi(
+          {
+            apiKey: params.apiKey,
+            url: `${params.url?.replace(/\/$/, '')}/api/v1`,
+          },
+          this.logger,
+        )
+      : this.api;
+
     try {
-      await this.api.getRawWithoutCache(`/settings/about`, {
+      await api.getRawWithoutCache(`/settings/about`, {
         signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
       });
 
