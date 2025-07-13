@@ -1,3 +1,4 @@
+import { BasicResponseDto } from '@maintainerr/contracts';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AxiosError } from 'axios';
 import { SettingsService } from '../../../modules/settings/settings.service';
@@ -5,7 +6,6 @@ import {
   MaintainerrLogger,
   MaintainerrLoggerFactory,
 } from '../../logging/logs.service';
-import { BasicResponseDto } from '../external-api/dto/basic-response.dto';
 import { OverseerrApi } from './helpers/overseerr-api.helper';
 
 interface OverseerrMediaInfo {
@@ -372,9 +372,21 @@ export class OverseerrApiService {
     }
   }
 
-  public async validateApiConnectivity(): Promise<BasicResponseDto> {
+  public async testConnection(
+    params?: ConstructorParameters<typeof OverseerrApi>[0],
+  ): Promise<BasicResponseDto> {
+    const api = params
+      ? new OverseerrApi(
+          {
+            apiKey: params.apiKey,
+            url: `${params.url?.replace(/\/$/, '')}/api/v1`,
+          },
+          this.loggerFactory.createLogger(),
+        )
+      : this.api;
+
     try {
-      await this.api.getRawWithoutCache(`/settings/about`, {
+      await api.getRawWithoutCache(`/settings/about`, {
         signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
       });
 
