@@ -156,7 +156,7 @@ const JellyseerrSettings = () => {
       {testResult != null &&
         (testResult?.status ? (
           <Alert
-            type="warning"
+            type="info"
             title={`Successfully connected to Jellyseerr (${testResult.message})`}
           />
         ) : (
