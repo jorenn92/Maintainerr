@@ -19,7 +19,7 @@
     "@hookform/resolvers": "^5.1.1",
     "@maintainerr/contracts": "workspace:^",
     "@monaco-editor/react": "^4.7.0",
-    "@tanstack/react-query": "^5.81.5",
+    "@tanstack/react-query": "^5.83.0",
     "axios": "^1.10.0",
     "bowser": "^2.11.0",
     "clsx": "^2.1.1",
