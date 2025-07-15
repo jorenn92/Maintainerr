@@ -154,7 +154,7 @@ const TautulliSettings = () => {
       {testResult != null &&
         (testResult?.status ? (
           <Alert
-            type="warning"
+            type="info"
             title={`Successfully connected to Tautulli (${testResult.message})`}
           />
         ) : (

@@ -1,4 +1,8 @@
-import { BasicResponseDto, TautulliSettingDto } from '@maintainerr/contracts';
+import {
+  BasicResponseDto,
+  JellyseerrSettingDto,
+  TautulliSettingDto,
+} from '@maintainerr/contracts';
 import {
   Body,
   Controller,
@@ -61,10 +65,6 @@ export class SettingsController {
   @Get('/test/overseerr')
   testOverseerr() {
     return this.settingsService.testOverseerr();
-  }
-  @Get('/test/jellyseerr')
-  testJellyseerr() {
-    return this.settingsService.testJellyseerr();
   }
   @Post('/test/radarr')
   testRadarr(@Body() payload: RadarrSettingRawDto) {
@@ -140,6 +140,39 @@ export class SettingsController {
   @Post('/test/tautulli')
   testTautulli(@Body() payload: TautulliSettingDto): Promise<BasicResponseDto> {
     return this.settingsService.testTautulli(payload);
+  }
+
+  @Get('/jellyseerr')
+  async getJellyseerrSetting(): Promise<
+    JellyseerrSettingDto | BasicResponseDto
+  > {
+    const settings = await this.settingsService.getSettings();
+
+    if (!(settings instanceof Settings)) {
+      return settings;
+    }
+
+    return {
+      api_key: settings.jellyseerr_api_key,
+      url: settings.jellyseerr_url,
+    };
+  }
+
+  @Post('/jellyseerr')
+  async updateJellyseerrSetting(@Body() payload: JellyseerrSettingDto) {
+    return await this.settingsService.updateJellyseerrSetting(payload);
+  }
+
+  @Delete('/jellyseerr')
+  async removeJellyseerrSetting() {
+    return await this.settingsService.removeJellyseerrSetting();
+  }
+
+  @Post('/test/jellyseerr')
+  testJellyseerr(
+    @Body() payload: JellyseerrSettingDto,
+  ): Promise<BasicResponseDto> {
+    return this.settingsService.testJellyseerr(payload);
   }
 
   @Delete('/sonarr/:id')
