@@ -8,17 +8,6 @@ import {
 import { BasicResponseDto } from '../external-api/dto/basic-response.dto';
 import { OmbiApi } from './helpers/ombi-api.helper';
 
-interface OmbiMediaInfo {
-  id: number;
-  theMovieDbId: number;
-  theTvDbId: number;
-  status: number;
-  requestedDate: string;
-  available: boolean;
-  denied: boolean;
-  deniedReason: string;
-}
-
 export interface OmbiMovieResponse {
   id: number;
   theMovieDbId: number;
@@ -57,18 +46,6 @@ export interface OmbiTVSeasonRequest {
   available: boolean;
   denied: boolean;
   deniedReason: string;
-}
-
-interface OmbiUser {
-  id: string;
-  userName: string;
-  normalizedUserName: string;
-  email: string;
-  normalizedEmail: string;
-  alias: string;
-  userType: number;
-  dateCreated: string;
-  lastLoggedIn: string;
 }
 
 interface OmbiStatus {
