@@ -133,6 +133,21 @@ ui/src/
 └── styles/         # Global styles and Tailwind config
 ```
 
+## Refactoring Guidelines
+
+When modifying existing code, follow these specific refactoring priorities:
+
+### Forms and UI Components
+- **React Hook Forms Migration**: Forms that do not use React Hook Form should be refactored to use it, along with their Zod validation schemas and corresponding DTOs from the contracts package. See [PR #1871](https://github.com/jorenn92/Maintainerr/pull/1871) as a reference example.
+- **Form Components**: Use existing form components from `ui/src/components/Forms/` (Input, Select, etc.) and create new ones in this directory if necessary, following the same patterns.
+- **Component Naming**: Component file names should follow the exported type name(s) rather than using generic `index.tsx` files. For example, use `UserSettingsForm.tsx` instead of `index.tsx`.
+
+### Server-Side Type Safety
+- **Strict Typing Evolution**: Extra care should be taken in the **server** project. While strict type checking is not currently enabled (`strictNullChecks: false`, `noImplicitAny: false`), we are moving toward stricter standards.
+- **Type Specifications**: When creating new code, specify explicit types including `undefined` when applicable, rather than relying on computed types.
+- **Any Type Elimination**: When encountering `any` types during code changes, attempt to use proper types or create specific type definitions. This includes external API requests and responses.
+- **Gradual Migration**: Incrementally improve type safety without breaking existing functionality.
+
 ## External Integrations
 
 The application integrates with several external services:
@@ -146,6 +161,24 @@ When working with these integrations:
 - Implement caching where appropriate (node-cache)
 - Follow rate limiting best practices
 - Use TypeScript interfaces for external API responses
+
+## External API Documentation
+
+Reference the following OpenAPI specifications and API documentation when working with external service integrations:
+
+### Media Management Services
+- **Sonarr**: [OpenAPI Specification](https://raw.githubusercontent.com/Sonarr/Sonarr/develop/src/Sonarr.Api.V3/openapi.json)
+- **Radarr**: [OpenAPI Specification](https://raw.githubusercontent.com/Radarr/Radarr/develop/src/Radarr.Api.V3/openapi.json)
+- **Tautulli**: [API Reference Documentation](https://docs.tautulli.com/extending-tautulli/api-reference)
+
+### Request Management Services
+- **Overseerr**: [API Documentation](https://api-docs.overseerr.dev/overseerr-api.yml)
+- **Jellyseerr**: [OpenAPI Specification](https://github.com/fallenbagel/jellyseerr/blob/develop/jellyseerr-api.yml)
+
+### Media Server Services
+- **Plex**: [OpenAPI Specification](https://raw.githubusercontent.com/LukeHagar/plex-api-spec/refs/heads/main/src/pms-spec.yaml) | [Additional Documentation](https://www.plexopedia.com/plex-media-server/api/)
+
+These specifications provide comprehensive type definitions and endpoint documentation for creating robust integrations with proper TypeScript typing.
 
 ## Testing Guidelines
 
