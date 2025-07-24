@@ -7,7 +7,6 @@ import { Repository } from 'typeorm';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { InternalApiService } from '../api/internal-api/internal-api.service';
 import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
-import { OmbiApiService } from '../api/ombi-api/ombi-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
@@ -85,8 +84,6 @@ export class SettingsService implements SettingDto {
     private readonly tautulli: TautulliApiService,
     @Inject(forwardRef(() => JellyseerrApiService))
     private readonly jellyseerr: JellyseerrApiService,
-    @Inject(forwardRef(() => OmbiApiService))
-    private readonly ombi: OmbiApiService,
     @Inject(forwardRef(() => InternalApiService))
     private readonly internalApi: InternalApiService,
     @InjectRepository(Settings)
@@ -541,29 +538,6 @@ export class SettingsService implements SettingDto {
 
       if (validateResponse.status === 'OK') {
         const resp = await this.jellyseerr.status();
-        return resp?.version != null
-          ? { status: 'OK', code: 1, message: resp.version }
-          : {
-              status: 'NOK',
-              code: 0,
-              message:
-                'Connection failed! Double check your entries and make sure to Save Changes before you Test.',
-            };
-      } else {
-        return validateResponse;
-      }
-    } catch (e) {
-      this.logger.debug(e);
-      return { status: 'NOK', code: 0, message: 'Failure' };
-    }
-  }
-
-  public async testOmbi(): Promise<BasicResponseDto> {
-    try {
-      const validateResponse = await this.ombi.validateApiConnectivity();
-
-      if (validateResponse.status === 'OK') {
-        const resp = await this.ombi.status();
         return resp?.version != null
           ? { status: 'OK', code: 1, message: resp.version }
           : {
