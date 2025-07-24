@@ -91,7 +91,7 @@ export interface OmbiBasicApiResponse {
   errorMessage: string;
 }
 
-interface OmbiUserResponse {
+export interface OmbiUserResponse {
   id: string;
   userName: string;
   normalizedUserName: string;
