@@ -218,7 +218,7 @@ const SonarrSettingsModal = (props: ISonarrSettingsModal) => {
       {testResult != null ? (
         testResult?.status ? (
           <Alert
-            type="warning"
+            type="info"
             title={`Successfully connected to Sonarr (${testResult.version})`}
           />
         ) : (
