@@ -11,3 +11,6 @@ steps:
   
   - name: Install dependencies
     run: yarn --immutable
+  
+  - name: Build contracts
+    run: yarn workspace @maintainerr/contracts build
