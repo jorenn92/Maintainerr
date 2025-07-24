@@ -184,10 +184,7 @@ describe('RadarrGetterService', () => {
     it('should return audio languages', async () => {
       const movie = createRadarrMovie({
         movieFile: createRadarrMovieFile({
-          mediaInfo: {
-            ...createRadarrMovieFile().mediaInfo,
-            audioLanguages: 'eng',
-          },
+          mediaInfo: { audioLanguages: 'eng' },
         }),
       });
       mockRadarrApi(movie);
