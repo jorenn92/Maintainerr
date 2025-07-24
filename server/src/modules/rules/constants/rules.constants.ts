@@ -630,6 +630,13 @@ export class RuleConstants {
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT,
         },
+        {
+          id: 22,
+          name: 'fileAudioLanguages',
+          humanName: 'File - audio languages',
+          mediaType: MediaType.MOVIE,
+          type: RuleType.TEXT,
+        },
       ],
     },
     {
@@ -835,6 +842,14 @@ export class RuleConstants {
           id: 24,
           name: 'fileQualityName',
           humanName: 'Episode file quality',
+          showType: [EPlexDataType.EPISODES],
+          mediaType: MediaType.SHOW,
+          type: RuleType.TEXT,
+        },
+        {
+          id: 26,
+          name: 'fileAudioLanguages',
+          humanName: 'Episode file audio languages',
           showType: [EPlexDataType.EPISODES],
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT,
