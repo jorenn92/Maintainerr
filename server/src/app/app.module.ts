@@ -7,6 +7,8 @@ import { ZodValidationPipe } from 'nestjs-zod';
 import { ExternalApiModule } from '../modules/api/external-api/external-api.module';
 import { JellyseerrApiModule } from '../modules/api/jellyseerr-api/jellyseerr-api.module';
 import { JellyseerrApiService } from '../modules/api/jellyseerr-api/jellyseerr-api.service';
+import { OmbiApiModule } from '../modules/api/ombi-api/ombi-api.module';
+import { OmbiApiService } from '../modules/api/ombi-api/ombi-api.service';
 import { OverseerrApiModule } from '../modules/api/overseerr-api/overseerr-api.module';
 import { OverseerrApiService } from '../modules/api/overseerr-api/overseerr-api.service';
 import { PlexApiModule } from '../modules/api/plex-api/plex-api.module';
@@ -43,6 +45,7 @@ import ormConfig from './config/typeOrmConfig';
     OverseerrApiModule,
     TautulliApiModule,
     JellyseerrApiModule,
+    OmbiApiModule,
     RulesModule,
     CollectionsModule,
     NotificationsModule,
@@ -65,6 +68,7 @@ export class AppModule implements OnModuleInit {
     private readonly tautulliApi: TautulliApiService,
     private readonly notificationService: NotificationService,
     private readonly jellyseerrApi: JellyseerrApiService,
+    private readonly ombiApi: OmbiApiService,
   ) {}
   async onModuleInit() {
     // Initialize modules requiring settings
@@ -73,6 +77,7 @@ export class AppModule implements OnModuleInit {
     await this.overseerApi.init();
     await this.tautulliApi.init();
     await this.jellyseerrApi.init();
+    await this.ombiApi.init();
 
     // intialize notification agents
     await this.notificationService.registerConfiguredAgents();

@@ -7,7 +7,8 @@ type AvailableCacheIds =
   | 'overseerr'
   | 'plexcommunity'
   | 'tautulli'
-  | 'jellyseerr';
+  | 'jellyseerr'
+  | 'ombi';
 
 type CacheType = AvailableCacheIds | 'radarr' | 'sonarr';
 
@@ -65,6 +66,7 @@ class CacheManager {
     ),
     tautulli: new Cache('tautulli', 'Tautulli API', 'tautulli'),
     jellyseerr: new Cache('jellyseerr', 'Jellyseerr API', 'jellyseerr'),
+    ombi: new Cache('ombi', 'Ombi API', 'ombi'),
   };
 
   public createCache(

@@ -66,6 +66,10 @@ export class SettingsController {
   testJellyseerr() {
     return this.settingsService.testJellyseerr();
   }
+  @Get('/test/ombi')
+  testOmbi() {
+    return this.settingsService.testOmbi();
+  }
   @Post('/test/radarr')
   testRadarr(@Body() payload: RadarrSettingRawDto) {
     return this.settingsService.testRadarr(payload);
