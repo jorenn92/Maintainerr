@@ -11,6 +11,7 @@ import { TautulliApiModule } from '../api/tautulli-api/tautulli-api.module';
 import { RadarrSettings } from './entities/radarr_settings.entities';
 import { SonarrSettings } from './entities/sonarr_settings.entities';
 import { JellyseerrApiModule } from '../api/jellyseerr-api/jellyseerr-api.module';
+import { OmbiApiModule } from '../api/ombi-api/ombi-api.module';
 
 @Global()
 @Module({
@@ -19,6 +20,7 @@ import { JellyseerrApiModule } from '../api/jellyseerr-api/jellyseerr-api.module
     forwardRef(() => ServarrApiModule),
     forwardRef(() => OverseerrApiModule),
     forwardRef(() => JellyseerrApiModule),
+    forwardRef(() => OmbiApiModule),
     forwardRef(() => TautulliApiModule),
     forwardRef(() => InternalApiModule),
     TypeOrmModule.forFeature([Settings, RadarrSettings]),

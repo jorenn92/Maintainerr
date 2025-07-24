@@ -1,4 +1,4 @@
-import { BasicResponseDto, TautulliSettingDto } from '@maintainerr/contracts';
+import { BasicResponseDto, OmbiSettingDto, TautulliSettingDto } from '@maintainerr/contracts';
 import {
   Body,
   Controller,
@@ -65,6 +65,10 @@ export class SettingsController {
   @Get('/test/jellyseerr')
   testJellyseerr() {
     return this.settingsService.testJellyseerr();
+  }
+  @Get('/test/ombi')
+  testOmbi() {
+    return this.settingsService.testOmbi();
   }
   @Post('/test/radarr')
   testRadarr(@Body() payload: RadarrSettingRawDto) {
@@ -140,6 +144,35 @@ export class SettingsController {
   @Post('/test/tautulli')
   testTautulli(@Body() payload: TautulliSettingDto): Promise<BasicResponseDto> {
     return this.settingsService.testTautulli(payload);
+  }
+
+  @Get('/ombi')
+  async getOmbiSetting(): Promise<OmbiSettingDto | BasicResponseDto> {
+    const settings = await this.settingsService.getSettings();
+
+    if (!(settings instanceof Settings)) {
+      return settings;
+    }
+
+    return {
+      api_key: settings.ombi_api_key,
+      url: settings.ombi_url,
+    };
+  }
+
+  @Post('/ombi')
+  async updateOmbiSetting(@Body() payload: OmbiSettingDto) {
+    return await this.settingsService.updateOmbiSetting(payload);
+  }
+
+  @Delete('/ombi')
+  async removeOmbiSetting() {
+    return await this.settingsService.removeOmbiSetting();
+  }
+
+  @Post('/test/ombi')
+  testOmbiWithPayload(@Body() payload: OmbiSettingDto): Promise<BasicResponseDto> {
+    return this.settingsService.testOmbiWithPayload(payload);
   }
 
   @Delete('/sonarr/:id')

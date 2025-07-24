@@ -1,118 +1,142 @@
 import { SaveIcon } from '@heroicons/react/solid'
-import { useContext, useEffect, useRef, useState } from 'react'
-import SettingsContext from '../../../contexts/settings-context'
-import { PostApiHandler } from '../../../utils/ApiHandler'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  addPortToUrl,
-  getPortFromUrl,
-  handleSettingsInputChange,
-  removePortFromUrl,
-} from '../../../utils/SettingsUtils'
+  BasicResponseDto,
+  OmbiSettingDto,
+  ombiSettingSchema,
+} from '@maintainerr/contracts'
+import { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import GetApiHandler, {
+  DeleteApiHandler,
+  PostApiHandler,
+} from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
 import DocsButton from '../../Common/DocsButton'
-import TestButton from '../../Common/TestButton'
+import { InputGroup } from '../../Forms/Input'
+
+interface TestStatus {
+  status: boolean
+  message: string
+}
+
+const OmbiSettingDeleteSchema = z.object({
+  url: z.literal(''),
+  api_key: z.literal(''),
+})
+
+const OmbiSettingFormSchema = z.union([
+  ombiSettingSchema,
+  OmbiSettingDeleteSchema,
+])
+
+type OmbiSettingFormResult = z.infer<typeof OmbiSettingFormSchema>
+
+const stripLeadingSlashes = (url: string) => url.replace(/\/+$/, '')
 
 const OmbiSettings = () => {
-  const settingsCtx = useContext(SettingsContext)
-  const hostnameRef = useRef<HTMLInputElement>(null)
-  const portRef = useRef<HTMLInputElement>(null)
-  const apiKeyRef = useRef<HTMLInputElement>(null)
-  const [hostname, setHostname] = useState<string>()
-  const [port, setPort] = useState<string>()
-  const [error, setError] = useState<boolean>()
-  const [changed, setChanged] = useState<boolean>()
-  const [testBanner, setTestbanner] = useState<
-    | {
-        status: boolean
-        message: string
-      }
-    | undefined
+  const [testedSettings, setTestedSettings] = useState<
+    OmbiSettingDto | undefined
   >()
+
+  const [testing, setTesting] = useState(false)
+  const [testResult, setTestResult] = useState<TestStatus>()
+  const [submitError, setSubmitError] = useState<boolean>(false)
+  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState<boolean>(false)
 
   useEffect(() => {
     document.title = 'Maintainerr - Settings - Ombi'
   }, [])
 
-  useEffect(() => {
-    // hostname
-    setHostname(removePortFromUrl(settingsCtx.settings.ombi_url))
-    // @ts-ignore
-    hostnameRef.current = {
-      value: removePortFromUrl(settingsCtx.settings.ombi_url) ?? '',
-    }
-
-    // port
-    setPort(getPortFromUrl(settingsCtx.settings.ombi_url))
-    // @ts-ignore
-    portRef.current = {
-      value: getPortFromUrl(settingsCtx.settings.ombi_url) ?? '',
-    }
-
-    // api key
-    // @ts-ignore
-    apiKeyRef.current = {
-      value: settingsCtx.settings.ombi_api_key ?? '',
-    }
-  }, [settingsCtx])
-
-  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    // if port not specified, but hostname is. Derive the port
-    if (!portRef.current?.value && hostnameRef.current?.value) {
-      const derivedPort = hostnameRef.current.value.includes('http://')
-        ? 80
-        : hostnameRef.current.value.includes('https://')
-          ? 443
-          : 80
-
-      if (derivedPort) {
-        setPort(derivedPort.toString())
-        // @ts-ignore
-        portRef.current = { value: derivedPort.toString() }
+  const {
+    register,
+    handleSubmit,
+    watch,
+    trigger,
+    control,
+    formState: { errors, isSubmitting, isLoading, defaultValues },
+  } = useForm<OmbiSettingFormResult, any, OmbiSettingFormResult>({
+    resolver: zodResolver(OmbiSettingFormSchema),
+    defaultValues: async () => {
+      const resp = await GetApiHandler<OmbiSettingDto>('/settings/ombi')
+      return {
+        url: resp.url ?? '',
+        api_key: resp.api_key ?? '',
       }
-    }
+    },
+  })
 
-    if (
-      hostnameRef.current?.value &&
-      apiKeyRef.current?.value &&
-      portRef.current?.value
-    ) {
-      const hostnameVal = hostnameRef.current.value.includes('http://')
-        ? hostnameRef.current.value
-        : hostnameRef.current.value.includes('https://')
-          ? hostnameRef.current.value
-          : portRef.current.value == '443'
-            ? 'https://' + hostnameRef.current.value
-            : 'http://' + hostnameRef.current.value
+  const url = watch('url')
+  const api_key = watch('api_key')
 
-      const payload = {
-        ombi_url: addPortToUrl(hostnameVal, +portRef.current.value),
-        ombi_api_key: apiKeyRef.current.value,
+  const isGoingToRemoveSetting = url === '' && api_key === ''
+  const enteredSettingsAreSameAsSaved =
+    url === defaultValues?.url && api_key === defaultValues?.api_key
+  const enteredSettingsHaveBeenTested =
+    api_key == testedSettings?.api_key &&
+    url == testedSettings?.url &&
+    testResult?.status
+  const canSaveSettings =
+    (enteredSettingsAreSameAsSaved ||
+      enteredSettingsHaveBeenTested ||
+      isGoingToRemoveSetting) &&
+    !isSubmitting &&
+    !isLoading
+
+  const onSubmit = async (data: OmbiSettingDto) => {
+    setSubmitError(false)
+    setIsSubmitSuccessful(false)
+
+    const removingSetting = data.api_key === '' && data.url === ''
+
+    try {
+      const resp = await (removingSetting
+        ? DeleteApiHandler<BasicResponseDto>('/settings/ombi')
+        : PostApiHandler<BasicResponseDto>('/settings/ombi', data))
+
+      if (resp.code) {
+        setIsSubmitSuccessful(true)
+      } else {
+        setSubmitError(true)
       }
-      const resp: { code: 0 | 1; message: string } = await PostApiHandler(
-        '/settings',
-        {
-          ...settingsCtx.settings,
-          ...payload,
-        },
-      )
-      if (Boolean(resp.code)) {
-        settingsCtx.addSettings({
-          ...settingsCtx.settings,
-          ...payload,
-        })
-        setError(false)
-        setChanged(true)
-      } else setError(true)
-    } else {
-      setError(true)
+    } catch (err) {
+      setSubmitError(true)
     }
   }
 
-  const appTest = (result: { status: boolean; message: string }) => {
-    setTestbanner({ status: result.status, message: result.message })
+  const performTest = async () => {
+    if (testing || !(await trigger())) return
+
+    setTesting(true)
+
+    await PostApiHandler<BasicResponseDto>('/settings/test/ombi', {
+      api_key: api_key,
+      url,
+    } satisfies OmbiSettingDto)
+      .then((resp) => {
+        setTestResult({
+          status: resp.code == 1 ? true : false,
+          message: resp.message ?? 'Unknown error',
+        })
+
+        if (resp.code == 1) {
+          setTestedSettings({
+            url,
+            api_key,
+          })
+        }
+      })
+      .catch((e) => {
+        setTestResult({
+          status: false,
+          message: 'Unknown error',
+        })
+      })
+      .finally(() => {
+        setTesting(false)
+      })
   }
 
   return (
@@ -121,94 +145,87 @@ const OmbiSettings = () => {
         <h3 className="heading">Ombi Settings</h3>
         <p className="description">Ombi configuration</p>
       </div>
-      {error ? (
-        <Alert type="warning" title="Not all fields contain values" />
-      ) : changed ? (
-        <Alert type="info" title="Settings successfully updated" />
+      {submitError ? (
+        <Alert type="warning" title="Something went wrong" />
+      ) : isSubmitSuccessful ? (
+        <Alert type="info" title="Ombi settings successfully updated" />
       ) : undefined}
 
-      {testBanner &&
-        (testBanner.status ? (
+      {testResult != null &&
+        (testResult?.status ? (
           <Alert
             type="warning"
-            title={`Successfully connected to Ombi (${testBanner.message})`}
+            title={`Successfully connected to Ombi (${testResult.message})`}
           />
         ) : (
-          <Alert type="error" title={testBanner.message} />
+          <Alert type="error" title={testResult.message} />
         ))}
 
       <div className="section">
-        <form onSubmit={submit}>
-          <div className="form-row">
-            <label htmlFor="hostname" className="text-label">
-              Hostname or IP
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="hostname"
-                  id="hostname"
-                  type="text"
-                  value={hostname ?? ''}
-                  ref={hostnameRef}
-                  onChange={(e) =>
-                    handleSettingsInputChange(e, hostnameRef, setHostname)
-                  }
-                />
-              </div>
-            </div>
-          </div>
-          <div className="form-row">
-            <label htmlFor="port" className="text-label">
-              Port
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="port"
-                  id="port"
-                  type="text"
-                  value={port ?? ''}
-                  ref={portRef}
-                  onChange={(e) =>
-                    handleSettingsInputChange(e, portRef, setPort)
-                  }
-                />
-              </div>
-            </div>
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name={'url'}
+            control={control}
+            render={({ field }) => (
+              <InputGroup
+                label="URL"
+                value={field.value}
+                placeholder="http://localhost:5000"
+                onChange={field.onChange}
+                onBlur={(event) =>
+                  field.onChange(stripLeadingSlashes(event.target.value))
+                }
+                ref={field.ref}
+                name={field.name}
+                type="text"
+                error={errors.url?.message}
+                helpText={
+                  <>
+                    Example URL formats:{' '}
+                    <span className="whitespace-nowrap">
+                      http://localhost:5000
+                    </span>
+                    ,{' '}
+                    <span className="whitespace-nowrap">
+                      http://192.168.1.5/ombi
+                    </span>
+                    ,{' '}
+                    <span className="whitespace-nowrap">
+                      https://ombi.example.com
+                    </span>
+                  </>
+                }
+                required
+              />
+            )}
+          />
 
-          <div className="form-row">
-            <label htmlFor="api_key" className="text-label">
-              API Key
-            </label>
-            <div className="form-input">
-              <div className="form-input-field">
-                <input
-                  name="api_key"
-                  id="api_key"
-                  type="password"
-                  ref={apiKeyRef}
-                  defaultValue={settingsCtx.settings.ombi_api_key}
-                />
-              </div>
-            </div>
-          </div>
+          <InputGroup
+            label="API key"
+            type="password"
+            {...register('api_key')}
+            error={errors.api_key?.message}
+          />
+
           <div className="actions mt-5 w-full">
             <div className="flex w-full flex-wrap sm:flex-nowrap">
               <span className="m-auto rounded-md shadow-sm sm:ml-3 sm:mr-auto">
                 <DocsButton page="Configuration/#ombi" />
               </span>
               <div className="m-auto mt-3 flex xs:mt-0 sm:m-0 sm:justify-end">
-                <TestButton
-                  onTestComplete={appTest}
-                  testUrl="/settings/test/ombi"
-                />
+                <Button
+                  buttonType="success"
+                  onClick={performTest}
+                  className="ml-3"
+                  disabled={testing || isGoingToRemoveSetting}
+                >
+                  {testing ? 'Testing...' : 'Test'}
+                </Button>
                 <span className="ml-3 inline-flex rounded-md shadow-sm">
                   <Button
                     buttonType="primary"
                     type="submit"
-                    // disabled={isSubmitting || !isValid}
+                    disabled={!canSaveSettings}
                   >
                     <SaveIcon />
                     <span>Save Changes</span>

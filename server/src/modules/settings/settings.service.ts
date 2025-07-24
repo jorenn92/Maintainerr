@@ -1,4 +1,4 @@
-import { TautulliSettingDto } from '@maintainerr/contracts';
+import { TautulliSettingDto, OmbiSettingDto } from '@maintainerr/contracts';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isValidCron } from 'cron-validator';
@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { InternalApiService } from '../api/internal-api/internal-api.service';
 import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
+import { OmbiApiService } from '../api/ombi-api/ombi-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
 import { ServarrService } from '../api/servarr-api/servarr.service';
@@ -84,6 +85,8 @@ export class SettingsService implements SettingDto {
     private readonly tautulli: TautulliApiService,
     @Inject(forwardRef(() => JellyseerrApiService))
     private readonly jellyseerr: JellyseerrApiService,
+    @Inject(forwardRef(() => OmbiApiService))
+    private readonly ombi: OmbiApiService,
     @Inject(forwardRef(() => InternalApiService))
     private readonly internalApi: InternalApiService,
     @InjectRepository(Settings)
@@ -309,6 +312,77 @@ export class SettingsService implements SettingDto {
     } catch (e) {
       this.logger.error('Error while updating Tautulli settings: ', e);
       return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
+  public async removeOmbiSetting() {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        ombi_url: null,
+        ombi_api_key: null,
+      });
+
+      this.ombi_url = null;
+      this.ombi_api_key = null;
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error removing Ombi settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
+  public async updateOmbiSetting(
+    settings: OmbiSettingDto,
+  ): Promise<BasicResponseDto> {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        ombi_url: settings.url,
+        ombi_api_key: settings.api_key,
+      });
+
+      this.ombi_url = settings.url;
+      this.ombi_api_key = settings.api_key;
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error while updating Ombi settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
+  public async testOmbiWithPayload(
+    setting: OmbiSettingDto,
+  ): Promise<BasicResponseDto> {
+    // Create a temporary instance with the provided settings
+    const tempOmbiApi = new (await import('../api/ombi-api/helpers/ombi-api.helper')).OmbiApi(
+      {
+        async getSettings() {
+          return {
+            ombi_url: setting.url,
+            ombi_api_key: setting.api_key,
+          } as any;
+        },
+      } as any,
+      this.logger,
+    );
+
+    try {
+      const response = await tempOmbiApi.testConnection();
+      return response;
+    } catch (error) {
+      this.logger.error('Ombi connection test failed:', error.message);
+      return {
+        status: 'NOK',
+        code: 0,
+        message: error.message || 'Connection failed',
+      };
     }
   }
 
@@ -538,6 +612,29 @@ export class SettingsService implements SettingDto {
 
       if (validateResponse.status === 'OK') {
         const resp = await this.jellyseerr.status();
+        return resp?.version != null
+          ? { status: 'OK', code: 1, message: resp.version }
+          : {
+              status: 'NOK',
+              code: 0,
+              message:
+                'Connection failed! Double check your entries and make sure to Save Changes before you Test.',
+            };
+      } else {
+        return validateResponse;
+      }
+    } catch (e) {
+      this.logger.debug(e);
+      return { status: 'NOK', code: 0, message: 'Failure' };
+    }
+  }
+
+  public async testOmbi(): Promise<BasicResponseDto> {
+    try {
+      const validateResponse = await this.ombi.validateApiConnectivity();
+
+      if (validateResponse.status === 'OK') {
+        const resp = await this.ombi.status();
         return resp?.version != null
           ? { status: 'OK', code: 1, message: resp.version }
           : {
