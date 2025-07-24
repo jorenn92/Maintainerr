@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import { Mocked, TestBed } from '@suites/unit';
 import {
   createCollectionMedia,
@@ -464,7 +463,7 @@ describe('SonarrGetterService', () => {
 
     it('should return audio languages', async () => {
       const episodeFile = createSonarrEpisodeFile({
-        mediaInfo: { audioLanguages: 'eng' },
+        mediaInfo: { audioLanguages: 'eng' } as any,
       });
       const episode = createSonarrEpisode({
         episodeFileId: episodeFile.id,

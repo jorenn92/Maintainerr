@@ -305,7 +305,7 @@ export const createRadarrMovieFile = (
     scanType: faker.helpers.arrayElement(['Progressive', 'Interlaced']),
     subtitles: faker.helpers.arrayElements(['eng', 'spa', 'fre']).join('/'),
     videoFps: faker.helpers.arrayElement([24, 30, 60]),
-    ...properties.mediaInfo,
+    ...(properties.mediaInfo as any),
   },
   ...properties,
 });
@@ -443,7 +443,7 @@ export const createSonarrEpisodeFile = (
     runTime: faker.date.anytime().toISOString().split('T')[1].split('.')[0],
     scanType: faker.helpers.arrayElement(['Progressive', 'Interlaced']),
     subtitles: faker.helpers.arrayElements(['eng', 'spa', 'fre']).join('/'),
-    ...properties.mediaInfo,
+    ...(properties.mediaInfo as any),
   },
   ...properties,
 });
