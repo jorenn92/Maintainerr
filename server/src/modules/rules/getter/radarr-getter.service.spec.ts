@@ -185,19 +185,8 @@ describe('RadarrGetterService', () => {
       const movie = createRadarrMovie({
         movieFile: createRadarrMovieFile({
           mediaInfo: {
-            audioBitrate: 1000,
-            audioChannels: 2,
-            audioCodec: 'AAC',
+            ...createRadarrMovieFile().mediaInfo,
             audioLanguages: 'eng',
-            audioStreamCount: 1,
-            videoBitDepth: 8,
-            videoBitrate: 5000,
-            videoCodec: 'H.264',
-            videoFps: 24,
-            resolution: '1920x1080',
-            runTime: '02:00:00',
-            scanType: 'Progressive',
-            subtitles: 'eng',
           },
         }),
       });
