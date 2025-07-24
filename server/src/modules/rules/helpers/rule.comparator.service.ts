@@ -197,10 +197,13 @@ export class RuleComparatorService {
       secondVal = await this.getSecondValue(rule, data[i], ruleGroup, firstVal);
       this.abortSignal?.throwIfAborted();
 
-      if (
-        (firstVal !== undefined || null) &&
-        (secondVal !== undefined || null)
-      ) {
+      // Check if values are valid for processing
+      const allowsNullValues = [RulePossibility.IS_NULL, RulePossibility.IS_NOT_NULL].includes(rule.action);
+      const hasValidValues = allowsNullValues || 
+        ((firstVal !== undefined && firstVal !== null) &&
+         (secondVal !== undefined && secondVal !== null));
+
+      if (hasValidValues) {
         // do action
         const comparisonResult = this.doRuleAction(
           firstVal,
@@ -565,6 +568,14 @@ export class RuleComparatorService {
       } else if (action === RulePossibility.COUNT_SMALLER) {
         return val1.length < val2Length;
       }
+    }
+
+    if (action === RulePossibility.IS_NULL) {
+      return val1 === null;
+    }
+
+    if (action === RulePossibility.IS_NOT_NULL) {
+      return val1 !== null;
     }
   }
 
