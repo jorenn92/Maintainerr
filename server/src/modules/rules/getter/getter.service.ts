@@ -5,6 +5,7 @@ import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { Application } from '../constants/rules.constants';
 import { RulesDto } from '../dtos/rules.dto';
 import { JellyseerrGetterService } from './jellyseerr-getter.service';
+import { OmbiGetterService } from './ombi-getter.service';
 import { OverseerrGetterService } from './overseerr-getter.service';
 import { PlexGetterService } from './plex-getter.service';
 import { RadarrGetterService } from './radarr-getter.service';
@@ -20,6 +21,7 @@ export class ValueGetterService {
     private readonly overseerGetter: OverseerrGetterService,
     private readonly tautulliGetter: TautulliGetterService,
     private readonly jellyseerrGetter: JellyseerrGetterService,
+    private readonly ombiGetter: OmbiGetterService,
   ) {}
 
   async get(
@@ -51,6 +53,9 @@ export class ValueGetterService {
       }
       case Application.JELLYSEERR: {
         return await this.jellyseerrGetter.get(val2, libItem, dataType);
+      }
+      case Application.OMBI: {
+        return await this.ombiGetter.get(val2, libItem, dataType);
       }
       default: {
         return null;

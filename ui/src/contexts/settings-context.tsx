@@ -25,6 +25,8 @@ export interface ISettings {
   tautulli_api_key: string
   jellyseerr_url: string
   jellyseerr_api_key: string
+  ombi_url: string
+  ombi_api_key: string
   collection_handler_job_cron: string
   rules_handler_job_cron: string
 }
