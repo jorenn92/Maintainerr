@@ -1,8 +1,12 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SettingsService } from '../../settings/settings.service';
-import { MaintainerrLogger } from '../../logging/logs.service';
+import { 
+  MaintainerrLogger,
+  MaintainerrLoggerFactory 
+} from '../../logging/logs.service';
 import { BasicResponseDto } from '../external-api/dto/basic-response.dto';
 import { OmbiApi } from './helpers/ombi-api.helper';
+import { AxiosError } from 'axios';
 
 // Ombi request interfaces
 interface OmbiMediaInfo {
@@ -74,38 +78,108 @@ interface OmbiUser {
   userType: number;
 }
 
+// Search result interfaces from Ombi API v2
+export interface OmbiSearchMovieResponse {
+  tmdbId: number;
+  imdbId?: string;
+  title: string;
+  overview?: string;
+  releaseDate?: string;
+  posterPath?: string;
+  backdrop?: string;
+  requestStatus?: number;
+  available?: boolean;
+  request?: OmbiMovieResponse;
+}
+
+export interface OmbiSearchTvResponse {
+  tmdbId: number;
+  tvDbId?: number;
+  imdbId?: string;
+  title: string;
+  overview?: string;
+  firstAired?: string;
+  posterPath?: string;
+  backdrop?: string;
+  requestStatus?: number;
+  available?: boolean;
+  request?: OmbiTvResponse;
+}
+
 @Injectable()
 export class OmbiApiService {
+  private api: OmbiApi;
+  
   constructor(
     @Inject(forwardRef(() => SettingsService))
     private readonly settingsService: SettingsService,
-    private readonly ombiApi: OmbiApi,
     private readonly logger: MaintainerrLogger,
+    private readonly loggerFactory: MaintainerrLoggerFactory,
   ) {
     this.logger.setContext(OmbiApiService.name);
   }
 
-  async validateApiConnectivity(): Promise<BasicResponseDto> {
-    try {
-      return await this.ombiApi.testConnection();
-    } catch (e) {
-      this.logger.error('Ombi API connectivity validation failed:', e.message);
-      return { status: 'NOK', code: 0, message: e.message };
+  public async init() {
+    const settings = await this.settingsService.getSettings();
+    
+    if (settings instanceof BasicResponseDto || !settings.ombi_url || !settings.ombi_api_key) {
+      throw new Error('Ombi is not configured');
     }
+
+    this.api = new OmbiApi(
+      {
+        url: settings.ombi_url.replace(/\/$/, ''),
+        apiKey: settings.ombi_api_key,
+      },
+      this.loggerFactory.createLogger(),
+    );
   }
 
-  async status() {
+  async validateApiConnectivity(): Promise<BasicResponseDto> {
     try {
-      return await this.ombiApi.getStatus();
+      await this.init();
+      const response = await this.api.getRawWithoutCache('/settings/about', {
+        signal: AbortSignal.timeout(10000),
+      });
+
+      return {
+        status: 'OK',
+        code: 1,
+        message: 'Success',
+      };
     } catch (e) {
-      this.logger.error('Failed to get Ombi status:', e.message);
-      throw e;
+      this.logger.warn(
+        `A failure occurred testing Ombi connectivity: ${e}`,
+      );
+
+      if (e instanceof AxiosError) {
+        if (e.response?.status === 403) {
+          return {
+            status: 'NOK',
+            code: 0,
+            message: 'Invalid API key',
+          };
+        } else if (e.response?.status) {
+          return {
+            status: 'NOK',
+            code: 0,
+            message: `Failure, received response: ${e.response?.status} ${e.response?.statusText}.`,
+          };
+        }
+      }
+
+      return {
+        status: 'NOK',
+        code: 0,
+        message: `Failure: ${e.message}`,
+      };
     }
   }
 
   async getMovieRequests(): Promise<OmbiMovieResponse[]> {
     try {
-      return await this.ombiApi.getMovieRequests();
+      if (!this.api) await this.init();
+      return await this.api.get('/Request/movie') || [];
     } catch (e) {
       this.logger.error('Failed to get Ombi movie requests:', e.message);
       return [];
@@ -114,7 +188,8 @@ export class OmbiApiService {
 
   async getTvRequests(): Promise<OmbiTvResponse[]> {
     try {
-      return await this.ombiApi.getTvRequests();
+      if (!this.api) await this.init();
+      return await this.api.get('/Request/tv') || [];
     } catch (e) {
       this.logger.error('Failed to get Ombi TV requests:', e.message);
       return [];
@@ -123,34 +198,43 @@ export class OmbiApiService {
 
   async getUsers(): Promise<OmbiUser[]> {
     try {
-      return await this.ombiApi.getUsers();
+      if (!this.api) await this.init();
+      return await this.api.get('/Identity/Users') || [];
     } catch (e) {
       this.logger.error('Failed to get Ombi users:', e.message);
       return [];
     }
   }
 
-  async getMovie(tmdbId: string): Promise<OmbiMovieResponse | null> {
+  async getMovie(tmdbId: string): Promise<OmbiSearchMovieResponse | null> {
     try {
-      const movieRequests = await this.getMovieRequests();
-      return movieRequests.find(request => 
-        request.tmdbId?.toString() === tmdbId
-      ) || null;
+      if (!this.api) await this.init();
+      const response: OmbiSearchMovieResponse = await this.api.get(`/v2/Search/movie/${tmdbId}`);
+      return response || null;
     } catch (e) {
       this.logger.error(`Failed to get Ombi movie ${tmdbId}:`, e.message);
       return null;
     }
   }
 
-  async getShow(tmdbId: string): Promise<OmbiTvResponse | null> {
+  async getShow(tmdbId: string): Promise<OmbiSearchTvResponse | null> {
     try {
-      const tvRequests = await this.getTvRequests();
-      return tvRequests.find(request => 
-        request.tmdbId?.toString() === tmdbId ||
-        request.tvDbId?.toString() === tmdbId
-      ) || null;
+      if (!this.api) await this.init();
+      const response: OmbiSearchTvResponse = await this.api.get(`/v2/Search/tv/moviedb/${tmdbId}`);
+      return response || null;
     } catch (e) {
       this.logger.error(`Failed to get Ombi show ${tmdbId}:`, e.message);
+      return null;
+    }
+  }
+
+  async getShowByTvdbId(tvdbId: string): Promise<OmbiSearchTvResponse | null> {
+    try {
+      if (!this.api) await this.init();
+      const response: OmbiSearchTvResponse = await this.api.get(`/v2/Search/tv/${tvdbId}`);
+      return response || null;
+    } catch (e) {
+      this.logger.error(`Failed to get Ombi show by TVDB ID ${tvdbId}:`, e.message);
       return null;
     }
   }

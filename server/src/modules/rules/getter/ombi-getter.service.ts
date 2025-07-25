@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import _ from 'lodash';
 import { 
   OmbiApiService, 
-  OmbiMovieResponse, 
-  OmbiTvResponse 
+  OmbiSearchMovieResponse, 
+  OmbiSearchTvResponse 
 } from '../../api/ombi-api/ombi-api.service';
 import { EPlexDataType } from '../../api/plex-api/enums/plex-data-type-enum';
 import { PlexLibraryItem } from '../../api/plex-api/interfaces/library.interfaces';
@@ -36,8 +36,8 @@ export class OmbiGetterService {
   async get(id: number, libItem: PlexLibraryItem, dataType?: EPlexDataType) {
     try {
       let origLibItem = undefined;
-      let tvMediaResponse: OmbiTvResponse = undefined;
-      let movieMediaResponse: OmbiMovieResponse = undefined;
+      let tvMediaResponse: OmbiSearchTvResponse = undefined;
+      let movieMediaResponse: OmbiSearchMovieResponse = undefined;
 
       // get original show in case of season / episode
       if (
@@ -67,7 +67,7 @@ export class OmbiGetterService {
         );
       }
 
-      const mediaResponse: OmbiTvResponse | OmbiMovieResponse =
+      const mediaResponse: OmbiSearchTvResponse | OmbiSearchMovieResponse =
         tvMediaResponse ?? movieMediaResponse;
 
       if (mediaResponse) {
@@ -76,22 +76,22 @@ export class OmbiGetterService {
             try {
               const userNames: string[] = [];
 
-              if (libItem.type === 'movie' && movieMediaResponse) {
+              if (libItem.type === 'movie' && movieMediaResponse?.request) {
                 // For movies, just get the requesting user
-                if (movieMediaResponse.requestedUser) {
-                  userNames.push(movieMediaResponse.requestedUser.userName);
+                if (movieMediaResponse.request.requestedUser) {
+                  userNames.push(movieMediaResponse.request.requestedUser.userName);
                 }
-              } else if (tvMediaResponse) {
+              } else if (tvMediaResponse?.request) {
                 // For TV shows, check child requests for seasons/episodes
                 if (
                   [EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType) &&
-                  tvMediaResponse.childRequests
+                  tvMediaResponse.request.childRequests
                 ) {
                   const seasonNum = dataType === EPlexDataType.SEASONS
                     ? origLibItem.index
                     : origLibItem.parentIndex;
                   
-                  for (const childRequest of tvMediaResponse.childRequests) {
+                  for (const childRequest of tvMediaResponse.request.childRequests) {
                     const hasRequestedSeason = childRequest.seasonRequests?.some(
                       season => season.seasonNumber === seasonNum
                     );
@@ -102,11 +102,11 @@ export class OmbiGetterService {
                   }
                 } else {
                   // For shows, get all requesting users
-                  if (tvMediaResponse.requestedUser) {
-                    userNames.push(tvMediaResponse.requestedUser.userName);
+                  if (tvMediaResponse.request.requestedUser) {
+                    userNames.push(tvMediaResponse.request.requestedUser.userName);
                   }
                   
-                  tvMediaResponse.childRequests?.forEach(childRequest => {
+                  tvMediaResponse.request.childRequests?.forEach(childRequest => {
                     if (childRequest.requestedUser) {
                       userNames.push(childRequest.requestedUser.userName);
                     }
@@ -123,24 +123,24 @@ export class OmbiGetterService {
           }
           case 'amountRequested': {
             if (libItem.type === 'movie') {
-              return movieMediaResponse ? 1 : 0;
+              return movieMediaResponse?.request ? 1 : 0;
             } else {
               if ([EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)) {
                 const seasonNum = dataType === EPlexDataType.SEASONS
                   ? origLibItem.index
                   : origLibItem.parentIndex;
                 
-                return tvMediaResponse?.childRequests?.filter(childRequest =>
+                return tvMediaResponse?.request?.childRequests?.filter(childRequest =>
                   childRequest.seasonRequests?.some(season => season.seasonNumber === seasonNum)
                 ).length || 0;
               }
-              return tvMediaResponse?.childRequests?.length || 0;
+              return tvMediaResponse?.request?.childRequests?.length || 0;
             }
           }
           case 'requestDate': {
             if (libItem.type === 'movie') {
-              return movieMediaResponse?.requestedDate 
-                ? new Date(movieMediaResponse.requestedDate) 
+              return movieMediaResponse?.request?.requestedDate 
+                ? new Date(movieMediaResponse.request.requestedDate) 
                 : null;
             } else {
               if ([EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)) {
@@ -148,7 +148,7 @@ export class OmbiGetterService {
                   ? origLibItem.index
                   : origLibItem.parentIndex;
                 
-                const childRequest = tvMediaResponse?.childRequests?.find(childRequest =>
+                const childRequest = tvMediaResponse?.request?.childRequests?.find(childRequest =>
                   childRequest.seasonRequests?.some(season => season.seasonNumber === seasonNum)
                 );
                 
@@ -156,8 +156,8 @@ export class OmbiGetterService {
                   ? new Date(childRequest.requestedDate) 
                   : null;
               }
-              return tvMediaResponse?.requestedDate 
-                ? new Date(tvMediaResponse.requestedDate) 
+              return tvMediaResponse?.request?.requestedDate 
+                ? new Date(tvMediaResponse.request.requestedDate) 
                 : null;
             }
           }
@@ -174,8 +174,8 @@ export class OmbiGetterService {
           }
           case 'approvalDate': {
             if (libItem.type === 'movie') {
-              return movieMediaResponse?.approved && movieMediaResponse?.approvedDate
-                ? new Date(movieMediaResponse.approvedDate)
+              return movieMediaResponse?.request?.approved && movieMediaResponse?.request?.approvedDate
+                ? new Date(movieMediaResponse.request.approvedDate)
                 : null;
             } else {
               if ([EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)) {
@@ -183,22 +183,22 @@ export class OmbiGetterService {
                   ? origLibItem.index
                   : origLibItem.parentIndex;
                 
-                const childRequest = tvMediaResponse?.childRequests?.find(childRequest =>
+                const childRequest = tvMediaResponse?.request?.childRequests?.find(childRequest =>
                   childRequest.seasonRequests?.some(season => season.seasonNumber === seasonNum)
                 );
                 
                 // For child requests, we use the approved status rather than a specific date
                 return childRequest?.approved ? new Date(childRequest.requestedDate) : null;
               }
-              return tvMediaResponse?.approved && tvMediaResponse?.requestedDate
-                ? new Date(tvMediaResponse.requestedDate)
+              return tvMediaResponse?.request?.approved && tvMediaResponse?.request?.requestedDate
+                ? new Date(tvMediaResponse.request.requestedDate)
                 : null;
             }
           }
           case 'mediaAddedAt': {
             if (libItem.type === 'movie') {
-              return movieMediaResponse?.available && movieMediaResponse?.availableDate
-                ? new Date(movieMediaResponse.availableDate)
+              return movieMediaResponse?.request?.available && movieMediaResponse?.request?.availableDate
+                ? new Date(movieMediaResponse.request.availableDate)
                 : null;
             } else {
               if ([EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)) {
@@ -206,33 +206,33 @@ export class OmbiGetterService {
                   ? origLibItem.index
                   : origLibItem.parentIndex;
                 
-                const childRequest = tvMediaResponse?.childRequests?.find(childRequest =>
+                const childRequest = tvMediaResponse?.request?.childRequests?.find(childRequest =>
                   childRequest.seasonRequests?.some(season => season.seasonNumber === seasonNum)
                 );
                 
                 return childRequest?.available ? new Date(childRequest.requestedDate) : null;
               }
-              return tvMediaResponse?.available && tvMediaResponse?.requestedDate
-                ? new Date(tvMediaResponse.requestedDate)
+              return tvMediaResponse?.request?.available && tvMediaResponse?.request?.requestedDate
+                ? new Date(tvMediaResponse.request.requestedDate)
                 : null;
             }
           }
           case 'isRequested': {
             if (libItem.type === 'movie') {
-              return movieMediaResponse ? 1 : 0;
+              return movieMediaResponse?.request ? 1 : 0;
             } else {
               if ([EPlexDataType.SEASONS, EPlexDataType.EPISODES].includes(dataType)) {
                 const seasonNum = dataType === EPlexDataType.SEASONS
                   ? origLibItem.index
                   : origLibItem.parentIndex;
                 
-                const hasSeasonRequest = tvMediaResponse?.childRequests?.some(childRequest =>
+                const hasSeasonRequest = tvMediaResponse?.request?.childRequests?.some(childRequest =>
                   childRequest.seasonRequests?.some(season => season.seasonNumber === seasonNum)
                 );
                 
                 return hasSeasonRequest ? 1 : 0;
               }
-              return tvMediaResponse ? 1 : 0;
+              return tvMediaResponse?.request ? 1 : 0;
             }
           }
           default: {

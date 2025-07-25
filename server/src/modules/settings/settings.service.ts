@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { BasicResponseDto } from '../api/external-api/dto/basic-response.dto';
 import { InternalApiService } from '../api/internal-api/internal-api.service';
 import { JellyseerrApiService } from '../api/jellyseerr-api/jellyseerr-api.service';
+import { OmbiApi } from '../api/ombi-api/helpers/ombi-api.helper';
 import { OmbiApiService } from '../api/ombi-api/ombi-api.service';
 import { OverseerrApiService } from '../api/overseerr-api/overseerr-api.service';
 import { PlexApiService } from '../api/plex-api/plex-api.service';
@@ -361,23 +362,41 @@ export class SettingsService implements SettingDto {
     setting: OmbiSettingDto,
   ): Promise<BasicResponseDto> {
     // Create a temporary instance with the provided settings
-    const tempOmbiApi = new (await import('../api/ombi-api/helpers/ombi-api.helper')).OmbiApi(
+    const tempOmbiApi = new OmbiApi(
       {
-        async getSettings() {
-          return {
-            ombi_url: setting.url,
-            ombi_api_key: setting.api_key,
-          } as any;
-        },
-      } as any,
+        url: setting.url,
+        apiKey: setting.api_key,
+      },
       this.logger,
     );
 
     try {
-      const response = await tempOmbiApi.testConnection();
-      return response;
+      const response = await tempOmbiApi.getRawWithoutCache('/settings/about', {
+        signal: AbortSignal.timeout(10000),
+      });
+
+      return {
+        status: 'OK',
+        code: 1,
+        message: 'Connected successfully',
+      };
     } catch (error) {
       this.logger.error('Ombi connection test failed:', error.message);
+      
+      if (error.response?.status === 403) {
+        return {
+          status: 'NOK',
+          code: 0,
+          message: 'Invalid API key',
+        };
+      } else if (error.response?.status) {
+        return {
+          status: 'NOK',
+          code: 0,
+          message: `Failure, received response: ${error.response?.status} ${error.response?.statusText}.`,
+        };
+      }
+      
       return {
         status: 'NOK',
         code: 0,
