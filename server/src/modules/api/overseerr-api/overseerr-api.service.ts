@@ -112,6 +112,10 @@ interface OverseerrStatus {
   commitsBehind: number;
 }
 
+interface OverseerrAbout {
+  version: string;
+}
+
 export enum OverseerrMediaStatus {
   UNKNOWN = 1,
   PENDING,
@@ -386,14 +390,26 @@ export class OverseerrApiService {
       : this.api;
 
     try {
-      await api.getRawWithoutCache(`/settings/about`, {
-        signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
-      });
+      const response = await api.getRawWithoutCache<OverseerrAbout>(
+        `/settings/about`,
+        {
+          signal: AbortSignal.timeout(10000), // aborts request after 10 seconds
+        },
+      );
+
+      if (!response.data?.version) {
+        return {
+          status: 'NOK',
+          code: 0,
+          message:
+            'Failure, an unexpected response was returned. The URL is likely incorrect.',
+        };
+      }
 
       return {
         status: 'OK',
         code: 1,
-        message: 'Success',
+        message: response.data.version,
       };
     } catch (e) {
       this.logger.warn(
