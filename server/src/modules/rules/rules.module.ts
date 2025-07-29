@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JellyseerrApiModule } from '../api/jellyseerr-api/jellyseerr-api.module';
+import { OmbiApiModule } from '../api/ombi-api/ombi-api.module';
 import { OverseerrApiModule } from '../api/overseerr-api/overseerr-api.module';
 import { PlexApiModule } from '../api/plex-api/plex-api.module';
 import { ServarrApiModule } from '../api/servarr-api/servarr-api.module';
@@ -20,6 +21,7 @@ import { RuleGroup } from './entities/rule-group.entities';
 import { Rules } from './entities/rules.entities';
 import { ValueGetterService } from './getter/getter.service';
 import { JellyseerrGetterService } from './getter/jellyseerr-getter.service';
+import { OmbiGetterService } from './getter/ombi-getter.service';
 import { OverseerrGetterService } from './getter/overseerr-getter.service';
 import { PlexGetterService } from './getter/plex-getter.service';
 import { RadarrGetterService } from './getter/radarr-getter.service';
@@ -54,6 +56,7 @@ import { RuleMaintenanceService } from './tasks/rule-maintenance.service';
     OverseerrApiModule,
     TautulliApiModule,
     JellyseerrApiModule,
+    OmbiApiModule,
     TmdbApiModule,
     CollectionsModule,
     TasksModule,
@@ -69,6 +72,7 @@ import { RuleMaintenanceService } from './tasks/rule-maintenance.service';
     OverseerrGetterService,
     TautulliGetterService,
     JellyseerrGetterService,
+    OmbiGetterService,
     ValueGetterService,
     RuleYamlService,
     RuleComparatorService,
