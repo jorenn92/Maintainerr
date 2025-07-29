@@ -123,12 +123,12 @@ describe('OmbiGetterService', () => {
         },
       };
 
-      ombiApi.getShow.mockResolvedValue(mockTvResponse);
+      ombiApi.getShowByTmdbId.mockResolvedValue(mockTvResponse);
 
       const result = await ombiGetterService.get(1, plexLibraryItem);
 
       expect(result).toEqual(['mainuser', 'childuser']);
-      expect(ombiApi.getShow).toHaveBeenCalledWith('123');
+      expect(ombiApi.getShowByTmdbId).toHaveBeenCalledWith('123');
     });
 
     it('should handle seasons and episodes correctly', async () => {
@@ -169,13 +169,13 @@ describe('OmbiGetterService', () => {
       };
 
       plexApi.getMetadata.mockResolvedValue(plexLibraryItem as any);
-      ombiApi.getShow.mockResolvedValue(mockTvResponse);
+      ombiApi.getShowByTmdbId.mockResolvedValue(mockTvResponse);
 
       const result = await ombiGetterService.get(1, origLibItem, EPlexDataType.SEASONS);
 
       expect(result).toEqual(['seasonuser']);
       expect(plexApi.getMetadata).toHaveBeenCalledWith(origLibItem.parentRatingKey);
-      expect(ombiApi.getShow).toHaveBeenCalledWith('123');
+      expect(ombiApi.getShowByTmdbId).toHaveBeenCalledWith('123');
     });
   });
 
@@ -250,7 +250,7 @@ describe('OmbiGetterService', () => {
         },
       };
 
-      ombiApi.getShow.mockResolvedValue(mockTvResponse);
+      ombiApi.getShowByTmdbId.mockResolvedValue(mockTvResponse);
 
       const result = await ombiGetterService.get(7, plexLibraryItem);
 
@@ -351,7 +351,7 @@ describe('OmbiGetterService', () => {
         },
       };
 
-      ombiApi.getShow.mockResolvedValue(mockTvResponse);
+      ombiApi.getShowByTmdbId.mockResolvedValue(mockTvResponse);
 
       const result = await ombiGetterService.get(3, plexLibraryItem);
 
@@ -526,7 +526,7 @@ describe('OmbiGetterService', () => {
         },
       };
 
-      ombiApi.getShow.mockResolvedValue(mockTvResponse);
+      ombiApi.getShowByTmdbId.mockResolvedValue(mockTvResponse);
 
       const result = await ombiGetterService.get(6, plexLibraryItem);
 

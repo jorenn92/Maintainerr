@@ -14,7 +14,7 @@ export class OmbiApi extends ExternalApiService {
     protected readonly logger: MaintainerrLogger,
   ) {
     logger.setContext(OmbiApi.name);
-    super(`${url}/api/v1`, {}, logger, {
+    super(`${url}/api`, {}, logger, {
       headers: {
         ApiKey: apiKey,
       },

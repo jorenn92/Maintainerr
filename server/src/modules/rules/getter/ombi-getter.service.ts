@@ -59,7 +59,7 @@ export class OmbiGetterService {
         if (libItem.type === 'movie') {
           movieMediaResponse = await this.ombiApi.getMovie(tmdb.id.toString());
         } else {
-          tvMediaResponse = await this.ombiApi.getShow(tmdb.id.toString());
+          tvMediaResponse = await this.ombiApi.getShowByTmdbId(tmdb.id.toString());
         }
       } else {
         this.logger.debug(

@@ -138,7 +138,7 @@ export class OmbiApiService {
   async validateApiConnectivity(): Promise<BasicResponseDto> {
     try {
       await this.init();
-      const response = await this.api.getRawWithoutCache('/settings/about', {
+      const response = await this.api.getRawWithoutCache('/v1/settings/about', {
         signal: AbortSignal.timeout(10000),
       });
 
@@ -179,7 +179,7 @@ export class OmbiApiService {
   async getMovieRequests(): Promise<OmbiMovieResponse[]> {
     try {
       if (!this.api) await this.init();
-      return await this.api.get('/Request/movie') || [];
+      return await this.api.get('/v1/Request/movie') || [];
     } catch (e) {
       this.logger.error('Failed to get Ombi movie requests:', e.message);
       return [];
@@ -189,7 +189,7 @@ export class OmbiApiService {
   async getTvRequests(): Promise<OmbiTvResponse[]> {
     try {
       if (!this.api) await this.init();
-      return await this.api.get('/Request/tv') || [];
+      return await this.api.get('/v1/Request/tv') || [];
     } catch (e) {
       this.logger.error('Failed to get Ombi TV requests:', e.message);
       return [];
@@ -199,7 +199,7 @@ export class OmbiApiService {
   async getUsers(): Promise<OmbiUser[]> {
     try {
       if (!this.api) await this.init();
-      return await this.api.get('/Identity/Users') || [];
+      return await this.api.get('/v1/Identity/Users') || [];
     } catch (e) {
       this.logger.error('Failed to get Ombi users:', e.message);
       return [];
@@ -217,7 +217,7 @@ export class OmbiApiService {
     }
   }
 
-  async getShow(tmdbId: string): Promise<OmbiSearchTvResponse | null> {
+  async getShowByTmdbId(tmdbId: string): Promise<OmbiSearchTvResponse | null> {
     try {
       if (!this.api) await this.init();
       const response: OmbiSearchTvResponse = await this.api.get(`/v2/Search/tv/moviedb/${tmdbId}`);
