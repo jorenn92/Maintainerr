@@ -534,33 +534,14 @@ export class SettingsService implements SettingDto {
   public async testJellyseerr(
     setting?: JellyseerrSettingDto,
   ): Promise<BasicResponseDto> {
-    try {
-      const validateResponse = await this.jellyseerr.testConnection(
-        setting
-          ? {
-              apiKey: setting.api_key,
-              url: setting.url,
-            }
-          : undefined,
-      );
-
-      if (validateResponse.status === 'OK') {
-        const resp = await this.jellyseerr.status();
-        return resp?.version != null
-          ? { status: 'OK', code: 1, message: resp.version }
-          : {
-              status: 'NOK',
-              code: 0,
-              message:
-                'Connection failed! Double check your entries and make sure to Save Changes before you Test.',
-            };
-      } else {
-        return validateResponse;
-      }
-    } catch (e) {
-      this.logger.debug(e);
-      return { status: 'NOK', code: 0, message: 'Failure' };
-    }
+    return await this.jellyseerr.testConnection(
+      setting
+        ? {
+            apiKey: setting.api_key,
+            url: setting.url,
+          }
+        : undefined,
+    );
   }
 
   public async removeJellyseerrSetting() {
