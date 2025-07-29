@@ -165,6 +165,7 @@ const TautulliSettings = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
             name={'url'}
+            defaultValue=""
             control={control}
             render={({ field }) => (
               <InputGroup
