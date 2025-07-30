@@ -1,5 +1,6 @@
 import {
   JellyseerrSettingDto,
+  OverseerrSettingDto,
   TautulliSettingDto,
 } from '@maintainerr/contracts';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -311,6 +312,50 @@ export class SettingsService implements SettingDto {
     }
   }
 
+  public async removeOverseerrSetting() {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        overseerr_url: null,
+        overseerr_api_key: null,
+      });
+
+      this.overseerr_url = null;
+      this.overseerr_api_key = null;
+      this.overseerr.init();
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error removing Overseerr settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
+  public async updateOverseerrSetting(
+    settings: OverseerrSettingDto,
+  ): Promise<BasicResponseDto> {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        overseerr_url: settings.url,
+        overseerr_api_key: settings.api_key,
+      });
+
+      this.overseerr_url = settings.url;
+      this.overseerr_api_key = settings.api_key;
+      this.overseerr.init();
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error while updating Overseerr settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
   public async addSonarrSetting(
     settings: Omit<SonarrSettings, 'id' | 'collections'>,
   ): Promise<SonarrSettingResponseDto> {
@@ -508,27 +553,17 @@ export class SettingsService implements SettingDto {
     );
   }
 
-  public async testOverseerr(): Promise<BasicResponseDto> {
-    try {
-      const validateResponse = await this.overseerr.validateApiConnectivity();
-
-      if (validateResponse.status === 'OK') {
-        const resp = await this.overseerr.status();
-        return resp?.version != null
-          ? { status: 'OK', code: 1, message: resp.version }
-          : {
-              status: 'NOK',
-              code: 0,
-              message:
-                'Connection failed! Double check your entries and make sure to Save Changes before you Test.',
-            };
-      } else {
-        return validateResponse;
-      }
-    } catch (e) {
-      this.logger.debug(e);
-      return { status: 'NOK', code: 0, message: 'Failure' };
-    }
+  public async testOverseerr(
+    setting?: OverseerrSettingDto,
+  ): Promise<BasicResponseDto> {
+    return await this.overseerr.testConnection(
+      setting
+        ? {
+            apiKey: setting.api_key,
+            url: setting.url,
+          }
+        : undefined,
+    );
   }
 
   public async testJellyseerr(
