@@ -1,4 +1,5 @@
 import {
+  JellyseerrSettingDto,
   OverseerrSettingDto,
   TautulliSettingDto,
 } from '@maintainerr/contracts';
@@ -565,26 +566,60 @@ export class SettingsService implements SettingDto {
     );
   }
 
-  public async testJellyseerr(): Promise<BasicResponseDto> {
-    try {
-      const validateResponse = await this.jellyseerr.validateApiConnectivity();
+  public async testJellyseerr(
+    setting?: JellyseerrSettingDto,
+  ): Promise<BasicResponseDto> {
+    return await this.jellyseerr.testConnection(
+      setting
+        ? {
+            apiKey: setting.api_key,
+            url: setting.url,
+          }
+        : undefined,
+    );
+  }
 
-      if (validateResponse.status === 'OK') {
-        const resp = await this.jellyseerr.status();
-        return resp?.version != null
-          ? { status: 'OK', code: 1, message: resp.version }
-          : {
-              status: 'NOK',
-              code: 0,
-              message:
-                'Connection failed! Double check your entries and make sure to Save Changes before you Test.',
-            };
-      } else {
-        return validateResponse;
-      }
+  public async removeJellyseerrSetting() {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        jellyseerr_url: null,
+        jellyseerr_api_key: null,
+      });
+
+      this.jellyseerr_url = null;
+      this.jellyseerr_api_key = null;
+      this.jellyseerr.init();
+
+      return { status: 'OK', code: 1, message: 'Success' };
     } catch (e) {
-      this.logger.debug(e);
-      return { status: 'NOK', code: 0, message: 'Failure' };
+      this.logger.error('Error removing Jellyseerr settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
+    }
+  }
+
+  public async updateJellyseerrSetting(
+    settings: JellyseerrSettingDto,
+  ): Promise<BasicResponseDto> {
+    try {
+      const settingsDb = await this.settingsRepo.findOne({ where: {} });
+
+      await this.settingsRepo.save({
+        ...settingsDb,
+        jellyseerr_url: settings.url,
+        jellyseerr_api_key: settings.api_key,
+      });
+
+      this.jellyseerr_url = settings.url;
+      this.jellyseerr_api_key = settings.api_key;
+      this.jellyseerr.init();
+
+      return { status: 'OK', code: 1, message: 'Success' };
+    } catch (e) {
+      this.logger.error('Error while updating Jellyseerr settings: ', e);
+      return { status: 'NOK', code: 0, message: 'Failed' };
     }
   }
 

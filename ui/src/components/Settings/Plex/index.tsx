@@ -312,7 +312,7 @@ const PlexSettings = () => {
       {testBanner.version !== '0' ? (
         testBanner.status ? (
           <Alert
-            type="warning"
+            type="info"
             title={`Successfully connected to Plex (${testBanner.version})`}
           />
         ) : (
