@@ -1,3 +1,12 @@
+# [2.19.0](https://github.com/jorenn92/Maintainerr/compare/v2.18.2...v2.19.0) (2025-08-17)
+
+
+### Features
+
+* add comprehensive Copilot instructions ([#1888](https://github.com/jorenn92/Maintainerr/issues/1888)) ([5053168](https://github.com/jorenn92/Maintainerr/commit/5053168d532a52c141899373c0ed6fa7afe45e2d))
+* Improve Jellyseerr settings UX ([#1872](https://github.com/jorenn92/Maintainerr/issues/1872)) ([2c7e7c3](https://github.com/jorenn92/Maintainerr/commit/2c7e7c300dfc9e031db306f90a80a39e28ef53d8))
+* Improve Overseerr settings UX ([#1871](https://github.com/jorenn92/Maintainerr/issues/1871)) ([0c484fb](https://github.com/jorenn92/Maintainerr/commit/0c484fbbabf0e127b3cc189c8a7d6b84428178f1))
+
 ## [2.18.2](https://github.com/jorenn92/Maintainerr/compare/v2.18.1...v2.18.2) (2025-07-12)
 
 
