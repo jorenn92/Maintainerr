@@ -45,10 +45,12 @@ const Overview = () => {
       ) {
         // Use default library from settings if available, otherwise use first library
         const defaultLibraryId = SettingsCtx.settings.plex_default_library
-        const libraryToUse = defaultLibraryId && LibrariesCtx.libraries.find(lib => +lib.key === defaultLibraryId)
-          ? defaultLibraryId
-          : selectedLibrary || +LibrariesCtx.libraries[0].key
-        
+        const libraryToUse =
+          defaultLibraryId &&
+          LibrariesCtx.libraries.find((lib) => +lib.key === defaultLibraryId)
+            ? defaultLibraryId
+            : selectedLibrary || +LibrariesCtx.libraries[0].key
+
         switchLib(libraryToUse)
       }
     }, 300)

@@ -6,8 +6,8 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import SettingsContext from '../../../contexts/settings-context'
 import GetApiHandler, {
-    DeleteApiHandler,
-    PostApiHandler,
+  DeleteApiHandler,
+  PostApiHandler,
 } from '../../../utils/ApiHandler'
 import Alert from '../../Common/Alert'
 import Button from '../../Common/Button'
@@ -133,7 +133,9 @@ const PlexSettings = () => {
         plex_port: +portRef.current.value,
         plex_name: nameRef.current.value,
         plex_ssl: +sslRef.current.checked, // not used, server derives this from https://
-        plex_default_library: defaultLibraryRef.current?.value ? +defaultLibraryRef.current.value : undefined,
+        plex_default_library: defaultLibraryRef.current?.value
+          ? +defaultLibraryRef.current.value
+          : undefined,
       }
 
       if (plex_token) {
@@ -533,7 +535,9 @@ const PlexSettings = () => {
                   name="defaultLibrary"
                   id="defaultLibrary"
                   ref={defaultLibraryRef}
-                  defaultValue={settingsCtx.settings.plex_default_library?.toString() || ''}
+                  defaultValue={
+                    settingsCtx.settings.plex_default_library?.toString() || ''
+                  }
                   disabled={!tokenValid || libraries.length === 0}
                 >
                   <option value="">No default library</option>

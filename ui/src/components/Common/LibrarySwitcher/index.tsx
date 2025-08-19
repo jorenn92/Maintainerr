@@ -24,10 +24,12 @@ const LibrarySwitcher = (props: ILibrarySwitcher) => {
           if (props.allPossible !== undefined && !props.allPossible) {
             // Use default library from settings if available, otherwise use first library
             const defaultLibraryId = SettingsCtx.settings.plex_default_library
-            const libraryToUse = defaultLibraryId && resp.find(lib => +lib.key === defaultLibraryId)
-              ? defaultLibraryId
-              : +resp[0].key
-            
+            const libraryToUse =
+              defaultLibraryId &&
+              resp.find((lib) => +lib.key === defaultLibraryId)
+                ? defaultLibraryId
+                : +resp[0].key
+
             props.onSwitch(libraryToUse)
           }
         } else {

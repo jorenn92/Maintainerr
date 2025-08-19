@@ -1,9 +1,9 @@
 import {
-    createContext,
-    ReactElement,
-    ReactNode,
-    ReactPortal,
-    useState,
+  createContext,
+  ReactElement,
+  ReactNode,
+  ReactPortal,
+  useState,
 } from 'react'
 
 export interface ISettings {
