@@ -23,6 +23,8 @@ export class SettingDto {
 
   plex_auth_token: string;
 
+  plex_default_library: number;
+
   overseerr_url: string;
 
   overseerr_api_key: string;
