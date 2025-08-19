@@ -135,7 +135,7 @@ const PlexSettings = () => {
         plex_ssl: +sslRef.current.checked, // not used, server derives this from https://
         plex_default_library: defaultLibraryRef.current?.value
           ? +defaultLibraryRef.current.value
-          : undefined,
+          : null,
       }
 
       if (plex_token) {

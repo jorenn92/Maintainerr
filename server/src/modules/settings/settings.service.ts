@@ -57,7 +57,7 @@ export class SettingsService implements SettingDto {
 
   plex_auth_token: string;
 
-  plex_default_library: number;
+  plex_default_library: number | null;
 
   overseerr_url: string;
 
