@@ -2488,7 +2488,7 @@ __metadata:
     axios: "npm:^1.11.0"
     axios-retry: "npm:^4.5.0"
     chalk: "npm:^4.1.2"
-    cron-validator: "npm:^1.3.1"
+    cron-validator: "npm:^1.4.0"
     email-templates: "npm:9.0.0"
     eslint: "npm:^9.33.0"
     eslint-config-prettier: "npm:^10.1.5"
@@ -2547,7 +2547,7 @@ __metadata:
     bowser: "npm:^2.11.0"
     clsx: "npm:^2.1.1"
     compare-versions: "npm:^6.1.1"
-    cron-validator: "npm:^1.3.1"
+    cron-validator: "npm:^1.4.0"
     eslint: "npm:^9.33.0"
     eslint-config-next: "npm:^15.4.7"
     eslint-config-prettier: "npm:^10.1.5"
@@ -7588,10 +7588,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron-validator@npm:^1.3.1":
-  version: 1.3.1
-  resolution: "cron-validator@npm:1.3.1"
-  checksum: 10c0/80d276a729959ceaf394a3ffd579579895ca3cf956e552aef351e4d3695c7baf5594e3f2ac8a11514520c94eeef66ad0b91424f938a7e0609e5557175f41349b
+"cron-validator@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "cron-validator@npm:1.4.0"
+  checksum: 10c0/fc81eb2dfdcce0c2e9b8ac44eae5c70ca439eb256d860d10849dfbcebc35e6c7746649a20e86e9a9156569e31d39717d7fc35341bd3fb81bbec9199b885ef945
   languageName: node
   linkType: hard
 
