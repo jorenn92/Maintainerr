@@ -19,6 +19,8 @@ export enum RulePossibility {
   COUNT_NOT_EQUALS,
   COUNT_BIGGER,
   COUNT_SMALLER,
+  IS_NULL,
+  IS_NOT_NULL,
 }
 
 export enum RuleOperators {
@@ -103,6 +105,14 @@ export class RuleType {
       RulePossibility.COUNT_SMALLER,
     ],
     'text list',
+  );
+  static readonly NULL = new RuleType(
+    '5',
+    [
+      RulePossibility.IS_NULL,
+      RulePossibility.IS_NOT_NULL,
+    ],
+    'null',
   );
   public constructor(
     private readonly key: string,
