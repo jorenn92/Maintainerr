@@ -2501,7 +2501,7 @@ __metadata:
     nestjs-zod: "npm:^4.3.1"
     node-cache: "npm:^5.1.2"
     nodemailer: "npm:7.0.3"
-    openpgp: "npm:^6.1.1"
+    openpgp: "npm:^6.2.2"
     prettier: "npm:^3.6.2"
     read-last-lines: "npm:^1.8.0"
     reflect-metadata: "npm:^0.2.2"
@@ -14716,10 +14716,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openpgp@npm:^6.1.1":
-  version: 6.1.1
-  resolution: "openpgp@npm:6.1.1"
-  checksum: 10c0/dcd355e3aa826d631ad1f5eb39dd939be93ef8d2f3eb56c279662cfb08aaf28f9d5eff92b40c9de28adcbda454d43b0398bc175c0fe9131ccf003f5a20614101
+"openpgp@npm:^6.2.2":
+  version: 6.2.2
+  resolution: "openpgp@npm:6.2.2"
+  checksum: 10c0/dd284ff20ad087c341ec86369e12d5c210056aa28edacba192b20bd0d20892ce21c6aef83c6d79f082f533343e80b8ad63a58ee9ebf5d7651173890e70833ae2
   languageName: node
   linkType: hard
 
