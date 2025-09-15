@@ -1239,9 +1239,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@headlessui/react@npm:^2.2.4":
-  version: 2.2.4
-  resolution: "@headlessui/react@npm:2.2.4"
+"@headlessui/react@npm:^2.2.8":
+  version: 2.2.8
+  resolution: "@headlessui/react@npm:2.2.8"
   dependencies:
     "@floating-ui/react": "npm:^0.26.16"
     "@react-aria/focus": "npm:^3.20.2"
@@ -1251,7 +1251,7 @@ __metadata:
   peerDependencies:
     react: ^18 || ^19 || ^19.0.0-rc
     react-dom: ^18 || ^19 || ^19.0.0-rc
-  checksum: 10c0/4b6dfe65adc7e28a842ea83faabd11979926a5fd2933e18bc934fd3c5aff11b8317f2a016026030691f6a417ba242a63bcae7ca3e137bcde7264d0211cec6dfe
+  checksum: 10c0/9c1c753d9e6298036767bd6ac7e83ed36fde0b46a0185a79ec1ef6b01e0d23d2fff6c12e05e6d6d5630ffef6a1fe15d501137ad0697d1b49d2e930049a8a2c30
   languageName: node
   linkType: hard
 
@@ -2583,7 +2583,7 @@ __metadata:
   dependencies:
     "@eslint/eslintrc": "npm:^3.3.1"
     "@eslint/js": "npm:^9.33.0"
-    "@headlessui/react": "npm:^2.2.4"
+    "@headlessui/react": "npm:^2.2.8"
     "@heroicons/react": "npm:^1.0.6"
     "@hookform/resolvers": "npm:^5.2.1"
     "@maintainerr/contracts": "workspace:^"
