@@ -2,9 +2,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RuleExecutorService } from './rule-executor.service';
 import { RulesDto } from '../dtos/rules.dto';
 
-const createService = (
-  mockRulesService: any = {},
-) => {
+const createService = (mockRulesService: any = {}) => {
   const mockLogger = {
     setContext: jest.fn(),
     log: jest.fn(),
@@ -129,7 +127,7 @@ describe('RuleExecutorService', () => {
       const result = await service['getRuleGroupsForExecution']();
 
       expect(result).toHaveLength(2);
-      expect(result.every(g => g.id !== undefined)).toBe(true);
+      expect(result.every((g) => g.id !== undefined)).toBe(true);
     });
   });
 
