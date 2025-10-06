@@ -49,7 +49,7 @@
     "rxjs": "^7.8.2",
     "sqlite3": "^5.1.6",
     "typeorm": "^0.3.25",
-    "winston": "^3.17.0",
+    "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0",
     "xml2js": "^0.6.2",
     "yaml": "^2.8.0",
