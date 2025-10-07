@@ -2600,7 +2600,7 @@ __metadata:
     nestjs-graceful-shutdown: "npm:^1.0.3"
     nestjs-zod: "npm:^4.3.1"
     node-cache: "npm:^5.1.2"
-    nodemailer: "npm:7.0.3"
+    nodemailer: "npm:7.0.7"
     openpgp: "npm:^6.2.2"
     prettier: "npm:^3.6.2"
     read-last-lines: "npm:^1.8.0"
@@ -14484,10 +14484,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:7.0.3":
-  version: 7.0.3
-  resolution: "nodemailer@npm:7.0.3"
-  checksum: 10c0/835492262328471b94a080cea43ea20f4232e19a915400cd71c7f4f4ab93a7d361775154eebe30a8fc40379eecf11a0bbc73e6cf4bbee9dccb6dd1cf7a1dc792
+"nodemailer@npm:7.0.7":
+  version: 7.0.7
+  resolution: "nodemailer@npm:7.0.7"
+  checksum: 10c0/9f7215f3c76b0db3e76a9a6a10fa4fdca3e3ea907fa82430498b6598b40700df287efd586e1d5bc56fe4b903144e5d70413e01f621106e4417e7af7eb1dccaee
   languageName: node
   linkType: hard
 
