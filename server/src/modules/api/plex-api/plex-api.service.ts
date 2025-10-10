@@ -433,7 +433,7 @@ export class PlexApiService {
       const response = await this.plexClient.queryAll<PlexLibraryResponse>({
         uri: `/library/metadata/${itemId}/users/top`,
       });
-      return response.MediaContainer.Metadata as PlexSeenBy[];
+      return response.MediaContainer.Account as PlexSeenBy[];
     } catch (err) {
       this.logger.warn(
         'Plex api communication failure.. Is the application running?',
