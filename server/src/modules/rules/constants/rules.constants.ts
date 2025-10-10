@@ -478,14 +478,16 @@ export class RuleConstants {
         {
           id: 43,
           name: 'seenBy_includingMarked',
-          humanName: '[list] Viewed by (username) - including marked as watched',
+          humanName:
+            '[list] Viewed by (username) - including marked as watched',
           mediaType: MediaType.MOVIE,
           type: RuleType.TEXT_LIST,
         },
         {
           id: 44,
           name: 'sw_allEpisodesSeenBy_includingMarked',
-          humanName: '[list] Users that saw all available episodes - including marked as watched',
+          humanName:
+            '[list] Users that saw all available episodes - including marked as watched',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT_LIST, // return usernames []
           showType: [EPlexDataType.SHOWS, EPlexDataType.SEASONS],
@@ -493,7 +495,8 @@ export class RuleConstants {
         {
           id: 45,
           name: 'sw_watchers_includingMarked',
-          humanName: '[list] Users that watch the show/season/episode - including marked as watched',
+          humanName:
+            '[list] Users that watch the show/season/episode - including marked as watched',
           mediaType: MediaType.SHOW,
           type: RuleType.TEXT_LIST, // return usernames []
           showType: [
