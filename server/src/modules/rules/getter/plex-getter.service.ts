@@ -798,16 +798,37 @@ export class PlexGetterService {
         }
         case 'sw_watchers_includingMarked': {
           const plexUsers = await this.plexApi.getCorrectedUsers(false);
+          const allViewers = new Set<number>();
 
-          const watchHistory =
-            await this.plexApi.getWatchHistoryIncludingMarked(
+          // for episodes
+          if (metadata.type === 'episode') {
+            const watchHistory = await this.plexApi.getWatchHistoryIncludingMarked(
               metadata.ratingKey,
             );
+            if (watchHistory) {
+              watchHistory.forEach(viewer => allViewers.add(+viewer.id));
+            }
+          } else {
+            // for seasons & shows
+            const seasons = metadata.type !== 'season'
+              ? await this.plexApi.getChildrenMetadata(metadata.ratingKey)
+              : [metadata];
 
-          const viewers = watchHistory ? watchHistory.map((el) => +el.id) : [];
-          const uniqueViewers = [...new Set(viewers)];
+            for (const season of seasons) {
+              const episodes = await this.plexApi.getChildrenMetadata(season.ratingKey);
+              for (const episode of episodes) {
+                const views = await this.plexApi.getWatchHistoryIncludingMarked(
+                  episode.ratingKey,
+                );
+                if (views) {
+                  views.forEach(viewer => allViewers.add(+viewer.id));
+                }
+              }
+            }
+          }
 
-          if (uniqueViewers && uniqueViewers.length > 0) {
+          const uniqueViewers = Array.from(allViewers);
+          if (uniqueViewers.length > 0) {
             return plexUsers
               .filter((el) => uniqueViewers.includes(+el.plexId))
               .map((el) => el.username);
