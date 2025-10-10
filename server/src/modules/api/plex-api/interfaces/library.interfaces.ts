@@ -131,5 +131,7 @@ export interface PlexSeenBy extends PlexLibraryItem {
   originallyAvailableAt: string;
   viewedAt: number;
   accountID: number;
+  id: number;
   deviceID: number;
+  globalViewCount: number;
 }
