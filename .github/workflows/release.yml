@@ -16,10 +16,6 @@ env:
   DOCKERHUB_SLUG: jorenn92/maintainerr
   GHCR_SLUG: ghcr.io/maintainerr/maintainerr
 
-permissions:
-  contents: read
-  packages: write
-
 jobs:
   semantic-release:
     name: Tag and release latest version
@@ -55,6 +51,9 @@ jobs:
     if: github.event.inputs.with-docker-images == 'true'
     name: Build ${{ matrix.platform }}
     needs: semantic-release
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -140,6 +139,9 @@ jobs:
     name: Merge Docker digests and push
     if: github.event.inputs.with-docker-images == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     needs:
       - build-docker-image
     steps:
