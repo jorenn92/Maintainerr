@@ -42,7 +42,7 @@
     "nestjs-graceful-shutdown": "^1.0.3",
     "nestjs-zod": "^4.3.1",
     "node-cache": "^5.1.2",
-    "nodemailer": "7.0.7",
+    "nodemailer": "7.0.9",
     "openpgp": "^6.2.2",
     "read-last-lines": "^1.8.0",
     "reflect-metadata": "^0.2.2",
