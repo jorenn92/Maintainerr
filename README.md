@@ -75,7 +75,7 @@ docker run -d \
 -u 1000:1000 \
 -p 6246:6246 \
 --restart unless-stopped \
-ghcr.io/jorenn92/maintainerr:latest
+ghcr.io/maintainerr/maintainerr:latest
 ```
 
 Docker-compose:
@@ -85,7 +85,7 @@ version: '3'
 
 services:
     maintainerr:
-        image: ghcr.io/jorenn92/maintainerr:latest # or jorenn92/maintainerr:latest
+        image: ghcr.io/maintainerr/maintainerr:latest # or jorenn92/maintainerr:latest
         container_name: maintainerr
         user: 1000:1000
         volumes:
