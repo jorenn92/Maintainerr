@@ -16,6 +16,10 @@ env:
   DOCKERHUB_SLUG: jorenn92/maintainerr
   GHCR_SLUG: ghcr.io/maintainerr/maintainerr
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   semantic-release:
     name: Tag and release latest version
