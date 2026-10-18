@@ -1,11 +1,26 @@
 import z from 'zod'
 
-export const tracearrServerSchema = z.object({
-  id: z.uuid(),
-  name: z.string().min(1),
+export interface TracearrServer {
+  id: string
+  name: string
+}
+
+// GET /servers, served from Tracearr 2.7.0 on: every media server Tracearr
+// tracks, and the version of the Tracearr answering.
+export const tracearrServersResponseSchema = z.object({
+  data: z.array(
+    z.object({
+      server_id: z.uuid(),
+      server_name: z.string(),
+      server_type: z.string().min(1),
+    }),
+  ),
+  tracearr_version: z.string(),
 })
 
-export type TracearrServer = z.infer<typeof tracearrServerSchema>
+export type TracearrServersResponse = z.infer<
+  typeof tracearrServersResponseSchema
+>
 
 // Rating keys only mean anything within one media server, so a candidate is
 // confirmed by reading its own library items: the same key resolving to the
@@ -20,17 +35,6 @@ export const tracearrRecentlyAddedPageSchema = z.object({
       // The media server's own added date, which every server reports for every
       // item. Year is not usable for this: it is absent on most rows.
       added_at: z.iso.datetime(),
-    }),
-  ),
-})
-
-// The server list carries no type, so /libraries supplies it: it reports one
-// row per library with its server, and needs no watch history to do so.
-export const tracearrLibrariesPageSchema = z.object({
-  data: z.array(
-    z.object({
-      server_id: z.uuid(),
-      server_type: z.string().min(1),
     }),
   ),
 })
