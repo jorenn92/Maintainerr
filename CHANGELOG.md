@@ -1,3 +1,16 @@
+# [3.30.2](https://github.com/Maintainerr/Maintainerr/compare/v3.30.1...v3.30.2) (2026-10-18)
+
+
+## Highlights
+- Maintainerr now starts correctly when the `TZ` environment variable is empty by defaulting to UTC (#3934).
+- Tracearr connection test and server discovery now use the `/servers` endpoint, requiring Tracearr 2.7.0 (#3960).
+
+## Fixes
+- Sonarr and Radarr tag rules now skip items when tag lists cannot be read instead of incorrectly evaluating them (#3935).
+
+## Dependencies
+- 62 dependency bumps including @eslint-react/eslint-plugin, zod, @typescript-eslint/eslint-plugin, eslint-plugin-jest, konva, vitest, nestjs, @tanstack/react-query, @swc/core, @types/lodash, @tanstack/eslint-plugin-query, prettier, react-hook-form, nodemailer, typescript-eslint, vite, knip, @types/node, typeorm, and rolldown.
+
 # [3.30.1](https://github.com/Maintainerr/Maintainerr/compare/v3.30.0...v3.30.1) (2026-10-03)
 
 
