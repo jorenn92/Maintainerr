@@ -39,10 +39,12 @@ export class TvdbApiService extends ExternalApiService {
     });
   }
 
-  async onApplicationBootstrap() {
+  onApplicationBootstrap() {
     const customKey = this.settings.tvdb_api_key;
     if (customKey) {
-      await this.authenticate(customKey);
+      // Not awaited: Nest opens the port only once every bootstrap hook has
+      // settled, so an unreachable TVDB kept the whole app offline (#3936).
+      void this.authenticate(customKey);
     }
   }
 
@@ -94,6 +96,12 @@ export class TvdbApiService extends ExternalApiService {
     options?: { preserveAuthOnFailure?: boolean },
   ): Promise<boolean> {
     const token = await this.requestToken(apiKey);
+
+    // The key was replaced or removed while this login was in flight; its
+    // answer is stale.
+    if (apiKey !== this.settings.tvdb_api_key) {
+      return false;
+    }
 
     if (token) {
       this.updateBearerToken(token);
