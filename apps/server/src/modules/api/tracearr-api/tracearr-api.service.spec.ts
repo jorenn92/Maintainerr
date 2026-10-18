@@ -1,5 +1,6 @@
 import { MediaServerType, TracearrHistoryItem } from '@maintainerr/contracts';
 import { Mocked, TestBed } from '@suites/unit';
+import { AxiosError, AxiosResponse } from 'axios';
 import { MediaServerFactory } from '../media-server/media-server.factory';
 import { SettingsDataService } from '../../settings/settings-data.service';
 import { TracearrApiService } from './tracearr-api.service';
@@ -46,6 +47,19 @@ const CONFIRMING_LIBRARY = {
     added_at: '2026-01-01T00:00:00.000Z',
   })),
 };
+
+const serversResponse = (
+  ...servers: { id: string; name: string; type: string }[]
+) => ({
+  data: {
+    data: servers.map(({ id, name, type }) => ({
+      server_id: id,
+      server_name: name,
+      server_type: type,
+    })),
+    tracearr_version: 'v2.8.3',
+  },
+});
 
 const usersPage = {
   data: [
@@ -452,79 +466,26 @@ describe('TracearrApiService', () => {
     expect(service.getHistoryIndex()).toBeUndefined();
   });
 
-  it('tests a Tracearr v2 OpenAPI document', async () => {
-    apiMock.getRawWithoutCache.mockResolvedValue({
-      data: {
-        openapi: '3.1.0',
-        info: { title: 'Tracearr Public API', version: '2.0.0-beta.1' },
-      },
-    });
+  it('tests the connection with the Tracearr version it reports', async () => {
+    apiMock.getRawWithoutCache.mockResolvedValue(serversResponse());
 
     await expect(
       service.testConnection({
         url: 'http://tracearr.local',
         apiKey: 'trr_pub_token',
       }),
-    ).resolves.toEqual({ status: 'OK', code: 1, message: '2.0.0-beta.1' });
-  });
-
-  it('reads Tracearr servers from the public API document', async () => {
-    apiMock.getRawWithoutCache.mockResolvedValue({
-      data: {
-        paths: {
-          '/api/v2/public/history': {
-            get: {
-              parameters: [
-                {
-                  name: 'server_id',
-                  in: 'query',
-                  schema: {
-                    enum: [SERVER_ID],
-                  },
-                  description: `Available servers: **Dev Plex**: \`${SERVER_ID}\``,
-                },
-              ],
-            },
-          },
-        },
-      },
-    });
-
-    await expect(
-      service.getServers({
-        url: 'http://tracearr.local',
-        apiKey: 'trr_pub_token',
-      }),
-    ).resolves.toEqual([{ id: SERVER_ID, name: 'Dev Plex' }]);
+    ).resolves.toEqual({ status: 'OK', code: 1, message: 'v2.8.3' });
   });
 
   it('offers only the Tracearr server matching the configured media server', async () => {
     const jellyfinServerId = '66666666-6666-4666-8666-666666666666';
     Object.assign(settings, { media_server_type: MediaServerType.PLEX });
-    apiMock.getRawWithoutCache.mockResolvedValue({
-      data: {
-        paths: {
-          '/api/v2/public/history': {
-            get: {
-              parameters: [
-                {
-                  name: 'server_id',
-                  in: 'query',
-                  schema: { enum: [SERVER_ID, jellyfinServerId] },
-                  description: `Available servers: **Dev Plex**: \`${SERVER_ID}\` **Dev Jellyfin**: \`${jellyfinServerId}\``,
-                },
-              ],
-            },
-          },
-        },
-      },
-    });
-    apiMock.getWithoutCache.mockResolvedValue({
-      data: [
-        { server_id: SERVER_ID, server_type: 'plex' },
-        { server_id: jellyfinServerId, server_type: 'jellyfin' },
-      ],
-    });
+    apiMock.getRawWithoutCache.mockResolvedValue(
+      serversResponse(
+        { id: SERVER_ID, name: 'Dev Plex', type: 'plex' },
+        { id: jellyfinServerId, name: 'Dev Jellyfin', type: 'jellyfin' },
+      ),
+    );
 
     await expect(
       service.getServers({
@@ -537,28 +498,10 @@ describe('TracearrApiService', () => {
   it('resolves the server itself when a media server switch cleared it', async () => {
     Object.assign(settings, { tracearr_server_id: undefined });
     service.init();
-    apiMock.getRawWithoutCache.mockResolvedValue({
-      data: {
-        paths: {
-          '/api/v2/public/history': {
-            get: {
-              parameters: [
-                {
-                  name: 'server_id',
-                  in: 'query',
-                  schema: { enum: [SERVER_ID] },
-                  description: `Available servers: **Dev Plex**: \`${SERVER_ID}\``,
-                },
-              ],
-            },
-          },
-        },
-      },
-    });
+    apiMock.getRawWithoutCache.mockResolvedValue(
+      serversResponse({ id: SERVER_ID, name: 'Dev Plex', type: 'plex' }),
+    );
     apiMock.getWithoutCache.mockImplementation(async (endpoint: string) => {
-      if (endpoint === '/libraries') {
-        return { data: [{ server_id: SERVER_ID, server_type: 'plex' }] };
-      }
       if (endpoint === '/recently-added') {
         return CONFIRMING_LIBRARY;
       }
@@ -604,34 +547,14 @@ describe('TracearrApiService', () => {
               },
       ),
     } as never);
-    apiMock.getRawWithoutCache.mockResolvedValue({
-      data: {
-        paths: {
-          '/api/v2/public/history': {
-            get: {
-              parameters: [
-                {
-                  name: 'server_id',
-                  in: 'query',
-                  schema: { enum: [SERVER_ID, otherPlexId] },
-                  description: `Available servers: **Ours**: \`${SERVER_ID}\` **Theirs**: \`${otherPlexId}\``,
-                },
-              ],
-            },
-          },
-        },
-      },
-    });
+    apiMock.getRawWithoutCache.mockResolvedValue(
+      serversResponse(
+        { id: SERVER_ID, name: 'Ours', type: 'plex' },
+        { id: otherPlexId, name: 'Theirs', type: 'plex' },
+      ),
+    );
     apiMock.getWithoutCache.mockImplementation(
       async (endpoint: string, config: { params: { server_id: string } }) => {
-        if (endpoint === '/libraries') {
-          return {
-            data: [
-              { server_id: SERVER_ID, server_type: 'plex' },
-              { server_id: otherPlexId, server_type: 'plex' },
-            ],
-          };
-        }
         return config.params.server_id === SERVER_ID
           ? {
               data: [
@@ -695,14 +618,6 @@ describe('TracearrApiService', () => {
     } as never);
     apiMock.getWithoutCache.mockImplementation(
       async (endpoint: string, config: { params: { server_id: string } }) => {
-        if (endpoint === '/libraries') {
-          return {
-            data: [
-              { server_id: SERVER_ID, server_type: 'jellyfin' },
-              { server_id: foreignId, server_type: 'jellyfin' },
-            ],
-          };
-        }
         const own = config.params.server_id === SERVER_ID;
         return {
           data: Array.from({ length: 6 }, (_unused, i) => ({
@@ -922,13 +837,12 @@ describe('TracearrApiService', () => {
     ).resolves.toBeUndefined();
   });
 
-  it('rejects Tracearr versions below 2.0.0-beta.1', async () => {
-    apiMock.getRawWithoutCache.mockResolvedValue({
-      data: {
-        openapi: '3.1.0',
-        info: { title: 'Tracearr Public API', version: '2.0.0-beta.0' },
-      },
-    });
+  it('asks for Tracearr 2.7.0 when /servers is missing', async () => {
+    apiMock.getRawWithoutCache.mockRejectedValue(
+      new AxiosError('Not Found', 'ERR_BAD_REQUEST', undefined, undefined, {
+        status: 404,
+      } as AxiosResponse),
+    );
 
     await expect(
       service.testConnection({
@@ -939,7 +853,7 @@ describe('TracearrApiService', () => {
       status: 'NOK',
       code: 0,
       message:
-        'Tracearr 2.0.0-beta.0 is below the minimum supported version 2.0.0-beta.1. Please update Tracearr.',
+        'Tracearr 2.7.0 or later is required. Update Tracearr, or verify the URL points to it.',
     });
   });
 

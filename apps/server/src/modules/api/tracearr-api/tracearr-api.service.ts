@@ -9,11 +9,11 @@ import {
   TracearrItemHistoryRow,
   tracearrItemHistoryPageSchema,
   tracearrHistoryPageSchema,
-  tracearrLibrariesPageSchema,
   tracearrMediaChildrenSchema,
   tracearrMediaSchema,
   tracearrRecentlyAddedPageSchema,
-  tracearrServerSchema,
+  TracearrServersResponse,
+  tracearrServersResponseSchema,
   tracearrUsersPageSchema,
 } from '@maintainerr/contracts';
 import { Injectable } from '@nestjs/common';
@@ -43,32 +43,6 @@ import {
   TRACEARR_SERVER_PROBE_SIZE,
 } from './tracearr-api.constants';
 import { TracearrApi } from './helpers/tracearr-api.helper';
-import { isBelowMinimumVersion } from '../../../utils/required-version-helper';
-
-interface TracearrOpenApiDocument {
-  openapi?: string;
-  info?: {
-    title?: string;
-    version?: string;
-  };
-  paths?: Record<
-    string,
-    Record<string, TracearrOpenApiOperation | undefined> | undefined
-  >;
-}
-
-interface TracearrOpenApiOperation {
-  parameters?: TracearrOpenApiParameter[];
-}
-
-interface TracearrOpenApiParameter {
-  name?: string;
-  in?: string;
-  description?: string;
-  schema?: {
-    enum?: unknown[];
-  };
-}
 
 // Tracearr truncates the media server's added date to milliseconds, so the two
 // only agree to the second.
@@ -388,14 +362,19 @@ export class TracearrApiService {
     const api = new TracearrApi(params, this.loggerFactory.createLogger());
 
     try {
-      const document = await this.getOpenApiDocument(api);
-      const servers = this.getServersFromOpenApiDocument(document);
-      const sameType = await this.keepServersMatchingMediaServer(api, servers);
+      const { data } = await this.fetchServers(api);
+      // Only the media server Maintainerr manages shares its rating keys, and
+      // offering the others yields rules that silently match nothing.
+      const mediaServerType = this.settings.media_server_type;
+      const sameType = data
+        .filter(
+          (server) =>
+            !mediaServerType || server.server_type === mediaServerType,
+        )
+        .map((server) => ({ id: server.server_id, name: server.server_name }));
       return await this.keepServersSharingLibrary(params, sameType);
     } catch (error) {
-      this.logger.warn(
-        'Could not load Tracearr servers from the public API document.',
-      );
+      this.logger.warn('Could not load Tracearr servers.');
       this.logger.debug(error);
       return undefined;
     }
@@ -537,42 +516,6 @@ export class TracearrApiService {
     return servers?.length === 1 ? servers[0].id : undefined;
   }
 
-  /**
-   * The server list carries no type, so /libraries supplies it. Only the media
-   * server Maintainerr manages shares its rating keys, and offering the others
-   * yields rules that silently match nothing. A server absent from /libraries
-   * has no type to compare and is kept, so it stays selectable.
-   */
-  private async keepServersMatchingMediaServer(
-    api: TracearrApi,
-    servers: TracearrServer[],
-  ): Promise<TracearrServer[]> {
-    const mediaServerType = this.settings.media_server_type;
-    if (!mediaServerType) {
-      return servers;
-    }
-
-    const raw = await api.getWithoutCache<unknown>('/libraries');
-    const parsed = tracearrLibrariesPageSchema.safeParse(raw);
-    if (!parsed.success) {
-      this.logger.warn(
-        'Could not read Tracearr library types. Listing every Tracearr server.',
-      );
-      return servers;
-    }
-
-    const typeByServerId = new Map(
-      parsed.data.data.map((library) => [
-        library.server_id,
-        library.server_type,
-      ]),
-    );
-    return servers.filter((server) => {
-      const serverType = typeByServerId.get(server.id);
-      return serverType === undefined || serverType === mediaServerType;
-    });
-  }
-
   public async testConnection(
     params: ConstructorParameters<typeof TracearrApi>[0],
   ): Promise<BasicResponseDto> {
@@ -580,28 +523,12 @@ export class TracearrApiService {
 
     try {
       assertApiKey(params.apiKey);
-      const document = await this.getOpenApiDocument(api);
-
-      const version = document.info?.version;
-      if (
-        !document.openapi ||
-        document.info?.title !== 'Tracearr Public API' ||
-        !version
-      ) {
-        throw new Error(
-          'Unexpected response from Tracearr. Verify the URL points to a Tracearr v2 instance.',
-        );
-      }
-      if (isBelowMinimumVersion(version, MINIMUM_TRACEARR_VERSION)) {
-        throw new Error(
-          `Tracearr ${version} is below the minimum supported version ${MINIMUM_TRACEARR_VERSION}. Please update Tracearr.`,
-        );
-      }
+      const { tracearr_version } = await this.fetchServers(api);
 
       return {
         status: 'OK',
         code: 1,
-        message: version,
+        message: tracearr_version,
       };
     } catch (error) {
       logConnectionTestError(this.logger, 'Tracearr', error);
@@ -910,76 +837,27 @@ export class TracearrApiService {
     };
   }
 
-  private async getOpenApiDocument(
+  private async fetchServers(
     api: TracearrApi,
-  ): Promise<TracearrOpenApiDocument> {
-    const response = await api.getRawWithoutCache<TracearrOpenApiDocument>(
-      '/docs',
-      connectionTestConfig(),
-    );
-    return response.data;
-  }
-
-  private getServersFromOpenApiDocument(
-    document: TracearrOpenApiDocument,
-  ): TracearrServer[] {
-    const serverParameter = this.getServerParameter(document);
-    if (!serverParameter?.schema?.enum) {
-      this.logger.warn(
-        'Tracearr public API document does not list any available servers.',
-      );
-      return [];
-    }
-
-    return serverParameter.schema.enum.flatMap((id) => {
-      if (typeof id !== 'string') {
-        return [];
-      }
-
-      const server = tracearrServerSchema.safeParse({
-        id,
-        name: this.getServerName(serverParameter.description, id),
-      });
-      return server.success ? [server.data] : [];
-    });
-  }
-
-  private getServerParameter(
-    document: TracearrOpenApiDocument,
-  ): TracearrOpenApiParameter | undefined {
-    for (const path of Object.values(document.paths ?? {})) {
-      for (const operation of Object.values(path ?? {})) {
-        const serverParameter = operation?.parameters?.find(
-          (parameter) =>
-            parameter.name === 'server_id' && parameter.in === 'query',
-        );
-        if (serverParameter) {
-          return serverParameter;
+  ): Promise<TracearrServersResponse> {
+    const response = await api
+      .getRawWithoutCache<unknown>('/servers', connectionTestConfig())
+      .catch((error: unknown) => {
+        // An older Tracearr answers 404: /servers arrived in 2.7.0.
+        if (isAxiosError(error) && error.response?.status === 404) {
+          throw new Error(
+            `Tracearr ${MINIMUM_TRACEARR_VERSION} or later is required. Update Tracearr, or verify the URL points to it.`,
+          );
         }
-      }
+        throw error;
+      });
+    const parsed = tracearrServersResponseSchema.safeParse(response.data);
+    if (!parsed.success) {
+      throw new Error(
+        'Unexpected response from Tracearr. Verify the URL points to Tracearr.',
+      );
     }
-
-    return undefined;
-  }
-
-  private getServerName(description: string | undefined, id: string): string {
-    if (!description) {
-      return id;
-    }
-
-    const idIndex = description.indexOf(id);
-    if (idIndex === -1) {
-      return id;
-    }
-
-    const nameEnd = description.lastIndexOf('**', idIndex);
-    const nameStart = description.lastIndexOf('**', nameEnd - 1);
-    if (nameStart === -1 || nameEnd === -1 || nameEnd > idIndex) {
-      return id;
-    }
-
-    const name = description.slice(nameStart + 2, nameEnd);
-    return name || id;
+    return parsed.data;
   }
 
   private async fetchUsernamesByTracearrUserId(): Promise<
