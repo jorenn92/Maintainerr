@@ -81,3 +81,46 @@ describe('TVDB connection test', () => {
     expect(retryingHttp.post).not.toHaveBeenCalled();
   });
 });
+
+describe('TVDB startup login', () => {
+  let service: TvdbApiService;
+  let settings: Mocked<SettingsDataService>;
+  let answerLogin: (token: string) => void;
+  const flush = () => new Promise((resolve) => setImmediate(resolve));
+
+  beforeEach(async () => {
+    const { unit, unitRef } = await TestBed.solitary(TvdbApiService).compile();
+    service = unit;
+    settings = unitRef.get(SettingsDataService);
+    settings.tvdb_api_key = 'saved-key';
+    jest.spyOn(retryingHttp, 'post').mockReturnValue(
+      new Promise((resolve) => {
+        answerLogin = (token) => resolve({ data: { data: { token } } });
+      }),
+    );
+  });
+
+  afterEach(() => jest.restoreAllMocks());
+
+  // #3936: Nest awaits this hook before it opens the port.
+  it('lets the app start before TVDB answers, then authenticates', async () => {
+    await service.onApplicationBootstrap();
+
+    answerLogin('token');
+    await flush();
+    expect(service.isAvailable()).toBe(true);
+  });
+
+  it('keeps a key removed during the startup login removed', async () => {
+    service.onApplicationBootstrap();
+    settings.tvdb_api_key = undefined;
+    await service.handleSettingsUpdate({
+      oldSettings: { tvdb_api_key: 'saved-key' },
+      settings: { tvdb_api_key: undefined },
+    });
+
+    answerLogin('stale-token');
+    await flush();
+    expect(service.isAvailable()).toBe(false);
+  });
+});
