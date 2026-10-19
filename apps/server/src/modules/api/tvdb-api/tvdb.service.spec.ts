@@ -123,4 +123,37 @@ describe('TVDB startup login', () => {
     await flush();
     expect(service.isAvailable()).toBe(false);
   });
+
+  it.each([
+    { cause: 'TVDB unreachable', status: undefined, available: true },
+    { cause: 'key rejected', status: 401, available: false },
+  ])(
+    'logs in again later after a failed login only when TVDB did not reject the key: $cause',
+    async ({ status, available }) => {
+      const error = new AxiosError('Login failed');
+      if (status) {
+        error.response = {
+          status,
+          statusText: '',
+          data: {},
+          headers: {},
+          config: { headers: new AxiosHeaders() },
+        };
+      }
+      jest
+        .mocked(retryingHttp.post)
+        .mockRejectedValueOnce(error)
+        .mockResolvedValue({ data: { data: { token: 'token' } } });
+      const now = jest.spyOn(Date, 'now').mockReturnValue(0);
+
+      await service.onApplicationBootstrap();
+      await flush();
+      expect(service.isAvailable()).toBe(false);
+
+      now.mockReturnValue(15 * 60 * 1000);
+      service.isAvailable();
+      await flush();
+      expect(service.isAvailable()).toBe(available);
+    },
+  );
 });
