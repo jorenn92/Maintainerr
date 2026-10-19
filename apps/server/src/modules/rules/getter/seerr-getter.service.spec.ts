@@ -19,6 +19,8 @@ describe('SeerrGetterService', () => {
   const MEDIA_ADDED_AT_PROP_ID = 4;
   const AMOUNT_REQUESTED_PROP_ID = 5;
   const IS_REQUESTED_PROP_ID = 6;
+  const WATCHLISTED_BY_PROP_ID = 7;
+  const IS_WATCHLISTED_PROP_ID = 8;
 
   const createService = () => {
     const seerrApi = {
@@ -26,6 +28,7 @@ describe('SeerrGetterService', () => {
       getShow: jest.fn(),
       getSeason: jest.fn(),
       getRequestsForMedia: jest.fn(),
+      getWatchlistedByUsernames: jest.fn(),
     } as unknown as jest.Mocked<SeerrApiService>;
 
     const mediaServerFactory = {
@@ -320,6 +323,38 @@ describe('SeerrGetterService', () => {
           'episode' as MediaItemType,
         ),
       ).resolves.toBe(1);
+    });
+  });
+
+  describe('watchlist (property ids 7 and 8)', () => {
+    // An episode reads its show's watchlist; a failed read stays undefined.
+    it.each([
+      [WATCHLISTED_BY_PROP_ID, ['alice'], ['alice']],
+      [IS_WATCHLISTED_PROP_ID, ['alice'], true],
+      [IS_WATCHLISTED_PROP_ID, undefined, undefined],
+    ])('property %i answers %j as %j', async (id, watchlisted, expected) => {
+      const { service, seerrApi, metadataService, mediaServerFactory } =
+        createService();
+      const episodeLibItem = createMediaItem({
+        type: 'episode',
+        grandparentId: showLibItem.id,
+      });
+      const mockMediaServer = await mediaServerFactory.getService();
+      (mockMediaServer as any).getMetadata = jest
+        .fn()
+        .mockResolvedValue(showLibItem);
+      metadataService.resolveIdsFromMediaItemForService.mockImplementation(
+        async (item) =>
+          item.id === showLibItem.id ? { tmdb: 12345, type: 'tv' } : undefined,
+      );
+      seerrApi.getWatchlistedByUsernames.mockImplementation(
+        async (tmdbId, type) =>
+          tmdbId === 12345 && type === 'tv' ? watchlisted : [],
+      );
+
+      await expect(
+        service.get(id, episodeLibItem, 'episode' as MediaItemType),
+      ).resolves.toEqual(expected);
     });
   });
 
