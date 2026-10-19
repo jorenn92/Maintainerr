@@ -387,9 +387,9 @@ export class SeerrApiService {
   /**
    * Fetches every request in a single paginated sweep, mirroring getUsers()'s
    * pagination. It returns `undefined` on failure so the index build can tell
-   * a genuinely empty Seerr
-   * (definitive: nothing requested) from an unreachable one (transient: protect
-   * items). `[]` therefore means "Seerr reachable, no requests".
+   * a genuinely empty Seerr (definitive: nothing requested) from an unreachable
+   * one (transient: protect items). `[]` therefore means "Seerr reachable, no
+   * requests".
    */
   public async getRequests(): Promise<SeerrRequest[] | undefined> {
     try {
