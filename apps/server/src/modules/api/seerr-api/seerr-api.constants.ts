@@ -7,6 +7,10 @@ export const SEERR_REQUESTS_CACHE_ID = 'seerrrequests';
 // /request sweep and reused across items within the run.
 export const SEERR_REQUESTS_CACHE_KEY = 'request-index';
 
+// Key of the run-scoped watchlist index (Map<type:tmdbId, usernames>) in the
+// same cache, built from every Seerr user's /user/{id}/watchlist per run.
+export const SEERR_WATCHLIST_CACHE_KEY = 'watchlist-index';
+
 // Page size for the /request pagination sweep. Seerr imposes no upper bound on
 // `take` (verified against the Seerr API source and a live instance) and its
 // OFFSET pagination re-scans skipped rows, so a larger page than getUsers' 50

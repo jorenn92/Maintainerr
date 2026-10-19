@@ -110,6 +110,23 @@ export class SeerrGetterService {
         );
       }
 
+      // Seerr watchlists hold titles, so a season or episode reads its show's.
+      if (
+        prop?.name === 'watchlist_isListedByUsers' ||
+        prop?.name === 'watchlist_isWatchlisted'
+      ) {
+        const usernames = await this.seerrApi.getWatchlistedByUsernames(
+          tmdbId,
+          resolvedIds.type,
+        );
+        if (usernames === undefined) {
+          return undefined;
+        }
+        return prop.name === 'watchlist_isWatchlisted'
+          ? usernames.length > 0
+          : usernames;
+      }
+
       // Every other Seerr property derives from the request set. Read the
       // run-scoped request index (one bulk /request sweep, deduped + cached)
       // instead of a per-item getMovie/getShow - the per-item path rate-limited
