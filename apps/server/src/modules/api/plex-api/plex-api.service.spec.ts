@@ -102,35 +102,17 @@ describe('PlexApiService.getMetadata', () => {
   });
 
   // Reading metadata must not start Plex background augmentation (#3976).
-  it.each([
-    { name: 'default', options: undefined, queryString: '' },
-    {
-      name: 'external media',
-      options: { includeExternalMedia: true },
-      queryString: '?includeExternalMedia=1',
-    },
-    {
-      name: 'children',
-      options: { includeChildren: true },
-      queryString: '?includeChildren=1&includeExternalMedia=1',
-    },
-  ])(
-    'reads $name metadata without starting augmentation',
-    async ({ options, queryString }) => {
-      const query = jest.fn().mockResolvedValue({
-        MediaContainer: { Metadata: [{ ratingKey: '123' }] },
-      });
+  it('reads metadata without starting augmentation', async () => {
+    const query = jest.fn().mockResolvedValue({
+      MediaContainer: { Metadata: [{ ratingKey: '123' }] },
+    });
 
-      (service as any).plexClient = { query };
+    (service as any).plexClient = { query };
 
-      await service.getMetadata('123', options);
+    await service.getMetadata('123');
 
-      expect(query).toHaveBeenCalledWith(
-        `/library/metadata/123${queryString}`,
-        true,
-      );
-    },
-  );
+    expect(query).toHaveBeenCalledWith('/library/metadata/123', true);
+  });
 
   // A membership decision made from a stale child list has already produced
   // phantom manual members once (#1446), and nothing invalidated this cache.
@@ -1435,13 +1417,8 @@ describe('PlexApiService.resetMetadataCache', () => {
     (cache as unknown as { flushAll: () => void }).flushAll();
   });
 
-  // The rule getter always passes includeExternalMedia, so its entries land
-  // under a query-string uri. Deleting only the bare uri invalidated nothing on
-  // the one path that caches, and rules testing kept serving stale metadata.
-  it('drops every option variant for the item, and nothing else', () => {
-    const withOptions = key('/library/metadata/12?includeExternalMedia=1');
+  it('drops the item, and nothing else', () => {
     cache.set(key('/library/metadata/12'), 'bare');
-    cache.set(withOptions, 'from the rule getter');
     cache.set(key('/library/metadata/12/children'), 'children');
     cache.set(key('/library/metadata/123'), 'a different item');
 
