@@ -20,6 +20,7 @@ import {
   MediaServerType,
   MediaSortOrder,
   parseCollectionSortKey,
+  resolveOverlayScope,
 } from '@maintainerr/contracts';
 import {
   BadGatewayException,
@@ -4821,6 +4822,10 @@ export class CollectionsService {
             mediaServerSort: collection.mediaServerSort ?? null,
             overlayEnabled: collection.overlayEnabled ?? false,
             overlayTemplateId: collection.overlayTemplateId ?? null,
+            overlayScope: resolveOverlayScope(
+              collection.type,
+              collection.overlayScope,
+            ),
           },
         ])
         .execute();

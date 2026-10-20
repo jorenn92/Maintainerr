@@ -1452,6 +1452,10 @@ msgstr "Episode {index}"
 msgid "episode {itemNumber}"
 msgstr "episode {itemNumber}"
 
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Episode artwork stays original"
+msgstr "Episode artwork stays original"
+
 #: src/components/Collection/CollectionItem/index.tsx
 #: src/components/Common/MediaActionModal.tsx
 #: src/components/Rules/RuleGroup/AddModal/index.tsx
@@ -2869,6 +2873,10 @@ msgstr "Output"
 msgid "Overlay Handler"
 msgstr "Overlay Handler"
 
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Overlay scope"
+msgstr "Overlay scope"
+
 #: src/components/Settings/Overlays/index.tsx
 msgid "Overlay Settings"
 msgstr "Overlay Settings"
@@ -3430,6 +3438,14 @@ msgstr "Season"
 msgid "season {itemNumber}"
 msgstr "season {itemNumber}"
 
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Season and episode artwork stays original"
+msgstr "Season and episode artwork stays original"
+
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Season posters and episode title cards get the overlay too"
+msgstr "Season posters and episode title cards get the overlay too"
+
 #: src/components/Collection/CollectionItem/index.tsx
 #: src/components/Common/MediaActionModal.tsx
 #: src/components/Rules/RuleGroup/AddModal/index.tsx
@@ -3648,6 +3664,14 @@ msgctxt "Toggle layer visibility"
 msgid "Show"
 msgstr "Show"
 
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Show + seasons"
+msgstr "Show + seasons"
+
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Show + seasons + episodes"
+msgstr "Show + seasons + episodes"
+
 #: src/components/Settings/MediaServerSelector/index.tsx
 msgid "Show incompatible rules ({skippedRules})"
 msgstr "Show incompatible rules ({skippedRules})"
@@ -3663,6 +3687,10 @@ msgstr "Show on {mediaServerName} home"
 #: src/components/Rules/RuleGroup/AddModal/index.tsx
 msgid "Show on {mediaServerName} library recommended"
 msgstr "Show on {mediaServerName} library recommended"
+
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Show only"
+msgstr "Show only"
 
 #: src/components/Rules/RuleGroup/AddModal/index.tsx
 msgid "Show the collection on the {mediaServerName} home screen"

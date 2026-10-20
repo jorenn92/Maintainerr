@@ -1452,6 +1452,10 @@ msgstr "Episode {index}"
 msgid "episode {itemNumber}"
 msgstr "Episode {itemNumber}"
 
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Episode artwork stays original"
+msgstr ""
+
 #: src/components/Collection/CollectionItem/index.tsx
 #: src/components/Common/MediaActionModal.tsx
 #: src/components/Rules/RuleGroup/AddModal/index.tsx
@@ -2869,6 +2873,10 @@ msgstr "Ausgabe"
 msgid "Overlay Handler"
 msgstr "Overlay-Handler"
 
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Overlay scope"
+msgstr ""
+
 #: src/components/Settings/Overlays/index.tsx
 msgid "Overlay Settings"
 msgstr "Overlay-Einstellungen"
@@ -3430,6 +3438,14 @@ msgstr "Staffel"
 msgid "season {itemNumber}"
 msgstr "Staffel {itemNumber}"
 
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Season and episode artwork stays original"
+msgstr ""
+
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Season posters and episode title cards get the overlay too"
+msgstr ""
+
 #: src/components/Collection/CollectionItem/index.tsx
 #: src/components/Common/MediaActionModal.tsx
 #: src/components/Rules/RuleGroup/AddModal/index.tsx
@@ -3648,6 +3664,14 @@ msgctxt "Toggle layer visibility"
 msgid "Show"
 msgstr "Anzeigen"
 
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Show + seasons"
+msgstr ""
+
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Show + seasons + episodes"
+msgstr ""
+
 #: src/components/Settings/MediaServerSelector/index.tsx
 msgid "Show incompatible rules ({skippedRules})"
 msgstr "Inkompatible Regeln anzeigen ({skippedRules})"
@@ -3663,6 +3687,10 @@ msgstr "Auf der Startseite von {mediaServerName} anzeigen"
 #: src/components/Rules/RuleGroup/AddModal/index.tsx
 msgid "Show on {mediaServerName} library recommended"
 msgstr "In den Bibliotheksempfehlungen von {mediaServerName} anzeigen"
+
+#: src/components/Rules/RuleGroup/AddModal/index.tsx
+msgid "Show only"
+msgstr ""
 
 #: src/components/Rules/RuleGroup/AddModal/index.tsx
 msgid "Show the collection on the {mediaServerName} home screen"

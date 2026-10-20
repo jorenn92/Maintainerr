@@ -331,6 +331,51 @@ describe('RulesService.setRules', () => {
     );
   });
 
+  // Only a show rule offers the overlay scope. A season or episode rule's own
+  // members already sit below the show, so a scope left behind by switching the
+  // media type is not stored, and a client that sends none gets every level.
+  it.each([
+    ['show', 'show_only', 'show_only'],
+    ['show', undefined, 'all'],
+    ['season', 'show_only', 'all'],
+  ] as const)(
+    'stores the overlay scope of a new %s rule group (sent %s, stored %s)',
+    async (dataType, overlayScope, stored) => {
+      const createCollection = jest
+        .fn()
+        .mockResolvedValue({ dbCollection: { id: 99 } });
+
+      const service = createRulesService({
+        rulesRepository: { save: jest.fn().mockResolvedValue(undefined) },
+        collectionService: { createCollection },
+        mediaServerFactory: createMediaServerFactory([
+          { id: '2', title: 'Shows', type: 'show' },
+        ]),
+      });
+
+      jest.spyOn(service as any, 'createOrUpdateGroup').mockResolvedValue(7);
+
+      await service.setRules({
+        libraryId: '2',
+        name: 'Scoped overlays',
+        description: '',
+        useRules: true,
+        isActive: true,
+        dataType,
+        rules: validRules,
+        collection: {
+          keepLogsForMonths: 6,
+          overlayEnabled: true,
+          overlayScope,
+        },
+      } as any);
+
+      expect(createCollection).toHaveBeenCalledWith(
+        expect.objectContaining({ type: dataType, overlayScope: stored }),
+      );
+    },
+  );
+
   // Mirrors the forceSeerr clamp: the checkbox is hidden for an action that
   // strands nothing, so a value left over from switching action after ticking it
   // must not be stored - a filesystem delete may not end up enabled unseen.
