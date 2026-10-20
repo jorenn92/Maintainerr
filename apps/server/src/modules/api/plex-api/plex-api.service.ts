@@ -665,8 +665,9 @@ export class PlexApiService {
       }
 
       if (options.includeChildren || options.includeExternalMedia) {
+        // Keep external ratings without scheduling background metadata work
+        // during rule evaluation (#3976).
         queryParams.set('includeExternalMedia', '1');
-        queryParams.set('asyncAugmentMetadata', '1');
       }
 
       const queryString = queryParams.toString();
@@ -732,7 +733,7 @@ export class PlexApiService {
   public resetMetadataCache(mediaId: string) {
     // getMetadata appends the caller's options to the uri, and the rule getter
     // always passes includeExternalMedia - so its entries are cached under
-    // `?includeExternalMedia=1&asyncAugmentMetadata=1`, which the bare-uri
+    // `?includeExternalMedia=1`, which the bare-uri
     // delete this used to do never matched. Rules testing flushed nothing on
     // the one path that caches, and served pre-change metadata for the TTL.
     // Drop every option variant for this id instead.

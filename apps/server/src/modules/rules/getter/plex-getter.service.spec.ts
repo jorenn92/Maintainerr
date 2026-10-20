@@ -1216,14 +1216,18 @@ describe('PlexGetterService', () => {
         }),
       );
 
+      const mediaItem = createMediaItem({ type: 'movie' });
       const result = await service.get(
         rule.id,
-        createMediaItem({ type: 'movie' }),
+        mediaItem,
         'movie',
         createRuleGroupDto({ dataType: 'movie' }),
       );
 
       expect(result).toBe(rule.expected);
+      expect(plexApi.getMetadata).toHaveBeenCalledWith(mediaItem.id, {
+        includeExternalMedia: true,
+      });
     });
 
     it.each([
@@ -1529,45 +1533,52 @@ describe('PlexGetterService', () => {
     });
   });
 
-  it('requests external media metadata for show IMDb ratings', async () => {
-    const mediaItem = createMediaItem({ id: PLEX_ITEM_ID, type: 'episode' });
+  it.each(['season', 'episode'] as const)(
+    'requests external media metadata for show IMDb ratings from a %s',
+    async (mediaType) => {
+      const mediaItem = createMediaItem({ id: PLEX_ITEM_ID, type: mediaType });
+      const showKey =
+        mediaType === 'season'
+          ? { parentRatingKey: 'show-1' }
+          : { grandparentRatingKey: 'show-1' };
 
-    plexApi.getMetadata
-      .mockResolvedValueOnce(
-        makeMetadata({
-          ratingKey: PLEX_ITEM_ID,
-          type: 'episode',
-          title: 'Episode 1',
-          grandparentRatingKey: 'show-1',
-        }),
-      )
-      .mockResolvedValueOnce(
-        makeMetadata({
-          ratingKey: 'show-1',
-          type: 'show',
-          title: 'Test Show',
-          guid: 'guid-show',
-          Rating: [
-            { image: 'imdb://image.rating', type: 'audience', value: 8.2 },
-          ],
-        }),
+      plexApi.getMetadata
+        .mockResolvedValueOnce(
+          makeMetadata({
+            ratingKey: PLEX_ITEM_ID,
+            type: mediaType,
+            title: 'Child Item',
+            ...showKey,
+          }),
+        )
+        .mockResolvedValueOnce(
+          makeMetadata({
+            ratingKey: 'show-1',
+            type: 'show',
+            title: 'Test Show',
+            guid: 'guid-show',
+            Rating: [
+              { image: 'imdb://image.rating', type: 'audience', value: 8.2 },
+            ],
+          }),
+        );
+
+      const result = await service.get(
+        35,
+        mediaItem,
+        mediaType,
+        createRuleGroupDto({ dataType: 'show' }),
       );
 
-    const result = await service.get(
-      35,
-      mediaItem,
-      'episode',
-      createRuleGroupDto({ dataType: 'show' }),
-    );
-
-    expect(result).toBe(8.2);
-    expect(plexApi.getMetadata).toHaveBeenNthCalledWith(1, PLEX_ITEM_ID, {
-      includeExternalMedia: true,
-    });
-    expect(plexApi.getMetadata).toHaveBeenNthCalledWith(2, 'show-1', {
-      includeExternalMedia: true,
-    });
-  });
+      expect(result).toBe(8.2);
+      expect(plexApi.getMetadata).toHaveBeenNthCalledWith(1, PLEX_ITEM_ID, {
+        includeExternalMedia: true,
+      });
+      expect(plexApi.getMetadata).toHaveBeenNthCalledWith(2, 'show-1', {
+        includeExternalMedia: true,
+      });
+    },
+  );
 
   describe('collection_siblings_lastViewedAt (id 44)', () => {
     const COLLECTION_SIBLINGS_PROP_ID = 44;
