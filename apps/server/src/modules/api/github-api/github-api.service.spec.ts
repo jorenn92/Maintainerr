@@ -4,7 +4,6 @@ import { GitHubApiService } from './github-api.service';
 
 const cacheSet = jest.fn();
 const cacheGet = jest.fn();
-const getLatestRelease = jest.fn();
 
 jest.mock('../../logging/logs.service', () => ({
   MaintainerrLogger: class MaintainerrLogger {},
@@ -38,30 +37,6 @@ jest.mock('fs/promises', () => ({
   writeFile: jest.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('@octokit/plugin-throttling', () => ({
-  throttling: {},
-}));
-
-jest.mock('octokit', () => {
-  class MockOctokit {
-    public rest = {
-      repos: {
-        getLatestRelease,
-        getCommit: jest.fn(),
-        listReleases: jest.fn(),
-      },
-    };
-
-    static plugin() {
-      return MockOctokit;
-    }
-  }
-
-  return {
-    Octokit: MockOctokit,
-  };
-});
-
 describe('GitHubApiService', () => {
   const actualDateNow = Date.now;
 
@@ -75,7 +50,6 @@ describe('GitHubApiService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    getLatestRelease.mockReset();
 
     logger = {
       setContext: jest.fn(),

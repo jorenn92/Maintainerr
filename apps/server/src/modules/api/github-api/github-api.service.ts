@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { throttling } from '@octokit/plugin-throttling';
 import { existsSync, readFileSync, renameSync } from 'fs';
 import { writeFile } from 'fs/promises';
-import { Octokit } from 'octokit';
 import { join } from 'path';
 import { dataDir } from '../../../app/config/dataDir';
 import { MaintainerrLogger } from '../../logging/logs.service';
+import { ExternalApiService } from '../external-api/external-api.service';
 import cacheManager from '../lib/cache';
 
 export interface GitHubRelease {
@@ -24,67 +23,26 @@ export interface GitHubCommit {
 type PersistedCacheEntry = { value: unknown; expiresAt: number };
 
 @Injectable()
-export class GitHubApiService {
-  private octokit: Octokit;
-  private cache = cacheManager.getCache('github');
+export class GitHubApiService extends ExternalApiService {
+  private githubCache = cacheManager.getCache('github');
   private readonly cacheFilePath = join(dataDir, 'github-cache.json');
   private persistedEntries: Record<string, PersistedCacheEntry> = {};
   private persistQueue: Promise<void> = Promise.resolve();
 
-  constructor(private readonly logger: MaintainerrLogger) {
+  constructor(protected readonly logger: MaintainerrLogger) {
     logger.setContext(GitHubApiService.name);
+    const token = process.env.GITHUB_TOKEN;
+    super('https://api.github.com', {}, logger, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
     this.loadPersistedCache();
 
-    // Create Octokit instance with throttling plugin
-    const OctokitWithPlugins = Octokit.plugin(throttling);
-
-    const octokitOptions: ConstructorParameters<typeof OctokitWithPlugins>[0] =
-      {
-        throttle: {
-          onRateLimit: (retryAfter, options, octokit, retryCount) => {
-            logger.warn(
-              `Request quota exhausted for ${options.method} ${options.url}`,
-            );
-
-            // Deliberately tighter than MAX_RATE_LIMIT_WAIT_MS: getReleases is
-            // served synchronously from app.controller, and unauthenticated
-            // GitHub allows only 60 requests an hour, so the wait it names is
-            // routinely minutes rather than seconds.
-            if (retryAfter && retryAfter > 10) {
-              logger.error(
-                `Aborting retry for ${options.method} ${options.url} due to long wait time of ${retryAfter} seconds`,
-              );
-              return false;
-            }
-
-            // Retry the first time, then give up
-            if (retryCount < 1) {
-              logger.log(`Retrying after ${retryAfter} seconds`);
-              return true;
-            }
-
-            logger.warn(
-              `Rate limit retry exhausted for ${options.method} ${options.url}`,
-            );
-            return false;
-          },
-          onSecondaryRateLimit: (retryAfter, options) => {
-            logger.warn(
-              `Secondary rate limit detected for ${options.method} ${options.url}`,
-            );
-            // Don't retry on secondary rate limits
-            return false;
-          },
-        },
-      };
-
-    // Add GitHub PAT if provided via environment variable
-    if (process.env.GITHUB_TOKEN) {
-      octokitOptions.auth = process.env.GITHUB_TOKEN;
+    if (token) {
       logger.log('GitHub API authentication configured with provided token');
     }
-
-    this.octokit = new OctokitWithPlugins(octokitOptions);
   }
 
   private quarantineCorruptCacheFile(): void {
@@ -113,7 +71,7 @@ export class GitHubApiService {
       for (const [key, { value, expiresAt }] of Object.entries(entries)) {
         const remainingTtl = Math.floor((expiresAt - now) / 1000);
         if (remainingTtl > 0) {
-          this.cache?.data.set(key, value, remainingTtl);
+          this.githubCache?.data.set(key, value, remainingTtl);
           this.persistedEntries[key] = { value, expiresAt };
         }
       }
@@ -154,7 +112,7 @@ export class GitHubApiService {
       }
     }
 
-    const ttlMs = (this.cache?.data.options.stdTTL ?? 86400) * 1000;
+    const ttlMs = (this.githubCache?.data.options.stdTTL ?? 86400) * 1000;
     this.persistedEntries[key] = { value, expiresAt: now + ttlMs };
 
     this.queuePersistedCacheWrite({ ...this.persistedEntries });
@@ -171,27 +129,22 @@ export class GitHubApiService {
     repo: string,
   ): Promise<GitHubRelease | undefined> {
     const cacheKey = `release:${owner}/${repo}:latest`;
-    const cached = this.cache?.data.get<GitHubRelease>(cacheKey);
+    const cached = this.githubCache?.data.get<GitHubRelease>(cacheKey);
     if (cached) {
       return cached;
     }
 
-    try {
-      const response = await this.octokit.rest.repos.getLatestRelease({
-        owner,
-        repo,
-      });
-      const release = response.data as GitHubRelease;
-
-      this.cache?.data.set(cacheKey, release);
-      this.persistCacheEntry(cacheKey, release);
-
-      return release;
-    } catch (error) {
-      this.logger.debug(`Failed to fetch latest release for ${owner}/${repo}`);
-      this.logger.debug(error);
+    const release = await this.getWithoutCache<GitHubRelease>(
+      `/repos/${owner}/${repo}/releases/latest`,
+    );
+    if (!release) {
       return undefined;
     }
+
+    this.githubCache?.data.set(cacheKey, release);
+    this.persistCacheEntry(cacheKey, release);
+
+    return release;
   }
 
   /**
@@ -207,28 +160,24 @@ export class GitHubApiService {
     ref: string,
   ): Promise<GitHubCommit | undefined> {
     const cacheKey = `commit:${owner}/${repo}:${ref}`;
-    const cached = this.cache?.data.get<GitHubCommit>(cacheKey);
+    const cached = this.githubCache?.data.get<GitHubCommit>(cacheKey);
     if (cached) {
       return cached;
     }
 
-    try {
-      const response = await this.octokit.rest.repos.getCommit({
-        owner,
-        repo,
-        ref,
-      });
-      const commit = { sha: response.data.sha };
-
-      this.cache?.data.set(cacheKey, commit);
-      this.persistCacheEntry(cacheKey, commit);
-
-      return commit;
-    } catch (error) {
-      this.logger.debug(`Failed to fetch commit ${ref} for ${owner}/${repo}`);
-      this.logger.debug(error);
+    const response = await this.getWithoutCache<GitHubCommit>(
+      `/repos/${owner}/${repo}/commits/${ref}`,
+    );
+    if (!response) {
       return undefined;
     }
+
+    const commit = { sha: response.sha };
+
+    this.githubCache?.data.set(cacheKey, commit);
+    this.persistCacheEntry(cacheKey, commit);
+
+    return commit;
   }
 
   /**
@@ -244,27 +193,22 @@ export class GitHubApiService {
     perPage: number = 10,
   ): Promise<GitHubRelease[] | undefined> {
     const cacheKey = `releases:${owner}/${repo}:${perPage}`;
-    const cached = this.cache?.data.get<GitHubRelease[]>(cacheKey);
+    const cached = this.githubCache?.data.get<GitHubRelease[]>(cacheKey);
     if (cached) {
       return cached;
     }
 
-    try {
-      const response = await this.octokit.rest.repos.listReleases({
-        owner,
-        repo,
-        per_page: perPage,
-      });
-      const releases = response.data as GitHubRelease[];
-
-      this.cache?.data.set(cacheKey, releases);
-      this.persistCacheEntry(cacheKey, releases);
-
-      return releases;
-    } catch (error) {
-      this.logger.debug(`Failed to fetch releases for ${owner}/${repo}`);
-      this.logger.debug(error);
+    const releases = await this.getWithoutCache<GitHubRelease[]>(
+      `/repos/${owner}/${repo}/releases`,
+      { params: { per_page: perPage } },
+    );
+    if (!releases) {
       return undefined;
     }
+
+    this.githubCache?.data.set(cacheKey, releases);
+    this.persistCacheEntry(cacheKey, releases);
+
+    return releases;
   }
 }

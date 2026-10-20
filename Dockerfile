@@ -86,9 +86,12 @@ RUN mkdir -m 777 /opt/data && \
     mkdir -m 777 /opt/data/logs && \
     chown -R node:node /opt/data
 
-# Runtime libraries for node-canvas, and curl for the health check. npm is
-# never run here, so it and the packages it bundles are removed.
-RUN apk --update --no-cache add \
+# Runtime libraries for node-canvas, and curl for the health check. The base
+# image only picks up Alpine's security fixes when it is next rebuilt, so the
+# packages it ships are upgraded here. npm is never run here, so it and the
+# packages it bundles are removed.
+RUN apk --no-cache upgrade && \
+    apk --update --no-cache add \
     curl \
     cairo \
     pango \
