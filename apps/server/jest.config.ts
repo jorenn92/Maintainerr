@@ -20,7 +20,7 @@ const config: Config = {
     ],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(@nestjs|@octokit|octokit|bottleneck|@jellyfin/sdk|@faker-js/faker)/)',
+    'node_modules/(?!(@nestjs|@jellyfin/sdk|@faker-js/faker)/)',
     '/packages/contracts/dist/',
   ],
   collectCoverageFrom: ['**/*.ts'],
