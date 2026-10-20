@@ -654,25 +654,13 @@ export class PlexApiService {
 
   public async getMetadata(
     key: string,
-    options: { includeChildren?: boolean; includeExternalMedia?: boolean } = {},
     useCache: boolean = true,
   ): Promise<PlexMetadata> {
     try {
-      const queryParams = new URLSearchParams();
-
-      if (options.includeChildren) {
-        queryParams.set('includeChildren', '1');
-      }
-
-      if (options.includeChildren || options.includeExternalMedia) {
-        queryParams.set('includeExternalMedia', '1');
-        queryParams.set('asyncAugmentMetadata', '1');
-      }
-
-      const queryString = queryParams.toString();
-
+      // Plain on purpose: asyncAugmentMetadata starts a Plex activity per read,
+      // and a rule run reads every item in the library (#3976).
       const response = await this.plexClient.query<PlexMetadataResponse>(
-        `/library/metadata/${key}${queryString.length > 0 ? `?${queryString}` : ''}`,
+        `/library/metadata/${key}`,
         useCache,
       );
       if (response) {
@@ -730,12 +718,6 @@ export class PlexApiService {
   }
 
   public resetMetadataCache(mediaId: string) {
-    // getMetadata appends the caller's options to the uri, and the rule getter
-    // always passes includeExternalMedia - so its entries are cached under
-    // `?includeExternalMedia=1&asyncAugmentMetadata=1`, which the bare-uri
-    // delete this used to do never matched. Rules testing flushed nothing on
-    // the one path that caches, and served pre-change metadata for the TTL.
-    // Drop every option variant for this id instead.
     const cache = cacheManager.getCache('plexguid').data;
     const metadataUriPrefix = '/library/metadata/';
     // Watch state goes too, like the Jellyfin and Emby resets already do.

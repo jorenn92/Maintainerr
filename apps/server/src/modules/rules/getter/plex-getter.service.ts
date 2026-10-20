@@ -35,7 +35,6 @@ import { MetadataRuleValueService } from './metadata-rule-value.service';
 @Injectable()
 export class PlexGetterService {
   plexProperties: Property[];
-  private readonly metadataRequestOptions = { includeExternalMedia: true };
 
   constructor(
     private readonly plexApi: PlexApiService,
@@ -74,10 +73,7 @@ export class PlexGetterService {
 
       // fetch metadata, parent & grandparent from cache, this data is more complete
       // libItem.id maps to Plex's ratingKey
-      const metadata: PlexMetadata = await this.plexApi.getMetadata(
-        libItem.id,
-        this.metadataRequestOptions,
-      );
+      const metadata: PlexMetadata = await this.plexApi.getMetadata(libItem.id);
 
       // Parent/grandparent metadata is only needed for some properties.
       // Lazy-load and memoize so we don't fetch unless a case uses it. Only a
@@ -87,7 +83,7 @@ export class PlexGetterService {
       const getParent = async (): Promise<PlexMetadata | undefined> => {
         if (!metadata?.parentRatingKey) return undefined;
         parentPromise ??= this.plexApi
-          .getMetadata(metadata.parentRatingKey, this.metadataRequestOptions)
+          .getMetadata(metadata.parentRatingKey)
           .then(requireRuleParent);
         return parentPromise;
       };
@@ -96,10 +92,7 @@ export class PlexGetterService {
       const getGrandparent = async (): Promise<PlexMetadata | undefined> => {
         if (!metadata?.grandparentRatingKey) return undefined;
         grandparentPromise ??= this.plexApi
-          .getMetadata(
-            metadata.grandparentRatingKey,
-            this.metadataRequestOptions,
-          )
+          .getMetadata(metadata.grandparentRatingKey)
           .then(requireRuleParent);
         return grandparentPromise;
       };
