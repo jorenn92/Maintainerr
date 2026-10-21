@@ -212,6 +212,54 @@ describe('database migrations', () => {
     expect(src).toContain('CREATE TABLE "temporary_collection"');
   });
 
+  // MoveExclusionTagToServers copies each service's exclusion tag settings onto
+  // its servers between its rebuilds. That data step is checked here by name,
+  // so it keeps its coverage after newer migrations land.
+  it('carry the exclusion tag settings onto every server (MoveExclusionTagToServers)', async () => {
+    const at = all.findIndex((m) =>
+      m.file.endsWith('-MoveExclusionTagToServers.ts'),
+    );
+    expect(at).toBeGreaterThan(0);
+    const ds = await makeDS(all.slice(0, at).map((m) => m.cls)).initialize();
+    try {
+      await ds.runMigrations();
+      await ds.query(
+        `INSERT INTO settings ("id", "applicationTitle", "applicationUrl", "locale", "metadata_provider_preference", "seerr_url", "seerr_api_key", "radarr_tag_exclusions", "radarr_exclusion_tag") VALUES (1, 'Media Manager', 'http://localhost:6246', 'en', 'tmdb_primary', 'http://seerr.local', 'seerr-key', 1, 'keep')`,
+      );
+      await ds.query(
+        `INSERT INTO radarr_settings ("id", "serverName") VALUES (1, 'HD')`,
+      );
+      await ds.query(
+        `INSERT INTO collection ("libraryId", "title", "type", "mediaServerType", "radarrSettingsId") VALUES ('1', 'Sample Collection', 'movie', 'plex', 1)`,
+      );
+
+      // Wrapped as the migration executor does, which turns foreign keys off
+      // so a rebuilt table may be one that other rows reference.
+      const runner = ds.createQueryRunner();
+      await runner.beforeMigration();
+      await new all[at].cls().up(runner);
+      await runner.afterMigration();
+      await runner.release();
+
+      const [settings] = await ds.query(`SELECT * FROM settings`);
+      expect(settings).toMatchObject({
+        applicationTitle: 'Media Manager',
+        seerr_url: 'http://seerr.local',
+        seerr_api_key: 'seerr-key',
+      });
+      // The server takes over the tag settings its service had.
+      const [server] = await ds.query(`SELECT * FROM radarr_settings`);
+      expect(server).toMatchObject({ tagExclusions: 1, exclusionTag: 'keep' });
+      const [collection] = await ds.query(`SELECT * FROM collection`);
+      expect(collection).toMatchObject({
+        title: 'Sample Collection',
+        radarrSettingsId: 1,
+      });
+    } finally {
+      await ds.destroy();
+    }
+  });
+
   // The rebuild in (3) drops and recreates the tables, so its INSERT...SELECT is
   // the only thing carrying an existing install's rows across. Every other test
   // here migrates an empty DB, where a rebuild that copies nothing looks
