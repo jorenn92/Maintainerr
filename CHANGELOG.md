@@ -1,3 +1,23 @@
+# [3.31.0](https://github.com/Maintainerr/Maintainerr/compare/v3.30.2...v3.31.0) (2026-10-21)
+
+
+### Features
+
+- feat(rules): add Seerr watchlist rules (#3975)
+
+### Fixes
+
+- fix: build the image on Node 26.12.1 to distrust compromised eMudhra CAs (#3994)
+- fix: ship patched Alpine packages and remove flagged dependencies (#3983)
+- fix(sonarr): match an episode by its file before its numbers or TVDB id (#3897)
+- fix(plex): avoid metadata augmentation during rule evaluation (#3977)
+- fix(tvdb): log in again after a failed login (#3964)
+- fix(tvdb): start while TVDB is unreachable (#3963)
+
+### Dependencies
+
+- 24 dependency updates (knip, nodemailer, konva, @tanstack/eslint-plugin-query, follow-redirects, jsdom, @tanstack/react-query, @hookform/resolvers, @eslint-react/eslint-plugin, @jellyfin/sdk, …)
+
 # [3.30.2](https://github.com/Maintainerr/Maintainerr/compare/v3.30.1...v3.30.2) (2026-10-18)
 
 
