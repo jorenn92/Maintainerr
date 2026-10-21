@@ -23,11 +23,13 @@ import {
 } from './interfaces/tvdb.interface';
 
 const TVDB_BASE_URL = 'https://api4.thetvdb.com/v4';
+const LOGIN_RETRY_MS = 15 * 60 * 1000;
 
 @Injectable()
 export class TvdbApiService extends ExternalApiService {
   private bearerToken: string | undefined;
   private refreshPromise: Promise<boolean> | undefined;
+  private loginRetryAt: number | undefined;
 
   constructor(
     private readonly settings: SettingsDataService,
@@ -39,10 +41,12 @@ export class TvdbApiService extends ExternalApiService {
     });
   }
 
-  async onApplicationBootstrap() {
+  onApplicationBootstrap() {
     const customKey = this.settings.tvdb_api_key;
     if (customKey) {
-      await this.authenticate(customKey);
+      // Not awaited: Nest opens the port only once every bootstrap hook has
+      // settled, so an unreachable TVDB kept the whole app offline (#3936).
+      void this.authenticate(customKey);
     }
   }
 
@@ -83,6 +87,11 @@ export class TvdbApiService extends ExternalApiService {
 
       return response.data?.data?.token;
     } catch (error) {
+      // A rejected key stays rejected; anything else, such as an outage, is
+      // worth another try.
+      this.loginRetryAt = this.isUnauthorizedError(error)
+        ? undefined
+        : Date.now() + LOGIN_RETRY_MS;
       this.logger.warn('TVDB authentication failed');
       this.logger.debug(error);
       return undefined;
@@ -94,6 +103,12 @@ export class TvdbApiService extends ExternalApiService {
     options?: { preserveAuthOnFailure?: boolean },
   ): Promise<boolean> {
     const token = await this.requestToken(apiKey);
+
+    // The key was replaced or removed while this login was in flight; its
+    // answer is stale.
+    if (apiKey !== this.settings.tvdb_api_key) {
+      return false;
+    }
 
     if (token) {
       this.updateBearerToken(token);
@@ -216,6 +231,17 @@ export class TvdbApiService extends ExternalApiService {
   }
 
   public isAvailable(): boolean {
+    // Only a 401 logs in again, and TVDB is never asked without a token, so
+    // nothing else would retry a failed login.
+    if (
+      this.bearerToken === undefined &&
+      this.loginRetryAt !== undefined &&
+      Date.now() >= this.loginRetryAt
+    ) {
+      this.loginRetryAt = undefined;
+      void this.refreshAuthentication();
+    }
+
     return this.bearerToken !== undefined;
   }
 

@@ -1,6 +1,6 @@
 # Plain -alpine, not -alpine3.x: Dependabot only offers tags with the same
 # suffix, and a versioned one stops once the Node images drop that Alpine.
-FROM node:26.11.1-alpine@sha256:143494b1da2945f061539253adc65e4f1569ddf07da2d384c022c791a9d90a4a AS base
+FROM node:26.12.1-alpine@sha256:9bd229b644e391df00fb989efa732335aefc6170a05d8c163c5c8ca9870da401 AS base
 LABEL Description="Contains the Maintainerr Docker image"
 
 FROM base AS builder
@@ -86,9 +86,12 @@ RUN mkdir -m 777 /opt/data && \
     mkdir -m 777 /opt/data/logs && \
     chown -R node:node /opt/data
 
-# Runtime libraries for node-canvas, and curl for the health check. npm is
-# never run here, so it and the packages it bundles are removed.
-RUN apk --update --no-cache add \
+# Runtime libraries for node-canvas, and curl for the health check. The base
+# image only picks up Alpine's security fixes when it is next rebuilt, so the
+# packages it ships are upgraded here. npm is never run here, so it and the
+# packages it bundles are removed.
+RUN apk --no-cache upgrade && \
+    apk --update --no-cache add \
     curl \
     cairo \
     pango \

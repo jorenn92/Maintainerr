@@ -529,6 +529,80 @@ describe('SeerrApiService', () => {
     });
   });
 
+  describe('getWatchlistedByUsernames (run-scoped index)', () => {
+    const users = {
+      pageInfo: { page: 1, pages: 1, pageSize: 50, results: 2 },
+      results: [
+        { id: 1, plexUsername: 'PlexUser', displayName: 'PlexUser' },
+        { id: 2, username: null, displayName: 'local@example.com' },
+      ],
+    };
+    const watchlist = (
+      results: { tmdbId?: number; mediaType: 'movie' | 'tv' }[],
+      totalPages = 1,
+    ) => ({ page: 1, totalPages, totalResults: results.length, results });
+
+    beforeEach(() => {
+      cacheManager.getCache(SEERR_REQUESTS_CACHE_ID)?.data.flushAll();
+    });
+
+    it('indexes every page of every user by title', async () => {
+      const responses: Record<string, unknown> = {
+        '/user?take=50&skip=0': users,
+        '/user/1/watchlist?page=1': watchlist(
+          [{ tmdbId: 100, mediaType: 'movie' }],
+          2,
+        ),
+        '/user/1/watchlist?page=2': watchlist([
+          { tmdbId: 100, mediaType: 'tv' },
+        ]),
+        '/user/2/watchlist?page=1': watchlist([
+          { tmdbId: 100, mediaType: 'movie' },
+          { mediaType: 'movie' },
+        ]),
+      };
+      (service as unknown as { api: unknown }).api = {
+        getWithoutCache: jest.fn((url: string) =>
+          Promise.resolve(responses[url]),
+        ),
+      };
+
+      await expect(
+        service.getWatchlistedByUsernames(100, 'movie'),
+      ).resolves.toEqual(['PlexUser', 'local@example.com']);
+      await expect(
+        service.getWatchlistedByUsernames(100, 'tv'),
+      ).resolves.toEqual(['PlexUser']);
+      await expect(
+        service.getWatchlistedByUsernames(999, 'movie'),
+      ).resolves.toEqual([]);
+    });
+
+    // A user whose watchlist could not be read must not look like one who
+    // never added the title, so nothing is answered.
+    it.each([
+      ['the user listing', '/user?take=50&skip=0'],
+      ['one watchlist page', '/user/2/watchlist?page=1'],
+    ])('answers undefined when %s fails', async (_, failingUrl) => {
+      const responses: Record<string, unknown> = {
+        '/user?take=50&skip=0': users,
+        '/user/1/watchlist?page=1': watchlist([
+          { tmdbId: 100, mediaType: 'movie' },
+        ]),
+        '/user/2/watchlist?page=1': watchlist([]),
+      };
+      (service as unknown as { api: unknown }).api = {
+        getWithoutCache: jest.fn((url: string) =>
+          Promise.resolve(url === failingUrl ? undefined : responses[url]),
+        ),
+      };
+
+      await expect(
+        service.getWatchlistedByUsernames(100, 'movie'),
+      ).resolves.toBeUndefined();
+    });
+  });
+
   describe('getRequestedByUsernames', () => {
     const requestedBy = (
       id: number,

@@ -101,19 +101,17 @@ describe('PlexApiService.getMetadata', () => {
     } as any);
   });
 
-  it('requests external media enrichment when includeExternalMedia is enabled', async () => {
+  // Reading metadata must not start Plex background augmentation (#3976).
+  it('reads metadata without starting augmentation', async () => {
     const query = jest.fn().mockResolvedValue({
       MediaContainer: { Metadata: [{ ratingKey: '123' }] },
     });
 
     (service as any).plexClient = { query };
 
-    await service.getMetadata('123', { includeExternalMedia: true });
+    await service.getMetadata('123');
 
-    expect(query).toHaveBeenCalledWith(
-      '/library/metadata/123?includeExternalMedia=1&asyncAugmentMetadata=1',
-      true,
-    );
+    expect(query).toHaveBeenCalledWith('/library/metadata/123', true);
   });
 
   // A membership decision made from a stale child list has already produced
@@ -1419,15 +1417,8 @@ describe('PlexApiService.resetMetadataCache', () => {
     (cache as unknown as { flushAll: () => void }).flushAll();
   });
 
-  // The rule getter always passes includeExternalMedia, so its entries land
-  // under a query-string uri. Deleting only the bare uri invalidated nothing on
-  // the one path that caches, and rules testing kept serving stale metadata.
-  it('drops every option variant for the item, and nothing else', () => {
-    const withOptions = key(
-      '/library/metadata/12?includeExternalMedia=1&asyncAugmentMetadata=1',
-    );
+  it('drops the item, and nothing else', () => {
     cache.set(key('/library/metadata/12'), 'bare');
-    cache.set(withOptions, 'from the rule getter');
     cache.set(key('/library/metadata/12/children'), 'children');
     cache.set(key('/library/metadata/123'), 'a different item');
 

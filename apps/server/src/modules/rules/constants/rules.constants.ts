@@ -1198,6 +1198,22 @@ export class RuleConstants {
           mediaType: MediaType.BOTH,
           type: RuleType.BOOL,
         },
+        // Seerr keeps a watchlist for Jellyfin, Emby and local users and
+        // serves Plex users their plex.tv one, so this works on every server.
+        {
+          id: 7,
+          name: 'watchlist_isListedByUsers',
+          humanName: '[list] Watchlisted by (username)',
+          mediaType: MediaType.BOTH,
+          type: RuleType.TEXT_LIST,
+        },
+        {
+          id: 8,
+          name: 'watchlist_isWatchlisted',
+          humanName: 'Is Watchlisted',
+          mediaType: MediaType.BOTH,
+          type: RuleType.BOOL,
+        },
       ],
     },
     {

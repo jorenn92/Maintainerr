@@ -278,9 +278,8 @@ describe('PlexGetterService', () => {
       );
 
       expect(result).toEqual(rule.expected);
-      expect(plexApi.getMetadata).toHaveBeenCalledWith(metadata.ratingKey, {
-        includeExternalMedia: true,
-      });
+      // A plain read: augmentation flags make Plex queue work per item (#3976).
+      expect(plexApi.getMetadata).toHaveBeenCalledWith(metadata.ratingKey);
     });
 
     it('returns the item lastViewedAt when no history row records that view (id 7)', async () => {
@@ -1227,6 +1226,7 @@ describe('PlexGetterService', () => {
     });
 
     it.each([
+      { id: 35, name: 'rating_imdbShow', expected: 8.8 },
       { id: 36, name: 'rating_rottenTomatoesCriticShow', expected: 7.2 },
       { id: 37, name: 'rating_rottenTomatoesAudienceShow', expected: 8.5 },
       { id: 38, name: 'rating_tmdbShow', expected: 8.3 },
@@ -1526,46 +1526,6 @@ describe('PlexGetterService', () => {
       const result = await service.get(MARKED_WATCHED_PROP_ID, libItem);
 
       expect(result).toBe(22);
-    });
-  });
-
-  it('requests external media metadata for show IMDb ratings', async () => {
-    const mediaItem = createMediaItem({ id: PLEX_ITEM_ID, type: 'episode' });
-
-    plexApi.getMetadata
-      .mockResolvedValueOnce(
-        makeMetadata({
-          ratingKey: PLEX_ITEM_ID,
-          type: 'episode',
-          title: 'Episode 1',
-          grandparentRatingKey: 'show-1',
-        }),
-      )
-      .mockResolvedValueOnce(
-        makeMetadata({
-          ratingKey: 'show-1',
-          type: 'show',
-          title: 'Test Show',
-          guid: 'guid-show',
-          Rating: [
-            { image: 'imdb://image.rating', type: 'audience', value: 8.2 },
-          ],
-        }),
-      );
-
-    const result = await service.get(
-      35,
-      mediaItem,
-      'episode',
-      createRuleGroupDto({ dataType: 'show' }),
-    );
-
-    expect(result).toBe(8.2);
-    expect(plexApi.getMetadata).toHaveBeenNthCalledWith(1, PLEX_ITEM_ID, {
-      includeExternalMedia: true,
-    });
-    expect(plexApi.getMetadata).toHaveBeenNthCalledWith(2, 'show-1', {
-      includeExternalMedia: true,
     });
   });
 

@@ -22,6 +22,7 @@ import {
   SEERR_REQUESTS_CACHE_ID,
   SEERR_REQUESTS_CACHE_KEY,
   SEERR_REQUESTS_PAGE_SIZE,
+  SEERR_WATCHLIST_CACHE_KEY,
 } from './seerr-api.constants';
 import { SeerrApi } from './helpers/seerr-api.helper';
 
@@ -195,6 +196,7 @@ interface SeerrUserResponseResult {
   id: number;
   email: string;
   plexUsername: string;
+  jellyfinUsername?: string;
   username: string;
   userType: number;
   plexId: number;
@@ -215,15 +217,22 @@ interface SeerrRequestPageResponse {
   results: SeerrRequest[];
 }
 
+// GET /user/{id}/watchlist: Seerr's stored watchlist, or for a Plex user
+// without one, their plex.tv watchlist. Twenty per page, no size parameter.
+interface SeerrWatchlistResponse {
+  page: number;
+  totalPages: number;
+  totalResults: number;
+  results: { tmdbId?: number; mediaType: 'movie' | 'tv' }[];
+}
+
 @Injectable()
 export class SeerrApiService {
   api: SeerrApi;
 
   // Deduplicates concurrent callers (the first batch of rule-evaluation items)
-  // onto a single /request sweep while the run-scoped index is being built.
-  private requestIndexPromise?: Promise<
-    Map<string, SeerrRequest[]> | undefined
-  >;
+  // onto a single sweep per index while the run-scoped index is being built.
+  private readonly indexBuilds = new Map<string, Promise<unknown>>();
 
   // Seasons removed while the request covering them was kept for its others,
   // by request id: Seerr marks them deleted only at its next availability sync.
@@ -334,7 +343,11 @@ export class SeerrApiService {
     }
   }
 
-  public async getUsers(): Promise<SeerrUserResponseResult[]> {
+  /**
+   * `undefined` when the listing fails, so a caller can tell an unreachable
+   * Seerr from one without users.
+   */
+  public async getUsers(): Promise<SeerrUserResponseResult[] | undefined> {
     try {
       const size = 50;
       let hasNext = true;
@@ -343,11 +356,14 @@ export class SeerrApiService {
       const users: SeerrUserResponseResult[] = [];
 
       while (hasNext) {
-        const resp: SeerrUserResponse = await this.api.get(
+        const resp = await this.api.getWithoutCache<SeerrUserResponse>(
           `/user?take=${size}&skip=${skip}`,
         );
+        if (!resp?.pageInfo) {
+          return undefined;
+        }
 
-        users.push(...resp.results);
+        users.push(...(resp.results ?? []));
 
         if (resp?.pageInfo?.page < resp?.pageInfo?.pages) {
           skip = skip + size;
@@ -364,16 +380,16 @@ export class SeerrApiService {
         `Couldn't fetch Seerr users. Is the application running?`,
         error,
       );
-      return [];
+      return undefined;
     }
   }
 
   /**
    * Fetches every request in a single paginated sweep, mirroring getUsers()'s
-   * pagination. Unlike getUsers() (which collapses errors to []), this returns
-   * `undefined` on failure so the index build can tell a genuinely empty Seerr
-   * (definitive: nothing requested) from an unreachable one (transient: protect
-   * items). `[]` therefore means "Seerr reachable, no requests".
+   * pagination. It returns `undefined` on failure so the index build can tell
+   * a genuinely empty Seerr (definitive: nothing requested) from an unreachable
+   * one (transient: protect items). `[]` therefore means "Seerr reachable, no
+   * requests".
    */
   public async getRequests(): Promise<SeerrRequest[] | undefined> {
     try {
@@ -495,22 +511,111 @@ export class SeerrApiService {
     return [...new Set(usernames)];
   }
 
-  private async getRequestIndex(): Promise<
-    Map<string, SeerrRequest[]> | undefined
-  > {
-    const cache = cacheManager.getCache(SEERR_REQUESTS_CACHE_ID)?.data;
-    const cached = cache?.get<Map<string, SeerrRequest[]>>(
-      SEERR_REQUESTS_CACHE_KEY,
+  /**
+   * Usernames of everyone with a title on their Seerr watchlist, from one
+   * run-scoped sweep of every user's watchlist. `undefined` when any read
+   * fails: a user whose watchlist could not be read must not look like one
+   * who never added the title.
+   */
+  public async getWatchlistedByUsernames(
+    tmdbId: number,
+    type: 'movie' | 'tv',
+  ): Promise<string[] | undefined> {
+    const index = await this.getRunScopedIndex(SEERR_WATCHLIST_CACHE_KEY, () =>
+      this.buildWatchlistIndex(),
     );
+    if (index === undefined) {
+      return undefined;
+    }
+    return [...(index.get(requestIndexKey(type, tmdbId)) ?? [])];
+  }
+
+  private getRequestIndex() {
+    return this.getRunScopedIndex(SEERR_REQUESTS_CACHE_KEY, () =>
+      this.buildRequestIndex(),
+    );
+  }
+
+  /**
+   * Builds an index at most once per rule-group run: it lives in the
+   * seerrrequests cache, which every run flushes, and the first concurrent
+   * batch of callers shares one build. A failed build (undefined) is not
+   * cached, so a later batch in the same run retries it.
+   */
+  private async getRunScopedIndex<T>(
+    key: string,
+    build: () => Promise<T | undefined>,
+  ): Promise<T | undefined> {
+    const cache = cacheManager.getCache(SEERR_REQUESTS_CACHE_ID)?.data;
+    const cached = cache?.get<T>(key);
     if (cached) {
       return cached;
     }
 
-    // Collapse the first concurrent batch of callers onto one sweep.
-    this.requestIndexPromise ??= this.buildRequestIndex().finally(() => {
-      this.requestIndexPromise = undefined;
-    });
-    return this.requestIndexPromise;
+    let pending = this.indexBuilds.get(key) as
+      Promise<T | undefined> | undefined;
+    if (pending === undefined) {
+      pending = build()
+        .then((index) => {
+          if (index !== undefined) {
+            cache?.set(key, index);
+          }
+          return index;
+        })
+        .finally(() => this.indexBuilds.delete(key));
+      this.indexBuilds.set(key, pending);
+    }
+    return pending;
+  }
+
+  private async buildWatchlistIndex(): Promise<
+    Map<string, string[]> | undefined
+  > {
+    const users = await this.getUsers();
+    if (users === undefined) {
+      return undefined;
+    }
+
+    const index = new Map<string, string[]>();
+    for (const user of users) {
+      // The name the requester properties use; a local user without a
+      // username falls back to Seerr's display name.
+      const username =
+        resolveRequestUsername({ requestedBy: user }) ?? user.displayName;
+      let page = 1;
+      let totalPages = 1;
+      while (page <= totalPages) {
+        // Seerr reads a Plex user's plex.tv watchlist itself and answers an
+        // empty one when that read fails, so only Seerr's own failures show.
+        const resp = await this.api.getWithoutCache<SeerrWatchlistResponse>(
+          `/user/${user.id}/watchlist?page=${page}`,
+        );
+        if (!resp?.results) {
+          this.logger.warn(`Couldn't read the Seerr watchlist of ${username}.`);
+          return undefined;
+        }
+
+        for (const item of resp.results) {
+          if (typeof item.tmdbId !== 'number') {
+            continue;
+          }
+          const key = requestIndexKey(item.mediaType, item.tmdbId);
+          const usernames = index.get(key);
+          if (!usernames) {
+            index.set(key, [username]);
+          } else if (!usernames.includes(username)) {
+            usernames.push(username);
+          }
+        }
+        totalPages = resp.totalPages;
+        page++;
+      }
+    }
+
+    this.logger.log(
+      `Seerr watchlist prefetch complete: ${users.length} users, ${index.size} titles.`,
+    );
+    return index;
   }
 
   private async buildRequestIndex(): Promise<
@@ -556,9 +661,6 @@ export class SeerrApiService {
       }
     }
 
-    cacheManager
-      .getCache(SEERR_REQUESTS_CACHE_ID)
-      ?.data.set(SEERR_REQUESTS_CACHE_KEY, index);
     this.logger.log(
       `Seerr request prefetch complete: ${requests.length} requests across ${index.size} titles.`,
     );
