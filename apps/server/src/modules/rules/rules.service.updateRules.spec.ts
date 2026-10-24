@@ -473,6 +473,85 @@ describe('RulesService.updateRules', () => {
     });
   });
 
+  // An older client sends no scope. Widening a narrowed collection back to every
+  // episode would redraw all of them on the next overlay run, so the saved
+  // scope stays. A season rule never keeps a narrower one.
+  it.each([
+    ['a sent scope', 'show', 'show_only', 'all', 'show_only'],
+    [
+      'the saved scope when none is sent',
+      'show',
+      undefined,
+      'show_seasons',
+      'show_seasons',
+    ],
+    [
+      'every level for a season rule',
+      'season',
+      'show_only',
+      'show_only',
+      'all',
+    ],
+  ] as const)(
+    'saves %s as the overlay scope',
+    async (_, dataType, sent, saved, stored) => {
+      const group = { id: 5, collectionId: 42, dataType };
+      const collectionService = {
+        getCollection: jest.fn().mockResolvedValue({
+          id: 42,
+          libraryId: 'lib-2',
+          type: dataType,
+          manualCollection: false,
+          manualCollectionName: '',
+          overlayScope: saved,
+        }),
+        updateCollection: jest
+          .fn()
+          .mockResolvedValue({ dbCollection: { id: 42 } }),
+      };
+
+      const service = createRulesService({
+        rulesRepository: { delete: jest.fn(), save: jest.fn() },
+        ruleGroupRepository: { findOne: jest.fn().mockResolvedValue(group) },
+        collectionMediaRepository: { delete: jest.fn() },
+        exclusionRepo: { delete: jest.fn() },
+        collectionService,
+        mediaServerFactory: {
+          getService: jest.fn().mockReturnValue({
+            getLibraries: jest
+              .fn()
+              .mockResolvedValue([
+                { id: 'lib-2', title: 'Shows', type: 'show' },
+              ]),
+          }),
+        },
+      });
+
+      jest
+        .spyOn(service as any, 'createOrUpdateGroup')
+        .mockResolvedValue(group.id);
+
+      await service.updateRules({
+        id: group.id,
+        libraryId: 'lib-2',
+        dataType,
+        name: 'Scoped overlays',
+        description: '',
+        rules: [],
+        useRules: true,
+        isActive: true,
+        collection: {
+          overlayEnabled: true,
+          ...(sent ? { overlayScope: sent } : {}),
+        },
+      } as any);
+
+      expect(collectionService.updateCollection).toHaveBeenCalledWith(
+        expect.objectContaining({ overlayScope: stored }),
+      );
+    },
+  );
+
   // The rule-group payload is the only way the UI can turn the leftover-folder
   // cleanup off again; updateRules used to drop the field, so an enabled
   // collection could never be switched back.

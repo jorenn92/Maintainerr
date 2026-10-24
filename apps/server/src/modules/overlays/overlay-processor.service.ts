@@ -8,6 +8,7 @@ import {
   overlayModeForType,
   OverlayTemplate,
   OverlayTemplateMode,
+  resolveOverlayScope,
   ServarrAction,
 } from '@maintainerr/contracts';
 import { Injectable } from '@nestjs/common';
@@ -203,12 +204,23 @@ export class OverlayProcessorService {
    *
    * `complete` is false when part of the hierarchy could not be read, so the
    * caller can keep what it drew instead of reverting on a transient failure.
+   *
+   * The collection's overlay scope trims how far down a show this reaches,
+   * and does so by not reading the levels it leaves out: on a large library
+   * that is most of the media-server reads and nearly all of the uploads.
+   * Whatever an earlier, wider scope drew is no longer a target, so the run's
+   * revert pass restores it from the saved original.
    */
   private async collectInheritedTargets(
     collection: Collection & { collectionMedia: CollectionMedia[] },
   ): Promise<{ targets: OverlayTarget[]; complete: boolean }> {
     // Callers only reach this for a collection that deletes on a schedule.
     if (collection.type === 'movie') return { targets: [], complete: true };
+
+    // Only a show collection has a narrower scope, and its members are the
+    // shows: nothing sits above them, so "show only" has nothing to inherit.
+    const scope = resolveOverlayScope(collection.type, collection.overlayScope);
+    if (scope === 'show_only') return { targets: [], complete: true };
 
     const memberDates = new Map<string, Date>();
     for (const member of this.getMemberTargets(collection)) {
@@ -247,23 +259,31 @@ export class OverlayProcessorService {
       });
     };
 
-    // Down: the deletion takes everything under the member with it.
+    const readChildrenOf = async (
+      parentId: string,
+      childType: MediaItemType,
+    ): Promise<MediaItem[]> => {
+      const children = await this.readChildren(
+        mediaServer,
+        parentId,
+        childType,
+      );
+      if (!children) complete = false;
+      return children ?? [];
+    };
+
+    // Down: the deletion takes everything under the member with it. "Show +
+    // seasons" stops at a show's seasons, so no episode list is read.
     for (const member of presence.found.values()) {
       const deleteDate = memberDates.get(member.id);
       if (!deleteDate) continue;
 
-      const descendants = await resolveDescendants(
-        member,
-        async (parentId, childType) => {
-          const children = await this.readChildren(
-            mediaServer,
-            parentId,
-            childType,
-          );
-          if (!children) complete = false;
-          return children ?? [];
-        },
-      );
+      let descendants: MediaItem[] = [];
+      if (scope === 'all') {
+        descendants = await resolveDescendants(member, readChildrenOf);
+      } else if (member.type === 'show') {
+        descendants = await readChildrenOf(member.id, 'season');
+      }
       for (const descendant of descendants) addTarget(descendant, deleteDate);
     }
 
@@ -661,6 +681,17 @@ export class OverlayProcessorService {
       `Collection "${collection.title}" using template "${template.name}" (${mode})`,
     );
 
+    const scope = resolveOverlayScope(collection.type, collection.overlayScope);
+    if (scope === 'show_only') {
+      this.logger.log(
+        `Collection "${collection.title}" overlays its shows only, not their seasons or episodes`,
+      );
+    } else if (scope === 'show_seasons') {
+      this.logger.log(
+        `Collection "${collection.title}" overlays its shows and their seasons, not their episodes`,
+      );
+    }
+
     const inheritedTargets =
       options.inheritedTargets ??
       (await this.collectInheritedTargets(collection)).targets;
@@ -849,12 +880,13 @@ export class OverlayProcessorService {
         }
       }
 
-      // Revert items no longer in any overlay-enabled collection
+      // Revert items no overlay-enabled collection draws on any more: a member
+      // that left, or what a narrower overlay scope no longer reaches.
       const allStates = await this.stateService.getAllStates();
       for (const state of allStates) {
         if (!allCurrentItemIds.has(state.mediaServerId)) {
           this.logger.log(
-            `Item ${state.mediaServerId} no longer in any overlay collection, reverting`,
+            `Item ${state.mediaServerId} is no longer drawn on by any overlay collection, reverting`,
           );
           try {
             const result = await this.revertItemInternal(

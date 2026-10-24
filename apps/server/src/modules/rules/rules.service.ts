@@ -10,6 +10,7 @@ import {
   MediaLibrary,
   MediaServerType,
   normalizeArrTagLabel,
+  resolveOverlayScope,
 } from '@maintainerr/contracts';
 import {
   BadGatewayException,
@@ -525,6 +526,10 @@ export class RulesService {
           mediaServerSort: params.collection?.mediaServerSort ?? null,
           overlayEnabled: params.collection?.overlayEnabled,
           overlayTemplateId: params.collection?.overlayTemplateId ?? null,
+          overlayScope: resolveOverlayScope(
+            collectionType,
+            params.collection?.overlayScope,
+          ),
         })
       )?.dbCollection;
 
@@ -773,6 +778,12 @@ export class RulesService {
           mediaServerSort: params.collection?.mediaServerSort ?? null,
           overlayEnabled: params.collection?.overlayEnabled,
           overlayTemplateId: params.collection?.overlayTemplateId ?? null,
+          // A client that predates the scope leaves it out; keep the saved
+          // one rather than widen it back to every episode on the next run.
+          overlayScope: resolveOverlayScope(
+            collectionType,
+            params.collection?.overlayScope ?? dbCollection?.overlayScope,
+          ),
         };
 
         // If there's no existing collection (e.g., after rule migration), create a new one
